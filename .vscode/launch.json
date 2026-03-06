@@ -1,0 +1,41 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Dev Server (Vite)",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "npm run dev"
+        },
+        {
+            "name": "Debug App (Chrome)",
+            "type": "pwa-chrome",
+            "request": "launch",
+            "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+            "name": "Debug App (Edge)",
+            "type": "pwa-msedge",
+            "request": "launch",
+            "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Run + Debug (Chrome)",
+            "configurations": [
+                "Dev Server (Vite)",
+                "Debug App (Chrome)"
+            ]
+        },
+        {
+            "name": "Run + Debug (Edge)",
+            "configurations": [
+                "Dev Server (Vite)",
+                "Debug App (Edge)"
+            ]
+        }
+    ]
+}
