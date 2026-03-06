@@ -1,7 +1,7 @@
 import { useAtomValue } from "jotai"
 import { useSnapshot } from "valtio"
-import { cn } from "@/utils/utils"
-import { uiSettings } from "@/store/1-ui-settings"
+import { cn } from "@/utils"
+import { appSettings } from "@/store/1-ui-settings"
 import {
     canvasViewBoxAtom,
     parseErrorAtom,
@@ -11,7 +11,7 @@ import {
 } from "@/store/2-svg-path-state"
 
 export function PathCanvas() {
-    const settings = useSnapshot(uiSettings)
+    const settings = useSnapshot(appSettings)
     const pathValue = useAtomValue(svgPathInputAtom)
     const parseError = useAtomValue(parseErrorAtom)
     const strokeWidth = useAtomValue(strokeWidthAtom)

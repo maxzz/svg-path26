@@ -3,7 +3,7 @@ import { useSnapshot } from "valtio"
 import { Toolbar } from "./1-toolbar"
 import { PathCanvas } from "../1-editor/2-canvas"
 import { EditorPanels } from "../1-editor/3-editor-panels"
-import { uiSettings } from "@/store/1-ui-settings"
+import { appSettings } from "@/store/1-ui-settings"
 import {
     commandCountAtom,
     svgPathInputAtom,
@@ -12,7 +12,7 @@ import {
 export function App() {
     const [pathValue, setPathValue] = useAtom(svgPathInputAtom)
     const commandCount = useAtomValue(commandCountAtom)
-    const settings = useSnapshot(uiSettings)
+    const settings = useSnapshot(appSettings)
 
     return (
         <div className="h-screen w-screen overflow-hidden bg-background text-foreground">

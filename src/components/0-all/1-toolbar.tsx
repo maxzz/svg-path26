@@ -17,7 +17,7 @@ import {
     zoomAtom,
 } from "@/store/2-svg-path-state"
 import {
-    uiSettings,
+    appSettings,
     toggleDarkCanvas,
     toggleShowGrid,
     toggleShowHelpers,
@@ -27,7 +27,7 @@ export function Toolbar() {
     const [strokeWidth, setStrokeWidth] = useAtom(strokeWidthAtom)
     const [zoom, setZoom] = useAtom(zoomAtom)
     const minified = useAtomValue(minifyOutputAtom)
-    const settings = useSnapshot(uiSettings)
+    const settings = useSnapshot(appSettings)
     const pathValue = useAtomValue(svgPathInputAtom)
     const canUndo = useAtomValue(canUndoAtom)
     const canRedo = useAtomValue(canRedoAtom)
