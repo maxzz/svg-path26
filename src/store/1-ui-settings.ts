@@ -1,5 +1,5 @@
 import { proxy, subscribe } from "valtio"
-import type { ThemeMode } from "@/utils";
+import { themeApplyMode, type ThemeMode } from "@/utils"
 
 const STORE_KEY = "svg-path26"
 const STORE_VER = "v1"
@@ -33,8 +33,11 @@ function loadSettings(): UiSettings {
 
 export const appSettings = proxy<UiSettings>(loadSettings())
 
+themeApplyMode(appSettings.theme)
+
 subscribe(appSettings, () => {
     try {
+        themeApplyMode(appSettings.theme)
         localStorage.setItem(STORAGE_ID, JSON.stringify(appSettings))
     } catch (error) {
         console.error("Failed to save UI settings", error)

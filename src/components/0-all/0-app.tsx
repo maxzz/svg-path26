@@ -1,6 +1,7 @@
 import { useAtom, useAtomValue } from "jotai"
 import { useSnapshot } from "valtio"
 import { Toolbar } from "./1-toolbar"
+import { ButtonThemeToggle } from "./4-btn-theme-toggle"
 import { PathCanvas } from "../1-editor/2-canvas"
 import { EditorPanels } from "../1-editor/3-editor-panels"
 import { appSettings } from "@/store/1-ui-settings"
@@ -18,10 +19,15 @@ export function App() {
         <div className="h-screen w-screen overflow-hidden bg-background text-foreground">
             <div className="mx-auto flex h-full max-w-6xl flex-col">
                 <header className="border-b px-4 py-3">
-                    <h1 className="text-xl font-semibold">SVG Path Editor</h1>
-                    <p className="text-sm text-muted-foreground">
-                        React + Vite layout using Jotai (path state) and Valtio (UI settings).
-                    </p>
+                    <div className="flex items-start justify-between gap-3">
+                        <div>
+                            <h1 className="text-xl font-semibold">SVG Path Editor</h1>
+                            <p className="text-sm text-muted-foreground">
+                                React + Vite layout using Jotai (path state) and Valtio (UI settings).
+                            </p>
+                        </div>
+                        <ButtonThemeToggle />
+                    </div>
                 </header>
 
                 <Toolbar />
