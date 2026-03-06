@@ -1,8 +1,8 @@
 import { useAtom, useAtomValue } from "jotai"
 import { useSnapshot } from "valtio"
 import { Toolbar } from "./1-toolbar"
-import { PathCanvas } from "./2-canvas"
-import { EditorPanels } from "./3-editor-panels"
+import { PathCanvas } from "../1-editor/2-canvas"
+import { EditorPanels } from "../1-editor/3-editor-panels"
 import { uiSettings } from "@/store/1-ui-settings"
 import {
     commandCountAtom,
