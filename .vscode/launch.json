@@ -2,40 +2,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Dev Server (Vite)",
-            "type": "node-terminal",
-            "request": "launch",
-            "command": "npm run dev"
-        },
-        {
-            "name": "Debug App (Chrome)",
-            "type": "pwa-chrome",
-            "request": "launch",
+            "name": "localhost:3000",
             "url": "http://localhost:3000",
-            "webRoot": "${workspaceFolder}"
-        },
-        {
-            "name": "Debug App (Edge)",
-            "type": "pwa-msedge",
             "request": "launch",
-            "url": "http://localhost:3000",
-            "webRoot": "${workspaceFolder}"
-        }
+            "type": "chrome",
+            "webRoot": "${workspaceFolder}/src",
+            "runtimeArgs": ["--preserve-symlinks"],
+            "timeout": 60000,
+            "userDataDir": "C:/x/settings/tm-chrome-debug-profile/.profile",
+            //"userDataDir": "c:/Users/maxzz/AppData/Roaming/Code/User/workspaceStorage/2bd09df41c757ca0ea1d0935b57d0cc7/ms-vscode.js-debug/.profile",
+        },
     ],
-    "compounds": [
-        {
-            "name": "Run + Debug (Chrome)",
-            "configurations": [
-                "Dev Server (Vite)",
-                "Debug App (Chrome)"
-            ]
-        },
-        {
-            "name": "Run + Debug (Edge)",
-            "configurations": [
-                "Dev Server (Vite)",
-                "Debug App (Edge)"
-            ]
-        }
-    ]
 }
