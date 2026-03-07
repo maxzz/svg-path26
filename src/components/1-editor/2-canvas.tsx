@@ -1,22 +1,22 @@
-import { useAtomValue } from "jotai"
-import { useSnapshot } from "valtio"
-import { cn } from "@/utils"
-import { appSettings } from "@/store/1-ui-settings"
+import { useAtomValue } from "jotai";
+import { useSnapshot } from "valtio";
+import { cn } from "@/utils";
+import { appSettings } from "@/store/1-ui-settings";
 import {
     canvasViewBoxAtom,
     parseErrorAtom,
     strokeWidthAtom,
     svgPathInputAtom,
     targetPointsAtom,
-} from "@/store/2-svg-path-state"
+} from "@/store/0-atoms/2-svg-path-state";
 
 export function PathCanvas() {
-    const settings = useSnapshot(appSettings)
-    const pathValue = useAtomValue(svgPathInputAtom)
-    const parseError = useAtomValue(parseErrorAtom)
-    const strokeWidth = useAtomValue(strokeWidthAtom)
-    const viewBox = useAtomValue(canvasViewBoxAtom)
-    const points = useAtomValue(targetPointsAtom)
+    const settings = useSnapshot(appSettings);
+    const pathValue = useAtomValue(svgPathInputAtom);
+    const parseError = useAtomValue(parseErrorAtom);
+    const strokeWidth = useAtomValue(strokeWidthAtom);
+    const viewBox = useAtomValue(canvasViewBoxAtom);
+    const points = useAtomValue(targetPointsAtom);
 
     return (
         <div
@@ -56,10 +56,10 @@ export function PathCanvas() {
                 </div>
             )}
         </div>
-    )
+    );
 }
 
-function GridOverlay({ dark }: { dark: boolean }) {
+function GridOverlay({ dark }: { dark: boolean; }) {
     return (
         <div
             className={cn(
@@ -70,5 +70,5 @@ function GridOverlay({ dark }: { dark: boolean }) {
                 "bg-size-[20px_20px]",
             )}
         />
-    )
+    );
 }

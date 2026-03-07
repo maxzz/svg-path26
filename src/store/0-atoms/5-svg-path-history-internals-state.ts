@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { rawPathAtom } from "./5-svg-path-history-source-state";
+import { rawPathAtom } from "./3-raw-path";
 
 const HISTORY_LIMIT = 120;
 

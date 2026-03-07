@@ -1,6 +1,6 @@
-import { useAtom, useAtomValue, useSetAtom } from "jotai"
-import { useSnapshot } from "valtio"
-import { Button } from "@/components/ui/shadcn/button"
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useSnapshot } from "valtio";
+import { Button } from "@/components/ui/shadcn/button";
 import {
     canRedoAtom,
     canUndoAtom,
@@ -15,35 +15,35 @@ import {
     strokeWidthAtom,
     svgPathInputAtom,
     zoomAtom,
-} from "@/store/2-svg-path-state"
+} from "@/store/0-atoms/2-svg-path-state";
 import {
     appSettings,
     toggleDarkCanvas,
     toggleShowGrid,
     toggleShowHelpers,
-} from "@/store/1-ui-settings"
+} from "@/store/1-ui-settings";
 
 export function Toolbar() {
-    const [strokeWidth, setStrokeWidth] = useAtom(strokeWidthAtom)
-    const [zoom, setZoom] = useAtom(zoomAtom)
-    const minified = useAtomValue(minifyOutputAtom)
-    const settings = useSnapshot(appSettings)
-    const pathValue = useAtomValue(svgPathInputAtom)
-    const canUndo = useAtomValue(canUndoAtom)
-    const canRedo = useAtomValue(canRedoAtom)
+    const [strokeWidth, setStrokeWidth] = useAtom(strokeWidthAtom);
+    const [zoom, setZoom] = useAtom(zoomAtom);
+    const minified = useAtomValue(minifyOutputAtom);
+    const settings = useSnapshot(appSettings);
+    const pathValue = useAtomValue(svgPathInputAtom);
+    const canUndo = useAtomValue(canUndoAtom);
+    const canRedo = useAtomValue(canRedoAtom);
 
-    const doUndo = useSetAtom(doUndoPathAtom)
-    const doRedo = useSetAtom(doRedoPathAtom)
-    const doNormalize = useSetAtom(doNormalizePathAtom)
-    const doSetRelative = useSetAtom(doSetRelativeAtom)
-    const doSetAbsolute = useSetAtom(doSetAbsoluteAtom)
-    const doClear = useSetAtom(doClearPathAtom)
-    const doSetMinify = useSetAtom(doSetMinifyAtom)
+    const doUndo = useSetAtom(doUndoPathAtom);
+    const doRedo = useSetAtom(doRedoPathAtom);
+    const doNormalize = useSetAtom(doNormalizePathAtom);
+    const doSetRelative = useSetAtom(doSetRelativeAtom);
+    const doSetAbsolute = useSetAtom(doSetAbsoluteAtom);
+    const doClear = useSetAtom(doClearPathAtom);
+    const doSetMinify = useSetAtom(doSetMinifyAtom);
 
     const handleCopy = async () => {
-        if (!pathValue) return
-        await navigator.clipboard.writeText(pathValue)
-    }
+        if (!pathValue) return;
+        await navigator.clipboard.writeText(pathValue);
+    };
 
     return (
         <div className="flex flex-wrap items-center gap-2 border-b px-4 py-3">
@@ -107,5 +107,5 @@ export function Toolbar() {
                 <span className="w-12 text-right tabular-nums">{zoom.toFixed(1)}x</span>
             </label>
         </div>
-    )
+    );
 }

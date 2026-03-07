@@ -1,5 +1,5 @@
-import { useAtom, useAtomValue, useSetAtom } from "jotai"
-import { Button } from "@/components/ui/shadcn/button"
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { Button } from "@/components/ui/shadcn/button";
 import {
     commandRowsAtom,
     decimalsAtom,
@@ -10,20 +10,20 @@ import {
     scaleYAtom,
     translateXAtom,
     translateYAtom,
-} from "@/store/2-svg-path-state"
+} from "@/store/0-atoms/2-svg-path-state";
 
 export function EditorPanels() {
-    const error = useAtomValue(parseErrorAtom)
-    const rows = useAtomValue(commandRowsAtom)
+    const error = useAtomValue(parseErrorAtom);
+    const rows = useAtomValue(commandRowsAtom);
 
-    const [scaleX, setScaleX] = useAtom(scaleXAtom)
-    const [scaleY, setScaleY] = useAtom(scaleYAtom)
-    const [translateX, setTranslateX] = useAtom(translateXAtom)
-    const [translateY, setTranslateY] = useAtom(translateYAtom)
-    const [decimals, setDecimals] = useAtom(decimalsAtom)
+    const [scaleX, setScaleX] = useAtom(scaleXAtom);
+    const [scaleY, setScaleY] = useAtom(scaleYAtom);
+    const [translateX, setTranslateX] = useAtom(translateXAtom);
+    const [translateY, setTranslateY] = useAtom(translateYAtom);
+    const [decimals, setDecimals] = useAtom(decimalsAtom);
 
-    const applyScale = useSetAtom(doApplyScaleAtom)
-    const applyTranslate = useSetAtom(doApplyTranslateAtom)
+    const applyScale = useSetAtom(doApplyScaleAtom);
+    const applyTranslate = useSetAtom(doApplyTranslateAtom);
 
     return (
         <div className="space-y-4">
@@ -123,5 +123,5 @@ export function EditorPanels() {
                 </div>
             </section>
         </div>
-    )
+    );
 }

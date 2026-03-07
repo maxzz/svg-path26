@@ -1,12 +1,12 @@
-import { useSnapshot } from "valtio"
-import { Button } from "@/components/ui/shadcn/button"
-import { IconThemeMoon, IconThemeSun } from "@/components/ui/icons/normal"
-import { appSettings } from "@/store/1-ui-settings"
-import { isThemeDark, toggleTheme } from "@/utils"
+import { useSnapshot } from "valtio";
+import { Button } from "@/components/ui/shadcn/button";
+import { IconThemeMoon, IconThemeSun } from "@/components/ui/icons/normal";
+import { appSettings } from "@/store/1-ui-settings";
+import { isThemeDark, toggleTheme } from "@/utils";
 
 export function ButtonThemeToggle() {
-    const { theme } = useSnapshot(appSettings)
-    const isDark = isThemeDark(theme)
+    const { theme } = useSnapshot(appSettings);
+    const isDark = isThemeDark(theme);
 
     return (
         <Button
@@ -22,5 +22,5 @@ export function ButtonThemeToggle() {
                 : <IconThemeMoon className="size-4 stroke-1!" />
             }
         </Button>
-    )
+    );
 }
