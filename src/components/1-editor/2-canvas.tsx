@@ -1,6 +1,7 @@
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { cn } from "@/utils";
+import { CanvasActionsMenu } from "./4-canvas-actions-menu";
 import { appSettings } from "@/store/1-ui-settings";
 import {
     canvasViewBoxAtom,
@@ -26,6 +27,7 @@ export function PathCanvas() {
             )}
         >
             {settings.showGrid && <GridOverlay dark={settings.darkCanvas} />}
+            <CanvasActionsMenu />
 
             <svg
                 viewBox={viewBox.join(" ")}
