@@ -18,7 +18,7 @@ export function TransformPanel() {
             <Accordion
                 type="single"
                 collapsible
-                value={settings.transformAccordionOpen ? "transform" : undefined}
+                value={settings.transformAccordionOpen ? "transform" : ""}
                 onValueChange={(value) => setTransformAccordionOpen(value === "transform")}
             >
                 <AccordionItem value="transform" className="border-none">
