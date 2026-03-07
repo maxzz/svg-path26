@@ -1,35 +1,13 @@
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { Button } from "@/components/ui/shadcn/button";
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from "@/components/ui/shadcn/accordion";
+import { useAtomValue } from "jotai";
+import { TransformPanel } from "./5-transform-panel";
 import {
     commandRowsAtom,
-    decimalsAtom,
-    doApplyScaleAtom,
-    doApplyTranslateAtom,
     parseErrorAtom,
-    scaleXAtom,
-    scaleYAtom,
-    translateXAtom,
-    translateYAtom,
 } from "@/store/0-atoms/2-svg-path-state";
 
 export function EditorPanels() {
     const error = useAtomValue(parseErrorAtom);
     const rows = useAtomValue(commandRowsAtom);
-
-    const [scaleX, setScaleX] = useAtom(scaleXAtom);
-    const [scaleY, setScaleY] = useAtom(scaleYAtom);
-    const [translateX, setTranslateX] = useAtom(translateXAtom);
-    const [translateY, setTranslateY] = useAtom(translateYAtom);
-    const [decimals, setDecimals] = useAtom(decimalsAtom);
-
-    const applyScale = useSetAtom(doApplyScaleAtom);
-    const applyTranslate = useSetAtom(doApplyTranslateAtom);
 
     return (
         <div className="space-y-4">
@@ -49,79 +27,7 @@ export function EditorPanels() {
                 </p>
             </section>
 
-            <section className="rounded-lg border px-3">
-                <Accordion type="single" collapsible defaultValue="transform">
-                    <AccordionItem value="transform" className="border-none">
-                        <AccordionTrigger className="py-3 text-sm font-semibold hover:no-underline">
-                            Transform
-                        </AccordionTrigger>
-                        <AccordionContent>
-                            <div className="grid grid-cols-2 gap-2 text-xs">
-                                <label className="space-y-1">
-                                    <span>Scale X</span>
-                                    <input
-                                        className="w-full rounded border bg-background px-2 py-1"
-                                        type="number"
-                                        step="0.1"
-                                        value={scaleX}
-                                        onChange={(event) => setScaleX(Number(event.target.value))}
-                                    />
-                                </label>
-                                <label className="space-y-1">
-                                    <span>Scale Y</span>
-                                    <input
-                                        className="w-full rounded border bg-background px-2 py-1"
-                                        type="number"
-                                        step="0.1"
-                                        value={scaleY}
-                                        onChange={(event) => setScaleY(Number(event.target.value))}
-                                    />
-                                </label>
-                                <label className="space-y-1">
-                                    <span>Translate X</span>
-                                    <input
-                                        className="w-full rounded border bg-background px-2 py-1"
-                                        type="number"
-                                        step="1"
-                                        value={translateX}
-                                        onChange={(event) => setTranslateX(Number(event.target.value))}
-                                    />
-                                </label>
-                                <label className="space-y-1">
-                                    <span>Translate Y</span>
-                                    <input
-                                        className="w-full rounded border bg-background px-2 py-1"
-                                        type="number"
-                                        step="1"
-                                        value={translateY}
-                                        onChange={(event) => setTranslateY(Number(event.target.value))}
-                                    />
-                                </label>
-                                <label className="col-span-2 space-y-1">
-                                    <span>Precision (decimals)</span>
-                                    <input
-                                        className="w-full rounded border bg-background px-2 py-1"
-                                        type="number"
-                                        min={0}
-                                        max={8}
-                                        step={1}
-                                        value={decimals}
-                                        onChange={(event) => setDecimals(Number(event.target.value))}
-                                    />
-                                </label>
-                            </div>
-                            <div className="mt-3 flex flex-wrap gap-2">
-                                <Button variant="outline" onClick={() => applyScale()}>
-                                    Apply Scale
-                                </Button>
-                                <Button variant="outline" onClick={() => applyTranslate()}>
-                                    Apply Translate
-                                </Button>
-                            </div>
-                        </AccordionContent>
-                    </AccordionItem>
-                </Accordion>
-            </section>
+            <TransformPanel />
 
             <section className="rounded-lg border p-3">
                 <h2 className="mb-2 text-sm font-semibold">Commands</h2>
