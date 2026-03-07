@@ -1,15 +1,7 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { SvgPathModel, type SvgSegmentSummary } from "@/svg-core/model";
-import { rawPathAtom, svgPathInputAtom } from "./2-svg-path-history-state";
-
-export {
-    canRedoAtom,
-    canUndoAtom,
-    doRedoPathAtom,
-    doUndoPathAtom,
-    svgPathInputAtom,
-} from "./2-svg-path-history-state";
+import { rawPathAtom, svgPathInputAtom, canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "./5-svg-path-history-state";
 
 export const strokeWidthAtom = atomWithStorage("svg-path26:stroke", 3);
 export const zoomAtom = atomWithStorage("svg-path26:zoom", 1);
