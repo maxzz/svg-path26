@@ -1,36 +1,17 @@
 import { useAtom } from "jotai";
-import { useSnapshot } from "valtio";
-import { Button } from "@/components/ui/shadcn/button";
 import { ToolbarUndoRedo } from "./2-toolbar-undo-redo";
 import {
     strokeWidthAtom,
     zoomAtom,
 } from "@/store/0-atoms/2-svg-path-state";
-import {
-    appSettings,
-    toggleDarkCanvas,
-    toggleShowGrid,
-    toggleShowHelpers,
-} from "@/store/1-ui-settings";
 
 export function Toolbar() {
     const [strokeWidth, setStrokeWidth] = useAtom(strokeWidthAtom);
     const [zoom, setZoom] = useAtom(zoomAtom);
-    const settings = useSnapshot(appSettings);
 
     return (
         <div className="flex flex-wrap items-center gap-2 border-b px-4 py-3">
             <ToolbarUndoRedo />
-
-            <Button variant={settings.showGrid ? "default" : "outline"} onClick={toggleShowGrid}>
-                Grid
-            </Button>
-            <Button variant={settings.showHelpers ? "default" : "outline"} onClick={toggleShowHelpers}>
-                Helpers
-            </Button>
-            <Button variant={settings.darkCanvas ? "default" : "outline"} onClick={toggleDarkCanvas}>
-                Dark Canvas
-            </Button>
 
             <label className="ml-4 flex items-center gap-2 text-sm">
                 Stroke

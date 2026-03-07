@@ -4,6 +4,7 @@ import { Toolbar } from "./1-toolbar";
 import { ButtonThemeToggle } from "./4-btn-theme-toggle";
 import { PathCanvas } from "../1-editor/2-canvas";
 import { EditorPanels } from "../1-editor/3-editor-panels";
+import { CanvasActionsMenu } from "../1-editor/4-canvas-actions-menu";
 import { appSettings } from "@/store/1-ui-settings";
 import { commandCountAtom, svgPathInputAtom, } from "@/store/0-atoms/2-svg-path-state";
 import { UISymbolDefs } from "../ui/icons/symbols";
@@ -35,9 +36,12 @@ export function App() {
                     <main className="flex min-h-0 flex-1">
                         <aside className="w-104 shrink-0 space-y-3 overflow-auto border-r p-4">
                             <section className="space-y-2">
-                                <label htmlFor="svg-path-input" className="text-sm font-medium">
-                                    Path input
-                                </label>
+                                <div className="flex items-center justify-between gap-2">
+                                    <label htmlFor="svg-path-input" className="text-sm font-medium">
+                                        Path input
+                                    </label>
+                                    <CanvasActionsMenu />
+                                </div>
                                 <textarea
                                     id="svg-path-input"
                                     className="min-h-40 w-full resize-y rounded-md border bg-background p-3 font-mono text-xs outline-ring/50 focus:outline-2"
