@@ -9,6 +9,7 @@ import {
     commandCountAtom,
     svgPathInputAtom,
 } from "@/store/2-svg-path-state"
+import { UISymbolDefs } from "../ui/icons/symbols";
 
 export function App() {
     const [pathValue, setPathValue] = useAtom(svgPathInputAtom)
@@ -16,6 +17,8 @@ export function App() {
     const settings = useSnapshot(appSettings)
 
     return (
+        <>
+        <UISymbolDefs />
         <div className="h-screen w-screen overflow-hidden bg-background text-foreground">
             <div className="mx-auto flex h-full max-w-6xl flex-col">
                 <header className="border-b px-4 py-3">
@@ -58,7 +61,8 @@ export function App() {
                     <span>Commands: {commandCount}</span>
                     <span>{settings.showGrid ? "Grid on" : "Grid off"} / {settings.darkCanvas ? "Dark canvas" : "Light canvas"}</span>
                 </footer>
+                </div>
             </div>
-        </div>
+        </>
     )
 }
