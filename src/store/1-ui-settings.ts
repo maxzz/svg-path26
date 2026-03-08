@@ -11,7 +11,7 @@ export interface UiSettings {
     showHelpers: boolean;
     darkCanvas: boolean;
     transformAccordionOpen: boolean;
-    editorLeftPanelSize: number;
+    editorPanelSizes: number[];
 }
 
 const DEFAULT_SETTINGS: UiSettings = {
@@ -20,7 +20,7 @@ const DEFAULT_SETTINGS: UiSettings = {
     showHelpers: true,
     darkCanvas: false,
     transformAccordionOpen: true,
-    editorLeftPanelSize: 33,
+    editorPanelSizes: [33, 67],
 };
 
 function loadSettings(): UiSettings {
@@ -66,6 +66,6 @@ export function setTransformAccordionOpen(isOpen: boolean) {
     appSettings.transformAccordionOpen = isOpen;
 }
 
-export function setEditorLeftPanelSize(size: number) {
-    appSettings.editorLeftPanelSize = size;
+export function setEditorPanelSizes(sizes: number[]) {
+    appSettings.editorPanelSizes = sizes;
 }

@@ -1,37 +1,39 @@
-import { useSnapshot } from "valtio";
-import { Group, Panel, Separator } from "react-resizable-panels";
-import { appSettings, setEditorLeftPanelSize } from "@/store/1-ui-settings";
+import { useCallback } from "react";
+import { appSettings, setEditorPanelSizes } from "@/store/1-ui-settings";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../ui/shadcn/resizable";
 import { EditorPanels } from "../2-editor/2-props/3-editor-panels";
 import { PathCanvas } from "../2-editor/3-canvas/2-canvas";
 
 export function Editor() {
-    const settings = useSnapshot(appSettings);
+    const savedSizes = appSettings.editorPanelSizes;
+    const defaultLeftPanelSize = savedSizes?.[0] ?? 33;
+    const defaultRightPanelSize = savedSizes?.[1] ?? 67;
+
+    const handleLayout = useCallback((layout: { [key: string]: number; }) => {
+        const sizes = [
+            layout["editor-controls"],
+            layout["editor-canvas"],
+        ];
+        setEditorPanelSizes(sizes);
+    }, []);
 
     return (
         <main className="flex-1 min-h-0">
-            <Group
-                orientation="horizontal"
-                onLayoutChanged={(sizes) => {
-                    const firstSize = sizes[0];
-                    if (typeof firstSize === "number") {
-                        setEditorLeftPanelSize(firstSize);
-                    }
-                }}
-            >
-                <Panel defaultSize={settings.editorLeftPanelSize} minSize={20}>
+            <ResizablePanelGroup orientation="horizontal" onLayoutChange={handleLayout}>
+                <ResizablePanel id="editor-controls" defaultSize={`${defaultLeftPanelSize}`} minSize="20%">
                     <aside className="h-full border-r p-4 overflow-auto space-y-3">
                         <EditorPanels />
                     </aside>
-                </Panel>
+                </ResizablePanel>
 
-                <Separator className="w-1 bg-border hover:bg-sky-500 transition-colors" />
+                <ResizableHandle withHandle />
 
-                <Panel minSize={30}>
+                <ResizablePanel id="editor-canvas" defaultSize={`${defaultRightPanelSize}`} minSize="30%">
                     <section className="h-full min-w-0 p-4">
                         <PathCanvas />
                     </section>
-                </Panel>
-            </Group>
+                </ResizablePanel>
+            </ResizablePanelGroup>
         </main>
     );
 }
