@@ -17,43 +17,70 @@ export function ToolbarViewSettingsPopover() {
             </PopoverTrigger>
 
             <PopoverContent align="start" className="w-80 p-3">
-                <div className="mb-3 border-b pb-2">
-                    <h4 className="text-xs leading-none">
+                <div className="-mx-3 mb-3 border-b pb-2">
+                    <h4 className="px-3 text-xs font-semibold leading-none">
                         View options
                     </h4>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                        Configure stroke width and canvas zoom.
-                    </p>
                 </div>
 
                 <div className="grid gap-3">
-                    <label className="flex items-center gap-2 text-xs">
-                        <span className="w-12 shrink-0">Stroke</span>
-                        <input
-                            type="range"
-                            min={1}
-                            max={12}
-                            step={1}
-                            value={strokeWidth}
-                            onChange={(event) => setStrokeWidth(Number(event.target.value))}
-                        />
-                        <span className="w-8 text-right tabular-nums">{strokeWidth}</span>
-                    </label>
-
-                    <label className="flex items-center gap-2 text-xs">
-                        <span className="w-12 shrink-0">Zoom</span>
-                        <input
-                            type="range"
-                            min={0.5}
-                            max={4}
-                            step={0.1}
-                            value={zoom}
-                            onChange={(event) => setZoom(Number(event.target.value))}
-                        />
-                        <span className="w-12 text-right tabular-nums">{zoom.toFixed(1)}x</span>
-                    </label>
+                    <SettingsRangeField
+                        label="Stroke"
+                        min={1}
+                        max={12}
+                        step={1}
+                        value={strokeWidth}
+                        valueClassName="w-8"
+                        displayValue={strokeWidth}
+                        onChange={setStrokeWidth}
+                    />
+                    <SettingsRangeField
+                        label="Zoom"
+                        min={0.5}
+                        max={4}
+                        step={0.1}
+                        value={zoom}
+                        valueClassName="w-12"
+                        displayValue={`${zoom.toFixed(1)}x`}
+                        onChange={setZoom}
+                    />
                 </div>
             </PopoverContent>
         </Popover>
+    );
+}
+
+function SettingsRangeField({
+    label,
+    min,
+    max,
+    step,
+    value,
+    displayValue,
+    valueClassName,
+    onChange,
+}: {
+    label: string;
+    min: number;
+    max: number;
+    step: number;
+    value: number;
+    displayValue: string | number;
+    valueClassName: string;
+    onChange: (value: number) => void;
+}) {
+    return (
+        <label className="flex items-center gap-2 text-xs">
+            <span className="w-12 shrink-0">{label}</span>
+            <input
+                type="range"
+                min={min}
+                max={max}
+                step={step}
+                value={value}
+                onChange={(event) => onChange(Number(event.target.value))}
+            />
+            <span className={`${valueClassName} text-right tabular-nums`}>{displayValue}</span>
+        </label>
     );
 }
