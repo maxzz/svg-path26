@@ -4,7 +4,7 @@ import { ButtonThemeToggle } from "./4-btn-theme-toggle";
 
 export function Toolbar() {
     return (
-        <header className="px-4 py-1 bg-muted/20 border-b flex items-center justify-between gap-3">
+        <header className="px-4 py-1 bg-muted/20 border-b shadow-xs flex items-center justify-between gap-3">
             <h1 className="text-xs font-semibold">SVG Path Editor</h1>
 
             <div className="flex items-center gap-2">
