@@ -10,7 +10,6 @@ import { commandCountAtom, svgPathInputAtom, } from "@/store/0-atoms/2-svg-path-
 import { UISymbolDefs } from "../ui/icons/symbols";
 
 export function App() {
-    const [pathValue, setPathValue] = useAtom(svgPathInputAtom);
     const commandCount = useAtomValue(commandCountAtom);
     const settings = useSnapshot(appSettings);
 
@@ -19,32 +18,13 @@ export function App() {
             <UISymbolDefs />
             <div className="h-screen w-screen overflow-hidden bg-background text-foreground">
                 <div className="mx-auto flex h-full max-w-6xl flex-col">
-                    <header className="border-b px-4 py-3">
-                        <div className="flex items-start justify-between gap-3">
-                            <AppHeaderInfo />
-                            <ButtonThemeToggle />
-                        </div>
-                    </header>
 
-                    <Toolbar />
+                    <AppHeaderInfo />
 
                     <main className="flex min-h-0 flex-1">
                         <aside className="w-104 shrink-0 space-y-3 overflow-auto border-r p-4">
-                            <section className="space-y-2">
-                                <div className="flex items-center justify-between gap-2">
-                                    <label htmlFor="svg-path-input" className="text-sm font-medium">
-                                        Path input
-                                    </label>
-                                    <CanvasActionsMenu />
-                                </div>
-                                <textarea
-                                    id="svg-path-input"
-                                    className="min-h-40 w-full resize-y rounded-md border bg-background p-3 font-mono text-xs outline-ring/50 focus:outline-2"
-                                    value={pathValue}
-                                    onChange={(event) => setPathValue(event.target.value)}
-                                    placeholder="M 10 10 L 100 100"
-                                />
-                            </section>
+                            <PathInputSection />
+
                             <EditorPanels />
                         </aside>
 
@@ -65,11 +45,36 @@ export function App() {
 
 function AppHeaderInfo() {
     return (
-        <div>
-            <h1 className="text-xl font-semibold">SVG Path Editor</h1>
-            <p className="text-sm text-muted-foreground">
-                React + Vite layout using Jotai (path state) and Valtio (UI settings).
-            </p>
-        </div>
+        <header className="border-b px-4 py-3">
+            <div className="flex items-start justify-between gap-3">
+                <div>
+                    <h1 className="text-xs font-semibold">SVG Path Editor</h1>
+                </div>
+                <Toolbar />
+                <ButtonThemeToggle />
+            </div>
+        </header>
+    );
+}
+
+function PathInputSection() {
+    const [pathValue, setPathValue] = useAtom(svgPathInputAtom);
+    return (
+        <section className="space-y-2">
+            <div className="flex items-center justify-between gap-2">
+                <label htmlFor="svg-path-input" className="text-xs font-medium">
+                    Path input
+                </label>
+                <CanvasActionsMenu />
+            </div>
+
+            <textarea
+                id="svg-path-input"
+                className="min-h-40 w-full resize-y rounded-md border bg-background p-3 font-mono text-xs outline-ring/50 focus:outline-2"
+                value={pathValue}
+                onChange={(event) => setPathValue(event.target.value)}
+                placeholder="M 10 10 L 100 100"
+            />
+        </section>
     );
 }
