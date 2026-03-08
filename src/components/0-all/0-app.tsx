@@ -10,9 +10,6 @@ import { commandCountAtom, svgPathInputAtom, } from "@/store/0-atoms/2-svg-path-
 import { UISymbolDefs } from "../ui/icons/symbols";
 
 export function App() {
-    const commandCount = useAtomValue(commandCountAtom);
-    const settings = useSnapshot(appSettings);
-
     return (
         <>
             <UISymbolDefs />
@@ -33,10 +30,7 @@ export function App() {
                         </section>
                     </main>
 
-                    <footer className="flex items-center justify-between border-t px-4 py-2 text-xs text-muted-foreground">
-                        <span>Commands: {commandCount}</span>
-                        <span>{settings.showGrid ? "Grid on" : "Grid off"} / {settings.darkCanvas ? "Dark canvas" : "Light canvas"}</span>
-                    </footer>
+                    <AppFooterStatus />
                 </div>
             </div>
         </>
@@ -76,5 +70,17 @@ function PathInputSection() {
                 placeholder="M 10 10 L 100 100"
             />
         </section>
+    );
+}
+
+function AppFooterStatus() {
+    const commandCount = useAtomValue(commandCountAtom);
+    const settings = useSnapshot(appSettings);
+
+    return (
+        <footer className="flex items-center justify-between border-t px-4 py-2 text-xs text-muted-foreground">
+            <span>Commands: {commandCount}</span>
+            <span>{settings.showGrid ? "Grid on" : "Grid off"} / {settings.darkCanvas ? "Dark canvas" : "Light canvas"}</span>
+        </footer>
     );
 }
