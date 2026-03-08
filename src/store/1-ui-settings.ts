@@ -65,7 +65,3 @@ export function toggleDarkCanvas() {
 export function setTransformAccordionOpen(isOpen: boolean) {
     appSettings.transformAccordionOpen = isOpen;
 }
-
-export function setEditorPanelSizes(sizes: number[]) {
-    appSettings.editorPanelSizes = sizes;
-}
