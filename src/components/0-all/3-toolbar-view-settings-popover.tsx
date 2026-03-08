@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/shadcn/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
 import { strokeWidthAtom, zoomAtom } from "@/store/0-atoms/2-svg-path-state";
 
-export function ToolbarViewSettingsPopover() {
+export function SettingsPopover() {
     return (
         <Popover>
             <PopoverTrigger asChild>
@@ -45,21 +45,9 @@ export function ToolbarViewSettingsPopover() {
     );
 }
 
-function SettingsRangeField({
-    valueAtom,
-    label,
-    valueClassName,
-    formatValue,
-    ...inputProps
-}: {
-    valueAtom: PrimitiveAtom<number>;
-    label: string;
-    valueClassName: string;
-    formatValue?: (value: number) => string | number;
-} & Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "value" | "onChange">) {
+function SettingsRangeField({ valueAtom, label, valueClassName, formatValue, ...inputProps }: { valueAtom: PrimitiveAtom<number>; label: string; valueClassName: string; formatValue?: (value: number) => string | number; } & InputHTMLAttributes<HTMLInputElement>) {
     const [value, setValue] = useAtom(valueAtom);
     const displayValue = formatValue ? formatValue(value) : value;
-
     return (
         <label className="flex items-center gap-2 text-xs">
             <span className="w-12 shrink-0">{label}</span>
