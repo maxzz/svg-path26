@@ -22,7 +22,7 @@ export function TransformPanel() {
                 onValueChange={(value) => setTransformAccordionOpen(value === "transform")}
             >
                 <AccordionItem value="transform" className="border-none">
-                    <AccordionTrigger className="py-3 text-sm font-semibold hover:no-underline">
+                    <AccordionTrigger className="py-2.5 text-xs font-semibold hover:no-underline">
                         Transform
                     </AccordionTrigger>
 
@@ -36,10 +36,10 @@ export function TransformPanel() {
                         </div>
 
                         <div className="mt-3 flex flex-wrap gap-2">
-                            <Button variant="outline" onClick={() => applyScale()}>
+                            <Button variant="outline" className="h-7 px-2.5" onClick={() => applyScale()}>
                                 Apply Scale
                             </Button>
-                            <Button variant="outline" onClick={() => applyTranslate()}>
+                            <Button variant="outline" className="h-7 px-2.5" onClick={() => applyTranslate()}>
                                 Apply Translate
                             </Button>
                         </div>
@@ -57,7 +57,7 @@ function TransformNumberField({ valueAtom, label, wrapperClassName, className, .
         <label className={classNames("space-y-1", wrapperClassName)}>
             <span>{label}</span>
             <input
-                className={classNames("w-full rounded border bg-background px-2 py-1", className)}
+                className={classNames("h-7 w-full rounded border bg-background px-2 text-xs", className)}
                 type="number"
                 {...rest}
                 value={value}

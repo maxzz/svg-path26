@@ -11,14 +11,14 @@ export function ToolbarViewSettingsPopover() {
     return (
         <Popover>
             <PopoverTrigger asChild>
-                <Button variant="outline" size="icon" title="View options">
+                <Button variant="outline" size="icon" className="size-7" title="View options">
                     <Settings className="size-4" />
                 </Button>
             </PopoverTrigger>
 
             <PopoverContent align="start" className="w-80 p-3">
                 <div className="mb-3 border-b pb-2">
-                    <h4 className="text-sm leading-none">
+                    <h4 className="text-xs leading-none">
                         View options
                     </h4>
                     <p className="mt-1 text-xs text-muted-foreground">
@@ -27,7 +27,7 @@ export function ToolbarViewSettingsPopover() {
                 </div>
 
                 <div className="grid gap-3">
-                    <label className="flex items-center gap-2 text-sm">
+                    <label className="flex items-center gap-2 text-xs">
                         <span className="w-12 shrink-0">Stroke</span>
                         <input
                             type="range"
@@ -40,7 +40,7 @@ export function ToolbarViewSettingsPopover() {
                         <span className="w-8 text-right tabular-nums">{strokeWidth}</span>
                     </label>
 
-                    <label className="flex items-center gap-2 text-sm">
+                    <label className="flex items-center gap-2 text-xs">
                         <span className="w-12 shrink-0">Zoom</span>
                         <input
                             type="range"

@@ -44,7 +44,7 @@ export function CanvasActionsMenu() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" title="More actions">
+                <Button variant="outline" size="icon" className="size-7" title="More actions">
                     <IconRadix_DotsHorizontal className="size-4" />
                 </Button>
             </DropdownMenuTrigger>

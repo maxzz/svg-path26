@@ -13,6 +13,7 @@ export function ToolbarUndoRedo() {
         <Button
             variant="outline"
             size="icon"
+            className="size-7"
             onClick={() => doUndo()}
             disabled={!canUndo}
             title="Undo"
@@ -23,6 +24,7 @@ export function ToolbarUndoRedo() {
         <Button
             variant="outline"
             size="icon"
+            className="size-7"
             onClick={() => doRedo()}
             disabled={!canRedo}
             title="Redo"
