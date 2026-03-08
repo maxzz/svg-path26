@@ -21,12 +21,7 @@ export function App() {
                 <div className="mx-auto flex h-full max-w-6xl flex-col">
                     <header className="border-b px-4 py-3">
                         <div className="flex items-start justify-between gap-3">
-                            <div>
-                                <h1 className="text-xl font-semibold">SVG Path Editor</h1>
-                                <p className="text-sm text-muted-foreground">
-                                    React + Vite layout using Jotai (path state) and Valtio (UI settings).
-                                </p>
-                            </div>
+                            <AppHeaderInfo />
                             <ButtonThemeToggle />
                         </div>
                     </header>
@@ -65,5 +60,16 @@ export function App() {
                 </div>
             </div>
         </>
+    );
+}
+
+function AppHeaderInfo() {
+    return (
+        <div>
+            <h1 className="text-xl font-semibold">SVG Path Editor</h1>
+            <p className="text-sm text-muted-foreground">
+                React + Vite layout using Jotai (path state) and Valtio (UI settings).
+            </p>
+        </div>
     );
 }
