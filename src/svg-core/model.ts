@@ -102,6 +102,14 @@ export class SvgPathModel {
         return summaries;
     }
 
+    setSegmentValue(segmentIndex: number, valueIndex: number, value: number) {
+        const segment = this.segments[segmentIndex];
+        if (!segment) return;
+        if (valueIndex < 0 || valueIndex >= segment.values.length) return;
+        if (!Number.isFinite(value)) return;
+        segment.values[valueIndex] = value;
+    }
+
     scale(scaleX: number, scaleY: number) {
         this.segments.forEach((segment) => {
             const cmd = upper(segment.command);

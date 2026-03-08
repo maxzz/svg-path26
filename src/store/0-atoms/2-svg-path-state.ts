@@ -48,6 +48,29 @@ export const commandRowsAtom = atom<SvgSegmentSummary[]>(
     }
 );
 
+const selectedCommandIndexBaseAtom = atom<number | null>(null);
+export const selectedCommandIndexAtom = atom(
+    (get) => {
+        const index = get(selectedCommandIndexBaseAtom);
+        const rowCount = get(commandRowsAtom).length;
+        if (index === null) return null;
+        if (index < 0 || index >= rowCount) return null;
+        return index;
+    },
+    (get, set, nextIndex: number | null) => {
+        if (nextIndex === null) {
+            set(selectedCommandIndexBaseAtom, null);
+            return;
+        }
+        const rowCount = get(commandRowsAtom).length;
+        if (nextIndex < 0 || nextIndex >= rowCount) {
+            set(selectedCommandIndexBaseAtom, null);
+            return;
+        }
+        set(selectedCommandIndexBaseAtom, nextIndex);
+    }
+);
+
 export const targetPointsAtom = atom(
     (get) => get(commandRowsAtom).map((row) => row.target)
 );
@@ -99,6 +122,15 @@ const applyModelAtom = atom(
         } catch {
             // no-op if path is currently invalid
         }
+    }
+);
+
+export const doSetCommandValueAtom = atom(
+    null,
+    (_get, set, args: { commandIndex: number; valueIndex: number; value: number; }) => {
+        set(applyModelAtom, (model) => {
+            model.setSegmentValue(args.commandIndex, args.valueIndex, args.value);
+        });
     }
 );
 

@@ -1,10 +1,11 @@
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { cn } from "@/utils";
 import { appSettings } from "@/store/1-ui-settings";
 import {
     canvasViewBoxAtom,
     parseErrorAtom,
+    selectedCommandIndexAtom,
     strokeWidthAtom,
     svgPathInputAtom,
     targetPointsAtom,
@@ -17,6 +18,7 @@ export function PathCanvas() {
     const strokeWidth = useAtomValue(strokeWidthAtom);
     const viewBox = useAtomValue(canvasViewBoxAtom);
     const points = useAtomValue(targetPointsAtom);
+    const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
 
     return (
         <div
@@ -30,6 +32,11 @@ export function PathCanvas() {
             <svg
                 viewBox={viewBox.join(" ")}
                 className="size-full"
+                onClick={(event) => {
+                    if (event.target === event.currentTarget) {
+                        setSelectedCommandIndex(null);
+                    }
+                }}
             >
                 <path
                     d={parseError ? "M 0 0" : (pathValue || "M 0 0")}
@@ -44,8 +51,19 @@ export function PathCanvas() {
                         key={`${point.x}-${point.y}-${index}`}
                         cx={point.x}
                         cy={point.y}
-                        r={1.6}
-                        fill={settings.darkCanvas ? "oklch(0.8 0.2 30)" : "oklch(0.55 0.2 30)"}
+                        r={selectedCommandIndex === index ? 2.1 : 1.6}
+                        fill={
+                            selectedCommandIndex === index
+                                ? (settings.darkCanvas ? "oklch(0.83 0.22 252)" : "oklch(0.55 0.2 252)")
+                                : (settings.darkCanvas ? "oklch(0.8 0.2 30)" : "oklch(0.55 0.2 30)")
+                        }
+                        stroke={selectedCommandIndex === index ? "oklch(1 0 0 / 0.75)" : "transparent"}
+                        strokeWidth={selectedCommandIndex === index ? 0.5 : 0}
+                        className="cursor-pointer transition-all"
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            setSelectedCommandIndex(index);
+                        }}
                     />
                 ))}
             </svg>
