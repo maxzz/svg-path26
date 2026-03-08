@@ -1,15 +1,18 @@
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { TransformPanel } from "./5-transform-panel";
 import {
     commandRowsAtom,
     parseErrorAtom,
+    svgPathInputAtom,
 } from "@/store/0-atoms/2-svg-path-state";
+import { CanvasActionsMenu } from "./4-canvas-actions-menu";
 
 export function EditorPanels() {
     const error = useAtomValue(parseErrorAtom);
     const rows = useAtomValue(commandRowsAtom);
 
-    return (
+    return (<>
+        <PathInputSection />
         <div className="space-y-4">
             <section className="rounded-lg border p-3">
                 <h2 className="mb-2 text-sm font-semibold">Path Status</h2>
@@ -43,5 +46,27 @@ export function EditorPanels() {
                 </div>
             </section>
         </div>
+    </>);
+}
+
+function PathInputSection() {
+    const [pathValue, setPathValue] = useAtom(svgPathInputAtom);
+    return (
+        <section className="space-y-2">
+            <div className="flex items-center justify-between gap-2">
+                <label htmlFor="svg-path-input" className="text-xs font-medium">
+                    Path input
+                </label>
+                <CanvasActionsMenu />
+            </div>
+
+            <textarea
+                id="svg-path-input"
+                className="min-h-40 w-full resize-y rounded-md border bg-background p-3 font-mono text-xs outline-ring/50 focus:outline-2"
+                value={pathValue}
+                onChange={(event) => setPathValue(event.target.value)}
+                placeholder="M 10 10 L 100 100"
+            />
+        </section>
     );
 }

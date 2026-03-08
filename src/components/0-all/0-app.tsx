@@ -1,40 +1,35 @@
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { Toolbar } from "./1-toolbar";
 import { ButtonThemeToggle } from "./4-btn-theme-toggle";
 import { PathCanvas } from "../1-editor/1-canvas/2-canvas";
 import { EditorPanels } from "../1-editor/2-props/3-editor-panels";
-import { CanvasActionsMenu } from "../1-editor/2-props/4-canvas-actions-menu";
 import { appSettings } from "@/store/1-ui-settings";
-import { commandCountAtom, svgPathInputAtom, } from "@/store/0-atoms/2-svg-path-state";
+import { commandCountAtom } from "@/store/0-atoms/2-svg-path-state";
 import { UISymbolDefs } from "../ui/icons/symbols";
 
 export function App() {
-    return (
-        <>
-            <UISymbolDefs />
-            <div className="h-screen w-screen overflow-hidden bg-background text-foreground">
-                <div className="mx-auto flex h-full max-w-6xl flex-col">
+    return (<>
+        <UISymbolDefs />
+        <div className="h-screen w-screen overflow-hidden bg-background text-foreground">
+            <div className="mx-auto flex h-full max-w-6xl flex-col">
 
-                    <AppHeaderInfo />
+                <AppHeaderInfo />
 
-                    <main className="flex min-h-0 flex-1">
-                        <aside className="w-104 shrink-0 space-y-3 overflow-auto border-r p-4">
-                            <PathInputSection />
+                <main className="flex min-h-0 flex-1">
+                    <aside className="w-104 shrink-0 space-y-3 overflow-auto border-r p-4">
+                        <EditorPanels />
+                    </aside>
 
-                            <EditorPanels />
-                        </aside>
+                    <section className="min-w-0 flex-1 p-4">
+                        <PathCanvas />
+                    </section>
+                </main>
 
-                        <section className="min-w-0 flex-1 p-4">
-                            <PathCanvas />
-                        </section>
-                    </main>
-
-                    <AppFooterStatus />
-                </div>
+                <AppFooterStatus />
             </div>
-        </>
-    );
+        </div>
+    </>);
 }
 
 function AppHeaderInfo() {
@@ -48,28 +43,6 @@ function AppHeaderInfo() {
                 <ButtonThemeToggle />
             </div>
         </header>
-    );
-}
-
-function PathInputSection() {
-    const [pathValue, setPathValue] = useAtom(svgPathInputAtom);
-    return (
-        <section className="space-y-2">
-            <div className="flex items-center justify-between gap-2">
-                <label htmlFor="svg-path-input" className="text-xs font-medium">
-                    Path input
-                </label>
-                <CanvasActionsMenu />
-            </div>
-
-            <textarea
-                id="svg-path-input"
-                className="min-h-40 w-full resize-y rounded-md border bg-background p-3 font-mono text-xs outline-ring/50 focus:outline-2"
-                value={pathValue}
-                onChange={(event) => setPathValue(event.target.value)}
-                placeholder="M 10 10 L 100 100"
-            />
-        </section>
     );
 }
 
