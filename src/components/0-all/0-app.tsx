@@ -1,7 +1,6 @@
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
-import { Toolbar } from "./1-toolbar";
-import { ButtonThemeToggle } from "./4-btn-theme-toggle";
+import { AppHeaderInfo } from "./1-toolbar";
 import { PathCanvas } from "../1-editor/1-canvas/2-canvas";
 import { EditorPanels } from "../1-editor/2-props/3-editor-panels";
 import { appSettings } from "@/store/1-ui-settings";
@@ -11,17 +10,17 @@ import { UISymbolDefs } from "../ui/icons/symbols";
 export function App() {
     return (<>
         <UISymbolDefs />
-        <div className="h-screen w-screen overflow-hidden bg-background text-foreground">
-            <div className="mx-auto flex h-full max-w-6xl flex-col">
+        <div className="h-screen w-screen text-foreground bg-background overflow-hidden">
+            <div className="mx-auto max-w-6xl h-full flex flex-col">
 
                 <AppHeaderInfo />
 
-                <main className="flex min-h-0 flex-1">
-                    <aside className="w-104 shrink-0 space-y-3 overflow-auto border-r p-4">
+                <main className="flex-1 min-h-0 flex">
+                    <aside className="shrink-0 p-4 w-104 border-r overflow-auto space-y-3">
                         <EditorPanels />
                     </aside>
 
-                    <section className="min-w-0 flex-1 p-4">
+                    <section className="flex-1 p-4 min-w-0">
                         <PathCanvas />
                     </section>
                 </main>
@@ -30,20 +29,6 @@ export function App() {
             </div>
         </div>
     </>);
-}
-
-function AppHeaderInfo() {
-    return (
-        <header className="border-b px-4 py-3">
-            <div className="flex items-start justify-between gap-3">
-                <div>
-                    <h1 className="text-xs font-semibold">SVG Path Editor</h1>
-                </div>
-                <Toolbar />
-                <ButtonThemeToggle />
-            </div>
-        </header>
-    );
 }
 
 function AppFooterStatus() {

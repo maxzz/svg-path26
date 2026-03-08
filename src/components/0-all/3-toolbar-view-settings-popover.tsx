@@ -1,6 +1,6 @@
 import { type InputHTMLAttributes } from "react";
 import { useAtom, type PrimitiveAtom } from "jotai";
-import { Settings } from "lucide-react";
+import { Settings as IconSettings } from "lucide-react";
 import { Button } from "@/components/ui/shadcn/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
 import { strokeWidthAtom, zoomAtom } from "@/store/0-atoms/2-svg-path-state";
@@ -10,7 +10,7 @@ export function SettingsPopover() {
         <Popover>
             <PopoverTrigger asChild>
                 <Button variant="outline" size="icon" className="size-7" title="View options">
-                    <Settings className="size-4" />
+                    <IconSettings className="size-4 stroke-1" />
                 </Button>
             </PopoverTrigger>
 
@@ -30,6 +30,7 @@ export function SettingsPopover() {
                         step={1}
                         valueClassName="w-8"
                     />
+
                     <SettingsRangeField
                         label="Zoom"
                         valueAtom={zoomAtom}
