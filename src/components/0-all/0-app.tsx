@@ -1,6 +1,6 @@
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
-import { AppHeaderInfo } from "./1-toolbar";
+import { Toolbar } from "../1-toolbar/1-toolbar";
 import { PathCanvas } from "../1-editor/1-canvas/2-canvas";
 import { EditorPanels } from "../1-editor/2-props/3-editor-panels";
 import { appSettings } from "@/store/1-ui-settings";
@@ -13,7 +13,7 @@ export function App() {
         <div className="h-screen w-screen text-foreground bg-background overflow-hidden">
             <div className="mx-auto max-w-6xl h-full flex flex-col">
 
-                <AppHeaderInfo />
+                <Toolbar />
 
                 <main className="flex-1 min-h-0 flex">
                     <aside className="shrink-0 p-4 w-104 border-r overflow-auto space-y-3">

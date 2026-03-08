@@ -10,7 +10,7 @@ export function ButtonThemeToggle() {
 
     return (
         <Button
-            className="size-7 rounded"
+            className="size-7"
             variant="ghost"
             size="icon"
             onClick={() => toggleTheme(theme)}
