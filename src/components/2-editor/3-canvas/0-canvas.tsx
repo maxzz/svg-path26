@@ -24,19 +24,6 @@ import {
     svgPathInputAtom,
 } from "@/store/0-atoms/2-svg-path-state";
 
-const canvasPathPreviewFillClasses = "fill-[oklch(0_0_0/0.18)]";
-const canvasPathEditorFillClasses = "fill-[oklch(0.65_0.1_260/0.25)]";
-const canvasPathNoFillClasses = "fill-none";
-const canvasPathPreviewStrokeClasses = "stroke-black";
-const canvasPathDarkStrokeClasses = "stroke-[oklch(0.9_0.05_260)]";
-const canvasPathLightStrokeClasses = "stroke-[oklch(0.45_0.2_260)]";
-const hoveredSegmentPathClasses = "fill-none stroke-[oklch(0.68_0.25_26)]";
-const selectedSegmentPathClasses = "fill-none stroke-[oklch(0.68_0.2_240)]";
-const imageEditRectFocusedClasses = "fill-transparent stroke-[oklch(0.68_0.2_240)] cursor-move";
-const imageEditRectDefaultClasses = "fill-transparent stroke-[oklch(0.6_0_0/0.8)] cursor-move";
-const imageHandleFocusedClasses = "fill-[oklch(0.68_0.2_240)] cursor-pointer";
-const imageHandleDefaultClasses = "fill-[oklch(0.65_0_0)] cursor-pointer";
-
 export function PathCanvas() {
     const { darkCanvas } = useSnapshot(appSettings);
 
@@ -201,3 +188,16 @@ export function PathCanvas() {
         </div>
     );
 }
+
+const canvasPathPreviewFillClasses = "fill-[oklch(0_0_0/0.18)]";
+const canvasPathEditorFillClasses = "fill-[oklch(0.65_0.1_260/0.25)]";
+const canvasPathNoFillClasses = "fill-none";
+const canvasPathPreviewStrokeClasses = "stroke-black";
+const canvasPathDarkStrokeClasses = "stroke-[oklch(0.9_0.05_260)]";
+const canvasPathLightStrokeClasses = "stroke-[oklch(0.45_0.2_260)]";
+const hoveredSegmentPathClasses = "fill-none stroke-[oklch(0.68_0.25_26)]";
+const selectedSegmentPathClasses = "fill-none stroke-[oklch(0.68_0.2_240)]";
+const imageEditRectFocusedClasses = "fill-transparent stroke-[oklch(0.68_0.2_240)] cursor-move";
+const imageEditRectDefaultClasses = "fill-transparent stroke-[oklch(0.6_0_0/0.8)] cursor-move";
+const imageHandleFocusedClasses = "fill-[oklch(0.68_0.2_240)] cursor-pointer";
+const imageHandleDefaultClasses = "fill-[oklch(0.65_0_0)] cursor-pointer";

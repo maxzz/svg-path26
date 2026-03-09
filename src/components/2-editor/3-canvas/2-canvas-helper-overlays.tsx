@@ -16,13 +16,6 @@ import {
 } from "@/store/0-atoms/2-svg-path-state";
 import { startPointDragAtom } from "./3-canvas-drag";
 
-const controlLinesDarkClasses = "stroke-[oklch(0.65_0_0_/_0.6)]";
-const controlLinesLightClasses = "stroke-[oklch(0.45_0_0_/_0.6)]";
-const controlPointSelectedClasses = "fill-[oklch(0.68_0.18_240)] stroke-transparent";
-const controlPointDefaultClasses = "fill-[oklch(0.63_0_0)] stroke-transparent";
-const targetPointSelectedClasses = "fill-[oklch(0.68_0.2_240)] stroke-[oklch(1_0_0_/_0.75)]";
-const targetPointDefaultClasses = "fill-[oklch(0.84_0.22_30)] stroke-transparent";
-
 export function CanvasHelperOverlays() {
     const settings = useSnapshot(appSettings);
     const preview = useAtomValue(canvasPreviewAtom);
@@ -120,3 +113,12 @@ function CanvasTargetPoints() {
         />
     ));
 }
+
+const controlLinesDarkClasses = "stroke-[oklch(0.65_0_0/0.6)]";
+const controlLinesLightClasses = "stroke-[oklch(0.45_0_0/0.6)]";
+
+const controlPointSelectedClasses = "fill-[oklch(0.68_0.18_240)] stroke-transparent";
+const controlPointDefaultClasses = "fill-[oklch(0.63_0_0)] stroke-transparent";
+
+const targetPointSelectedClasses = "fill-[oklch(0.68_0.2_240)] stroke-[oklch(1_0_0/0.75)]";
+const targetPointDefaultClasses = "fill-[oklch(0.84_0.22_30)] stroke-transparent";
