@@ -38,6 +38,13 @@ export const pushHistoryAtom = atom(
     }
 );
 
+export const commitCurrentPathToHistoryAtom = atom(
+    null,
+    (get, set) => {
+        set(pushHistoryAtom, get(rawPathAtom));
+    }
+);
+
 export const setPathWithoutHistoryAtom = atom(
     null,
     (_get, set, nextPath: string) => {

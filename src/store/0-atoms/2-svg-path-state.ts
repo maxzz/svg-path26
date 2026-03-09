@@ -1,9 +1,18 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { SvgPathModel, type Point, type SvgCanvasLine, type SvgCanvasPoint, type SvgSegmentSummary } from "@/svg-core/model";
-import { rawPathAtom, svgPathInputAtom, canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "./5-svg-path-history-state";
+import {
+    rawPathAtom,
+    setPathWithoutHistoryAtom,
+    commitCurrentPathToHistoryAtom,
+    svgPathInputAtom,
+    canRedoAtom,
+    canUndoAtom,
+    doRedoPathAtom,
+    doUndoPathAtom,
+} from "./5-svg-path-history-state";
 
-export { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom, svgPathInputAtom };
+export { canRedoAtom, canUndoAtom, commitCurrentPathToHistoryAtom, doRedoPathAtom, doUndoPathAtom, svgPathInputAtom };
 
 export const strokeWidthAtom = atomWithStorage("svg-path26:stroke", 3);
 export const zoomAtom = atomWithStorage("svg-path26:zoom", 1);
@@ -237,10 +246,37 @@ const applyModelAtom = atom(
     }
 );
 
+const applyModelWithoutHistoryAtom = atom(
+    null,
+    (get, set, updater: (svg: SvgPathModel) => void) => {
+        const path = get(rawPathAtom).trim();
+        if (!path) return;
+
+        try {
+            const model = new SvgPathModel(path);
+            updater(model);
+            const decimals = get(decimalsAtom);
+            const minify = get(minifyOutputAtom);
+            set(setPathWithoutHistoryAtom, model.toString(decimals, minify));
+        } catch {
+            // no-op if path is currently invalid
+        }
+    }
+);
+
 export const doSetPointLocationAtom = atom(
     null,
     (_get, set, args: { point: SvgCanvasPoint; to: Point; }) => {
         set(applyModelAtom, (model) => {
+            model.setCanvasPointLocation(args.point, args.to);
+        });
+    }
+);
+
+export const doSetPointLocationWithoutHistoryAtom = atom(
+    null,
+    (_get, set, args: { point: SvgCanvasPoint; to: Point; }) => {
+        set(applyModelWithoutHistoryAtom, (model) => {
             model.setCanvasPointLocation(args.point, args.to);
         });
     }

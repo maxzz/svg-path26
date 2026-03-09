@@ -3,8 +3,10 @@ import type { RefObject, TouchEventHandler } from "react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import {
     canvasPreviewAtom,
+    commitCurrentPathToHistoryAtom,
     doPanViewBoxAtom,
     doSetPointLocationAtom,
+    doSetPointLocationWithoutHistoryAtom,
     doUpdateImageAtom,
     doZoomViewBoxAtom,
     draggedCanvasPointAtom,
@@ -98,8 +100,10 @@ export function useCanvasDragAndDrop(
 
     const setDragState = useSetAtom(canvasDragStateAtom);
     const stopCanvasDrag = useSetAtom(stopCanvasDragAtom);
+    const commitCurrentPathToHistory = useSetAtom(commitCurrentPathToHistoryAtom);
     const setPathValue = useSetAtom(svgPathInputAtom);
     const setPointLocation = useSetAtom(doSetPointLocationAtom);
+    const setPointLocationWithoutHistory = useSetAtom(doSetPointLocationWithoutHistoryAtom);
     const panViewBox = useSetAtom(doPanViewBoxAtom);
     const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
     const updateImage = useSetAtom(doUpdateImageAtom);
@@ -123,7 +127,7 @@ export function useCanvasDragAndDrop(
                 const decimals = event.ctrlKey ? (baseDecimals ? 0 : 3) : baseDecimals;
                 const x = Number.parseFloat(next.x.toFixed(decimals));
                 const y = Number.parseFloat(next.y.toFixed(decimals));
-                setPointLocation({
+                setPointLocationWithoutHistory({
                     point: dragState.point,
                     to: { x, y },
                 });
@@ -159,6 +163,9 @@ export function useCanvasDragAndDrop(
 
         const onPointerUp = (event: PointerEvent) => {
             if (event.pointerId !== dragState.pointerId) return;
+            if (dragState.mode === "point") {
+                commitCurrentPathToHistory();
+            }
             stopCanvasDrag();
         };
 
@@ -167,7 +174,7 @@ export function useCanvasDragAndDrop(
         window.addEventListener("pointerup", onPointerUp, { signal: controller.signal });
         window.addEventListener("pointercancel", onPointerUp, { signal: controller.signal });
         return () => controller.abort();
-    }, [dragState, panViewBox, pointPrecision, setDragState, setPointLocation, snapToGrid, stopCanvasDrag, svgRef, updateImage, vh, viewBox, viewPortLocked, vw]);
+    }, [commitCurrentPathToHistory, dragState, panViewBox, pointPrecision, setDragState, setPointLocationWithoutHistory, snapToGrid, stopCanvasDrag, svgRef, updateImage, vh, viewBox, viewPortLocked, vw]);
 
     useEffect(() => {
         if (!dragState) return;
