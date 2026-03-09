@@ -24,6 +24,19 @@ import {
     svgPathInputAtom,
 } from "@/store/0-atoms/2-svg-path-state";
 
+const canvasPathPreviewFillClasses = "fill-[oklch(0_0_0/0.18)]";
+const canvasPathEditorFillClasses = "fill-[oklch(0.65_0.1_260/0.25)]";
+const canvasPathNoFillClasses = "fill-none";
+const canvasPathPreviewStrokeClasses = "stroke-black";
+const canvasPathDarkStrokeClasses = "stroke-[oklch(0.9_0.05_260)]";
+const canvasPathLightStrokeClasses = "stroke-[oklch(0.45_0.2_260)]";
+const hoveredSegmentPathClasses = "fill-none stroke-[oklch(0.68_0.25_26)]";
+const selectedSegmentPathClasses = "fill-none stroke-[oklch(0.68_0.2_240)]";
+const imageEditRectFocusedClasses = "fill-transparent stroke-[oklch(0.68_0.2_240)] cursor-move";
+const imageEditRectDefaultClasses = "fill-transparent stroke-[oklch(0.6_0_0/0.8)] cursor-move";
+const imageHandleFocusedClasses = "fill-[oklch(0.68_0.2_240)] cursor-pointer";
+const imageHandleDefaultClasses = "fill-[oklch(0.65_0_0)] cursor-pointer";
+
 export function PathCanvas() {
     const { darkCanvas } = useSnapshot(appSettings);
 
@@ -49,6 +62,12 @@ export function PathCanvas() {
     const { onTouchEnd, onTouchMove, onTouchStart, startCanvasDrag, startImageDrag, } = useCanvasDragAndDrop(svgRef, viewBox);
 
     const [vx, vy, vw, vh] = viewBox;
+    const canvasPathFillClasses = fillPreview
+        ? (preview ? canvasPathPreviewFillClasses : canvasPathEditorFillClasses)
+        : canvasPathNoFillClasses;
+    const canvasPathStrokeClasses = preview
+        ? canvasPathPreviewStrokeClasses
+        : (darkCanvas ? canvasPathDarkStrokeClasses : canvasPathLightStrokeClasses);
 
     useEffect(() => {
         fitViewBox();
@@ -94,16 +113,7 @@ export function PathCanvas() {
 
                 <path
                     d={parseError ? "M 0 0" : (pathValue || "M 0 0")}
-                    fill={
-                        fillPreview
-                            ? (preview ? "oklch(0 0 0 / 0.18)" : "oklch(0.65 0.1 260 / 0.25)")
-                            : "none"
-                    }
-                    stroke={
-                        preview
-                            ? "black"
-                            : (darkCanvas ? "oklch(0.9 0.05 260)" : "oklch(0.45 0.2 260)")
-                    }
+                    className={classNames(canvasPathFillClasses, canvasPathStrokeClasses)}
                     strokeWidth={strokeWidth}
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -112,8 +122,7 @@ export function PathCanvas() {
                 {!preview && hoveredSegmentPath && (
                     <path
                         d={hoveredSegmentPath}
-                        fill="none"
-                        stroke={darkCanvas ? "oklch(0.68 0.25 26)" : "oklch(0.68 0.25 26)"}
+                        className={hoveredSegmentPathClasses}
                         strokeWidth={Math.max(strokeWidth * 1.4, 0.8)}
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -123,8 +132,7 @@ export function PathCanvas() {
                 {!preview && selectedSegmentPath && (
                     <path
                         d={selectedSegmentPath}
-                        fill="none"
-                        stroke="oklch(0.68 0.2 240)"
+                        className={selectedSegmentPathClasses}
                         strokeWidth={Math.max(strokeWidth * 1.6, 0.95)}
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -162,10 +170,8 @@ export function PathCanvas() {
                             y={Math.min(image.y1, image.y2)}
                             width={Math.abs(image.x2 - image.x1)}
                             height={Math.abs(image.y2 - image.y1)}
-                            fill="transparent"
-                            stroke={image.id === focusedImageId ? "oklch(0.68 0.2 240)" : "oklch(0.6 0 0 / 0.8)"}
+                            className={image.id === focusedImageId ? imageEditRectFocusedClasses : imageEditRectDefaultClasses}
                             strokeWidth={Math.max(vw, vh) / 900}
-                            className="cursor-move"
                         />
                         {buildImageHandles(image).map((handle) => (
                             <circle
@@ -173,8 +179,7 @@ export function PathCanvas() {
                                 cx={handle.x}
                                 cy={handle.y}
                                 r={Math.max(vw, vh) / 180}
-                                fill={image.id === focusedImageId ? "oklch(0.68 0.2 240)" : "oklch(0.65 0 0)"}
-                                className="cursor-pointer"
+                                className={image.id === focusedImageId ? imageHandleFocusedClasses : imageHandleDefaultClasses}
                                 onPointerDown={(event) => {
                                     event.stopPropagation();
                                     const start = eventToSvgPoint(svgRef.current, event.clientX, event.clientY, viewBox);

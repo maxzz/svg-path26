@@ -16,6 +16,13 @@ import {
 } from "@/store/0-atoms/2-svg-path-state";
 import { startPointDragAtom } from "./3-canvas-drag";
 
+const controlLinesDarkClasses = "stroke-[oklch(0.65_0_0_/_0.6)]";
+const controlLinesLightClasses = "stroke-[oklch(0.45_0_0_/_0.6)]";
+const controlPointSelectedClasses = "fill-[oklch(0.68_0.18_240)] stroke-transparent";
+const controlPointDefaultClasses = "fill-[oklch(0.63_0_0)] stroke-transparent";
+const targetPointSelectedClasses = "fill-[oklch(0.68_0.2_240)] stroke-[oklch(1_0_0_/_0.75)]";
+const targetPointDefaultClasses = "fill-[oklch(0.84_0.22_30)] stroke-transparent";
+
 export function CanvasHelperOverlays() {
     const settings = useSnapshot(appSettings);
     const preview = useAtomValue(canvasPreviewAtom);
@@ -36,6 +43,7 @@ function CanvasControlLines() {
     const settings = useSnapshot(appSettings);
     const controlLines = useAtomValue(controlLinesAtom);
     const [, , vw, vh] = useAtomValue(canvasViewBoxAtom);
+    const controlLinesClasses = settings.darkCanvas ? controlLinesDarkClasses : controlLinesLightClasses;
 
     return controlLines.map((line, index) => (
         <line
@@ -44,7 +52,7 @@ function CanvasControlLines() {
             y1={line.from.y}
             x2={line.to.x}
             y2={line.to.y}
-            stroke={settings.darkCanvas ? "oklch(0.65 0 0 / 0.6)" : "oklch(0.45 0 0 / 0.6)"}
+            className={controlLinesClasses}
             strokeWidth={Math.max(vw, vh) / 1400}
         />
     ));
@@ -64,9 +72,10 @@ function CanvasControlPoints() {
             cx={point.x}
             cy={point.y}
             r={point.movable ? 1.45 : 1.2}
-            fill={point.segmentIndex === selectedCommandIndex ? "oklch(0.68 0.18 240)" : "oklch(0.63 0 0)"}
-            stroke="transparent"
-            className={classNames(point.movable ? "cursor-pointer" : "cursor-default")}
+            className={classNames(
+                point.segmentIndex === selectedCommandIndex ? controlPointSelectedClasses : controlPointDefaultClasses,
+                point.movable ? "cursor-pointer" : "cursor-default",
+            )}
             onPointerDown={(event) => {
                 if (!point.movable) return;
                 event.stopPropagation();
@@ -94,10 +103,11 @@ function CanvasTargetPoints() {
             cx={point.x}
             cy={point.y}
             r={point.segmentIndex === selectedCommandIndex ? 2.15 : 1.7}
-            fill={point.segmentIndex === selectedCommandIndex ? "oklch(0.68 0.2 240)" : "oklch(0.84 0.22 30)"}
-            stroke={point.segmentIndex === selectedCommandIndex ? "oklch(1 0 0 / 0.75)" : "transparent"}
             strokeWidth={point.segmentIndex === selectedCommandIndex ? 0.5 : 0}
-            className={classNames(point.movable ? "cursor-pointer transition-all" : "cursor-default")}
+            className={classNames(
+                point.segmentIndex === selectedCommandIndex ? targetPointSelectedClasses : targetPointDefaultClasses,
+                point.movable ? "cursor-pointer transition-all" : "cursor-default",
+            )}
             onPointerDown={(event) => {
                 event.stopPropagation();
                 setFocusPointCommand(point);
