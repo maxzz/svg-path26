@@ -8,21 +8,15 @@ import {
     controlLinesAtom,
     controlPointsAtom,
     doFocusPointCommandAtom,
-    draggedCanvasPointAtom,
     hoveredCommandIndexAtom,
-    isCanvasDraggingAtom,
     isImageEditModeAtom,
     selectedCommandIndexAtom,
     svgPathInputAtom,
     targetPointsAtom,
 } from "@/store/0-atoms/2-svg-path-state";
-import type { SvgCanvasPoint } from "@/svg-core/model";
+import { startPointDragAtom } from "./4-canvas-drag";
 
-export function CanvasHelperOverlays({
-    onStartPointDrag,
-}: {
-    onStartPointDrag: (point: SvgCanvasPoint, pointerId: number, startPath: string) => void;
-}) {
+export function CanvasHelperOverlays() {
     const settings = useSnapshot(appSettings);
     const preview = useAtomValue(canvasPreviewAtom);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
@@ -32,8 +26,8 @@ export function CanvasHelperOverlays({
     return (
         <>
             <CanvasControlLines />
-            <CanvasControlPoints onStartPointDrag={onStartPointDrag} />
-            <CanvasTargetPoints onStartPointDrag={onStartPointDrag} />
+            <CanvasControlPoints />
+            <CanvasTargetPoints />
         </>
     );
 }
@@ -56,18 +50,13 @@ function CanvasControlLines() {
     ));
 }
 
-function CanvasControlPoints({
-    onStartPointDrag,
-}: {
-    onStartPointDrag: (point: SvgCanvasPoint, pointerId: number, startPath: string) => void;
-}) {
+function CanvasControlPoints() {
     const pathValue = useAtomValue(svgPathInputAtom);
     const controlPoints = useAtomValue(controlPointsAtom);
     const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
     const [, setHoveredCommandIndex] = useAtom(hoveredCommandIndexAtom);
-    const [, setDraggedCanvasPoint] = useAtom(draggedCanvasPointAtom);
-    const [, setCanvasDragging] = useAtom(isCanvasDraggingAtom);
     const setFocusPointCommand = useSetAtom(doFocusPointCommandAtom);
+    const startPointDrag = useSetAtom(startPointDragAtom);
 
     return controlPoints.map((point) => (
         <circle
@@ -83,9 +72,7 @@ function CanvasControlPoints({
                 event.stopPropagation();
                 setFocusPointCommand(point);
                 setSelectedCommandIndex(point.segmentIndex);
-                setDraggedCanvasPoint(point);
-                setCanvasDragging(true);
-                onStartPointDrag(point, event.pointerId, pathValue);
+                startPointDrag({ point, pointerId: event.pointerId, startPath: pathValue });
             }}
             onMouseEnter={() => setHoveredCommandIndex(point.segmentIndex)}
             onMouseLeave={() => setHoveredCommandIndex(null)}
@@ -93,18 +80,13 @@ function CanvasControlPoints({
     ));
 }
 
-function CanvasTargetPoints({
-    onStartPointDrag,
-}: {
-    onStartPointDrag: (point: SvgCanvasPoint, pointerId: number, startPath: string) => void;
-}) {
+function CanvasTargetPoints() {
     const pathValue = useAtomValue(svgPathInputAtom);
     const targetPoints = useAtomValue(targetPointsAtom);
     const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
     const [, setHoveredCommandIndex] = useAtom(hoveredCommandIndexAtom);
-    const [, setDraggedCanvasPoint] = useAtom(draggedCanvasPointAtom);
-    const [, setCanvasDragging] = useAtom(isCanvasDraggingAtom);
     const setFocusPointCommand = useSetAtom(doFocusPointCommandAtom);
+    const startPointDrag = useSetAtom(startPointDragAtom);
 
     return targetPoints.map((point) => (
         <circle
@@ -121,9 +103,7 @@ function CanvasTargetPoints({
                 setFocusPointCommand(point);
                 setSelectedCommandIndex(point.segmentIndex);
                 if (!point.movable) return;
-                setDraggedCanvasPoint(point);
-                setCanvasDragging(true);
-                onStartPointDrag(point, event.pointerId, pathValue);
+                startPointDrag({ point, pointerId: event.pointerId, startPath: pathValue });
             }}
             onMouseEnter={() => setHoveredCommandIndex(point.segmentIndex)}
             onMouseLeave={() => setHoveredCommandIndex(null)}
