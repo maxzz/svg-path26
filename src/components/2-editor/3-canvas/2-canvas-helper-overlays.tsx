@@ -14,7 +14,7 @@ import {
     svgPathInputAtom,
     targetPointsAtom,
 } from "@/store/0-atoms/2-svg-path-state";
-import { startPointDragAtom } from "./4-canvas-drag";
+import { startPointDragAtom } from "./3-canvas-drag";
 
 export function CanvasHelperOverlays() {
     const settings = useSnapshot(appSettings);

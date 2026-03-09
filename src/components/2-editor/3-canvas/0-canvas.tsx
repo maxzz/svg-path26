@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
-import { cn } from "@/utils";
+import { classNames } from "@/utils";
 import { CanvasGrid } from "./1-canvas-grid";
-import { CanvasHelperOverlays } from "./3-canvas-helper-overlays";
-import { buildImageHandles, canvasDragStateAtom, eventToSvgPoint, useCanvasDragAndDrop } from "./4-canvas-drag";
+import { CanvasHelperOverlays } from "./2-canvas-helper-overlays";
+import { buildImageHandles, canvasDragStateAtom, eventToSvgPoint, useCanvasDragAndDrop } from "./3-canvas-drag";
 import { appSettings } from "@/store/1-ui-settings";
 import {
     canvasPreviewAtom,
@@ -25,7 +25,8 @@ import {
 } from "@/store/0-atoms/2-svg-path-state";
 
 export function PathCanvas() {
-    const settings = useSnapshot(appSettings);
+    const { darkCanvas } = useSnapshot(appSettings);
+
     const pathValue = useAtomValue(svgPathInputAtom);
     const parseError = useAtomValue(parseErrorAtom);
     const strokeWidth = useAtomValue(strokeWidthAtom);
@@ -45,13 +46,7 @@ export function PathCanvas() {
 
     const svgRef = useRef<SVGSVGElement | null>(null);
     const dragState = useAtomValue(canvasDragStateAtom);
-    const {
-        onTouchEnd,
-        onTouchMove,
-        onTouchStart,
-        startCanvasDrag,
-        startImageDrag,
-    } = useCanvasDragAndDrop(svgRef, viewBox);
+    const { onTouchEnd, onTouchMove, onTouchStart, startCanvasDrag, startImageDrag, } = useCanvasDragAndDrop(svgRef, viewBox);
 
     const [vx, vy, vw, vh] = viewBox;
 
@@ -61,9 +56,9 @@ export function PathCanvas() {
 
     return (
         <div
-            className={cn(
+            className={classNames(
                 "relative mx-auto aspect-4/3 w-full max-w-4xl overflow-hidden rounded-xl border",
-                preview ? "bg-white" : (settings.darkCanvas ? "bg-zinc-900" : "bg-white"),
+                preview ? "bg-white" : (darkCanvas ? "bg-zinc-900" : "bg-white"),
             )}
         >
             <svg
@@ -107,7 +102,7 @@ export function PathCanvas() {
                     stroke={
                         preview
                             ? "black"
-                            : (settings.darkCanvas ? "oklch(0.9 0.05 260)" : "oklch(0.45 0.2 260)")
+                            : (darkCanvas ? "oklch(0.9 0.05 260)" : "oklch(0.45 0.2 260)")
                     }
                     strokeWidth={strokeWidth}
                     strokeLinecap="round"
@@ -118,7 +113,7 @@ export function PathCanvas() {
                     <path
                         d={hoveredSegmentPath}
                         fill="none"
-                        stroke="oklch(0.68 0.25 26)"
+                        stroke={darkCanvas ? "oklch(0.68 0.25 26)" : "oklch(0.68 0.25 26)"}
                         strokeWidth={Math.max(strokeWidth * 1.4, 0.8)}
                         strokeLinecap="round"
                         strokeLinejoin="round"

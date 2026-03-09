@@ -2,7 +2,7 @@ import { atom, useSetAtom } from "jotai";
 import { appSettings } from "@/store/1-ui-settings";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../ui/shadcn/resizable";
 import { EditorPanels } from "../2-editor/2-props/3-editor-panels";
-import { PathCanvas } from "../2-editor/3-canvas/2-canvas";
+import { PathCanvas } from "./3-canvas/0-canvas";
 
 export function Editor() {
     const savedSizes = appSettings.editorPanelSizes;
