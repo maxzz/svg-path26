@@ -1,6 +1,6 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
-import { cn } from "@/utils";
+import { classNames } from "@/utils";
 import { appSettings } from "@/store/1-ui-settings";
 import {
     canvasPreviewAtom,
@@ -66,7 +66,7 @@ function CanvasControlPoints() {
             r={point.movable ? 1.45 : 1.2}
             fill={point.segmentIndex === selectedCommandIndex ? "oklch(0.68 0.18 240)" : "oklch(0.63 0 0)"}
             stroke="transparent"
-            className={cn(point.movable ? "cursor-pointer" : "cursor-default")}
+            className={classNames(point.movable ? "cursor-pointer" : "cursor-default")}
             onPointerDown={(event) => {
                 if (!point.movable) return;
                 event.stopPropagation();
@@ -97,7 +97,7 @@ function CanvasTargetPoints() {
             fill={point.segmentIndex === selectedCommandIndex ? "oklch(0.68 0.2 240)" : "oklch(0.84 0.22 30)"}
             stroke={point.segmentIndex === selectedCommandIndex ? "oklch(1 0 0 / 0.75)" : "transparent"}
             strokeWidth={point.segmentIndex === selectedCommandIndex ? 0.5 : 0}
-            className={cn(point.movable ? "cursor-pointer transition-all" : "cursor-default")}
+            className={classNames(point.movable ? "cursor-pointer transition-all" : "cursor-default")}
             onPointerDown={(event) => {
                 event.stopPropagation();
                 setFocusPointCommand(point);
