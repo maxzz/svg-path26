@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { IconRadix_DotsHorizontal } from "@/components/ui/icons/normal";
@@ -82,11 +82,33 @@ export function CanvasActionsMenu() {
     const [pendingImage, setPendingImage] = useState<Omit<EditorImage, "id"> | null>(null);
     const [openImageDialog, setOpenImageDialog] = useState(false);
     const fileRef = useRef<HTMLInputElement | null>(null);
+    const [exportViewBoxDraft, setExportViewBoxDraft] = useState({
+        x: exportX,
+        y: exportY,
+        width: exportWidth,
+        height: exportHeight,
+    });
 
     const sortedStored = useMemo(
         () => [...storedPaths].sort((a, b) => b.updatedAt - a.updatedAt),
         [storedPaths],
     );
+
+    const resetExportViewBox = () => {
+        const next = computeExportViewBox(pathValue, exportStroke ? exportStrokeWidth : 0, {
+            x: exportX,
+            y: exportY,
+            width: exportWidth,
+            height: exportHeight,
+        });
+        setExportViewBoxDraft(next);
+    };
+
+    useEffect(() => {
+        if (!openExportDialog) return;
+        resetExportViewBox();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [openExportDialog, pathValue, exportStroke, exportStrokeWidth, exportX, exportY, exportWidth, exportHeight]);
 
     const handleCopy = async () => {
         if (!pathValue) return;
@@ -95,11 +117,13 @@ export function CanvasActionsMenu() {
 
     const handleExport = () => {
         if (!pathValue.trim()) return;
+        const width = Math.max(1e-6, exportViewBoxDraft.width);
+        const height = Math.max(1e-6, exportViewBoxDraft.height);
         const fillPart = exportFill ? ` fill="${exportFillColor}"` : " fill=\"none\"";
         const strokePart = exportStroke
             ? ` stroke="${exportStrokeColor}" stroke-width="${exportStrokeWidth}"`
             : "";
-        const svgData = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${exportX} ${exportY} ${exportWidth} ${exportHeight}"><path d="${pathValue}"${strokePart}${fillPart} /></svg>`;
+        const svgData = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${exportViewBoxDraft.x} ${exportViewBoxDraft.y} ${width} ${height}"><path d="${pathValue}"${strokePart}${fillPart} /></svg>`;
         const blob = new Blob([svgData], { type: "image/svg+xml" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -339,9 +363,64 @@ export function CanvasActionsMenu() {
                                     onChange={(event) => setExportStrokeWidth(Number(event.target.value))}
                                 />
                             </label>
-                            <div className="rounded border px-2 py-1.5 text-[11px] text-muted-foreground">
-                                viewBox {exportX.toFixed(2)} {exportY.toFixed(2)} {exportWidth.toFixed(2)} {exportHeight.toFixed(2)}
+                            <div className="col-span-2 grid grid-cols-4 gap-2 rounded border px-2 py-2">
+                                <NumberField
+                                    label="x"
+                                    value={exportViewBoxDraft.x}
+                                    onChange={(value) => setExportViewBoxDraft((previous) => ({ ...previous, x: value }))}
+                                />
+                                <NumberField
+                                    label="y"
+                                    value={exportViewBoxDraft.y}
+                                    onChange={(value) => setExportViewBoxDraft((previous) => ({ ...previous, y: value }))}
+                                />
+                                <NumberField
+                                    label="width"
+                                    min={0.000001}
+                                    value={exportViewBoxDraft.width}
+                                    onChange={(value) => setExportViewBoxDraft((previous) => ({ ...previous, width: value }))}
+                                />
+                                <NumberField
+                                    label="height"
+                                    min={0.000001}
+                                    value={exportViewBoxDraft.height}
+                                    onChange={(value) => setExportViewBoxDraft((previous) => ({ ...previous, height: value }))}
+                                />
                             </div>
+                            <Button
+                                variant="outline"
+                                className="col-span-2 h-7 px-2"
+                                onClick={resetExportViewBox}
+                            >
+                                Reset viewBox from path bounds
+                            </Button>
+                        </div>
+
+                        <div className="rounded border p-2">
+                            <p className="mb-2 text-[11px] text-muted-foreground">Live preview</p>
+                            <svg
+                                className="h-40 w-full rounded bg-muted/20"
+                                viewBox={`${exportViewBoxDraft.x} ${exportViewBoxDraft.y} ${Math.max(1e-6, exportViewBoxDraft.width)} ${Math.max(1e-6, exportViewBoxDraft.height)}`}
+                            >
+                                <defs>
+                                    <pattern id="export-preview-grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                                        <path d="M 10 0 L 0 0 0 10" fill="none" stroke="oklch(0.7 0 0 / 0.25)" strokeWidth="0.3" />
+                                    </pattern>
+                                </defs>
+                                <rect
+                                    x={exportViewBoxDraft.x}
+                                    y={exportViewBoxDraft.y}
+                                    width={Math.max(1e-6, exportViewBoxDraft.width)}
+                                    height={Math.max(1e-6, exportViewBoxDraft.height)}
+                                    fill="url(#export-preview-grid)"
+                                />
+                                <path
+                                    d={pathValue || "M 0 0"}
+                                    fill={exportFill ? exportFillColor : "none"}
+                                    stroke={exportStroke ? exportStrokeColor : "none"}
+                                    strokeWidth={exportStroke ? exportStrokeWidth : 0}
+                                />
+                            </svg>
                         </div>
                     </div>
                     <DialogFooter>
@@ -425,6 +504,28 @@ function NumberField({ label, value, onChange, min }: { label: string; value: nu
             />
         </label>
     );
+}
+
+function computeExportViewBox(
+    path: string,
+    strokePadding: number,
+    fallback: { x: number; y: number; width: number; height: number; },
+) {
+    try {
+        const model = new SvgPathModel(path);
+        const bounds = model.getBounds();
+        const width = Math.max(1e-6, bounds.xmax - bounds.xmin);
+        const height = Math.max(1e-6, bounds.ymax - bounds.ymin);
+        const pad = Math.max(0, strokePadding);
+        return {
+            x: bounds.xmin - pad,
+            y: bounds.ymin - pad,
+            width: width + 2 * pad,
+            height: height + 2 * pad,
+        };
+    } catch {
+        return fallback;
+    }
 }
 
 function getPathPreview(path: string): { viewBox: string; strokeWidth: number; } {

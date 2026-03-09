@@ -40,11 +40,15 @@ import type { EditorImage } from "@/store/0-atoms/2-svg-path-state";
 import type { Point, SvgCanvasPoint } from "@/svg-core/model";
 
 type DragState =
-    | { mode: "point"; pointerId: number; point: SvgCanvasPoint; }
+    | { mode: "point"; pointerId: number; point: SvgCanvasPoint; startPath: string; }
     | { mode: "canvas"; pointerId: number; lastClientX: number; lastClientY: number; moved: boolean; }
     | { mode: "image"; pointerId: number; imageId: string; handle: ImageHandle; start: Point; initial: EditorImage; };
 
 type ImageHandle = "move" | "left" | "right" | "top" | "bottom" | "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
+
+type TouchGestureState =
+    | { mode: "pan"; lastClientX: number; lastClientY: number; }
+    | { mode: "pinch"; lastDistance: number; lastCenter: Point; };
 
 export function PathCanvas() {
     const settings = useSnapshot(appSettings);
@@ -75,6 +79,7 @@ export function PathCanvas() {
     const [, setDraggedCanvasPoint] = useAtom(draggedCanvasPointAtom);
     const [, setCanvasDragging] = useAtom(isCanvasDraggingAtom);
 
+    const setPathValue = useSetAtom(svgPathInputAtom);
     const setPointLocation = useSetAtom(doSetPointLocationAtom);
     const setFocusPointCommand = useSetAtom(doFocusPointCommandAtom);
     const panViewBox = useSetAtom(doPanViewBoxAtom);
@@ -84,6 +89,7 @@ export function PathCanvas() {
 
     const svgRef = useRef<SVGSVGElement | null>(null);
     const [dragState, setDragState] = useState<DragState | null>(null);
+    const touchGestureRef = useRef<TouchGestureState | null>(null);
 
     const [vx, vy, vw, vh] = viewBox;
     const grid = useMemo(() => buildGrid(vx, vy, vw, vh), [vx, vy, vw, vh]);
@@ -157,6 +163,37 @@ export function PathCanvas() {
         };
     }, [dragState, panViewBox, pointPrecision, setCanvasDragging, setDraggedCanvasPoint, setPointLocation, snapToGrid, updateImage, vh, viewBox, viewPortLocked, vw]);
 
+    useEffect(() => {
+        if (!dragState) return;
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key !== "Escape") return;
+            event.preventDefault();
+
+            if (dragState.mode === "point") {
+                setPathValue(dragState.startPath);
+            } else if (dragState.mode === "image") {
+                updateImage({
+                    id: dragState.imageId,
+                    patch: {
+                        x1: dragState.initial.x1,
+                        y1: dragState.initial.y1,
+                        x2: dragState.initial.x2,
+                        y2: dragState.initial.y2,
+                        preserveAspectRatio: dragState.initial.preserveAspectRatio,
+                        opacity: dragState.initial.opacity,
+                    },
+                });
+            }
+
+            setDragState(null);
+            setDraggedCanvasPoint(null);
+            setCanvasDragging(false);
+        };
+
+        window.addEventListener("keydown", onKeyDown);
+        return () => window.removeEventListener("keydown", onKeyDown);
+    }, [dragState, setCanvasDragging, setDraggedCanvasPoint, setPathValue, updateImage]);
+
     return (
         <div
             className={cn(
@@ -177,6 +214,7 @@ export function PathCanvas() {
                     zoomViewBox({ scale, center });
                 }}
                 onPointerDown={(event) => {
+                    if (event.pointerType === "touch") return;
                     if (event.button !== 0 || imageEditMode || preview) return;
                     setCanvasDragging(true);
                     setDragState({
@@ -186,6 +224,114 @@ export function PathCanvas() {
                         lastClientY: event.clientY,
                         moved: false,
                     });
+                }}
+                onTouchStart={(event) => {
+                    if (imageEditMode || preview) return;
+                    if (event.target !== event.currentTarget) return;
+                    if (!svgRef.current) return;
+                    if (event.touches.length === 1) {
+                        const touch = event.touches[0];
+                        touchGestureRef.current = {
+                            mode: "pan",
+                            lastClientX: touch.clientX,
+                            lastClientY: touch.clientY,
+                        };
+                        return;
+                    }
+                    if (event.touches.length === 2) {
+                        const first = event.touches[0];
+                        const second = event.touches[1];
+                        const p1 = eventToSvgPoint(svgRef.current, first.clientX, first.clientY, viewBox);
+                        const p2 = eventToSvgPoint(svgRef.current, second.clientX, second.clientY, viewBox);
+                        if (!p1 || !p2) return;
+                        touchGestureRef.current = {
+                            mode: "pinch",
+                            lastDistance: distanceBetween(p1, p2),
+                            lastCenter: midpoint(p1, p2),
+                        };
+                    }
+                }}
+                onTouchMove={(event) => {
+                    if (imageEditMode || preview) return;
+                    if (!svgRef.current || !touchGestureRef.current) return;
+                    if (event.touches.length === 0) return;
+                    event.preventDefault();
+
+                    if (event.touches.length === 2) {
+                        const p1 = eventToSvgPoint(svgRef.current, event.touches[0].clientX, event.touches[0].clientY, viewBox);
+                        const p2 = eventToSvgPoint(svgRef.current, event.touches[1].clientX, event.touches[1].clientY, viewBox);
+                        if (!p1 || !p2) return;
+                        const center = midpoint(p1, p2);
+                        const distance = distanceBetween(p1, p2);
+                        const previous = touchGestureRef.current;
+                        if (previous.mode === "pinch" && previous.lastDistance > 0 && distance > 0) {
+                            const scale = previous.lastDistance / distance;
+                            zoomViewBox({ scale, center });
+                            panViewBox({
+                                dx: previous.lastCenter.x - center.x,
+                                dy: previous.lastCenter.y - center.y,
+                            });
+                        }
+                        touchGestureRef.current = {
+                            mode: "pinch",
+                            lastDistance: distance,
+                            lastCenter: center,
+                        };
+                        return;
+                    }
+
+                    if (event.touches.length === 1) {
+                        const touch = event.touches[0];
+                        const previous = touchGestureRef.current;
+                        if (previous.mode === "pan" && svgRef.current) {
+                            const rect = svgRef.current.getBoundingClientRect();
+                            if (!rect.width || !rect.height) return;
+                            const dxPx = touch.clientX - previous.lastClientX;
+                            const dyPx = touch.clientY - previous.lastClientY;
+                            const dx = -(dxPx / rect.width) * vw;
+                            const dy = -(dyPx / rect.height) * vh;
+                            panViewBox({ dx, dy });
+                        }
+                        touchGestureRef.current = {
+                            mode: "pan",
+                            lastClientX: touch.clientX,
+                            lastClientY: touch.clientY,
+                        };
+                    }
+                }}
+                onTouchEnd={(event) => {
+                    if (!svgRef.current) {
+                        touchGestureRef.current = null;
+                        return;
+                    }
+                    if (event.touches.length === 0) {
+                        touchGestureRef.current = null;
+                        return;
+                    }
+                    if (event.touches.length === 1) {
+                        const touch = event.touches[0];
+                        touchGestureRef.current = {
+                            mode: "pan",
+                            lastClientX: touch.clientX,
+                            lastClientY: touch.clientY,
+                        };
+                        return;
+                    }
+                    if (event.touches.length === 2) {
+                        const p1 = eventToSvgPoint(svgRef.current, event.touches[0].clientX, event.touches[0].clientY, viewBox);
+                        const p2 = eventToSvgPoint(svgRef.current, event.touches[1].clientX, event.touches[1].clientY, viewBox);
+                        if (!p1 || !p2) {
+                            touchGestureRef.current = null;
+                            return;
+                        }
+                        touchGestureRef.current = {
+                            mode: "pinch",
+                            lastDistance: distanceBetween(p1, p2),
+                            lastCenter: midpoint(p1, p2),
+                        };
+                        return;
+                    }
+                    touchGestureRef.current = null;
                 }}
                 onClick={(event) => {
                     if (event.target === event.currentTarget) {
@@ -358,6 +504,7 @@ export function PathCanvas() {
                                 mode: "point",
                                 point,
                                 pointerId: event.pointerId,
+                                startPath: pathValue,
                             });
                         }}
                         onMouseEnter={() => setHoveredCommandIndex(point.segmentIndex)}
@@ -390,6 +537,7 @@ export function PathCanvas() {
                                 mode: "point",
                                 point,
                                 pointerId: event.pointerId,
+                                startPath: pathValue,
                             });
                         }}
                         onMouseEnter={() => setHoveredCommandIndex(point.segmentIndex)}
@@ -477,6 +625,17 @@ function eventToSvgPoint(
     return {
         x: x + ((clientX - rect.left) / rect.width) * width,
         y: y + ((clientY - rect.top) / rect.height) * height,
+    };
+}
+
+function distanceBetween(a: Point, b: Point): number {
+    return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function midpoint(a: Point, b: Point): Point {
+    return {
+        x: (a.x + b.x) / 2,
+        y: (a.y + b.y) / 2,
     };
 }
 

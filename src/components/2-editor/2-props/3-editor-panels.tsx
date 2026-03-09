@@ -18,6 +18,7 @@ import {
     hoveredCommandIndexAtom,
     imagesAtom,
     isImageEditModeAtom,
+    parseStateAtom,
     parseErrorAtom,
     selectedCommandIndexAtom,
     svgPathInputAtom,
@@ -41,6 +42,7 @@ const COMMAND_TYPES = ["M", "L", "V", "H", "C", "S", "Q", "T", "A", "Z"] as cons
 
 export function EditorPanels() {
     const error = useAtomValue(parseErrorAtom);
+    const parseState = useAtomValue(parseStateAtom);
     const rows = useAtomValue(commandRowsAtom);
     const canUndo = useAtomValue(canUndoAtom);
     const canRedo = useAtomValue(canRedoAtom);
@@ -111,6 +113,7 @@ export function EditorPanels() {
                 if (selectedCommandIndex === null) return;
                 const row = rows[selectedCommandIndex];
                 if (!row) return;
+                if (parseState.model && !parseState.model.canConvert(selectedCommandIndex, key)) return;
                 const toType = row.command === row.command.toLowerCase()
                     ? key.toLowerCase()
                     : key.toUpperCase();
@@ -118,6 +121,9 @@ export function EditorPanels() {
                 return;
             }
 
+            if (parseState.model && !parseState.model.canInsertAfter(selectedCommandIndex, key)) {
+                return;
+            }
             doInsertSegment({
                 type: key,
                 afterIndex: selectedCommandIndex,
@@ -126,10 +132,45 @@ export function EditorPanels() {
 
         window.addEventListener("keydown", onKeyDown);
         return () => window.removeEventListener("keydown", onKeyDown);
-    }, [canRedo, canUndo, doConvertSegment, doDeleteImage, doDeleteSegment, doInsertSegment, doRedo, doUndo, focusedImageId, rows, selectedCommandIndex, setHoveredCommandIndex, setSelectedCommandIndex]);
+    }, [canRedo, canUndo, doConvertSegment, doDeleteImage, doDeleteSegment, doInsertSegment, doRedo, doUndo, focusedImageId, parseState.model, rows, selectedCommandIndex, setHoveredCommandIndex, setSelectedCommandIndex]);
 
     const focusField = (rowIndex: number, valueIndex: number) => {
-        fieldRefs.current[`${rowIndex}:${valueIndex}`]?.focus();
+        const row = rows[rowIndex];
+        if (!row) return;
+        if (row.values.length === 0) {
+            setSelectedCommandIndex(rowIndex);
+            rowRefs.current[rowIndex]?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            return;
+        }
+
+        const clampedIndex = Math.min(Math.max(valueIndex, 0), row.values.length - 1);
+        const direct = fieldRefs.current[`${rowIndex}:${clampedIndex}`];
+        if (direct) {
+            direct.focus();
+            return;
+        }
+
+        for (let i = clampedIndex - 1; i >= 0; i -= 1) {
+            const candidate = fieldRefs.current[`${rowIndex}:${i}`];
+            if (candidate) {
+                candidate.focus();
+                return;
+            }
+        }
+        for (let i = clampedIndex + 1; i < row.values.length; i += 1) {
+            const candidate = fieldRefs.current[`${rowIndex}:${i}`];
+            if (candidate) {
+                candidate.focus();
+                return;
+            }
+        }
+    };
+
+    const moveVertical = (rowIndex: number, valueIndex: number, direction: "up" | "down") => {
+        const nextRowIndex = direction === "up" ? rowIndex - 1 : rowIndex + 1;
+        if (nextRowIndex < 0 || nextRowIndex >= rows.length) return;
+        setSelectedCommandIndex(nextRowIndex);
+        focusField(nextRowIndex, valueIndex);
     };
 
     return (<>
@@ -223,11 +264,22 @@ export function EditorPanels() {
                                                     onKeyDown={(event) => {
                                                         if (event.key === "ArrowLeft") {
                                                             focusField(row.index, Math.max(0, valueIndex - 1));
+                                                            event.preventDefault();
                                                         }
                                                         if (event.key === "ArrowRight") {
                                                             focusField(row.index, Math.min(row.values.length - 1, valueIndex + 1));
+                                                            event.preventDefault();
+                                                        }
+                                                        if (event.key === "ArrowUp") {
+                                                            moveVertical(row.index, valueIndex, "up");
+                                                            event.preventDefault();
+                                                        }
+                                                        if (event.key === "ArrowDown") {
+                                                            moveVertical(row.index, valueIndex, "down");
+                                                            event.preventDefault();
                                                         }
                                                     }}
+                                                    title={commandValueTooltip(row.command, valueIndex)}
                                                 />
                                                 <span className="text-muted-foreground">{valueIndex === 3 ? "laf" : "swp"}</span>
                                             </label>
@@ -256,6 +308,8 @@ export function EditorPanels() {
                                                     : Math.min(row.values.length - 1, valueIndex + 1);
                                                 focusField(row.index, nextIndex);
                                             }}
+                                            onArrowVertical={(direction) => moveVertical(row.index, valueIndex, direction)}
+                                            title={commandValueTooltip(row.command, valueIndex)}
                                         />
                                     );
                                 })}
@@ -284,6 +338,7 @@ export function EditorPanels() {
                                                 {COMMAND_TYPES.map((type) => (
                                                     <DropdownMenuItem
                                                         key={`insert:${row.index}:${type}`}
+                                                        disabled={parseState.model ? !parseState.model.canInsertAfter(row.index, type) : false}
                                                         onSelect={() => doInsertSegment({ type, afterIndex: row.index })}
                                                     >
                                                         <strong className="mr-1">{type}</strong> {commandLabel(type)}
@@ -302,6 +357,7 @@ export function EditorPanels() {
                                                     return (
                                                         <DropdownMenuItem
                                                             key={`convert:${row.index}:${type}`}
+                                                            disabled={parseState.model ? !parseState.model.canConvert(row.index, toType) : false}
                                                             onSelect={() => doConvertSegment({ segmentIndex: row.index, type: toType })}
                                                         >
                                                             <strong className="mr-1">{type}</strong> {commandLabel(type)}
@@ -422,12 +478,16 @@ function CommandValueInput({
     onFocus,
     inputRef,
     onArrowMove,
+    onArrowVertical,
+    title,
 }: {
     value: number;
     onCommit: (value: number) => void;
     onFocus: () => void;
     inputRef?: (element: HTMLInputElement | null) => void;
     onArrowMove?: (direction: "left" | "right") => void;
+    onArrowVertical?: (direction: "up" | "down") => void;
+    title?: string;
 }) {
     const [draft, setDraft] = useState(String(value));
 
@@ -451,6 +511,7 @@ function CommandValueInput({
             className="h-6 w-14 rounded border bg-background px-1.5 text-center text-[11px]"
             ref={inputRef}
             value={draft}
+            title={title}
             onFocus={onFocus}
             onChange={(event) => setDraft(event.target.value)}
             onBlur={commit}
@@ -466,9 +527,19 @@ function CommandValueInput({
                 }
                 if (event.key === "ArrowLeft" && event.currentTarget.selectionStart === 0 && event.currentTarget.selectionEnd === 0) {
                     onArrowMove?.("left");
+                    event.preventDefault();
                 }
                 if (event.key === "ArrowRight" && event.currentTarget.selectionStart === event.currentTarget.value.length && event.currentTarget.selectionEnd === event.currentTarget.value.length) {
                     onArrowMove?.("right");
+                    event.preventDefault();
+                }
+                if (event.key === "ArrowUp") {
+                    onArrowVertical?.("up");
+                    event.preventDefault();
+                }
+                if (event.key === "ArrowDown") {
+                    onArrowVertical?.("down");
+                    event.preventDefault();
                 }
             }}
         />
@@ -489,4 +560,28 @@ function commandLabel(type: string): string {
         case "Z": return "Close";
         default: return type;
     }
+}
+
+function commandValueTooltip(command: string, valueIndex: number): string {
+    const labels: Record<string, string[]> = {
+        M: ["x", "y"],
+        m: ["dx", "dy"],
+        L: ["x", "y"],
+        l: ["dx", "dy"],
+        V: ["y"],
+        v: ["dy"],
+        H: ["x"],
+        h: ["dx"],
+        C: ["x1", "y1", "x2", "y2", "x", "y"],
+        c: ["dx1", "dy1", "dx2", "dy2", "dx", "dy"],
+        S: ["x2", "y2", "x", "y"],
+        s: ["dx2", "dy2", "dx", "dy"],
+        Q: ["x1", "y1", "x", "y"],
+        q: ["dx1", "dy1", "dx", "dy"],
+        T: ["x", "y"],
+        t: ["dx", "dy"],
+        A: ["rx", "ry", "x-axis-rotation", "large-arc-flag", "sweep-flag", "x", "y"],
+        a: ["rx", "ry", "x-axis-rotation", "large-arc-flag", "sweep-flag", "dx", "dy"],
+    };
+    return labels[command]?.[valueIndex] ?? `value ${valueIndex + 1}`;
 }
