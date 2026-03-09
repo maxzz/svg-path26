@@ -1,11 +1,32 @@
 import { type InputHTMLAttributes } from "react";
-import { useAtom, type PrimitiveAtom } from "jotai";
+import { useAtom, useSetAtom, type PrimitiveAtom } from "jotai";
 import { Settings as IconSettings } from "lucide-react";
 import { Button } from "@/components/ui/shadcn/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
-import { strokeWidthAtom, zoomAtom } from "@/store/0-atoms/2-svg-path-state";
+import { Switch } from "@/components/ui/shadcn/switch";
+import {
+    canvasPreviewAtom,
+    doFitViewBoxAtom,
+    doZoomViewBoxAtom,
+    fillPreviewAtom,
+    isImageEditModeAtom,
+    pointPrecisionAtom,
+    showTicksAtom,
+    snapToGridAtom,
+    strokeWidthAtom,
+    tickIntervalAtom,
+    viewPortHeightAtom,
+    viewPortLockedAtom,
+    viewPortWidthAtom,
+    viewPortXAtom,
+    viewPortYAtom,
+    zoomAtom,
+} from "@/store/0-atoms/2-svg-path-state";
 
 export function SettingsPopover() {
+    const fitViewBox = useSetAtom(doFitViewBoxAtom);
+    const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
+
     return (
         <Popover>
             <PopoverTrigger asChild>
@@ -40,6 +61,43 @@ export function SettingsPopover() {
                         valueClassName="w-12"
                         formatValue={(value) => `${value.toFixed(1)}x`}
                     />
+
+                    <div className="grid grid-cols-4 gap-2 rounded-md border p-2">
+                        <SettingsNumberField label="x" valueAtom={viewPortXAtom} />
+                        <SettingsNumberField label="y" valueAtom={viewPortYAtom} />
+                        <SettingsNumberField label="w" valueAtom={viewPortWidthAtom} min={1e-3} />
+                        <SettingsNumberField label="h" valueAtom={viewPortHeightAtom} min={1e-3} />
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs">
+                        <span>Lock viewBox</span>
+                        <SettingsSwitch atom={viewPortLockedAtom} />
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-1">
+                        <Button variant="outline" className="h-7 px-2" onClick={() => zoomViewBox({ scale: 0.9 })}>
+                            Zoom In
+                        </Button>
+                        <Button variant="outline" className="h-7 px-2" onClick={() => fitViewBox()}>
+                            Fit
+                        </Button>
+                        <Button variant="outline" className="h-7 px-2" onClick={() => zoomViewBox({ scale: 1.1 })}>
+                            Zoom Out
+                        </Button>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 rounded-md border p-2">
+                        <ToggleRow label="Snap to grid" atom={snapToGridAtom} />
+                        <ToggleRow label="Show ticks" atom={showTicksAtom} />
+                        <ToggleRow label="Fill path" atom={fillPreviewAtom} />
+                        <ToggleRow label="Preview mode" atom={canvasPreviewAtom} />
+                        <ToggleRow label="Image edit mode" atom={isImageEditModeAtom} />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                        <SettingsNumberField label="Tick interval" valueAtom={tickIntervalAtom} min={1} step={1} />
+                        <SettingsNumberField label="Point precision" valueAtom={pointPrecisionAtom} min={0} max={8} step={1} />
+                    </div>
                 </div>
             </PopoverContent>
         </Popover>
@@ -60,5 +118,38 @@ function SettingsRangeField({ valueAtom, label, valueClassName, formatValue, ...
             />
             <span className={`${valueClassName} text-right tabular-nums`}>{displayValue}</span>
         </label>
+    );
+}
+
+function SettingsNumberField({ valueAtom, label, ...rest }: { valueAtom: PrimitiveAtom<number>; label: string; } & InputHTMLAttributes<HTMLInputElement>) {
+    const [value, setValue] = useAtom(valueAtom);
+    return (
+        <label className="space-y-1 text-xs">
+            <span className="text-muted-foreground">{label}</span>
+            <input
+                type="number"
+                className="h-7 w-full rounded border bg-background px-2 text-xs"
+                value={value}
+                onChange={(event) => setValue(Number(event.target.value))}
+                {...rest}
+            />
+        </label>
+    );
+}
+
+function ToggleRow({ label, atom }: { label: string; atom: PrimitiveAtom<boolean>; }) {
+    const [value, setValue] = useAtom(atom);
+    return (
+        <label className="flex items-center justify-between gap-2 text-xs">
+            <span>{label}</span>
+            <Switch checked={value} onCheckedChange={(checked) => setValue(Boolean(checked))} />
+        </label>
+    );
+}
+
+function SettingsSwitch({ atom }: { atom: PrimitiveAtom<boolean>; }) {
+    const [value, setValue] = useAtom(atom);
+    return (
+        <Switch checked={value} onCheckedChange={(checked) => setValue(Boolean(checked))} />
     );
 }

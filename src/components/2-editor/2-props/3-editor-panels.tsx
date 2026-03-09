@@ -2,21 +2,64 @@ import { useEffect, useRef, useState } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { TransformPanel } from "./5-transform-panel";
 import {
+    canRedoAtom,
+    canUndoAtom,
     commandRowsAtom,
+    doConvertSegmentAtom,
+    doDeleteSegmentAtom,
+    doInsertSegmentAtom,
+    doRedoPathAtom,
     doSetCommandValueAtom,
+    doToggleSegmentRelativeAtom,
+    doUndoPathAtom,
+    doDeleteImageAtom,
+    doUpdateImageAtom,
+    focusedImageIdAtom,
+    hoveredCommandIndexAtom,
+    imagesAtom,
+    isImageEditModeAtom,
     parseErrorAtom,
     selectedCommandIndexAtom,
     svgPathInputAtom,
 } from "@/store/0-atoms/2-svg-path-state";
 import { CanvasActionsMenu } from "./4-canvas-actions-menu";
 import { cn } from "@/utils";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from "@/components/ui/shadcn/dropdown-menu";
+import { Button } from "@/components/ui/shadcn/button";
+import { IconRadix_DotsHorizontal } from "@/components/ui/icons/normal";
+
+const COMMAND_TYPES = ["M", "L", "V", "H", "C", "S", "Q", "T", "A", "Z"] as const;
 
 export function EditorPanels() {
     const error = useAtomValue(parseErrorAtom);
     const rows = useAtomValue(commandRowsAtom);
+    const canUndo = useAtomValue(canUndoAtom);
+    const canRedo = useAtomValue(canRedoAtom);
     const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
+    const [, setHoveredCommandIndex] = useAtom(hoveredCommandIndexAtom);
+    const [isImageEditMode] = useAtom(isImageEditModeAtom);
+    const images = useAtomValue(imagesAtom);
+    const [focusedImageId, setFocusedImageId] = useAtom(focusedImageIdAtom);
     const setCommandValue = useSetAtom(doSetCommandValueAtom);
+    const doToggleRelative = useSetAtom(doToggleSegmentRelativeAtom);
+    const doDeleteSegment = useSetAtom(doDeleteSegmentAtom);
+    const doInsertSegment = useSetAtom(doInsertSegmentAtom);
+    const doConvertSegment = useSetAtom(doConvertSegmentAtom);
+    const doUndo = useSetAtom(doUndoPathAtom);
+    const doRedo = useSetAtom(doRedoPathAtom);
+    const doDeleteImage = useSetAtom(doDeleteImageAtom);
+    const doUpdateImage = useSetAtom(doUpdateImageAtom);
     const rowRefs = useRef<Record<number, HTMLDivElement | null>>({});
+    const fieldRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
     useEffect(() => {
         if (selectedCommandIndex === null) return;
@@ -25,6 +68,69 @@ export function EditorPanels() {
             block: "nearest",
         });
     }, [selectedCommandIndex, rows.length]);
+
+    useEffect(() => {
+        const onKeyDown = (event: KeyboardEvent) => {
+            const target = event.target as HTMLElement | null;
+            const inInput = target?.tagName === "INPUT" || target?.tagName === "TEXTAREA";
+            if (event.key === "Escape" && !inInput) {
+                setSelectedCommandIndex(null);
+                setHoveredCommandIndex(null);
+                return;
+            }
+
+            const key = event.key.toLowerCase();
+            const withCtrl = event.metaKey || event.ctrlKey;
+            if (withCtrl && key === "z") {
+                event.preventDefault();
+                if (event.shiftKey) {
+                    if (canRedo) doRedo();
+                } else if (canUndo) {
+                    doUndo();
+                }
+                return;
+            }
+
+            if (inInput) return;
+
+            if ((event.key === "Backspace" || event.key === "Delete") && selectedCommandIndex !== null) {
+                event.preventDefault();
+                doDeleteSegment(selectedCommandIndex);
+                return;
+            }
+            if ((event.key === "Backspace" || event.key === "Delete") && focusedImageId) {
+                event.preventDefault();
+                doDeleteImage(focusedImageId);
+                return;
+            }
+
+            if (!/^[mlvhcsqtaz]$/i.test(event.key)) return;
+            event.preventDefault();
+
+            if (event.shiftKey) {
+                if (selectedCommandIndex === null) return;
+                const row = rows[selectedCommandIndex];
+                if (!row) return;
+                const toType = row.command === row.command.toLowerCase()
+                    ? key.toLowerCase()
+                    : key.toUpperCase();
+                doConvertSegment({ segmentIndex: selectedCommandIndex, type: toType });
+                return;
+            }
+
+            doInsertSegment({
+                type: key,
+                afterIndex: selectedCommandIndex,
+            });
+        };
+
+        window.addEventListener("keydown", onKeyDown);
+        return () => window.removeEventListener("keydown", onKeyDown);
+    }, [canRedo, canUndo, doConvertSegment, doDeleteImage, doDeleteSegment, doInsertSegment, doRedo, doUndo, focusedImageId, rows, selectedCommandIndex, setHoveredCommandIndex, setSelectedCommandIndex]);
+
+    const focusField = (rowIndex: number, valueIndex: number) => {
+        fieldRefs.current[`${rowIndex}:${valueIndex}`]?.focus();
+    };
 
     return (<>
         <PathInputSection />
@@ -64,23 +170,32 @@ export function EditorPanels() {
                                     : "border-transparent bg-background hover:bg-muted/40",
                             )}
                             onClick={() => setSelectedCommandIndex(row.index)}
+                            onMouseEnter={() => setHoveredCommandIndex(row.index)}
+                            onMouseLeave={() => setHoveredCommandIndex(null)}
                         >
                             <span className="w-6 shrink-0 text-[10px] text-muted-foreground">
                                 {String(row.index + 1).padStart(2, "0")}.
                             </span>
 
-                            <span
+                            <button
+                                type="button"
                                 className={cn(
-                                    "w-4 shrink-0 text-center text-sm font-semibold",
+                                    "w-4 shrink-0 text-center text-sm font-semibold cursor-pointer",
                                     row.command === row.command.toLowerCase()
                                         ? "text-violet-500"
                                         : "text-orange-500",
                                 )}
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    setSelectedCommandIndex(row.index);
+                                    doToggleRelative(row.index);
+                                }}
+                                title="Toggle relative/absolute"
                             >
                                 {row.command}
-                            </span>
+                            </button>
 
-                            <div className="flex flex-wrap items-center gap-1.5">
+                            <div className="flex flex-wrap items-center gap-1.5 min-w-0">
                                 {row.values.length === 0 && (
                                     <span className="text-[10px] text-muted-foreground">No values</span>
                                 )}
@@ -93,6 +208,9 @@ export function EditorPanels() {
                                                 <input
                                                     type="checkbox"
                                                     checked={value === 1}
+                                                    ref={(element) => {
+                                                        fieldRefs.current[`${row.index}:${valueIndex}`] = element;
+                                                    }}
                                                     onFocus={() => setSelectedCommandIndex(row.index)}
                                                     onChange={(event) => {
                                                         setSelectedCommandIndex(row.index);
@@ -101,6 +219,14 @@ export function EditorPanels() {
                                                             valueIndex,
                                                             value: event.target.checked ? 1 : 0,
                                                         });
+                                                    }}
+                                                    onKeyDown={(event) => {
+                                                        if (event.key === "ArrowLeft") {
+                                                            focusField(row.index, Math.max(0, valueIndex - 1));
+                                                        }
+                                                        if (event.key === "ArrowRight") {
+                                                            focusField(row.index, Math.min(row.values.length - 1, valueIndex + 1));
+                                                        }
                                                     }}
                                                 />
                                                 <span className="text-muted-foreground">{valueIndex === 3 ? "laf" : "swp"}</span>
@@ -121,14 +247,149 @@ export function EditorPanels() {
                                                     value: nextValue,
                                                 });
                                             }}
+                                            inputRef={(element) => {
+                                                fieldRefs.current[`${row.index}:${valueIndex}`] = element;
+                                            }}
+                                            onArrowMove={(direction) => {
+                                                const nextIndex = direction === "left"
+                                                    ? Math.max(0, valueIndex - 1)
+                                                    : Math.min(row.values.length - 1, valueIndex + 1);
+                                                focusField(row.index, nextIndex);
+                                            }}
                                         />
                                     );
                                 })}
+                            </div>
+
+                            <div className="ml-auto">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="size-6"
+                                            onClick={(event) => event.stopPropagation()}
+                                        >
+                                            <IconRadix_DotsHorizontal className="size-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+
+                                    <DropdownMenuContent
+                                        align="end"
+                                        onClick={(event) => event.stopPropagation()}
+                                    >
+                                        <DropdownMenuSub>
+                                            <DropdownMenuSubTrigger>Insert After</DropdownMenuSubTrigger>
+                                            <DropdownMenuSubContent>
+                                                {COMMAND_TYPES.map((type) => (
+                                                    <DropdownMenuItem
+                                                        key={`insert:${row.index}:${type}`}
+                                                        onSelect={() => doInsertSegment({ type, afterIndex: row.index })}
+                                                    >
+                                                        <strong className="mr-1">{type}</strong> {commandLabel(type)}
+                                                    </DropdownMenuItem>
+                                                ))}
+                                            </DropdownMenuSubContent>
+                                        </DropdownMenuSub>
+
+                                        <DropdownMenuSub>
+                                            <DropdownMenuSubTrigger>Convert To</DropdownMenuSubTrigger>
+                                            <DropdownMenuSubContent>
+                                                {COMMAND_TYPES.map((type) => {
+                                                    const toType = row.command === row.command.toLowerCase()
+                                                        ? type.toLowerCase()
+                                                        : type;
+                                                    return (
+                                                        <DropdownMenuItem
+                                                            key={`convert:${row.index}:${type}`}
+                                                            onSelect={() => doConvertSegment({ segmentIndex: row.index, type: toType })}
+                                                        >
+                                                            <strong className="mr-1">{type}</strong> {commandLabel(type)}
+                                                        </DropdownMenuItem>
+                                                    );
+                                                })}
+                                            </DropdownMenuSubContent>
+                                        </DropdownMenuSub>
+
+                                        <DropdownMenuItem onSelect={() => doToggleRelative(row.index)}>
+                                            {row.command === row.command.toLowerCase() ? "Set Absolute" : "Set Relative"}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem
+                                            disabled={row.index === 0}
+                                            onSelect={() => doDeleteSegment(row.index)}
+                                        >
+                                            Delete
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
                         </div>
                     ))}
                 </div>
             </section>
+
+            {(isImageEditMode || images.length > 0) && (
+                <section className="rounded-lg border p-3">
+                    <h2 className="mb-2 text-sm font-semibold">Images</h2>
+                    <div className="space-y-2">
+                        {images.length === 0 && (
+                            <p className="text-xs text-muted-foreground">No images loaded.</p>
+                        )}
+                        {images.map((image) => (
+                            <div
+                                key={image.id}
+                                className={cn(
+                                    "rounded border p-2 space-y-2",
+                                    focusedImageId === image.id ? "border-sky-500/50 bg-sky-500/10" : "bg-muted/20",
+                                )}
+                                onClick={() => setFocusedImageId(image.id)}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs font-medium">Image {image.id.slice(-4)}</span>
+                                    <Button
+                                        variant="outline"
+                                        className="ml-auto h-6 px-2 text-xs text-destructive"
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            doDeleteImage(image.id);
+                                        }}
+                                    >
+                                        Delete
+                                    </Button>
+                                </div>
+
+                                <label className="flex items-center justify-between text-xs">
+                                    <span>Opacity</span>
+                                    <input
+                                        type="range"
+                                        min={0}
+                                        max={1}
+                                        step={0.01}
+                                        value={image.opacity}
+                                        onChange={(event) => doUpdateImage({
+                                            id: image.id,
+                                            patch: { opacity: Number(event.target.value) },
+                                        })}
+                                    />
+                                </label>
+
+                                <label className="flex items-center justify-between text-xs">
+                                    <span>Preserve aspect</span>
+                                    <input
+                                        type="checkbox"
+                                        checked={image.preserveAspectRatio}
+                                        onChange={(event) => doUpdateImage({
+                                            id: image.id,
+                                            patch: { preserveAspectRatio: event.target.checked },
+                                        })}
+                                    />
+                                </label>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
         </div>
     </>);
 }
@@ -159,10 +420,14 @@ function CommandValueInput({
     value,
     onCommit,
     onFocus,
+    inputRef,
+    onArrowMove,
 }: {
     value: number;
     onCommit: (value: number) => void;
     onFocus: () => void;
+    inputRef?: (element: HTMLInputElement | null) => void;
+    onArrowMove?: (direction: "left" | "right") => void;
 }) {
     const [draft, setDraft] = useState(String(value));
 
@@ -184,6 +449,7 @@ function CommandValueInput({
             type="text"
             inputMode="decimal"
             className="h-6 w-14 rounded border bg-background px-1.5 text-center text-[11px]"
+            ref={inputRef}
             value={draft}
             onFocus={onFocus}
             onChange={(event) => setDraft(event.target.value)}
@@ -198,7 +464,29 @@ function CommandValueInput({
                     setDraft(String(value));
                     event.currentTarget.blur();
                 }
+                if (event.key === "ArrowLeft" && event.currentTarget.selectionStart === 0 && event.currentTarget.selectionEnd === 0) {
+                    onArrowMove?.("left");
+                }
+                if (event.key === "ArrowRight" && event.currentTarget.selectionStart === event.currentTarget.value.length && event.currentTarget.selectionEnd === event.currentTarget.value.length) {
+                    onArrowMove?.("right");
+                }
             }}
         />
     );
+}
+
+function commandLabel(type: string): string {
+    switch (type) {
+        case "M": return "Move";
+        case "L": return "Line";
+        case "H": return "Horizontal";
+        case "V": return "Vertical";
+        case "C": return "Cubic";
+        case "S": return "Smooth Cubic";
+        case "Q": return "Quadratic";
+        case "T": return "Smooth Quadratic";
+        case "A": return "Arc";
+        case "Z": return "Close";
+        default: return type;
+    }
 }

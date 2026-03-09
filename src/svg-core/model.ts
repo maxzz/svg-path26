@@ -1,5 +1,7 @@
 import { parseSvgPath } from "./parser";
 
+export type Point = { x: number; y: number; };
+
 export type SvgSegmentSummary = {
     index: number;
     command: string;
@@ -7,9 +9,43 @@ export type SvgSegmentSummary = {
     target: Point;
 };
 
+export type SvgCanvasPoint = {
+    id: string;
+    segmentIndex: number;
+    kind: "target" | "control";
+    controlIndex: number;
+    x: number;
+    y: number;
+    movable: boolean;
+    relations: Point[];
+};
+
+export type SvgCanvasLine = {
+    from: Point;
+    to: Point;
+};
+
+export type SvgCanvasGeometry = {
+    targets: SvgCanvasPoint[];
+    controls: SvgCanvasPoint[];
+    relationLines: SvgCanvasLine[];
+    standaloneBySegment: string[];
+};
+
 type SvgSegment = {
     command: string;
     values: number[];
+};
+
+type AbsoluteSegment = {
+    index: number;
+    segment: SvgSegment;
+    command: string;
+    start: Point;
+    end: Point;
+    values: number[];
+    reflectedCubicControl: Point;
+    reflectedQuadraticControl: Point;
 };
 
 export class SvgPathModel {
@@ -56,50 +92,44 @@ export class SvgPathModel {
     }
 
     getTargetPoints(): Point[] {
-        return this.getSummaries().map((it) => it.target);
+        return this.computeAbsoluteSegments().map((it) => ({ ...it.end }));
     }
 
     getBounds(): Bounds {
-        const targets = this.getTargetPoints();
-        if (!targets.length) {
+        const geometry = this.getCanvasGeometry();
+        const points = [
+            ...geometry.targets.map((it) => ({ x: it.x, y: it.y })),
+            ...geometry.controls.map((it) => ({ x: it.x, y: it.y })),
+        ];
+
+        if (!points.length) {
             return { xmin: 0, ymin: 0, xmax: 10, ymax: 10 };
         }
 
         return {
-            xmin: Math.min(...targets.map((p) => p.x)),
-            ymin: Math.min(...targets.map((p) => p.y)),
-            xmax: Math.max(...targets.map((p) => p.x)),
-            ymax: Math.max(...targets.map((p) => p.y)),
+            xmin: Math.min(...points.map((p) => p.x)),
+            ymin: Math.min(...points.map((p) => p.y)),
+            xmax: Math.max(...points.map((p) => p.x)),
+            ymax: Math.max(...points.map((p) => p.y)),
         };
     }
 
     getSummaries(): SvgSegmentSummary[] {
-        const summaries: SvgSegmentSummary[] = [];
-        let current: Point = { x: 0, y: 0 };
-        let subpathStart: Point = { x: 0, y: 0 };
+        return this.computeAbsoluteSegments().map((item) => ({
+            index: item.index,
+            command: item.segment.command,
+            values: [...item.segment.values],
+            target: { ...item.end },
+        }));
+    }
 
-        this.segments.forEach((segment, index) => {
-            const absolute = this.toAbsoluteSegment(segment, current, subpathStart);
-            const cmd = upper(absolute.command);
+    getCanvasGeometry(): SvgCanvasGeometry {
+        return this.buildCanvasGeometry(this.computeAbsoluteSegments());
+    }
 
-            if (cmd === "M") {
-                subpathStart = { ...absolute.target };
-            }
-            if (cmd === "Z") {
-                current = { ...subpathStart };
-            } else {
-                current = { ...absolute.target };
-            }
-
-            summaries.push({
-                index,
-                command: segment.command,
-                values: [...segment.values],
-                target: { ...absolute.target },
-            });
-        });
-
-        return summaries;
+    getStandaloneSegmentPath(segmentIndex: number): string | null {
+        const { standaloneBySegment } = this.getCanvasGeometry();
+        return standaloneBySegment[segmentIndex] ?? null;
     }
 
     setSegmentValue(segmentIndex: number, valueIndex: number, value: number) {
@@ -108,6 +138,241 @@ export class SvgPathModel {
         if (valueIndex < 0 || valueIndex >= segment.values.length) return;
         if (!Number.isFinite(value)) return;
         segment.values[valueIndex] = value;
+    }
+
+    setTargetPointLocation(segmentIndex: number, target: Point) {
+        const absolute = this.computeAbsoluteSegments();
+        const segmentData = absolute[segmentIndex];
+        if (!segmentData) return;
+
+        const segment = this.segments[segmentIndex];
+        const cmd = upper(segment.command);
+        if (cmd === "Z") return;
+
+        if (cmd === "H") {
+            segment.values[0] = isRelative(segment.command)
+                ? target.x - segmentData.start.x
+                : target.x;
+            return;
+        }
+        if (cmd === "V") {
+            segment.values[0] = isRelative(segment.command)
+                ? target.y - segmentData.start.y
+                : target.y;
+            return;
+        }
+        if (cmd === "A") {
+            if (isRelative(segment.command)) {
+                segment.values[5] = target.x - segmentData.start.x;
+                segment.values[6] = target.y - segmentData.start.y;
+            } else {
+                segment.values[5] = target.x;
+                segment.values[6] = target.y;
+            }
+            return;
+        }
+
+        const valueCount = segment.values.length;
+        if (valueCount < 2) return;
+
+        if (isRelative(segment.command)) {
+            segment.values[valueCount - 2] = target.x - segmentData.start.x;
+            segment.values[valueCount - 1] = target.y - segmentData.start.y;
+        } else {
+            segment.values[valueCount - 2] = target.x;
+            segment.values[valueCount - 1] = target.y;
+        }
+    }
+
+    setControlPointLocation(segmentIndex: number, controlIndex: number, next: Point) {
+        const absolute = this.computeAbsoluteSegments();
+        const segmentData = absolute[segmentIndex];
+        if (!segmentData) return;
+
+        const segment = this.segments[segmentIndex];
+        const cmd = upper(segment.command);
+        const relative = isRelative(segment.command);
+
+        const setXY = (xIndex: number, yIndex: number) => {
+            if (relative) {
+                segment.values[xIndex] = next.x - segmentData.start.x;
+                segment.values[yIndex] = next.y - segmentData.start.y;
+            } else {
+                segment.values[xIndex] = next.x;
+                segment.values[yIndex] = next.y;
+            }
+        };
+
+        if (cmd === "C") {
+            if (controlIndex === 0) setXY(0, 1);
+            if (controlIndex === 1) setXY(2, 3);
+            return;
+        }
+
+        if (cmd === "S" && controlIndex === 1) {
+            setXY(0, 1);
+            return;
+        }
+
+        if (cmd === "Q" && controlIndex === 0) {
+            setXY(0, 1);
+        }
+    }
+
+    setCanvasPointLocation(point: SvgCanvasPoint, to: Point) {
+        if (point.kind === "target") {
+            this.setTargetPointLocation(point.segmentIndex, to);
+            return;
+        }
+        this.setControlPointLocation(point.segmentIndex, point.controlIndex, to);
+    }
+
+    canDelete(segmentIndex: number): boolean {
+        return segmentIndex > 0 && segmentIndex < this.segments.length;
+    }
+
+    deleteSegment(segmentIndex: number) {
+        if (!this.canDelete(segmentIndex)) return;
+        this.segments.splice(segmentIndex, 1);
+    }
+
+    canInsertAfter(afterIndex: number | null, commandType: string): boolean {
+        const type = upper(commandType);
+        let previousType: string | null = null;
+
+        if (afterIndex !== null && afterIndex >= 0 && afterIndex < this.segments.length) {
+            previousType = upper(this.segments[afterIndex].command);
+        } else if (this.segments.length > 0) {
+            previousType = upper(this.segments[this.segments.length - 1].command);
+        }
+
+        if (!previousType) return type !== "Z";
+        if (previousType === "M") return type !== "M" && type !== "Z" && type !== "T" && type !== "S";
+        if (previousType === "Z") return type !== "Z" && type !== "T" && type !== "S";
+        if (previousType === "C" || previousType === "S") return type !== "T";
+        if (previousType === "Q" || previousType === "T") return type !== "S";
+        return type !== "T" && type !== "S";
+    }
+
+    canConvert(segmentIndex: number, toCommandType: string): boolean {
+        if (segmentIndex <= 0 || segmentIndex >= this.segments.length) return false;
+        return this.canInsertAfter(segmentIndex - 1, toCommandType);
+    }
+
+    insertSegment(type: string, afterIndex: number | null): number | null {
+        const command = type || "L";
+        const cmd = upper(command);
+        if (!this.canInsertAfter(afterIndex, command)) return null;
+
+        const absolute = this.computeAbsoluteSegments();
+        let anchor: Point = { x: 0, y: 0 };
+
+        if (afterIndex !== null && afterIndex >= 0 && afterIndex < absolute.length) {
+            anchor = { ...absolute[afterIndex].end };
+        } else if (absolute.length > 0) {
+            anchor = { ...absolute[absolute.length - 1].end };
+        }
+
+        let insertAt = afterIndex === null ? this.segments.length : Math.min(this.segments.length, afterIndex + 1);
+
+        if (this.segments.length === 0 && cmd !== "M") {
+            this.segments.push({ command: "M", values: [0, 0] });
+            insertAt = this.segments.length;
+        }
+
+        const newSegment = this.createSegmentForType(command, anchor);
+        this.segments.splice(insertAt, 0, newSegment);
+        return insertAt;
+    }
+
+    changeSegmentType(segmentIndex: number, toCommandType: string): boolean {
+        if (!this.canConvert(segmentIndex, toCommandType)) return false;
+        const absolute = this.computeAbsoluteSegments();
+        const current = absolute[segmentIndex];
+        if (!current) return false;
+
+        const toUpper = upper(toCommandType);
+        const toRelative = isRelative(toCommandType);
+        const start = current.start;
+        const end = current.end;
+
+        let nextAbsoluteValues: number[] = [];
+        switch (toUpper) {
+            case "M":
+            case "L":
+                nextAbsoluteValues = [end.x, end.y];
+                break;
+            case "H":
+                nextAbsoluteValues = [end.x];
+                break;
+            case "V":
+                nextAbsoluteValues = [end.y];
+                break;
+            case "C":
+                nextAbsoluteValues = [
+                    (2 * start.x + end.x) / 3,
+                    (2 * start.y + end.y) / 3,
+                    (start.x + 2 * end.x) / 3,
+                    (start.y + 2 * end.y) / 3,
+                    end.x,
+                    end.y,
+                ];
+                break;
+            case "S":
+                nextAbsoluteValues = [
+                    (start.x + 2 * end.x) / 3,
+                    (start.y + 2 * end.y) / 3,
+                    end.x,
+                    end.y,
+                ];
+                break;
+            case "Q":
+                nextAbsoluteValues = [
+                    (start.x + end.x) / 2,
+                    (start.y + end.y) / 2,
+                    end.x,
+                    end.y,
+                ];
+                break;
+            case "T":
+                nextAbsoluteValues = [end.x, end.y];
+                break;
+            case "A":
+                nextAbsoluteValues = [1, 1, 0, 0, 0, end.x, end.y];
+                break;
+            case "Z":
+                nextAbsoluteValues = [];
+                break;
+            default:
+                return false;
+        }
+
+        const nextValues = toRelative
+            ? this.absoluteToRelativeValues(toUpper, nextAbsoluteValues, start)
+            : nextAbsoluteValues;
+
+        this.segments[segmentIndex].command = toRelative ? toUpper.toLowerCase() : toUpper;
+        this.segments[segmentIndex].values = nextValues;
+        return true;
+    }
+
+    toggleSegmentRelative(segmentIndex: number) {
+        const segment = this.segments[segmentIndex];
+        if (!segment) return;
+
+        const absolute = this.computeAbsoluteSegments();
+        const data = absolute[segmentIndex];
+        if (!data) return;
+
+        const currentlyRelative = isRelative(segment.command);
+        if (currentlyRelative) {
+            segment.command = upper(segment.command);
+            segment.values = [...data.values];
+            return;
+        }
+
+        segment.command = segment.command.toLowerCase();
+        segment.values = this.absoluteToRelativeValues(data.command, data.values, data.start);
     }
 
     scale(scaleX: number, scaleY: number) {
@@ -184,30 +449,242 @@ export class SvgPathModel {
     }
 
     setRelative(makeRelative: boolean) {
+        const absolute = this.computeAbsoluteSegments();
+        absolute.forEach((entry) => {
+            if (makeRelative) {
+                entry.segment.command = entry.command.toLowerCase();
+                entry.segment.values = this.absoluteToRelativeValues(entry.command, entry.values, entry.start);
+            } else {
+                entry.segment.command = entry.command;
+                entry.segment.values = [...entry.values];
+            }
+        });
+    }
+
+    private createSegmentForType(type: string, anchor: Point): SvgSegment {
+        const relative = isRelative(type);
+        const cmd = upper(type);
+        const x = relative ? 0 : anchor.x;
+        const y = relative ? 0 : anchor.y;
+
+        switch (cmd) {
+            case "M":
+            case "L":
+            case "T":
+                return { command: type, values: [x, y] };
+            case "H":
+                return { command: type, values: [x] };
+            case "V":
+                return { command: type, values: [y] };
+            case "S":
+            case "Q":
+                return { command: type, values: [x, y, x, y] };
+            case "C":
+                return { command: type, values: [x, y, x, y, x, y] };
+            case "A":
+                return { command: type, values: [1, 1, 0, 0, 0, x, y] };
+            case "Z":
+                return { command: type, values: [] };
+            default:
+                return { command: type, values: [x, y] };
+        }
+    }
+
+    private computeAbsoluteSegments(): AbsoluteSegment[] {
+        const computed: AbsoluteSegment[] = [];
         let current: Point = { x: 0, y: 0 };
         let subpathStart: Point = { x: 0, y: 0 };
 
-        this.segments.forEach((segment) => {
-            const absSegment = this.toAbsoluteSegment(segment, current, subpathStart);
-            const absCommand = upper(segment.command);
+        for (let index = 0; index < this.segments.length; index += 1) {
+            const segment = this.segments[index];
+            const absolute = this.toAbsoluteSegment(segment, current, subpathStart);
+            const command = upper(segment.command);
+            const start = clonePoint(current);
+            const end = clonePoint(absolute.target);
 
-            if (makeRelative) {
-                segment.command = segment.command.toLowerCase();
-                segment.values = this.absoluteToRelativeValues(absCommand, absSegment.values, current);
-            } else {
-                segment.command = absCommand;
-                segment.values = [...absSegment.values];
+            let reflectedCubicControl = clonePoint(start);
+            let reflectedQuadraticControl = clonePoint(start);
+
+            const previous = computed[computed.length - 1];
+            if (command === "S" && previous) {
+                if (previous.command === "C") {
+                    reflectedCubicControl = reflectPoint({ x: previous.values[2], y: previous.values[3] }, start);
+                } else if (previous.command === "S") {
+                    reflectedCubicControl = reflectPoint({ x: previous.values[0], y: previous.values[1] }, start);
+                }
+            }
+            if (command === "T" && previous) {
+                if (previous.command === "Q") {
+                    reflectedQuadraticControl = reflectPoint({ x: previous.values[0], y: previous.values[1] }, start);
+                } else if (previous.command === "T") {
+                    reflectedQuadraticControl = reflectPoint(previous.reflectedQuadraticControl, start);
+                }
             }
 
-            if (absCommand === "M") {
-                subpathStart = { ...absSegment.target };
+            computed.push({
+                index,
+                segment,
+                command,
+                start,
+                end,
+                values: [...absolute.values],
+                reflectedCubicControl,
+                reflectedQuadraticControl,
+            });
+
+            if (command === "M") {
+                subpathStart = clonePoint(end);
             }
-            if (absCommand === "Z") {
-                current = { ...subpathStart };
-            } else {
-                current = { ...absSegment.target };
+            current = command === "Z" ? clonePoint(subpathStart) : clonePoint(end);
+        }
+
+        return computed;
+    }
+
+    private buildCanvasGeometry(absolute: AbsoluteSegment[]): SvgCanvasGeometry {
+        const targets: SvgCanvasPoint[] = [];
+        const controls: SvgCanvasPoint[] = [];
+        const relationLines: SvgCanvasLine[] = [];
+        const standaloneBySegment: string[] = [];
+
+        const addControl = (args: {
+            id: string;
+            segmentIndex: number;
+            controlIndex: number;
+            x: number;
+            y: number;
+            movable: boolean;
+            relations: Point[];
+        }) => {
+            controls.push({
+                id: args.id,
+                segmentIndex: args.segmentIndex,
+                kind: "control",
+                controlIndex: args.controlIndex,
+                x: args.x,
+                y: args.y,
+                movable: args.movable,
+                relations: args.relations.map((it) => ({ ...it })),
+            });
+            args.relations.forEach((relation) => {
+                relationLines.push({
+                    from: { x: args.x, y: args.y },
+                    to: { ...relation },
+                });
+            });
+        };
+
+        absolute.forEach((segmentData) => {
+            const { index, command, values, start, end } = segmentData;
+            targets.push({
+                id: `${index}:target`,
+                segmentIndex: index,
+                kind: "target",
+                controlIndex: -1,
+                x: end.x,
+                y: end.y,
+                movable: command !== "Z",
+                relations: [],
+            });
+
+            if (command === "C") {
+                addControl({
+                    id: `${index}:control:0`,
+                    segmentIndex: index,
+                    controlIndex: 0,
+                    x: values[0],
+                    y: values[1],
+                    movable: true,
+                    relations: [start],
+                });
+                addControl({
+                    id: `${index}:control:1`,
+                    segmentIndex: index,
+                    controlIndex: 1,
+                    x: values[2],
+                    y: values[3],
+                    movable: true,
+                    relations: [end],
+                });
             }
+
+            if (command === "S") {
+                addControl({
+                    id: `${index}:control:0`,
+                    segmentIndex: index,
+                    controlIndex: 0,
+                    x: segmentData.reflectedCubicControl.x,
+                    y: segmentData.reflectedCubicControl.y,
+                    movable: false,
+                    relations: [start],
+                });
+                addControl({
+                    id: `${index}:control:1`,
+                    segmentIndex: index,
+                    controlIndex: 1,
+                    x: values[0],
+                    y: values[1],
+                    movable: true,
+                    relations: [end],
+                });
+            }
+
+            if (command === "Q") {
+                addControl({
+                    id: `${index}:control:0`,
+                    segmentIndex: index,
+                    controlIndex: 0,
+                    x: values[0],
+                    y: values[1],
+                    movable: true,
+                    relations: [start, end],
+                });
+            }
+
+            if (command === "T") {
+                addControl({
+                    id: `${index}:control:0`,
+                    segmentIndex: index,
+                    controlIndex: 0,
+                    x: segmentData.reflectedQuadraticControl.x,
+                    y: segmentData.reflectedQuadraticControl.y,
+                    movable: false,
+                    relations: [start, end],
+                });
+            }
+
+            standaloneBySegment[index] = this.makeStandaloneSegmentPath(segmentData);
         });
+
+        return {
+            targets,
+            controls,
+            relationLines,
+            standaloneBySegment,
+        };
+    }
+
+    private makeStandaloneSegmentPath(segment: AbsoluteSegment): string {
+        const start = `${formatNumber(segment.start.x, 4, false)} ${formatNumber(segment.start.y, 4, false)}`;
+        const cmd = segment.command;
+        if (cmd === "Z") {
+            const end = `${formatNumber(segment.end.x, 4, false)} ${formatNumber(segment.end.y, 4, false)}`;
+            return `M ${start} L ${end}`;
+        }
+        if (cmd === "S") {
+            const c1 = `${formatNumber(segment.reflectedCubicControl.x, 4, false)} ${formatNumber(segment.reflectedCubicControl.y, 4, false)}`;
+            const c2 = `${formatNumber(segment.values[0], 4, false)} ${formatNumber(segment.values[1], 4, false)}`;
+            const end = `${formatNumber(segment.end.x, 4, false)} ${formatNumber(segment.end.y, 4, false)}`;
+            return `M ${start} C ${c1} ${c2} ${end}`;
+        }
+        if (cmd === "T") {
+            const c1 = `${formatNumber(segment.reflectedQuadraticControl.x, 4, false)} ${formatNumber(segment.reflectedQuadraticControl.y, 4, false)}`;
+            const end = `${formatNumber(segment.end.x, 4, false)} ${formatNumber(segment.end.y, 4, false)}`;
+            return `M ${start} Q ${c1} ${end}`;
+        }
+
+        const values = segment.values.map((value) => formatNumber(value, 4, false)).join(" ");
+        return `M ${start} ${cmd}${values ? ` ${values}` : ""}`;
     }
 
     private toAbsoluteSegment(segment: SvgSegment, current: Point, subpathStart: Point) {
@@ -301,9 +778,7 @@ export class SvgPathModel {
     }
 }
 
-type Point = { x: number; y: number; };
-
-type Bounds = {
+export type Bounds = {
     xmin: number;
     ymin: number;
     xmax: number;
@@ -327,4 +802,15 @@ function isRelative(command: string): boolean {
 
 function upper(command: string): string {
     return command.toUpperCase();
+}
+
+function reflectPoint(origin: Point, center: Point): Point {
+    return {
+        x: 2 * center.x - origin.x,
+        y: 2 * center.y - origin.y,
+    };
+}
+
+function clonePoint(point: Point): Point {
+    return { x: point.x, y: point.y };
 }
