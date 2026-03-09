@@ -50,6 +50,8 @@ type TouchGestureState =
     | { mode: "pan"; lastClientX: number; lastClientY: number; }
     | { mode: "pinch"; lastDistance: number; lastCenter: Point; };
 
+type GridValues = ReturnType<typeof buildGrid>;
+
 export function PathCanvas() {
     const settings = useSnapshot(appSettings);
     const pathValue = useAtomValue(svgPathInputAtom);
@@ -343,46 +345,15 @@ export function PathCanvas() {
                 }}
             >
                 {settings.showGrid && !preview && (
-                    <>
-                        {grid.xValues.map((x) => (
-                            <line
-                                key={`gx:${x}`}
-                                x1={x}
-                                y1={vy}
-                                x2={x}
-                                y2={vy + vh}
-                                stroke={showTicks && isTick(x, tickInterval) ? "oklch(0.45 0 0 / 0.55)" : "oklch(0.45 0 0 / 0.35)"}
-                                strokeWidth={Math.max(vw, vh) / 1300}
-                            />
-                        ))}
-                        {grid.yValues.map((y) => (
-                            <line
-                                key={`gy:${y}`}
-                                x1={vx}
-                                y1={y}
-                                x2={vx + vw}
-                                y2={y}
-                                stroke={showTicks && isTick(y, tickInterval) ? "oklch(0.45 0 0 / 0.55)" : "oklch(0.45 0 0 / 0.35)"}
-                                strokeWidth={Math.max(vw, vh) / 1300}
-                            />
-                        ))}
-                        <line
-                            x1={0}
-                            y1={vy}
-                            x2={0}
-                            y2={vy + vh}
-                            stroke="oklch(0.7 0 0 / 0.7)"
-                            strokeWidth={Math.max(vw, vh) / 500}
-                        />
-                        <line
-                            x1={vx}
-                            y1={0}
-                            x2={vx + vw}
-                            y2={0}
-                            stroke="oklch(0.7 0 0 / 0.7)"
-                            strokeWidth={Math.max(vw, vh) / 500}
-                        />
-                    </>
+                    <CanvasGridLines
+                        grid={grid}
+                        showTicks={showTicks}
+                        tickInterval={tickInterval}
+                        vx={vx}
+                        vy={vy}
+                        vw={vw}
+                        vh={vh}
+                    />
                 )}
 
                 {!preview && showTicks && settings.showGrid && (
@@ -609,6 +580,70 @@ export function PathCanvas() {
                 </div>
             )}
         </div>
+    );
+}
+
+function CanvasGridLines({
+    grid,
+    showTicks,
+    tickInterval,
+    vx,
+    vy,
+    vw,
+    vh,
+}: {
+    grid: GridValues;
+    showTicks: boolean;
+    tickInterval: number;
+    vx: number;
+    vy: number;
+    vw: number;
+    vh: number;
+}) {
+    const gridStrokeWidth = Math.max(vw, vh) / 1300;
+    const axisStrokeWidth = Math.max(vw, vh) / 500;
+
+    return (
+        <>
+            {grid.xValues.map((x) => (
+                <line
+                    key={`gx:${x}`}
+                    x1={x}
+                    y1={vy}
+                    x2={x}
+                    y2={vy + vh}
+                    stroke={showTicks && isTick(x, tickInterval) ? "oklch(0.45 0 0 / 0.55)" : "oklch(0.45 0 0 / 0.35)"}
+                    strokeWidth={gridStrokeWidth}
+                />
+            ))}
+            {grid.yValues.map((y) => (
+                <line
+                    key={`gy:${y}`}
+                    x1={vx}
+                    y1={y}
+                    x2={vx + vw}
+                    y2={y}
+                    stroke={showTicks && isTick(y, tickInterval) ? "oklch(0.45 0 0 / 0.55)" : "oklch(0.45 0 0 / 0.35)"}
+                    strokeWidth={gridStrokeWidth}
+                />
+            ))}
+            <line
+                x1={0}
+                y1={vy}
+                x2={0}
+                y2={vy + vh}
+                stroke="oklch(0.7 0 0 / 0.7)"
+                strokeWidth={axisStrokeWidth}
+            />
+            <line
+                x1={vx}
+                y1={0}
+                x2={vx + vw}
+                y2={0}
+                stroke="oklch(0.7 0 0 / 0.7)"
+                strokeWidth={axisStrokeWidth}
+            />
+        </>
     );
 }
 
