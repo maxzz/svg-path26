@@ -1,17 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import type { Dispatch, SetStateAction } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { cn } from "@/utils";
 import { CanvasGrid } from "./1-canvas-grid";
+import { CanvasHelperOverlays } from "./3-canvas-helper-overlays";
 import { appSettings } from "@/store/1-ui-settings";
 import {
     canvasPreviewAtom,
     canvasViewBoxAtom,
-    controlLinesAtom,
-    controlPointsAtom,
     doFitViewBoxAtom,
-    doFocusPointCommandAtom,
     doPanViewBoxAtom,
     doSetPointLocationAtom,
     doUpdateImageAtom,
@@ -31,7 +28,6 @@ import {
     snapToGridAtom,
     strokeWidthAtom,
     svgPathInputAtom,
-    targetPointsAtom,
     viewPortLockedAtom,
 } from "@/store/0-atoms/2-svg-path-state";
 import type { EditorImage } from "@/store/0-atoms/2-svg-path-state";
@@ -54,9 +50,6 @@ export function PathCanvas() {
     const parseError = useAtomValue(parseErrorAtom);
     const strokeWidth = useAtomValue(strokeWidthAtom);
     const viewBox = useAtomValue(canvasViewBoxAtom);
-    const targetPoints = useAtomValue(targetPointsAtom);
-    const controlPoints = useAtomValue(controlPointsAtom);
-    const controlLines = useAtomValue(controlLinesAtom);
     const selectedSegmentPath = useAtomValue(selectedStandaloneSegmentPathAtom);
     const hoveredSegmentPath = useAtomValue(hoveredStandaloneSegmentPathAtom);
     const snapToGrid = useAtomValue(snapToGridAtom);
@@ -70,12 +63,11 @@ export function PathCanvas() {
 
     const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
     const [, setHoveredCommandIndex] = useAtom(hoveredCommandIndexAtom);
-    const [, setDraggedCanvasPoint] = useAtom(draggedCanvasPointAtom);
+    const setDraggedCanvasPoint = useSetAtom(draggedCanvasPointAtom);
     const [, setCanvasDragging] = useAtom(isCanvasDraggingAtom);
 
     const setPathValue = useSetAtom(svgPathInputAtom);
     const setPointLocation = useSetAtom(doSetPointLocationAtom);
-    const setFocusPointCommand = useSetAtom(doFocusPointCommandAtom);
     const panViewBox = useSetAtom(doPanViewBoxAtom);
     const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
     const fitViewBox = useSetAtom(doFitViewBoxAtom);
@@ -388,7 +380,16 @@ export function PathCanvas() {
                     />
                 ))}
 
-                <CanvasHelperOverlays pathValue={pathValue} setDragState={setDragState} />
+                <CanvasHelperOverlays
+                    onStartPointDrag={(point, pointerId, startPath) => {
+                        setDragState({
+                            mode: "point",
+                            point,
+                            pointerId,
+                            startPath,
+                        });
+                    }}
+                />
 
                 {!preview && imageEditMode && images.map((image) => (
                     <g
@@ -455,133 +456,6 @@ export function PathCanvas() {
             )}
         </div>
     );
-}
-
-function CanvasHelperOverlays({
-    pathValue,
-    setDragState,
-}: {
-    pathValue: string;
-    setDragState: Dispatch<SetStateAction<DragState | null>>;
-}) {
-    const settings = useSnapshot(appSettings);
-    const preview = useAtomValue(canvasPreviewAtom);
-    const imageEditMode = useAtomValue(isImageEditModeAtom);
-
-    if (preview || imageEditMode || !settings.showHelpers) return null;
-
-    return (
-        <>
-            <CanvasControlLines />
-            <CanvasControlPoints pathValue={pathValue} setDragState={setDragState} />
-            <CanvasTargetPoints pathValue={pathValue} setDragState={setDragState} />
-        </>
-    );
-}
-
-function CanvasControlLines() {
-    const settings = useSnapshot(appSettings);
-    const controlLines = useAtomValue(controlLinesAtom);
-    const [,, vw, vh] = useAtomValue(canvasViewBoxAtom);
-
-    return controlLines.map((line, index) => (
-        <line
-            key={`line:${index}`}
-            x1={line.from.x}
-            y1={line.from.y}
-            x2={line.to.x}
-            y2={line.to.y}
-            stroke={settings.darkCanvas ? "oklch(0.65 0 0 / 0.6)" : "oklch(0.45 0 0 / 0.6)"}
-            strokeWidth={Math.max(vw, vh) / 1400}
-        />
-    ));
-}
-
-function CanvasControlPoints({
-    pathValue,
-    setDragState,
-}: {
-    pathValue: string;
-    setDragState: Dispatch<SetStateAction<DragState | null>>;
-}) {
-    const controlPoints = useAtomValue(controlPointsAtom);
-    const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
-    const [, setHoveredCommandIndex] = useAtom(hoveredCommandIndexAtom);
-    const [, setDraggedCanvasPoint] = useAtom(draggedCanvasPointAtom);
-    const [, setCanvasDragging] = useAtom(isCanvasDraggingAtom);
-    const setFocusPointCommand = useSetAtom(doFocusPointCommandAtom);
-
-    return controlPoints.map((point) => (
-        <circle
-            key={point.id}
-            cx={point.x}
-            cy={point.y}
-            r={point.movable ? 1.45 : 1.2}
-            fill={point.segmentIndex === selectedCommandIndex ? "oklch(0.68 0.18 240)" : "oklch(0.63 0 0)"}
-            stroke="transparent"
-            className={cn(point.movable ? "cursor-pointer" : "cursor-default")}
-            onPointerDown={(event) => {
-                if (!point.movable) return;
-                event.stopPropagation();
-                setFocusPointCommand(point);
-                setSelectedCommandIndex(point.segmentIndex);
-                setDraggedCanvasPoint(point);
-                setCanvasDragging(true);
-                setDragState({
-                    mode: "point",
-                    point,
-                    pointerId: event.pointerId,
-                    startPath: pathValue,
-                });
-            }}
-            onMouseEnter={() => setHoveredCommandIndex(point.segmentIndex)}
-            onMouseLeave={() => setHoveredCommandIndex(null)}
-        />
-    ));
-}
-
-function CanvasTargetPoints({
-    pathValue,
-    setDragState,
-}: {
-    pathValue: string;
-    setDragState: Dispatch<SetStateAction<DragState | null>>;
-}) {
-    const targetPoints = useAtomValue(targetPointsAtom);
-    const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
-    const [, setHoveredCommandIndex] = useAtom(hoveredCommandIndexAtom);
-    const [, setDraggedCanvasPoint] = useAtom(draggedCanvasPointAtom);
-    const [, setCanvasDragging] = useAtom(isCanvasDraggingAtom);
-    const setFocusPointCommand = useSetAtom(doFocusPointCommandAtom);
-
-    return targetPoints.map((point) => (
-        <circle
-            key={point.id}
-            cx={point.x}
-            cy={point.y}
-            r={point.segmentIndex === selectedCommandIndex ? 2.15 : 1.7}
-            fill={point.segmentIndex === selectedCommandIndex ? "oklch(0.68 0.2 240)" : "oklch(0.84 0.22 30)"}
-            stroke={point.segmentIndex === selectedCommandIndex ? "oklch(1 0 0 / 0.75)" : "transparent"}
-            strokeWidth={point.segmentIndex === selectedCommandIndex ? 0.5 : 0}
-            className={cn(point.movable ? "cursor-pointer transition-all" : "cursor-default")}
-            onPointerDown={(event) => {
-                event.stopPropagation();
-                setFocusPointCommand(point);
-                setSelectedCommandIndex(point.segmentIndex);
-                if (!point.movable) return;
-                setDraggedCanvasPoint(point);
-                setCanvasDragging(true);
-                setDragState({
-                    mode: "point",
-                    point,
-                    pointerId: event.pointerId,
-                    startPath: pathValue,
-                });
-            }}
-            onMouseEnter={() => setHoveredCommandIndex(point.segmentIndex)}
-            onMouseLeave={() => setHoveredCommandIndex(null)}
-        />
-    ));
 }
 
 function eventToSvgPoint(
