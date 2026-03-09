@@ -357,34 +357,15 @@ export function PathCanvas() {
                 )}
 
                 {!preview && showTicks && settings.showGrid && (
-                    <>
-                        {grid.xValues.filter((x) => x !== 0 && isTick(x, tickInterval)).map((x) => (
-                            <text
-                                key={`tx:${x}`}
-                                x={x}
-                                y={viewPortY + Math.max(vh / 35, 1)}
-                                textAnchor="middle"
-                                fontSize={Math.max(vw, vh) / 45}
-                                fill={settings.darkCanvas ? "oklch(0.7 0 0)" : "oklch(0.5 0 0)"}
-                                style={{ userSelect: "none" }}
-                            >
-                                {formatTick(x)}
-                            </text>
-                        ))}
-                        {grid.yValues.filter((y) => y !== 0 && isTick(y, tickInterval)).map((y) => (
-                            <text
-                                key={`ty:${y}`}
-                                x={viewPortX + Math.max(vw / 70, 1)}
-                                y={y}
-                                dominantBaseline="middle"
-                                fontSize={Math.max(vw, vh) / 45}
-                                fill={settings.darkCanvas ? "oklch(0.7 0 0)" : "oklch(0.5 0 0)"}
-                                style={{ userSelect: "none" }}
-                            >
-                                {formatTick(y)}
-                            </text>
-                        ))}
-                    </>
+                    <CanvasGridTicks
+                        darkCanvas={settings.darkCanvas}
+                        grid={grid}
+                        tickInterval={tickInterval}
+                        viewPortX={viewPortX}
+                        viewPortY={viewPortY}
+                        vw={vw}
+                        vh={vh}
+                    />
                 )}
 
                 <path
@@ -643,6 +624,58 @@ function CanvasGridLines({
                 stroke="oklch(0.7 0 0 / 0.7)"
                 strokeWidth={axisStrokeWidth}
             />
+        </>
+    );
+}
+
+function CanvasGridTicks({
+    darkCanvas,
+    grid,
+    tickInterval,
+    viewPortX,
+    viewPortY,
+    vw,
+    vh,
+}: {
+    darkCanvas: boolean;
+    grid: GridValues;
+    tickInterval: number;
+    viewPortX: number;
+    viewPortY: number;
+    vw: number;
+    vh: number;
+}) {
+    const fontSize = Math.max(vw, vh) / 45;
+    const fill = darkCanvas ? "oklch(0.7 0 0)" : "oklch(0.5 0 0)";
+
+    return (
+        <>
+            {grid.xValues.filter((x) => x !== 0 && isTick(x, tickInterval)).map((x) => (
+                <text
+                    key={`tx:${x}`}
+                    x={x}
+                    y={viewPortY + Math.max(vh / 35, 1)}
+                    textAnchor="middle"
+                    fontSize={fontSize}
+                    fill={fill}
+                    style={{ userSelect: "none" }}
+                >
+                    {formatTick(x)}
+                </text>
+            ))}
+            {grid.yValues.filter((y) => y !== 0 && isTick(y, tickInterval)).map((y) => (
+                <text
+                    key={`ty:${y}`}
+                    x={viewPortX + Math.max(vw / 70, 1)}
+                    y={y}
+                    dominantBaseline="middle"
+                    fontSize={fontSize}
+                    fill={fill}
+                    style={{ userSelect: "none" }}
+                >
+                    {formatTick(y)}
+                </text>
+            ))}
         </>
     );
 }
