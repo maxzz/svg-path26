@@ -49,12 +49,8 @@ export function PathCanvas() {
     const { onTouchEnd, onTouchMove, onTouchStart, startCanvasDrag, startImageDrag, } = useCanvasDragAndDrop(svgRef, viewBox);
 
     const [vx, vy, vw, vh] = viewBox;
-    const canvasPathFillClasses = fillPreview
-        ? (preview ? canvasPathPreviewFillClasses : canvasPathEditorFillClasses)
-        : canvasPathNoFillClasses;
-    const canvasPathStrokeClasses = preview
-        ? canvasPathPreviewStrokeClasses
-        : (darkCanvas ? canvasPathDarkStrokeClasses : canvasPathLightStrokeClasses);
+    const canvasPathFillClasses = getCanvasPathFillClasses(fillPreview, preview);
+    const canvasPathStrokeClasses = getCanvasPathStrokeClasses(preview, darkCanvas);
 
     useEffect(() => {
         fitViewBox();
@@ -157,7 +153,7 @@ export function PathCanvas() {
                             y={Math.min(image.y1, image.y2)}
                             width={Math.abs(image.x2 - image.x1)}
                             height={Math.abs(image.y2 - image.y1)}
-                            className={image.id === focusedImageId ? imageEditRectFocusedClasses : imageEditRectDefaultClasses}
+                            className={getImageEditRectClasses(image.id === focusedImageId)}
                             strokeWidth={Math.max(vw, vh) / 900}
                         />
                         {buildImageHandles(image).map((handle) => (
@@ -166,7 +162,7 @@ export function PathCanvas() {
                                 cx={handle.x}
                                 cy={handle.y}
                                 r={Math.max(vw, vh) / 180}
-                                className={image.id === focusedImageId ? imageHandleFocusedClasses : imageHandleDefaultClasses}
+                                className={getImageHandleClasses(image.id === focusedImageId)}
                                 onPointerDown={(event) => {
                                     event.stopPropagation();
                                     const start = eventToSvgPoint(svgRef.current, event.clientX, event.clientY, viewBox);
@@ -201,3 +197,21 @@ const imageEditRectFocusedClasses = "fill-transparent stroke-[oklch(0.68_0.2_240
 const imageEditRectDefaultClasses = "fill-transparent stroke-[oklch(0.6_0_0/0.8)] cursor-move";
 const imageHandleFocusedClasses = "fill-[oklch(0.68_0.2_240)] cursor-pointer";
 const imageHandleDefaultClasses = "fill-[oklch(0.65_0_0)] cursor-pointer";
+
+function getCanvasPathFillClasses(fillPreview: boolean, preview: boolean): string {
+    if (!fillPreview) return canvasPathNoFillClasses;
+    return preview ? canvasPathPreviewFillClasses : canvasPathEditorFillClasses;
+}
+
+function getCanvasPathStrokeClasses(preview: boolean, darkCanvas: boolean): string {
+    if (preview) return canvasPathPreviewStrokeClasses;
+    return darkCanvas ? canvasPathDarkStrokeClasses : canvasPathLightStrokeClasses;
+}
+
+function getImageEditRectClasses(focused: boolean): string {
+    return focused ? imageEditRectFocusedClasses : imageEditRectDefaultClasses;
+}
+
+function getImageHandleClasses(focused: boolean): string {
+    return focused ? imageHandleFocusedClasses : imageHandleDefaultClasses;
+}

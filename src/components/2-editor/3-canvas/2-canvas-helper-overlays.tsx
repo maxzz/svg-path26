@@ -36,7 +36,7 @@ function CanvasControlLines() {
     const settings = useSnapshot(appSettings);
     const controlLines = useAtomValue(controlLinesAtom);
     const [, , vw, vh] = useAtomValue(canvasViewBoxAtom);
-    const controlLinesClasses = settings.darkCanvas ? controlLinesDarkClasses : controlLinesLightClasses;
+    const controlLinesClasses = getControlLinesClasses(settings.darkCanvas);
 
     return controlLines.map((line, index) => (
         <line
@@ -65,10 +65,7 @@ function CanvasControlPoints() {
             cx={point.x}
             cy={point.y}
             r={point.movable ? 1.45 : 1.2}
-            className={classNames(
-                point.segmentIndex === selectedCommandIndex ? controlPointSelectedClasses : controlPointDefaultClasses,
-                point.movable ? "cursor-pointer" : "cursor-default",
-            )}
+            className={getControlPointClasses(point.segmentIndex === selectedCommandIndex, point.movable)}
             onPointerDown={(event) => {
                 if (!point.movable) return;
                 event.stopPropagation();
@@ -97,10 +94,7 @@ function CanvasTargetPoints() {
             cy={point.y}
             r={point.segmentIndex === selectedCommandIndex ? 2.15 : 1.7}
             strokeWidth={point.segmentIndex === selectedCommandIndex ? 0.5 : 0}
-            className={classNames(
-                point.segmentIndex === selectedCommandIndex ? targetPointSelectedClasses : targetPointDefaultClasses,
-                point.movable ? "cursor-pointer transition-all" : "cursor-default",
-            )}
+            className={getTargetPointClasses(point.segmentIndex === selectedCommandIndex, point.movable)}
             onPointerDown={(event) => {
                 event.stopPropagation();
                 setFocusPointCommand(point);
@@ -119,6 +113,27 @@ const controlLinesLightClasses = "stroke-[oklch(0.45_0_0/0.6)]";
 
 const controlPointSelectedClasses = "fill-[oklch(0.68_0.18_240)] stroke-transparent";
 const controlPointDefaultClasses = "fill-[oklch(0.63_0_0)] stroke-transparent";
+const cursorPointerClasses = "cursor-pointer";
+const cursorDefaultClasses = "cursor-default";
 
 const targetPointSelectedClasses = "fill-[oklch(0.68_0.2_240)] stroke-[oklch(1_0_0/0.75)]";
 const targetPointDefaultClasses = "fill-[oklch(0.84_0.22_30)] stroke-transparent";
+const targetPointInteractiveClasses = "cursor-pointer transition-all";
+
+function getControlLinesClasses(darkCanvas: boolean): string {
+    return darkCanvas ? controlLinesDarkClasses : controlLinesLightClasses;
+}
+
+function getControlPointClasses(selected: boolean, movable: boolean): string {
+    return classNames(
+        selected ? controlPointSelectedClasses : controlPointDefaultClasses,
+        movable ? cursorPointerClasses : cursorDefaultClasses,
+    );
+}
+
+function getTargetPointClasses(selected: boolean, movable: boolean): string {
+    return classNames(
+        selected ? targetPointSelectedClasses : targetPointDefaultClasses,
+        movable ? targetPointInteractiveClasses : cursorDefaultClasses,
+    );
+}
