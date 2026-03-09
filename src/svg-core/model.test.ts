@@ -34,4 +34,16 @@ describe("SvgPathModel", () => {
         model.deleteSegment(2);
         expect(model.getCommandCount()).toBe(2);
     });
+
+    it("enforces command-context guards for insert and convert", () => {
+        const model = new SvgPathModel("M 0 0 L 10 0");
+
+        expect(model.canInsertAfter(0, "L")).toBe(true);
+        expect(model.canInsertAfter(0, "T")).toBe(false);
+        expect(model.canInsertAfter(0, "S")).toBe(false);
+
+        expect(model.canConvert(0, "L")).toBe(false);
+        expect(model.canConvert(1, "L")).toBe(true);
+        expect(model.canConvert(1, "T")).toBe(false);
+    });
 });

@@ -506,7 +506,7 @@ function NumberField({ label, value, onChange, min }: { label: string; value: nu
     );
 }
 
-function computeExportViewBox(
+export function computeExportViewBox(
     path: string,
     strokePadding: number,
     fallback: { x: number; y: number; width: number; height: number; },
