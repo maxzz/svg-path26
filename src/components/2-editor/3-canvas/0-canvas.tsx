@@ -120,58 +120,64 @@ export function PathCanvas() {
                     />
                 )}
 
-                {images.map((image) => (
-                    <image
-                        key={image.id}
-                        href={image.data}
-                        x={Math.min(image.x1, image.x2)}
-                        y={Math.min(image.y1, image.y2)}
-                        width={Math.abs(image.x2 - image.x1)}
-                        height={Math.abs(image.y2 - image.y1)}
-                        preserveAspectRatio={image.preserveAspectRatio ? "xMidYMid meet" : "none"}
-                        opacity={image.opacity}
-                    />
-                ))}
-
-                <CanvasHelperOverlays />
-
-                {!preview && imageEditMode && images.map((image) => (
-                    <g
-                        key={`edit:${image.id}`}
-                        onPointerDown={(event) => {
-                            event.stopPropagation();
-                            const start = eventToSvgPoint(svgRef.current, event.clientX, event.clientY, viewBox);
-                            if (!start) return;
-                            startImageDrag({ pointerId: event.pointerId, imageId: image.id, handle: "move", start, initial: image });
-                            setFocusedImageId(image.id);
-                        }}
-                    >
-                        <rect
+                {images.map(
+                    (image) => (
+                        <image
+                            key={image.id}
+                            href={image.data}
                             x={Math.min(image.x1, image.x2)}
                             y={Math.min(image.y1, image.y2)}
                             width={Math.abs(image.x2 - image.x1)}
                             height={Math.abs(image.y2 - image.y1)}
-                            className={getImageEditRectClasses(image.id === focusedImageId)}
-                            strokeWidth={Math.max(vw, vh) / 900}
+                            preserveAspectRatio={image.preserveAspectRatio ? "xMidYMid meet" : "none"}
+                            opacity={image.opacity}
                         />
-                        {buildImageHandles(image).map((handle) => (
-                            <circle
-                                key={`${image.id}:${handle.type}`}
-                                cx={handle.x}
-                                cy={handle.y}
-                                r={Math.max(vw, vh) / 180}
-                                className={getImageHandleClasses(image.id === focusedImageId)}
-                                onPointerDown={(event) => {
-                                    event.stopPropagation();
-                                    const start = eventToSvgPoint(svgRef.current, event.clientX, event.clientY, viewBox);
-                                    if (!start) return;
-                                    startImageDrag({ pointerId: event.pointerId, imageId: image.id, handle: handle.type, start, initial: image });
-                                    setFocusedImageId(image.id);
-                                }}
+                    )
+                )}
+
+                <CanvasHelperOverlays />
+
+                {!preview && imageEditMode && images.map(
+                    (image) => (
+                        <g
+                            key={`edit:${image.id}`}
+                            onPointerDown={(event) => {
+                                event.stopPropagation();
+                                const start = eventToSvgPoint(svgRef.current, event.clientX, event.clientY, viewBox);
+                                if (!start) return;
+                                startImageDrag({ pointerId: event.pointerId, imageId: image.id, handle: "move", start, initial: image });
+                                setFocusedImageId(image.id);
+                            }}
+                        >
+                            <rect
+                                x={Math.min(image.x1, image.x2)}
+                                y={Math.min(image.y1, image.y2)}
+                                width={Math.abs(image.x2 - image.x1)}
+                                height={Math.abs(image.y2 - image.y1)}
+                                className={getImageEditRectClasses(image.id === focusedImageId)}
+                                strokeWidth={Math.max(vw, vh) / 900}
                             />
-                        ))}
-                    </g>
-                ))}
+                            {buildImageHandles(image).map(
+                                (handle) => (
+                                    <circle
+                                        key={`${image.id}:${handle.type}`}
+                                        cx={handle.x}
+                                        cy={handle.y}
+                                        r={Math.max(vw, vh) / 180}
+                                        className={getImageHandleClasses(image.id === focusedImageId)}
+                                        onPointerDown={(event) => {
+                                            event.stopPropagation();
+                                            const start = eventToSvgPoint(svgRef.current, event.clientX, event.clientY, viewBox);
+                                            if (!start) return;
+                                            startImageDrag({ pointerId: event.pointerId, imageId: image.id, handle: handle.type, start, initial: image });
+                                            setFocusedImageId(image.id);
+                                        }}
+                                    />
+                                )
+                            )}
+                        </g>
+                    )
+                )}
             </svg>
 
             {parseError && (
