@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
@@ -6,7 +6,7 @@ import { CanvasGrid } from "./1-canvas-grid";
 import { CanvasHelperOverlays } from "./2-canvas-helper-overlays";
 import { canvasDragStateAtom, eventToSvgPoint, useCanvasDragAndDrop } from "./3-canvas-drag";
 import { PathCanvasImageEditOverlays, PathCanvasImages } from "./4-canvas-image-edit-overlays";
-import { useSvgUnitsPerPixel } from "./5-canvas-viewport-metrics";
+import { canvasSvgElementAtom, canvasUnitsPerPixelAtom, useSyncCanvasViewportSize } from "./5-canvas-viewport-metrics";
 import { appSettings } from "@/store/1-ui-settings";
 import {
     canvasPreviewAtom,
@@ -37,18 +37,21 @@ export function PathCanvas() {
     const fillPreview = useAtomValue(fillPreviewAtom);
     const preview = useAtomValue(canvasPreviewAtom);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
+    const svgElement = useAtomValue(canvasSvgElementAtom);
+    const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
 
     const setFocusedImageId = useSetAtom(focusedImageIdAtom);
     const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
     const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
+    const setCanvasSvgElement = useSetAtom(canvasSvgElementAtom);
     const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
     const fitViewBox = useSetAtom(doFitViewBoxAtom);
 
-    const svgRef = useRef<SVGSVGElement | null>(null);
     const dragState = useAtomValue(canvasDragStateAtom);
-    const { onTouchEnd, onTouchMove, onTouchStart, startCanvasDrag } = useCanvasDragAndDrop(svgRef, viewBox);
-    const unitsPerPixel = useSvgUnitsPerPixel(svgRef, viewBox);
+    const { onTouchEnd, onTouchMove, onTouchStart, startCanvasDrag } = useCanvasDragAndDrop(viewBox);
     const canvasStrokeWidth = unitsPerPixel * strokeWidth;
+
+    useSyncCanvasViewportSize();
 
     useEffect(() => {
         fitViewBox();
@@ -62,13 +65,13 @@ export function PathCanvas() {
             )}
         >
             <svg
-                ref={svgRef}
+                ref={(node) => setCanvasSvgElement(node)}
                 viewBox={viewBox.join(" ")}
                 className="size-full touch-none"
                 onWheel={(event) => {
                     event.preventDefault();
-                    if (!svgRef.current) return;
-                    const center = eventToSvgPoint(svgRef.current, event.clientX, event.clientY, viewBox);
+                    if (!svgElement) return;
+                    const center = eventToSvgPoint(svgElement, event.clientX, event.clientY, viewBox);
                     if (!center) return;
                     const scale = Math.pow(1.005, event.deltaY);
                     zoomViewBox({ scale, center });
@@ -90,7 +93,7 @@ export function PathCanvas() {
                     }
                 }}
             >
-                {!preview && <CanvasGrid unitsPerPixel={unitsPerPixel} />}
+                {!preview && <CanvasGrid />}
 
                 <path
                     d={parseError ? "M 0 0" : (pathValue || "M 0 0")}
@@ -122,9 +125,9 @@ export function PathCanvas() {
 
                 <PathCanvasImages />
 
-                <CanvasHelperOverlays unitsPerPixel={unitsPerPixel} />
+                <CanvasHelperOverlays />
 
-                <PathCanvasImageEditOverlays unitsPerPixel={unitsPerPixel} />
+                <PathCanvasImageEditOverlays />
             </svg>
 
             {parseError && (

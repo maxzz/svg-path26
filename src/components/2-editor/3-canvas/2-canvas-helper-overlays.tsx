@@ -2,6 +2,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
 import { appSettings } from "@/store/1-ui-settings";
+import { canvasUnitsPerPixelAtom } from "./5-canvas-viewport-metrics";
 import {
     canvasPreviewAtom,
     canvasViewBoxAtom,
@@ -17,10 +18,11 @@ import {
 } from "@/store/0-atoms/2-svg-path-state";
 import { startPointDragAtom } from "./3-canvas-drag";
 
-export function CanvasHelperOverlays({ unitsPerPixel }: { unitsPerPixel: number; }) {
+export function CanvasHelperOverlays() {
     const settings = useSnapshot(appSettings);
     const preview = useAtomValue(canvasPreviewAtom);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
+    const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
 
     if (preview || imageEditMode || !settings.showHelpers) return null;
 

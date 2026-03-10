@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/1-ui-settings";
+import { canvasUnitsPerPixelAtom } from "./5-canvas-viewport-metrics";
 import {
     canvasViewBoxAtom,
     showTicksAtom,
@@ -12,9 +13,10 @@ import {
 
 type GridValues = ReturnType<typeof buildGrid>;
 
-export function CanvasGrid({ unitsPerPixel }: { unitsPerPixel: number; }) {
+export function CanvasGrid() {
     const settings = useSnapshot(appSettings);
     const viewBox = useAtomValue(canvasViewBoxAtom);
+    const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
     const viewPortX = useAtomValue(viewPortXAtom);
     const viewPortY = useAtomValue(viewPortYAtom);
     const showTicks = useAtomValue(showTicksAtom);

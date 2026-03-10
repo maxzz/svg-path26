@@ -7,6 +7,7 @@ import {
     isImageEditModeAtom,
 } from "@/store/0-atoms/2-svg-path-state";
 import { buildImageHandles, eventToSvgPoint, startImageDragAtom } from "./3-canvas-drag";
+import { canvasUnitsPerPixelAtom } from "./5-canvas-viewport-metrics";
 
 export function PathCanvasImages() {
     const images = useAtomValue(imagesAtom);
@@ -27,10 +28,11 @@ export function PathCanvasImages() {
     );
 }
 
-export function PathCanvasImageEditOverlays({ unitsPerPixel }: { unitsPerPixel: number; }) {
+export function PathCanvasImageEditOverlays() {
     const preview = useAtomValue(canvasPreviewAtom);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
     const images = useAtomValue(imagesAtom);
+    const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
     const [focusedImageId, setFocusedImageId] = useAtom(focusedImageIdAtom);
     const viewBox = useAtomValue(canvasViewBoxAtom);
     const startImageDrag = useSetAtom(startImageDragAtom);
