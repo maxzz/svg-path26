@@ -46,10 +46,11 @@ export function SettingsPopover() {
                     <SettingsRangeField
                         label="Stroke"
                         valueAtom={strokeWidthAtom}
-                        min={1}
+                        min={0.1}
                         max={12}
-                        step={1}
-                        valueClassName="w-8"
+                        step={0.1}
+                        valueClassName="w-10"
+                        formatValue={formatCompactNumber}
                     />
 
                     <ZoomSettingsField />
@@ -168,4 +169,8 @@ function SettingsSwitch({ atom }: { atom: PrimitiveAtom<boolean>; }) {
     return (
         <Switch checked={value} onCheckedChange={(checked) => setValue(Boolean(checked))} />
     );
+}
+
+function formatCompactNumber(value: number): string {
+    return Number.isInteger(value) ? String(value) : value.toFixed(1);
 }
