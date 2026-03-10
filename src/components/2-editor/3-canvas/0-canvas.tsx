@@ -133,15 +133,15 @@ export function PathCanvas() {
     );
 }
 
-const canvasPathPreviewFillClasses = "fill-[oklch(0_0_0/0.18)]";
-const canvasPathEditorFillClasses = "fill-[oklch(0.65_0.1_260/0.25)]";
+const canvasPathPreviewFillClasses = "fill-black/20";
+const canvasPathEditorFillClasses = "fill-blue-500/25";
 const canvasPathNoFillClasses = "fill-none";
 const canvasPathPreviewStrokeClasses = "stroke-black";
-const canvasPathDarkStrokeClasses = "stroke-[oklch(0.9_0.05_260)]";
-const canvasPathLightStrokeClasses = "stroke-[oklch(0.45_0.2_260)]";
+const canvasPathDarkStrokeClasses = "stroke-slate-200";
+const canvasPathLightStrokeClasses = "stroke-blue-700";
 
-const hoveredSegmentPathClasses = "fill-none stroke-[oklch(0.68_0.25_26)]";
-const selectedSegmentPathClasses = "fill-none stroke-[oklch(0.68_0.2_240)]";
+const hoveredSegmentPathClasses = "fill-none stroke-red-400";
+const selectedSegmentPathClasses = "fill-none stroke-sky-500";
 
 function getCanvasPathFillClasses(preview: boolean, fillPreview: boolean): string {
     if (!fillPreview) return canvasPathNoFillClasses;

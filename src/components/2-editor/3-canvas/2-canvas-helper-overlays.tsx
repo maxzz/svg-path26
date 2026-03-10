@@ -110,16 +110,16 @@ function CanvasTargetPoints() {
     );
 }
 
-const controlLinesDarkClasses = "stroke-[oklch(0.65_0_0/0.6)]";
-const controlLinesLightClasses = "stroke-[oklch(0.45_0_0/0.6)]";
+const controlLinesDarkClasses = "stroke-zinc-400/60";
+const controlLinesLightClasses = "stroke-zinc-700/60";
 
-const controlPointSelectedClasses = "fill-[oklch(0.68_0.18_240)] stroke-transparent";
-const controlPointDefaultClasses = "fill-[oklch(0.63_0_0)] stroke-transparent";
+const controlPointSelectedClasses = "fill-sky-500 stroke-transparent";
+const controlPointDefaultClasses = "fill-zinc-500 stroke-transparent";
 const cursorPointerClasses = "cursor-pointer";
 const cursorDefaultClasses = "cursor-default";
 
-const targetPointSelectedClasses = "fill-[oklch(0.68_0.2_240)] stroke-[oklch(1_0_0/0.75)]";
-const targetPointDefaultClasses = "fill-[oklch(0.84_0.22_30)] stroke-transparent";
+const targetPointSelectedClasses = "fill-sky-500 stroke-white/75";
+const targetPointDefaultClasses = "fill-orange-400 stroke-transparent";
 const targetPointInteractiveClasses = "cursor-pointer transition-all";
 
 function getControlLinesClasses(darkCanvas: boolean): string {
