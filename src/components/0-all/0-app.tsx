@@ -8,7 +8,7 @@ export function App() {
         <UISymbolDefs />
         
         <div className="h-screen w-screen text-foreground bg-background overflow-hidden">
-            <div className="mx-auto max-w-6xl h-full flex flex-col">
+            <div className="h-full flex flex-col">
                 <Toolbar />
                 <Editor />
                 <Footer />
@@ -16,3 +16,5 @@ export function App() {
         </div>
     </>);
 }
+
+//TODO: check why zooo is not working from popover, but works from canvas scroll wheel.

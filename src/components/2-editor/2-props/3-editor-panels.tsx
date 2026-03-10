@@ -47,7 +47,7 @@ export function EditorPanels() {
     const canUndo = useAtomValue(canUndoAtom);
     const canRedo = useAtomValue(canRedoAtom);
     const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
-    const [, setHoveredCommandIndex] = useAtom(hoveredCommandIndexAtom);
+    const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
     const [isImageEditMode] = useAtom(isImageEditModeAtom);
     const images = useAtomValue(imagesAtom);
     const [focusedImageId, setFocusedImageId] = useAtom(focusedImageIdAtom);

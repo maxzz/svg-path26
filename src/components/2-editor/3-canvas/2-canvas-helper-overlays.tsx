@@ -55,7 +55,7 @@ function CanvasControlPoints() {
     const pathValue = useAtomValue(svgPathInputAtom);
     const controlPoints = useAtomValue(controlPointsAtom);
     const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
-    const [, setHoveredCommandIndex] = useAtom(hoveredCommandIndexAtom);
+    const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
     const setFocusPointCommand = useSetAtom(doFocusPointCommandAtom);
     const startPointDrag = useSetAtom(startPointDragAtom);
 
@@ -83,7 +83,7 @@ function CanvasTargetPoints() {
     const pathValue = useAtomValue(svgPathInputAtom);
     const targetPoints = useAtomValue(targetPointsAtom);
     const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
-    const [, setHoveredCommandIndex] = useAtom(hoveredCommandIndexAtom);
+    const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
     const setFocusPointCommand = useSetAtom(doFocusPointCommandAtom);
     const startPointDrag = useSetAtom(startPointDragAtom);
 

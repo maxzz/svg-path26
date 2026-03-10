@@ -40,7 +40,7 @@ export function PathCanvas() {
     const [focusedImageId, setFocusedImageId] = useAtom(focusedImageIdAtom);
 
     const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
-    const [, setHoveredCommandIndex] = useAtom(hoveredCommandIndexAtom);
+    const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
     const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
     const fitViewBox = useSetAtom(doFitViewBoxAtom);
 
