@@ -48,6 +48,7 @@ export function PathCanvas() {
     const dragState = useAtomValue(canvasDragStateAtom);
     const { onTouchEnd, onTouchMove, onTouchStart, startCanvasDrag } = useCanvasDragAndDrop(svgRef, viewBox);
     const unitsPerPixel = useSvgUnitsPerPixel(svgRef, viewBox);
+    const canvasStrokeWidth = unitsPerPixel * strokeWidth;
 
     useEffect(() => {
         fitViewBox();
@@ -94,7 +95,7 @@ export function PathCanvas() {
                 <path
                     d={parseError ? "M 0 0" : (pathValue || "M 0 0")}
                     className={classNames(getCanvasPathFillClasses(preview, fillPreview), getCanvasPathStrokeClasses(preview, darkCanvas))}
-                    strokeWidth={strokeWidth}
+                    strokeWidth={canvasStrokeWidth}
                     strokeLinecap="round"
                     strokeLinejoin="round"
                 />
@@ -103,7 +104,7 @@ export function PathCanvas() {
                     <path
                         d={hoveredSegmentPath}
                         className={hoveredSegmentPathClasses}
-                        strokeWidth={Math.max(strokeWidth * 1.4, 0.8)}
+                        strokeWidth={Math.max(canvasStrokeWidth * 1.4, unitsPerPixel * 0.8)}
                         strokeLinecap="round"
                         strokeLinejoin="round"
                     />
@@ -113,7 +114,7 @@ export function PathCanvas() {
                     <path
                         d={selectedSegmentPath}
                         className={selectedSegmentPathClasses}
-                        strokeWidth={Math.max(strokeWidth * 1.6, 0.95)}
+                        strokeWidth={Math.max(canvasStrokeWidth * 1.6, unitsPerPixel * 0.95)}
                         strokeLinecap="round"
                         strokeLinejoin="round"
                     />

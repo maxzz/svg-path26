@@ -11,6 +11,7 @@ import {
     hoveredCommandIndexAtom,
     isImageEditModeAtom,
     selectedCommandIndexAtom,
+    strokeWidthAtom,
     svgPathInputAtom,
     targetPointsAtom,
 } from "@/store/0-atoms/2-svg-path-state";
@@ -33,7 +34,9 @@ export function CanvasHelperOverlays({ unitsPerPixel }: { unitsPerPixel: number;
 function CanvasControlLines({ unitsPerPixel }: { unitsPerPixel: number; }) {
     const settings = useSnapshot(appSettings);
     const controlLines = useAtomValue(controlLinesAtom);
+    const strokeScale = useAtomValue(strokeWidthAtom);
     const controlLinesClasses = getControlLinesClasses(settings.darkCanvas);
+    const strokeWidth = unitsPerPixel * strokeScale;
 
     return controlLines.map(
         (line, index) => (
@@ -44,7 +47,7 @@ function CanvasControlLines({ unitsPerPixel }: { unitsPerPixel: number; }) {
                 x2={line.to.x}
                 y2={line.to.y}
                 className={controlLinesClasses}
-                strokeWidth={unitsPerPixel}
+                strokeWidth={strokeWidth}
             />
         )
     );
