@@ -1,6 +1,6 @@
 import { atom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
 import { SvgPathModel, type Point, type SvgCanvasLine, type SvgCanvasPoint, type SvgSegmentSummary } from "@/svg-core/model";
+import { appSettingAtom } from "@/store/1-ui-settings";
 import {
     rawPathAtom,
     setPathWithoutHistoryAtom,
@@ -17,23 +17,23 @@ export { canRedoAtom, canUndoAtom, commitCurrentPathToHistoryAtom, doRedoPathAto
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 16;
 
-export const strokeWidthAtom = atomWithStorage("svg-path26:stroke", 3);
-export const zoomAtom = atomWithStorage("svg-path26:zoom", 1);
-export const decimalsAtom = atomWithStorage("svg-path26:decimals", 3);
-export const minifyOutputAtom = atomWithStorage("svg-path26:minify", false);
-export const snapToGridAtom = atomWithStorage("svg-path26:snapToGrid", true);
-export const pointPrecisionAtom = atomWithStorage("svg-path26:pointPrecision", 3);
-export const showTicksAtom = atomWithStorage("svg-path26:showTicks", false);
-export const tickIntervalAtom = atomWithStorage("svg-path26:tickInterval", 5);
-export const fillPreviewAtom = atomWithStorage("svg-path26:fillPreview", false);
-export const canvasPreviewAtom = atomWithStorage("svg-path26:canvasPreview", false);
+export const strokeWidthAtom = appSettingAtom("strokeWidth");
+export const zoomAtom = appSettingAtom("zoom");
+export const decimalsAtom = appSettingAtom("decimals");
+export const minifyOutputAtom = appSettingAtom("minifyOutput");
+export const snapToGridAtom = appSettingAtom("snapToGrid");
+export const pointPrecisionAtom = appSettingAtom("pointPrecision");
+export const showTicksAtom = appSettingAtom("showTicks");
+export const tickIntervalAtom = appSettingAtom("tickInterval");
+export const fillPreviewAtom = appSettingAtom("fillPreview");
+export const canvasPreviewAtom = appSettingAtom("canvasPreview");
 
-export const viewPortXAtom = atomWithStorage("svg-path26:viewPortX", 0);
-export const viewPortYAtom = atomWithStorage("svg-path26:viewPortY", 0);
-export const viewPortWidthAtom = atomWithStorage("svg-path26:viewPortWidth", 120);
-export const viewPortHeightAtom = atomWithStorage("svg-path26:viewPortHeight", 90);
-export const viewPortLockedAtom = atomWithStorage("svg-path26:viewPortLocked", false);
-export const pathNameAtom = atomWithStorage("svg-path26:pathName", "");
+export const viewPortXAtom = appSettingAtom("viewPortX");
+export const viewPortYAtom = appSettingAtom("viewPortY");
+export const viewPortWidthAtom = appSettingAtom("viewPortWidth");
+export const viewPortHeightAtom = appSettingAtom("viewPortHeight");
+export const viewPortLockedAtom = appSettingAtom("viewPortLocked");
+export const pathNameAtom = appSettingAtom("pathName");
 
 export const scaleXAtom = atom(1);
 export const scaleYAtom = atom(1);
@@ -434,7 +434,7 @@ export type StoredPath = {
     updatedAt: number;
 };
 
-export const storedPathsAtom = atomWithStorage<StoredPath[]>("svg-path26:storedPaths", []);
+export const storedPathsAtom = appSettingAtom("storedPaths");
 
 export const doSaveNamedPathAtom = atom(
     null,
@@ -518,11 +518,11 @@ export const doDeleteImageAtom = atom(
     }
 );
 
-export const exportFillAtom = atomWithStorage("svg-path26:exportFill", true);
-export const exportFillColorAtom = atomWithStorage("svg-path26:exportFillColor", "#000000");
-export const exportStrokeAtom = atomWithStorage("svg-path26:exportStroke", false);
-export const exportStrokeColorAtom = atomWithStorage("svg-path26:exportStrokeColor", "#ff0000");
-export const exportStrokeWidthAtom = atomWithStorage("svg-path26:exportStrokeWidth", 0.1);
+export const exportFillAtom = appSettingAtom("exportFill");
+export const exportFillColorAtom = appSettingAtom("exportFillColor");
+export const exportStrokeAtom = appSettingAtom("exportStroke");
+export const exportStrokeColorAtom = appSettingAtom("exportStrokeColor");
+export const exportStrokeWidthAtom = appSettingAtom("exportStrokeWidth");
 
 const EMPTY_GEOMETRY = {
     targets: [],
