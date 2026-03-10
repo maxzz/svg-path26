@@ -4,13 +4,16 @@ import {
     canRedoAtom,
     canUndoAtom,
     canvasViewBoxAtom,
+    commitCurrentPathToHistoryAtom,
     doFitViewBoxAtom,
     doOpenNamedPathAtom,
     doPanViewBoxAtom,
     doRedoPathAtom,
+    doSetPointLocationWithoutHistoryAtom,
     doSaveNamedPathAtom,
     doUndoPathAtom,
     doZoomViewBoxAtom,
+    targetPointsAtom,
     pathNameAtom,
     storedPathsAtom,
     svgPathInputAtom,
@@ -37,6 +40,27 @@ describe("svg path state atoms", () => {
 
         store.set(doRedoPathAtom);
         expect(store.get(svgPathInputAtom)).toContain("2 2");
+    });
+
+    it("commits point drag history only after release", () => {
+        const store = createStore();
+        const startPath = store.get(svgPathInputAtom);
+
+        const point = store.get(targetPointsAtom)[1];
+        store.set(doSetPointLocationWithoutHistoryAtom, {
+            point,
+            to: { x: 20, y: 30 },
+        });
+
+        expect(store.get(canUndoAtom)).toBe(false);
+
+        store.set(commitCurrentPathToHistoryAtom, startPath);
+
+        expect(store.get(canUndoAtom)).toBe(true);
+
+        store.set(doUndoPathAtom);
+
+        expect(store.get(svgPathInputAtom)).toBe(startPath);
     });
 
     it("fits, pans and zooms viewport with lock handling", () => {

@@ -5,7 +5,6 @@ import {
     canvasPreviewAtom,
     commitCurrentPathToHistoryAtom,
     doPanViewBoxAtom,
-    doSetPointLocationAtom,
     doSetPointLocationWithoutHistoryAtom,
     doUpdateImageAtom,
     doZoomViewBoxAtom,
@@ -102,7 +101,6 @@ export function useCanvasDragAndDrop(
     const stopCanvasDrag = useSetAtom(stopCanvasDragAtom);
     const commitCurrentPathToHistory = useSetAtom(commitCurrentPathToHistoryAtom);
     const setPathValue = useSetAtom(svgPathInputAtom);
-    const setPointLocation = useSetAtom(doSetPointLocationAtom);
     const setPointLocationWithoutHistory = useSetAtom(doSetPointLocationWithoutHistoryAtom);
     const panViewBox = useSetAtom(doPanViewBoxAtom);
     const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
@@ -164,7 +162,7 @@ export function useCanvasDragAndDrop(
         const onPointerUp = (event: PointerEvent) => {
             if (event.pointerId !== dragState.pointerId) return;
             if (dragState.mode === "point") {
-                commitCurrentPathToHistory();
+                commitCurrentPathToHistory(dragState.startPath);
             }
             stopCanvasDrag();
         };

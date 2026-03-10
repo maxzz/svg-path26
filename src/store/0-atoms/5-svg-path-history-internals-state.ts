@@ -9,9 +9,9 @@ const historyReadyAtom = atom(false);
 
 export const ensureHistoryReadyAtom = atom(
     null,
-    (get, set) => {
+    (get, set, initialPath?: string) => {
         if (get(historyReadyAtom)) return;
-        const initial = get(rawPathAtom);
+        const initial = initialPath ?? get(rawPathAtom);
         set(historyStackAtom, [initial]);
         set(historyIndexAtom, 0);
         set(historyReadyAtom, true);
@@ -40,7 +40,8 @@ export const pushHistoryAtom = atom(
 
 export const commitCurrentPathToHistoryAtom = atom(
     null,
-    (get, set) => {
+    (get, set, previousPath?: string) => {
+        set(ensureHistoryReadyAtom, previousPath);
         set(pushHistoryAtom, get(rawPathAtom));
     }
 );
