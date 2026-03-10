@@ -4,7 +4,8 @@ import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
 import { CanvasGrid } from "./1-canvas-grid";
 import { CanvasHelperOverlays } from "./2-canvas-helper-overlays";
-import { buildImageHandles, canvasDragStateAtom, eventToSvgPoint, useCanvasDragAndDrop } from "./3-canvas-drag";
+import { canvasDragStateAtom, eventToSvgPoint, useCanvasDragAndDrop } from "./3-canvas-drag";
+import { PathCanvasImageEditOverlays } from "./4-canvas-image-edit-overlays";
 import { appSettings } from "@/store/1-ui-settings";
 import {
     canvasPreviewAtom,
@@ -47,8 +48,6 @@ export function PathCanvas() {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const dragState = useAtomValue(canvasDragStateAtom);
     const { onTouchEnd, onTouchMove, onTouchStart, startCanvasDrag, startImageDrag, } = useCanvasDragAndDrop(svgRef, viewBox);
-
-    const [vx, vy, vw, vh] = viewBox;
 
     useEffect(() => {
         fitViewBox();
@@ -137,47 +136,16 @@ export function PathCanvas() {
 
                 <CanvasHelperOverlays />
 
-                {!preview && imageEditMode && images.map(
-                    (image) => (
-                        <g
-                            key={`edit:${image.id}`}
-                            onPointerDown={(event) => {
-                                event.stopPropagation();
-                                const start = eventToSvgPoint(svgRef.current, event.clientX, event.clientY, viewBox);
-                                if (!start) return;
-                                startImageDrag({ pointerId: event.pointerId, imageId: image.id, handle: "move", start, initial: image });
-                                setFocusedImageId(image.id);
-                            }}
-                        >
-                            <rect
-                                x={Math.min(image.x1, image.x2)}
-                                y={Math.min(image.y1, image.y2)}
-                                width={Math.abs(image.x2 - image.x1)}
-                                height={Math.abs(image.y2 - image.y1)}
-                                className={getImageEditRectClasses(image.id === focusedImageId)}
-                                strokeWidth={Math.max(vw, vh) / 900}
-                            />
-                            {buildImageHandles(image).map(
-                                (handle) => (
-                                    <circle
-                                        key={`${image.id}:${handle.type}`}
-                                        cx={handle.x}
-                                        cy={handle.y}
-                                        r={Math.max(vw, vh) / 180}
-                                        className={getImageHandleClasses(image.id === focusedImageId)}
-                                        onPointerDown={(event) => {
-                                            event.stopPropagation();
-                                            const start = eventToSvgPoint(svgRef.current, event.clientX, event.clientY, viewBox);
-                                            if (!start) return;
-                                            startImageDrag({ pointerId: event.pointerId, imageId: image.id, handle: handle.type, start, initial: image });
-                                            setFocusedImageId(image.id);
-                                        }}
-                                    />
-                                )
-                            )}
-                        </g>
-                    )
-                )}
+                <PathCanvasImageEditOverlays
+                    preview={preview}
+                    imageEditMode={imageEditMode}
+                    images={images}
+                    focusedImageId={focusedImageId}
+                    setFocusedImageId={setFocusedImageId}
+                    svgRef={svgRef}
+                    viewBox={viewBox}
+                    startImageDrag={startImageDrag}
+                />
             </svg>
 
             {parseError && (
@@ -199,13 +167,6 @@ const canvasPathLightStrokeClasses = "stroke-[oklch(0.45_0.2_260)]";
 const hoveredSegmentPathClasses = "fill-none stroke-[oklch(0.68_0.25_26)]";
 const selectedSegmentPathClasses = "fill-none stroke-[oklch(0.68_0.2_240)]";
 
-const imageEditRectFocusedClasses = "fill-transparent stroke-[oklch(0.68_0.2_240)] cursor-move";
-const imageEditRectDefaultClasses = "fill-transparent stroke-[oklch(0.6_0_0/0.8)] cursor-move";
-const imageHandleFocusedClasses = "fill-[oklch(0.68_0.2_240)] cursor-pointer";
-const imageHandleDefaultClasses = "fill-[oklch(0.65_0_0)] cursor-pointer";
-
-//
-
 function getCanvasPathFillClasses(preview: boolean, fillPreview: boolean): string {
     if (!fillPreview) return canvasPathNoFillClasses;
     return preview ? canvasPathPreviewFillClasses : canvasPathEditorFillClasses;
@@ -215,15 +176,3 @@ function getCanvasPathStrokeClasses(preview: boolean, darkCanvas: boolean): stri
     if (preview) return canvasPathPreviewStrokeClasses;
     return darkCanvas ? canvasPathDarkStrokeClasses : canvasPathLightStrokeClasses;
 }
-
-//
-
-function getImageEditRectClasses(focused: boolean): string {
-    return focused ? imageEditRectFocusedClasses : imageEditRectDefaultClasses;
-}
-
-function getImageHandleClasses(focused: boolean): string {
-    return focused ? imageHandleFocusedClasses : imageHandleDefaultClasses;
-}
-
-//
