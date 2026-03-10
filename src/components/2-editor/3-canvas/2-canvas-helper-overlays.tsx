@@ -2,7 +2,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
 import { appSettings } from "@/store/1-ui-settings";
-import { canvasUnitsPerPixelAtom } from "./5-canvas-viewport-metrics";
+import { canvasStrokeWidthAtom, canvasUnitsPerPixelAtom } from "./5-canvas-viewport-metrics";
 import {
     canvasPreviewAtom,
     canvasViewBoxAtom,
@@ -12,7 +12,6 @@ import {
     hoveredCommandIndexAtom,
     isImageEditModeAtom,
     selectedCommandIndexAtom,
-    strokeWidthAtom,
     svgPathInputAtom,
     targetPointsAtom,
 } from "@/store/0-atoms/2-svg-path-state";
@@ -36,9 +35,8 @@ export function CanvasHelperOverlays() {
 function CanvasControlLines({ unitsPerPixel }: { unitsPerPixel: number; }) {
     const settings = useSnapshot(appSettings);
     const controlLines = useAtomValue(controlLinesAtom);
-    const strokeScale = useAtomValue(strokeWidthAtom);
+    const strokeWidth = useAtomValue(canvasStrokeWidthAtom);
     const controlLinesClasses = getControlLinesClasses(settings.darkCanvas);
-    const strokeWidth = unitsPerPixel * strokeScale;
 
     return controlLines.map(
         (line, index) => (

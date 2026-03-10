@@ -6,7 +6,13 @@ import { CanvasGrid } from "./1-canvas-grid";
 import { CanvasHelperOverlays } from "./2-canvas-helper-overlays";
 import { canvasDragStateAtom, eventToSvgPoint, useCanvasDragAndDrop } from "./3-canvas-drag";
 import { PathCanvasImageEditOverlays, PathCanvasImages } from "./4-canvas-image-edit-overlays";
-import { canvasSvgElementAtom, canvasUnitsPerPixelAtom, useSyncCanvasViewportSize } from "./5-canvas-viewport-metrics";
+import {
+    canvasStrokeWidthAtom,
+    canvasSvgElementAtom,
+    hoveredSegmentStrokeWidthAtom,
+    selectedSegmentStrokeWidthAtom,
+    useSyncCanvasViewportSize,
+} from "./5-canvas-viewport-metrics";
 import { appSettings } from "@/store/1-ui-settings";
 import {
     canvasPreviewAtom,
@@ -30,15 +36,16 @@ export function PathCanvas() {
 
     const pathValue = useAtomValue(svgPathInputAtom);
     const parseError = useAtomValue(parseErrorAtom);
-    const strokeWidth = useAtomValue(strokeWidthAtom);
     const viewBox = useAtomValue(canvasViewBoxAtom);
     const selectedSegmentPath = useAtomValue(selectedStandaloneSegmentPathAtom);
     const hoveredSegmentPath = useAtomValue(hoveredStandaloneSegmentPathAtom);
     const fillPreview = useAtomValue(fillPreviewAtom);
     const preview = useAtomValue(canvasPreviewAtom);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
+    const canvasStrokeWidth = useAtomValue(canvasStrokeWidthAtom);
+    const hoveredSegmentStrokeWidth = useAtomValue(hoveredSegmentStrokeWidthAtom);
+    const selectedSegmentStrokeWidth = useAtomValue(selectedSegmentStrokeWidthAtom);
     const svgElement = useAtomValue(canvasSvgElementAtom);
-    const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
 
     const setFocusedImageId = useSetAtom(focusedImageIdAtom);
     const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
@@ -49,7 +56,6 @@ export function PathCanvas() {
 
     const dragState = useAtomValue(canvasDragStateAtom);
     const { onTouchEnd, onTouchMove, onTouchStart, startCanvasDrag } = useCanvasDragAndDrop(viewBox);
-    const canvasStrokeWidth = unitsPerPixel * strokeWidth;
 
     useSyncCanvasViewportSize();
 
@@ -107,7 +113,7 @@ export function PathCanvas() {
                     <path
                         d={hoveredSegmentPath}
                         className={hoveredSegmentPathClasses}
-                        strokeWidth={Math.max(canvasStrokeWidth * 1.4, unitsPerPixel * 0.8)}
+                        strokeWidth={hoveredSegmentStrokeWidth}
                         strokeLinecap="round"
                         strokeLinejoin="round"
                     />
@@ -117,7 +123,7 @@ export function PathCanvas() {
                     <path
                         d={selectedSegmentPath}
                         className={selectedSegmentPathClasses}
-                        strokeWidth={Math.max(canvasStrokeWidth * 1.6, unitsPerPixel * 0.95)}
+                        strokeWidth={selectedSegmentStrokeWidth}
                         strokeLinecap="round"
                         strokeLinejoin="round"
                     />

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
-import { canvasViewBoxAtom } from "@/store/0-atoms/2-svg-path-state";
+import { canvasViewBoxAtom, strokeWidthAtom } from "@/store/0-atoms/2-svg-path-state";
 
 export type SvgViewBox = [number, number, number, number];
 
@@ -13,6 +13,15 @@ export const canvasSvgElementAtom = atom<SVGSVGElement | null>(null);
 export const canvasViewportSizeAtom = atom<SvgViewportSize | null>(null);
 export const canvasUnitsPerPixelAtom = atom(
     (get) => getSvgUnitsPerPixel(get(canvasViewBoxAtom), get(canvasViewportSizeAtom))
+);
+export const canvasStrokeWidthAtom = atom(
+    (get) => get(canvasUnitsPerPixelAtom) * get(strokeWidthAtom)
+);
+export const hoveredSegmentStrokeWidthAtom = atom(
+    (get) => Math.max(get(canvasStrokeWidthAtom) * 1.4, get(canvasUnitsPerPixelAtom) * 0.8)
+);
+export const selectedSegmentStrokeWidthAtom = atom(
+    (get) => Math.max(get(canvasStrokeWidthAtom) * 1.6, get(canvasUnitsPerPixelAtom) * 0.95)
 );
 
 export function useSyncCanvasViewportSize() {
