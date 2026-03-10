@@ -14,6 +14,9 @@ import {
 
 export { canRedoAtom, canUndoAtom, commitCurrentPathToHistoryAtom, doRedoPathAtom, doUndoPathAtom, svgPathInputAtom };
 
+const MIN_ZOOM = 0.25;
+const MAX_ZOOM = 16;
+
 export const strokeWidthAtom = atomWithStorage("svg-path26:stroke", 3);
 export const zoomAtom = atomWithStorage("svg-path26:zoom", 1);
 export const decimalsAtom = atomWithStorage("svg-path26:decimals", 3);
@@ -167,8 +170,12 @@ export const doZoomViewBoxAtom = atom(
     null,
     (get, set, args: { scale: number; center?: Point; }) => {
         if (get(viewPortLockedAtom)) return;
-        const scale = args.scale;
-        if (!Number.isFinite(scale) || scale <= 0) return;
+        const requestedScale = args.scale;
+        if (!Number.isFinite(requestedScale) || requestedScale <= 0) return;
+
+        const currentZoom = clampZoom(get(zoomAtom));
+        const nextZoom = clampZoom(currentZoom / requestedScale);
+        const scale = currentZoom / nextZoom;
 
         const x = get(viewPortXAtom);
         const y = get(viewPortYAtom);
@@ -185,6 +192,7 @@ export const doZoomViewBoxAtom = atom(
         set(viewPortYAtom, nextY);
         set(viewPortWidthAtom, Math.max(1e-3, nextWidth));
         set(viewPortHeightAtom, Math.max(1e-3, nextHeight));
+        set(zoomAtom, nextZoom);
     }
 );
 
@@ -215,7 +223,7 @@ export const doFitViewBoxAtom = atom(
             width = height * aspect;
         }
 
-        const zoom = Math.max(0.25, get(zoomAtom));
+        const zoom = clampZoom(get(zoomAtom));
         width /= zoom;
         height /= zoom;
         const centerX = (bounds.xmin + bounds.xmax) / 2;
@@ -417,6 +425,11 @@ export const doClearPathAtom = atom(
         set(draggedCanvasPointAtom, null);
     }
 );
+
+function clampZoom(value: number): number {
+    if (!Number.isFinite(value) || value <= 0) return 1;
+    return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value));
+}
 
 export type StoredPath = {
     name: string;

@@ -6,6 +6,7 @@ import { CanvasGrid } from "./1-canvas-grid";
 import { CanvasHelperOverlays } from "./2-canvas-helper-overlays";
 import { canvasDragStateAtom, eventToSvgPoint, useCanvasDragAndDrop } from "./3-canvas-drag";
 import { PathCanvasImageEditOverlays, PathCanvasImages } from "./4-canvas-image-edit-overlays";
+import { useSvgUnitsPerPixel } from "./5-canvas-viewport-metrics";
 import { appSettings } from "@/store/1-ui-settings";
 import {
     canvasPreviewAtom,
@@ -46,6 +47,7 @@ export function PathCanvas() {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const dragState = useAtomValue(canvasDragStateAtom);
     const { onTouchEnd, onTouchMove, onTouchStart, startCanvasDrag } = useCanvasDragAndDrop(svgRef, viewBox);
+    const unitsPerPixel = useSvgUnitsPerPixel(svgRef, viewBox);
 
     useEffect(() => {
         fitViewBox();
@@ -87,7 +89,7 @@ export function PathCanvas() {
                     }
                 }}
             >
-                {!preview && <CanvasGrid />}
+                {!preview && <CanvasGrid unitsPerPixel={unitsPerPixel} />}
 
                 <path
                     d={parseError ? "M 0 0" : (pathValue || "M 0 0")}
@@ -119,9 +121,9 @@ export function PathCanvas() {
 
                 <PathCanvasImages />
 
-                <CanvasHelperOverlays />
+                <CanvasHelperOverlays unitsPerPixel={unitsPerPixel} />
 
-                <PathCanvasImageEditOverlays />
+                <PathCanvasImageEditOverlays unitsPerPixel={unitsPerPixel} />
             </svg>
 
             {parseError && (

@@ -16,7 +16,7 @@ import {
 } from "@/store/0-atoms/2-svg-path-state";
 import { startPointDragAtom } from "./3-canvas-drag";
 
-export function CanvasHelperOverlays() {
+export function CanvasHelperOverlays({ unitsPerPixel }: { unitsPerPixel: number; }) {
     const settings = useSnapshot(appSettings);
     const preview = useAtomValue(canvasPreviewAtom);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
@@ -24,16 +24,15 @@ export function CanvasHelperOverlays() {
     if (preview || imageEditMode || !settings.showHelpers) return null;
 
     return (<>
-        <CanvasControlLines />
-        <CanvasControlPoints />
-        <CanvasTargetPoints />
+        <CanvasControlLines unitsPerPixel={unitsPerPixel} />
+        <CanvasControlPoints unitsPerPixel={unitsPerPixel} />
+        <CanvasTargetPoints unitsPerPixel={unitsPerPixel} />
     </>);
 }
 
-function CanvasControlLines() {
+function CanvasControlLines({ unitsPerPixel }: { unitsPerPixel: number; }) {
     const settings = useSnapshot(appSettings);
     const controlLines = useAtomValue(controlLinesAtom);
-    const [, , vw, vh] = useAtomValue(canvasViewBoxAtom);
     const controlLinesClasses = getControlLinesClasses(settings.darkCanvas);
 
     return controlLines.map(
@@ -45,13 +44,13 @@ function CanvasControlLines() {
                 x2={line.to.x}
                 y2={line.to.y}
                 className={controlLinesClasses}
-                strokeWidth={Math.max(vw, vh) / 1400}
+                strokeWidth={unitsPerPixel}
             />
         )
     );
 }
 
-function CanvasControlPoints() {
+function CanvasControlPoints({ unitsPerPixel }: { unitsPerPixel: number; }) {
     const pathValue = useAtomValue(svgPathInputAtom);
     const controlPoints = useAtomValue(controlPointsAtom);
     const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
@@ -64,7 +63,8 @@ function CanvasControlPoints() {
             key={point.id}
             cx={point.x}
             cy={point.y}
-            r={point.movable ? 1.45 : 1.2}
+            r={unitsPerPixel * (point.movable ? 3 : 2.5)}
+            strokeWidth={unitsPerPixel * (point.movable ? 12 : 4)}
             className={getControlPointClasses(point.segmentIndex === selectedCommandIndex, point.movable)}
             onPointerDown={(event) => {
                 if (!point.movable) return;
@@ -79,7 +79,7 @@ function CanvasControlPoints() {
     ));
 }
 
-function CanvasTargetPoints() {
+function CanvasTargetPoints({ unitsPerPixel }: { unitsPerPixel: number; }) {
     const pathValue = useAtomValue(svgPathInputAtom);
     const targetPoints = useAtomValue(targetPointsAtom);
     const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
@@ -93,8 +93,8 @@ function CanvasTargetPoints() {
                 key={point.id}
                 cx={point.x}
                 cy={point.y}
-                r={point.segmentIndex === selectedCommandIndex ? 2.15 : 1.7}
-                strokeWidth={point.segmentIndex === selectedCommandIndex ? 0.5 : 0}
+                r={unitsPerPixel * (point.segmentIndex === selectedCommandIndex ? 3.35 : 3)}
+                strokeWidth={unitsPerPixel * (point.movable ? 12 : 0)}
                 className={getTargetPointClasses(point.segmentIndex === selectedCommandIndex, point.movable)}
                 onPointerDown={(event) => {
                     event.stopPropagation();

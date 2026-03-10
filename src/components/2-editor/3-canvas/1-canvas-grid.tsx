@@ -12,7 +12,7 @@ import {
 
 type GridValues = ReturnType<typeof buildGrid>;
 
-export function CanvasGrid() {
+export function CanvasGrid({ unitsPerPixel }: { unitsPerPixel: number; }) {
     const settings = useSnapshot(appSettings);
     const viewBox = useAtomValue(canvasViewBoxAtom);
     const viewPortX = useAtomValue(viewPortXAtom);
@@ -31,6 +31,7 @@ export function CanvasGrid() {
                 grid={grid}
                 showTicks={showTicks}
                 tickInterval={tickInterval}
+                unitsPerPixel={unitsPerPixel}
                 vx={vx}
                 vy={vy}
                 vw={vw}
@@ -41,10 +42,9 @@ export function CanvasGrid() {
                     darkCanvas={settings.darkCanvas}
                     grid={grid}
                     tickInterval={tickInterval}
+                    unitsPerPixel={unitsPerPixel}
                     viewPortX={viewPortX}
                     viewPortY={viewPortY}
-                    vw={vw}
-                    vh={vh}
                 />
             )}
         </>
@@ -55,6 +55,7 @@ function CanvasGridLines({
     grid,
     showTicks,
     tickInterval,
+    unitsPerPixel,
     vx,
     vy,
     vw,
@@ -63,13 +64,14 @@ function CanvasGridLines({
     grid: GridValues;
     showTicks: boolean;
     tickInterval: number;
+    unitsPerPixel: number;
     vx: number;
     vy: number;
     vw: number;
     vh: number;
 }) {
-    const gridStrokeWidth = Math.max(vw, vh) / 1300;
-    const axisStrokeWidth = Math.max(vw, vh) / 500;
+    const gridStrokeWidth = unitsPerPixel;
+    const axisStrokeWidth = unitsPerPixel * 4;
 
     return (
         <>
@@ -119,20 +121,18 @@ function CanvasGridTicks({
     darkCanvas,
     grid,
     tickInterval,
+    unitsPerPixel,
     viewPortX,
     viewPortY,
-    vw,
-    vh,
 }: {
     darkCanvas: boolean;
     grid: GridValues;
     tickInterval: number;
+    unitsPerPixel: number;
     viewPortX: number;
     viewPortY: number;
-    vw: number;
-    vh: number;
 }) {
-    const fontSize = Math.max(vw, vh) / 45;
+    const fontSize = unitsPerPixel * 14;
     const fill = darkCanvas ? "oklch(0.7 0 0)" : "oklch(0.5 0 0)";
 
     return (
@@ -141,7 +141,7 @@ function CanvasGridTicks({
                 <text
                     key={`tx:${x}`}
                     x={x}
-                    y={viewPortY + Math.max(vh / 35, 1)}
+                    y={viewPortY + unitsPerPixel * 14}
                     textAnchor="middle"
                     fontSize={fontSize}
                     fill={fill}
@@ -153,7 +153,7 @@ function CanvasGridTicks({
             {grid.yValues.filter((y) => y !== 0 && isTick(y, tickInterval)).map((y) => (
                 <text
                     key={`ty:${y}`}
-                    x={viewPortX + Math.max(vw / 70, 1)}
+                    x={viewPortX + unitsPerPixel * 8}
                     y={y}
                     dominantBaseline="middle"
                     fontSize={fontSize}

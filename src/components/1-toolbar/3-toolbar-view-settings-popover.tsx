@@ -52,15 +52,7 @@ export function SettingsPopover() {
                         valueClassName="w-8"
                     />
 
-                    <SettingsRangeField
-                        label="Zoom"
-                        valueAtom={zoomAtom}
-                        min={0.5}
-                        max={4}
-                        step={0.1}
-                        valueClassName="w-12"
-                        formatValue={(value) => `${value.toFixed(1)}x`}
-                    />
+                    <ZoomSettingsField />
 
                     <div className="grid grid-cols-4 gap-2 rounded-md border p-2">
                         <SettingsNumberField label="x" valueAtom={viewPortXAtom} />
@@ -75,13 +67,13 @@ export function SettingsPopover() {
                     </div>
 
                     <div className="grid grid-cols-3 gap-1">
-                        <Button variant="outline" className="h-7 px-2" onClick={() => zoomViewBox({ scale: 0.9 })}>
+                        <Button variant="outline" className="h-7 px-2" onClick={() => zoomViewBox({ scale: 9 / 10 })}>
                             Zoom In
                         </Button>
                         <Button variant="outline" className="h-7 px-2" onClick={() => fitViewBox()}>
                             Fit
                         </Button>
-                        <Button variant="outline" className="h-7 px-2" onClick={() => zoomViewBox({ scale: 1.1 })}>
+                        <Button variant="outline" className="h-7 px-2" onClick={() => zoomViewBox({ scale: 10 / 9 })}>
                             Zoom Out
                         </Button>
                     </div>
@@ -117,6 +109,30 @@ function SettingsRangeField({ valueAtom, label, valueClassName, formatValue, ...
                 onChange={(event) => setValue(Number(event.target.value))}
             />
             <span className={`${valueClassName} text-right tabular-nums`}>{displayValue}</span>
+        </label>
+    );
+}
+
+function ZoomSettingsField() {
+    const [zoom] = useAtom(zoomAtom);
+    const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
+
+    return (
+        <label className="flex items-center gap-2 text-xs">
+            <span className="w-12 shrink-0">Zoom</span>
+            <input
+                type="range"
+                min={0.25}
+                max={16}
+                step={0.1}
+                value={zoom}
+                onChange={(event) => {
+                    const nextZoom = Number(event.target.value);
+                    if (!Number.isFinite(nextZoom) || nextZoom <= 0 || nextZoom === zoom) return;
+                    zoomViewBox({ scale: zoom / nextZoom });
+                }}
+            />
+            <span className="w-12 text-right tabular-nums">{zoom.toFixed(1)}x</span>
         </label>
     );
 }

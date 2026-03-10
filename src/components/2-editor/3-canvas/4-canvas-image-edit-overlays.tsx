@@ -27,15 +27,13 @@ export function PathCanvasImages() {
     );
 }
 
-export function PathCanvasImageEditOverlays() {
+export function PathCanvasImageEditOverlays({ unitsPerPixel }: { unitsPerPixel: number; }) {
     const preview = useAtomValue(canvasPreviewAtom);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
     const images = useAtomValue(imagesAtom);
     const [focusedImageId, setFocusedImageId] = useAtom(focusedImageIdAtom);
     const viewBox = useAtomValue(canvasViewBoxAtom);
     const startImageDrag = useSetAtom(startImageDragAtom);
-
-    const [, , vw, vh] = viewBox;
 
     if (preview || !imageEditMode) return null;
 
@@ -57,7 +55,7 @@ export function PathCanvasImageEditOverlays() {
                     width={Math.abs(image.x2 - image.x1)}
                     height={Math.abs(image.y2 - image.y1)}
                     className={getImageEditRectClasses(image.id === focusedImageId)}
-                    strokeWidth={Math.max(vw, vh) / 900}
+                    strokeWidth={unitsPerPixel * 2}
                 />
                 {buildImageHandles(image).map(
                     (handle) => (
@@ -65,7 +63,7 @@ export function PathCanvasImageEditOverlays() {
                             key={`${image.id}:${handle.type}`}
                             cx={handle.x}
                             cy={handle.y}
-                            r={Math.max(vw, vh) / 180}
+                            r={unitsPerPixel * 3}
                             className={getImageHandleClasses(image.id === focusedImageId)}
                             onPointerDown={(event) => {
                                 event.stopPropagation();
