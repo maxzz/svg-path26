@@ -15,6 +15,7 @@ import {
     storedPathsAtom,
     svgPathInputAtom,
     viewPortLockedAtom,
+    zoomAtom,
 } from "./2-svg-path-state";
 
 describe("svg path state atoms", () => {
@@ -60,6 +61,21 @@ describe("svg path state atoms", () => {
         const lockedBefore = store.get(canvasViewBoxAtom);
         store.set(doPanViewBoxAtom, { dx: 5, dy: 5 });
         expect(store.get(canvasViewBoxAtom)).toEqual(lockedBefore);
+    });
+
+    it("applies zoom scale to the viewport independently from stored zoom", () => {
+        const store = createStore();
+        store.set(zoomAtom, 2);
+        store.set(svgPathInputAtom, "M 0 0 L 50 25");
+        store.set(doFitViewBoxAtom);
+
+        const before = store.get(canvasViewBoxAtom);
+        store.set(doZoomViewBoxAtom, { scale: 0.9 });
+        const after = store.get(canvasViewBoxAtom);
+
+        expect(after[2]).toBeCloseTo(before[2] * 0.9);
+        expect(after[3]).toBeCloseTo(before[3] * 0.9);
+        expect(store.get(zoomAtom)).toBeCloseTo(2 / 0.9);
     });
 
     it("stores and opens named paths", () => {

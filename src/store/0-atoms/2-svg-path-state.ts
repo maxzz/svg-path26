@@ -170,12 +170,8 @@ export const doZoomViewBoxAtom = atom(
     null,
     (get, set, args: { scale: number; center?: Point; }) => {
         if (get(viewPortLockedAtom)) return;
-        const requestedScale = args.scale;
-        if (!Number.isFinite(requestedScale) || requestedScale <= 0) return;
-
-        const currentZoom = clampZoom(get(zoomAtom));
-        const nextZoom = clampZoom(currentZoom / requestedScale);
-        const scale = currentZoom / nextZoom;
+        const scale = args.scale;
+        if (!Number.isFinite(scale) || scale <= 0) return;
 
         const x = get(viewPortXAtom);
         const y = get(viewPortYAtom);
@@ -192,7 +188,7 @@ export const doZoomViewBoxAtom = atom(
         set(viewPortYAtom, nextY);
         set(viewPortWidthAtom, Math.max(1e-3, nextWidth));
         set(viewPortHeightAtom, Math.max(1e-3, nextHeight));
-        set(zoomAtom, nextZoom);
+        set(zoomAtom, clampZoom(get(zoomAtom) / scale));
     }
 );
 
