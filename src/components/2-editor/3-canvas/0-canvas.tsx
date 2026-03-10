@@ -125,7 +125,7 @@ export function PathCanvas() {
             </svg>
 
             {parseError && (
-                <div className="pointer-events-none absolute inset-x-4 bottom-4 rounded-md bg-destructive/90 px-3 py-2 text-xs text-destructive-foreground">
+                <div className="absolute inset-x-4 bottom-4 px-3 py-2 text-xs text-destructive-foreground bg-destructive/90 rounded-md pointer-events-none">
                     {parseError}
                 </div>
             )}
