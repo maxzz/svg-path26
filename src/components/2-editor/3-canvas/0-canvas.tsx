@@ -5,7 +5,7 @@ import { classNames } from "@/utils";
 import { CanvasGrid } from "./1-canvas-grid";
 import { CanvasHelperOverlays } from "./2-canvas-helper-overlays";
 import { canvasDragStateAtom, eventToSvgPoint, useCanvasDragAndDrop } from "./3-canvas-drag";
-import { PathCanvasImageEditOverlays } from "./4-canvas-image-edit-overlays";
+import { PathCanvasImageEditOverlays, PathCanvasImages } from "./4-canvas-image-edit-overlays";
 import { appSettings } from "@/store/1-ui-settings";
 import {
     canvasPreviewAtom,
@@ -16,7 +16,6 @@ import {
     focusedImageIdAtom,
     hoveredCommandIndexAtom,
     hoveredStandaloneSegmentPathAtom,
-    imagesAtom,
     isImageEditModeAtom,
     parseErrorAtom,
     selectedCommandIndexAtom,
@@ -37,7 +36,6 @@ export function PathCanvas() {
     const fillPreview = useAtomValue(fillPreviewAtom);
     const preview = useAtomValue(canvasPreviewAtom);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
-    const images = useAtomValue(imagesAtom);
 
     const setFocusedImageId = useSetAtom(focusedImageIdAtom);
     const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
@@ -119,20 +117,7 @@ export function PathCanvas() {
                     />
                 )}
 
-                {images.map(
-                    (image) => (
-                        <image
-                            key={image.id}
-                            href={image.data}
-                            x={Math.min(image.x1, image.x2)}
-                            y={Math.min(image.y1, image.y2)}
-                            width={Math.abs(image.x2 - image.x1)}
-                            height={Math.abs(image.y2 - image.y1)}
-                            preserveAspectRatio={image.preserveAspectRatio ? "xMidYMid meet" : "none"}
-                            opacity={image.opacity}
-                        />
-                    )
-                )}
+                <PathCanvasImages />
 
                 <CanvasHelperOverlays />
 

@@ -8,6 +8,25 @@ import {
 } from "@/store/0-atoms/2-svg-path-state";
 import { buildImageHandles, eventToSvgPoint, startImageDragAtom } from "./3-canvas-drag";
 
+export function PathCanvasImages() {
+    const images = useAtomValue(imagesAtom);
+
+    return images.map(
+        (image) => (
+            <image
+                key={image.id}
+                href={image.data}
+                x={Math.min(image.x1, image.x2)}
+                y={Math.min(image.y1, image.y2)}
+                width={Math.abs(image.x2 - image.x1)}
+                height={Math.abs(image.y2 - image.y1)}
+                preserveAspectRatio={image.preserveAspectRatio ? "xMidYMid meet" : "none"}
+                opacity={image.opacity}
+            />
+        )
+    );
+}
+
 export function PathCanvasImageEditOverlays() {
     const preview = useAtomValue(canvasPreviewAtom);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
