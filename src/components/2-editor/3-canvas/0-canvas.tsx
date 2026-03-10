@@ -49,8 +49,6 @@ export function PathCanvas() {
     const { onTouchEnd, onTouchMove, onTouchStart, startCanvasDrag, startImageDrag, } = useCanvasDragAndDrop(svgRef, viewBox);
 
     const [vx, vy, vw, vh] = viewBox;
-    const canvasPathFillClasses = getCanvasPathFillClasses(fillPreview, preview);
-    const canvasPathStrokeClasses = getCanvasPathStrokeClasses(preview, darkCanvas);
 
     useEffect(() => {
         fitViewBox();
@@ -96,7 +94,7 @@ export function PathCanvas() {
 
                 <path
                     d={parseError ? "M 0 0" : (pathValue || "M 0 0")}
-                    className={classNames(canvasPathFillClasses, canvasPathStrokeClasses)}
+                    className={classNames(getCanvasPathFillClasses(preview, fillPreview), getCanvasPathStrokeClasses(preview, darkCanvas))}
                     strokeWidth={strokeWidth}
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -191,14 +189,18 @@ const canvasPathNoFillClasses = "fill-none";
 const canvasPathPreviewStrokeClasses = "stroke-black";
 const canvasPathDarkStrokeClasses = "stroke-[oklch(0.9_0.05_260)]";
 const canvasPathLightStrokeClasses = "stroke-[oklch(0.45_0.2_260)]";
+
 const hoveredSegmentPathClasses = "fill-none stroke-[oklch(0.68_0.25_26)]";
 const selectedSegmentPathClasses = "fill-none stroke-[oklch(0.68_0.2_240)]";
+
 const imageEditRectFocusedClasses = "fill-transparent stroke-[oklch(0.68_0.2_240)] cursor-move";
 const imageEditRectDefaultClasses = "fill-transparent stroke-[oklch(0.6_0_0/0.8)] cursor-move";
 const imageHandleFocusedClasses = "fill-[oklch(0.68_0.2_240)] cursor-pointer";
 const imageHandleDefaultClasses = "fill-[oklch(0.65_0_0)] cursor-pointer";
 
-function getCanvasPathFillClasses(fillPreview: boolean, preview: boolean): string {
+//
+
+function getCanvasPathFillClasses(preview: boolean, fillPreview: boolean): string {
     if (!fillPreview) return canvasPathNoFillClasses;
     return preview ? canvasPathPreviewFillClasses : canvasPathEditorFillClasses;
 }
@@ -208,6 +210,8 @@ function getCanvasPathStrokeClasses(preview: boolean, darkCanvas: boolean): stri
     return darkCanvas ? canvasPathDarkStrokeClasses : canvasPathLightStrokeClasses;
 }
 
+//
+
 function getImageEditRectClasses(focused: boolean): string {
     return focused ? imageEditRectFocusedClasses : imageEditRectDefaultClasses;
 }
@@ -215,3 +219,5 @@ function getImageEditRectClasses(focused: boolean): string {
 function getImageHandleClasses(focused: boolean): string {
     return focused ? imageHandleFocusedClasses : imageHandleDefaultClasses;
 }
+
+//

@@ -23,13 +23,11 @@ export function CanvasHelperOverlays() {
 
     if (preview || imageEditMode || !settings.showHelpers) return null;
 
-    return (
-        <>
-            <CanvasControlLines />
-            <CanvasControlPoints />
-            <CanvasTargetPoints />
-        </>
-    );
+    return (<>
+        <CanvasControlLines />
+        <CanvasControlPoints />
+        <CanvasTargetPoints />
+    </>);
 }
 
 function CanvasControlLines() {
@@ -38,17 +36,19 @@ function CanvasControlLines() {
     const [, , vw, vh] = useAtomValue(canvasViewBoxAtom);
     const controlLinesClasses = getControlLinesClasses(settings.darkCanvas);
 
-    return controlLines.map((line, index) => (
-        <line
-            key={`line:${index}`}
-            x1={line.from.x}
-            y1={line.from.y}
-            x2={line.to.x}
-            y2={line.to.y}
-            className={controlLinesClasses}
-            strokeWidth={Math.max(vw, vh) / 1400}
-        />
-    ));
+    return controlLines.map(
+        (line, index) => (
+            <line
+                key={`line:${index}`}
+                x1={line.from.x}
+                y1={line.from.y}
+                x2={line.to.x}
+                y2={line.to.y}
+                className={controlLinesClasses}
+                strokeWidth={Math.max(vw, vh) / 1400}
+            />
+        )
+    );
 }
 
 function CanvasControlPoints() {
@@ -87,25 +87,27 @@ function CanvasTargetPoints() {
     const setFocusPointCommand = useSetAtom(doFocusPointCommandAtom);
     const startPointDrag = useSetAtom(startPointDragAtom);
 
-    return targetPoints.map((point) => (
-        <circle
-            key={point.id}
-            cx={point.x}
-            cy={point.y}
-            r={point.segmentIndex === selectedCommandIndex ? 2.15 : 1.7}
-            strokeWidth={point.segmentIndex === selectedCommandIndex ? 0.5 : 0}
-            className={getTargetPointClasses(point.segmentIndex === selectedCommandIndex, point.movable)}
-            onPointerDown={(event) => {
-                event.stopPropagation();
-                setFocusPointCommand(point);
-                setSelectedCommandIndex(point.segmentIndex);
-                if (!point.movable) return;
-                startPointDrag({ point, pointerId: event.pointerId, startPath: pathValue });
-            }}
-            onMouseEnter={() => setHoveredCommandIndex(point.segmentIndex)}
-            onMouseLeave={() => setHoveredCommandIndex(null)}
-        />
-    ));
+    return targetPoints.map(
+        (point) => (
+            <circle
+                key={point.id}
+                cx={point.x}
+                cy={point.y}
+                r={point.segmentIndex === selectedCommandIndex ? 2.15 : 1.7}
+                strokeWidth={point.segmentIndex === selectedCommandIndex ? 0.5 : 0}
+                className={getTargetPointClasses(point.segmentIndex === selectedCommandIndex, point.movable)}
+                onPointerDown={(event) => {
+                    event.stopPropagation();
+                    setFocusPointCommand(point);
+                    setSelectedCommandIndex(point.segmentIndex);
+                    if (!point.movable) return;
+                    startPointDrag({ point, pointerId: event.pointerId, startPath: pathValue });
+                }}
+                onMouseEnter={() => setHoveredCommandIndex(point.segmentIndex)}
+                onMouseLeave={() => setHoveredCommandIndex(null)}
+            />
+        )
+    );
 }
 
 const controlLinesDarkClasses = "stroke-[oklch(0.65_0_0/0.6)]";
