@@ -1,38 +1,21 @@
-import type { RefObject } from "react";
-import type { EditorImage } from "@/store/0-atoms/2-svg-path-state";
-import type { Point } from "@/svg-core/model";
-import { buildImageHandles, eventToSvgPoint } from "./3-canvas-drag";
-import type { ImageHandle } from "./3-canvas-drag";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import {
+    canvasPreviewAtom,
+    canvasViewBoxAtom,
+    focusedImageIdAtom,
+    imagesAtom,
+    isImageEditModeAtom,
+} from "@/store/0-atoms/2-svg-path-state";
+import { buildImageHandles, eventToSvgPoint, startImageDragAtom } from "./3-canvas-drag";
 
-type StartImageDragArgs = {
-    pointerId: number;
-    imageId: string;
-    handle: ImageHandle;
-    start: Point;
-    initial: EditorImage;
-};
+export function PathCanvasImageEditOverlays() {
+    const preview = useAtomValue(canvasPreviewAtom);
+    const imageEditMode = useAtomValue(isImageEditModeAtom);
+    const images = useAtomValue(imagesAtom);
+    const [focusedImageId, setFocusedImageId] = useAtom(focusedImageIdAtom);
+    const viewBox = useAtomValue(canvasViewBoxAtom);
+    const startImageDrag = useSetAtom(startImageDragAtom);
 
-type PathCanvasImageEditOverlaysProps = {
-    preview: boolean;
-    imageEditMode: boolean;
-    images: EditorImage[];
-    focusedImageId: string | null;
-    setFocusedImageId: (imageId: string | null) => void;
-    svgRef: RefObject<SVGSVGElement | null>;
-    viewBox: [number, number, number, number];
-    startImageDrag: (args: StartImageDragArgs) => void;
-};
-
-export function PathCanvasImageEditOverlays({
-    preview,
-    imageEditMode,
-    images,
-    focusedImageId,
-    setFocusedImageId,
-    svgRef,
-    viewBox,
-    startImageDrag,
-}: PathCanvasImageEditOverlaysProps) {
     const [, , vw, vh] = viewBox;
 
     if (preview || !imageEditMode) return null;
@@ -43,7 +26,7 @@ export function PathCanvasImageEditOverlays({
                 key={`edit:${image.id}`}
                 onPointerDown={(event) => {
                     event.stopPropagation();
-                    const start = eventToSvgPoint(svgRef.current, event.clientX, event.clientY, viewBox);
+                    const start = eventToSvgPoint(event.currentTarget.ownerSVGElement, event.clientX, event.clientY, viewBox);
                     if (!start) return;
                     startImageDrag({ pointerId: event.pointerId, imageId: image.id, handle: "move", start, initial: image });
                     setFocusedImageId(image.id);
@@ -67,7 +50,7 @@ export function PathCanvasImageEditOverlays({
                             className={getImageHandleClasses(image.id === focusedImageId)}
                             onPointerDown={(event) => {
                                 event.stopPropagation();
-                                const start = eventToSvgPoint(svgRef.current, event.clientX, event.clientY, viewBox);
+                                const start = eventToSvgPoint(event.currentTarget.ownerSVGElement, event.clientX, event.clientY, viewBox);
                                 if (!start) return;
                                 startImageDrag({ pointerId: event.pointerId, imageId: image.id, handle: handle.type, start, initial: image });
                                 setFocusedImageId(image.id);

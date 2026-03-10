@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
 import { CanvasGrid } from "./1-canvas-grid";
@@ -38,16 +38,16 @@ export function PathCanvas() {
     const preview = useAtomValue(canvasPreviewAtom);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
     const images = useAtomValue(imagesAtom);
-    const [focusedImageId, setFocusedImageId] = useAtom(focusedImageIdAtom);
 
-    const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
+    const setFocusedImageId = useSetAtom(focusedImageIdAtom);
+    const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
     const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
     const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
     const fitViewBox = useSetAtom(doFitViewBoxAtom);
 
     const svgRef = useRef<SVGSVGElement | null>(null);
     const dragState = useAtomValue(canvasDragStateAtom);
-    const { onTouchEnd, onTouchMove, onTouchStart, startCanvasDrag, startImageDrag, } = useCanvasDragAndDrop(svgRef, viewBox);
+    const { onTouchEnd, onTouchMove, onTouchStart, startCanvasDrag } = useCanvasDragAndDrop(svgRef, viewBox);
 
     useEffect(() => {
         fitViewBox();
@@ -136,16 +136,7 @@ export function PathCanvas() {
 
                 <CanvasHelperOverlays />
 
-                <PathCanvasImageEditOverlays
-                    preview={preview}
-                    imageEditMode={imageEditMode}
-                    images={images}
-                    focusedImageId={focusedImageId}
-                    setFocusedImageId={setFocusedImageId}
-                    svgRef={svgRef}
-                    viewBox={viewBox}
-                    startImageDrag={startImageDrag}
-                />
+                <PathCanvasImageEditOverlays />
             </svg>
 
             {parseError && (
