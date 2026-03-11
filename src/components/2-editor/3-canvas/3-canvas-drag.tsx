@@ -4,20 +4,17 @@ import { atom, useAtomValue, useSetAtom } from "jotai";
 import { canvasSvgElementAtom } from "./5-canvas-viewport-metrics";
 import {
     canvasPreviewAtom,
-    commitCurrentPathToHistoryAtom,
     doPanViewBoxAtom,
     doSetPointLocationWithoutHistoryAtom,
-    doUpdateImageAtom,
     doZoomViewBoxAtom,
     draggedCanvasPointAtom,
     isCanvasDraggingAtom,
-    isImageEditModeAtom,
     pointPrecisionAtom,
     snapToGridAtom,
-    svgPathInputAtom,
     viewPortLockedAtom,
 } from "@/store/0-atoms/2-0-svg-path-state";
-import type { EditorImage } from "@/store/0-atoms/2-0-svg-path-state";
+import { doCommitCurrentPathToHistoryAtom, svgPathInputAtom } from "@/store/0-atoms/1-8-all-exports";
+import { doUpdateImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-2-images";
 import type { Point, SvgCanvasPoint } from "@/svg-core/model";
 
 export type DragState =
@@ -100,7 +97,7 @@ export function useCanvasDragAndDrop(
 
     const setDragState = useSetAtom(canvasDragStateAtom);
     const stopCanvasDrag = useSetAtom(stopCanvasDragAtom);
-    const commitCurrentPathToHistory = useSetAtom(commitCurrentPathToHistoryAtom);
+    const commitCurrentPathToHistory = useSetAtom(doCommitCurrentPathToHistoryAtom);
     const setPathValue = useSetAtom(svgPathInputAtom);
     const setPointLocationWithoutHistory = useSetAtom(doSetPointLocationWithoutHistoryAtom);
     const panViewBox = useSetAtom(doPanViewBoxAtom);

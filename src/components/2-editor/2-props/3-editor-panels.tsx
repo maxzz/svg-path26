@@ -2,27 +2,19 @@ import { useEffect, useRef, useState } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { TransformPanel } from "./5-transform-panel";
 import {
-    canRedoAtom,
-    canUndoAtom,
     commandRowsAtom,
     doConvertSegmentAtom,
     doDeleteSegmentAtom,
     doInsertSegmentAtom,
-    doRedoPathAtom,
     doSetCommandValueAtom,
     doToggleSegmentRelativeAtom,
-    doUndoPathAtom,
-    doDeleteImageAtom,
-    doUpdateImageAtom,
-    focusedImageIdAtom,
     hoveredCommandIndexAtom,
-    imagesAtom,
-    isImageEditModeAtom,
     parseStateAtom,
     parseErrorAtom,
     selectedCommandIndexAtom,
-    svgPathInputAtom,
 } from "@/store/0-atoms/2-0-svg-path-state";
+import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom, svgPathInputAtom } from "@/store/0-atoms/1-8-all-exports";
+import { doDeleteImageAtom, doUpdateImageAtom, focusedImageIdAtom, imagesAtom, isImageEditModeAtom } from "@/store/0-atoms/2-2-images";
 import { CanvasActionsMenu } from "./4-canvas-actions-menu";
 import { cn } from "@/utils";
 import {

@@ -15,7 +15,6 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/shadcn/input";
 import { Switch } from "@/components/ui/shadcn/switch";
 import {
-    doAddImageAtom,
     doClearPathAtom,
     doDeleteNamedPathAtom,
     doNormalizePathAtom,
@@ -29,17 +28,16 @@ import {
     exportStrokeAtom,
     exportStrokeColorAtom,
     exportStrokeWidthAtom,
-    isImageEditModeAtom,
     minifyOutputAtom,
     pathNameAtom,
-    storedPathsAtom,
-    svgPathInputAtom,
     viewPortHeightAtom,
     viewPortWidthAtom,
     viewPortXAtom,
     viewPortYAtom,
 } from "@/store/0-atoms/2-0-svg-path-state";
-import type { EditorImage } from "@/store/0-atoms/2-0-svg-path-state";
+import { svgPathInputAtom } from "@/store/0-atoms/1-8-all-exports";
+import { storedPathsAtom } from "@/store/0-atoms/2-1-stored-paths-actions";
+import { doAddImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-2-images";
 import {
     appSettings,
 } from "@/store/0-ui-settings";

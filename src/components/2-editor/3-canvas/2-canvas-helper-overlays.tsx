@@ -10,11 +10,11 @@ import {
     controlPointsAtom,
     doFocusPointCommandAtom,
     hoveredCommandIndexAtom,
-    isImageEditModeAtom,
     selectedCommandIndexAtom,
-    svgPathInputAtom,
     targetPointsAtom,
 } from "@/store/0-atoms/2-0-svg-path-state";
+import { svgPathInputAtom } from "@/store/0-atoms/1-8-all-exports";
+import { isImageEditModeAtom } from "@/store/0-atoms/2-2-images";
 import { startPointDragAtom } from "./3-canvas-drag";
 
 export function CanvasHelperOverlays() {

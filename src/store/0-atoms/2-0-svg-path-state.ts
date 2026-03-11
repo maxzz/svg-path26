@@ -2,29 +2,7 @@ import { atom } from "jotai";
 import { SvgPathModel, type Point, type SvgCanvasLine, type SvgCanvasPoint, type SvgSegmentSummary } from "@/svg-core/model";
 import { createAtomAppSetting } from "@/store/0-atoms/8-create-app-settings-atoms";
 import { createStoredPathActionsAtoms } from "@/store/0-atoms/2-1-stored-paths-actions";
-import {
-    rawPathAtom,
-    doSetPathWithoutHistoryAtom,
-    doCommitCurrentPathToHistoryAtom,
-    svgPathInputAtom,
-    canRedoAtom,
-    canUndoAtom,
-    doRedoPathAtom,
-    doUndoPathAtom,
-} from "./1-8-svg-path-history-state";
-
-export { canRedoAtom, canUndoAtom, doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom, doRedoPathAtom, doUndoPathAtom, svgPathInputAtom };
-export type { StoredPath } from "@/store/0-atoms/2-1-stored-paths-actions";
-export { storedPathsAtom } from "@/store/0-atoms/2-1-stored-paths-actions";
-export type { EditorImage } from "@/store/0-atoms/2-2-images";
-export {
-    isImageEditModeAtom,
-    imagesAtom,
-    focusedImageIdAtom,
-    doAddImageAtom,
-    doUpdateImageAtom,
-    doDeleteImageAtom,
-} from "@/store/0-atoms/2-2-images";
+import { rawPathAtom, doSetPathWithoutHistoryAtom, svgPathInputAtom } from "./1-8-all-exports";
 
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 16;
@@ -331,7 +309,7 @@ export const doDeleteSegmentAtom = atom(
 
         const selected = get(selectedCommandIndexAtom);
         if (selected === null) return;
-        
+
         if (selected === segmentIndex) {
             set(selectedCommandIndexAtom, null);
         } else if (selected > segmentIndex) {

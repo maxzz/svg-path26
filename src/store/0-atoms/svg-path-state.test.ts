@@ -1,25 +1,27 @@
 import { createStore } from "jotai";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
-    canRedoAtom,
-    canUndoAtom,
     canvasViewBoxAtom,
-    commitCurrentPathToHistoryAtom,
     doFitViewBoxAtom,
     doOpenNamedPathAtom,
     doPanViewBoxAtom,
-    doRedoPathAtom,
     doSetPointLocationWithoutHistoryAtom,
     doSaveNamedPathAtom,
-    doUndoPathAtom,
     doZoomViewBoxAtom,
     targetPointsAtom,
     pathNameAtom,
-    storedPathsAtom,
-    svgPathInputAtom,
     viewPortLockedAtom,
     zoomAtom,
 } from "./2-0-svg-path-state";
+import {
+    canRedoAtom,
+    canUndoAtom,
+    doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom,
+    doRedoPathAtom,
+    doUndoPathAtom,
+    svgPathInputAtom,
+} from "./1-8-all-exports";
+import { storedPathsAtom } from "./2-1-stored-paths-actions";
 
 describe("svg path state atoms", () => {
     beforeEach(() => {

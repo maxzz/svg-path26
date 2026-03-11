@@ -20,16 +20,15 @@ import {
     doFitViewBoxAtom,
     doZoomViewBoxAtom,
     fillPreviewAtom,
-    focusedImageIdAtom,
     hoveredCommandIndexAtom,
     hoveredStandaloneSegmentPathAtom,
-    isImageEditModeAtom,
     parseErrorAtom,
     selectedCommandIndexAtom,
     selectedStandaloneSegmentPathAtom,
     strokeWidthAtom,
-    svgPathInputAtom,
 } from "@/store/0-atoms/2-0-svg-path-state";
+import { svgPathInputAtom } from "@/store/0-atoms/1-8-all-exports";
+import { focusedImageIdAtom, isImageEditModeAtom } from "@/store/0-atoms/2-2-images";
 
 export function PathCanvas() {
     const { darkCanvas } = useSnapshot(appSettings);

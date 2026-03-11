@@ -9,7 +9,6 @@ import {
     doFitViewBoxAtom,
     doZoomViewBoxAtom,
     fillPreviewAtom,
-    isImageEditModeAtom,
     pointPrecisionAtom,
     showTicksAtom,
     snapToGridAtom,
@@ -22,6 +21,7 @@ import {
     viewPortYAtom,
     zoomAtom,
 } from "@/store/0-atoms/2-0-svg-path-state";
+import { isImageEditModeAtom } from "@/store/0-atoms/2-2-images";
 
 export function SettingsPopover() {
     const fitViewBox = useSetAtom(doFitViewBoxAtom);
