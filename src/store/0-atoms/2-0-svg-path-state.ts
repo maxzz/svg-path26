@@ -1,8 +1,10 @@
 import { atom } from "jotai";
-import { SvgPathModel, type Point, type SvgCanvasLine, type SvgCanvasPoint, type SvgSegmentSummary } from "@/svg-core/model";
+import { SvgPathModel, type Point, type SvgCanvasLine, type SvgCanvasPoint, type SvgSegmentSummary } from "@/svg-core/2-svg-model";
 import { createAtomAppSetting } from "@/store/0-atoms/8-create-app-settings-atoms";
 import { createStoredPathActionsAtoms } from "@/store/0-atoms/2-1-stored-paths-actions";
-import { rawPathAtom, doSetPathWithoutHistoryAtom, svgPathInputAtom } from "./1-8-all-exports";
+import { rawPathAtom } from "./1-0-raw-path";
+import { svgPathInputAtom } from "./1-1-svg-path-history-input-state";
+import { doSetPathWithoutHistoryAtom } from "./1-2-history-internals";
 
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 16;
@@ -30,7 +32,9 @@ export const scaleYAtom = atom(1);
 export const translateXAtom = atom(0);
 export const translateYAtom = atom(0);
 
-export const parseStateAtom = atom<{ model: SvgPathModel | null; error: string | null; }>(
+// SVG model
+
+export const svgModelAtom = atom<{ model: SvgPathModel | null; error: string | null; }>(
     (get) => {
         const path = get(rawPathAtom).trim();
         if (!path) {
@@ -48,18 +52,18 @@ export const parseStateAtom = atom<{ model: SvgPathModel | null; error: string |
     }
 );
 
-export const commandCountAtom = atom((get) => get(parseStateAtom).model?.getCommandCount() ?? 0);
-export const parseErrorAtom = atom((get) => get(parseStateAtom).error);
+export const commandCountAtom = atom((get) => get(svgModelAtom).model?.getCommandCount() ?? 0);
+export const parseErrorAtom = atom((get) => get(svgModelAtom).error);
 
 export const commandRowsAtom = atom<SvgSegmentSummary[]>(
     (get) => {
-        const model = get(parseStateAtom).model;
+        const model = get(svgModelAtom).model;
         return model ? model.getSummaries() : [];
     }
 );
 
 export const canvasGeometryAtom = atom(
-    (get) => get(parseStateAtom).model?.getCanvasGeometry() ?? EMPTY_GEOMETRY
+    (get) => get(svgModelAtom).model?.getCanvasGeometry() ?? EMPTY_GEOMETRY
 );
 
 export const targetPointsAtom = atom<SvgCanvasPoint[]>(
@@ -105,6 +109,8 @@ export const hoveredCommandIndexAtom = atom<number | null>(null);
 export const draggedCanvasPointAtom = atom<SvgCanvasPoint | null>(null);
 export const isCanvasDraggingAtom = atom(false);
 
+// Stored paths actions
+
 const storedPathActions = createStoredPathActionsAtoms({
     pathNameAtom,
     selectedCommandIndexAtom,
@@ -113,6 +119,8 @@ const storedPathActions = createStoredPathActionsAtoms({
 export const doSaveNamedPathAtom = storedPathActions.doSaveNamedPathAtom;
 export const doDeleteNamedPathAtom = storedPathActions.doDeleteNamedPathAtom;
 export const doOpenNamedPathAtom = storedPathActions.doOpenNamedPathAtom;
+
+// Selected standalone segment path
 
 export const selectedStandaloneSegmentPathAtom = atom(
     (get) => {
@@ -129,6 +137,8 @@ export const hoveredStandaloneSegmentPathAtom = atom(
         return get(standaloneSegmentPathsAtom)[hovered] ?? null;
     }
 );
+
+// Canvas view box
 
 export const canvasViewBoxAtom = atom<[number, number, number, number]>(
     (get) => [
@@ -192,7 +202,7 @@ export const doFitViewBoxAtom = atom(
     null,
     (get, set) => {
         if (get(viewPortLockedAtom)) return;
-        const model = get(parseStateAtom).model;
+        const model = get(svgModelAtom).model;
         if (!model) {
             set(viewPortXAtom, 0);
             set(viewPortYAtom, 0);
@@ -227,6 +237,8 @@ export const doFitViewBoxAtom = atom(
         set(viewPortHeightAtom, height);
     }
 );
+
+// Model
 
 const applyModelAtom = atom(
     null,
@@ -264,6 +276,8 @@ const applyModelWithoutHistoryAtom = atom(
     }
 );
 
+// Canvas point location
+
 export const doSetPointLocationAtom = atom(
     null,
     (_get, set, args: { point: SvgCanvasPoint; to: Point; }) => {
@@ -290,6 +304,8 @@ export const doSetCommandValueAtom = atom(
         });
     }
 );
+
+// Segment relative
 
 export const doToggleSegmentRelativeAtom = atom(
     null,
@@ -350,6 +366,8 @@ export const doConvertSegmentAtom = atom(
         });
     }
 );
+
+// Focus point command
 
 export const doFocusPointCommandAtom = atom(
     null,

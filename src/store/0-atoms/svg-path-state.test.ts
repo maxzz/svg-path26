@@ -16,11 +16,11 @@ import {
 import {
     canRedoAtom,
     canUndoAtom,
-    doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom,
     doRedoPathAtom,
     doUndoPathAtom,
-    svgPathInputAtom,
-} from "./1-8-all-exports";
+} from "./1-3-history-actions";
+import { svgPathInputAtom } from "./1-1-svg-path-history-input-state";
+import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } from "./1-2-history-internals";
 import { storedPathsAtom } from "./2-1-stored-paths-actions";
 
 describe("svg path state atoms", () => {

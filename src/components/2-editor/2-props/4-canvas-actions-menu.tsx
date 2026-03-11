@@ -35,13 +35,13 @@ import {
     viewPortXAtom,
     viewPortYAtom,
 } from "@/store/0-atoms/2-0-svg-path-state";
-import { svgPathInputAtom } from "@/store/0-atoms/1-8-all-exports";
+import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-history-input-state";
 import { storedPathsAtom } from "@/store/0-atoms/2-1-stored-paths-actions";
 import { doAddImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-2-images";
 import {
     appSettings,
 } from "@/store/0-ui-settings";
-import { SvgPathModel } from "@/svg-core/model";
+import { SvgPathModel } from "@/svg-core/2-svg-model";
 
 export function CanvasActionsMenu() {
     const settings = useSnapshot(appSettings);

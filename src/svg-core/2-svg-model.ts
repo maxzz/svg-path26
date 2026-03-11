@@ -1,6 +1,13 @@
-import { parseSvgPath } from "./parser";
+import { parseSvgPath } from "./1-parser";
 
 export type Point = { x: number; y: number; };
+
+export type Bounds = {
+    xmin: number;
+    ymin: number;
+    xmax: number;
+    ymax: number;
+};
 
 export type SvgSegmentSummary = {
     index: number;
@@ -777,13 +784,6 @@ export class SvgPathModel {
         }
     }
 }
-
-export type Bounds = {
-    xmin: number;
-    ymin: number;
-    xmax: number;
-    ymax: number;
-};
 
 function formatNumber(value: number, decimals: number, minify: boolean): string {
     let out = value

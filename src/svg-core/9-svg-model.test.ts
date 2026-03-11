@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SvgPathModel } from "./model";
+import { SvgPathModel } from "./2-svg-model";
 
 describe("SvgPathModel", () => {
     it("exposes editable canvas geometry", () => {

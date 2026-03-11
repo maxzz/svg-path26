@@ -9,11 +9,12 @@ import {
     doSetCommandValueAtom,
     doToggleSegmentRelativeAtom,
     hoveredCommandIndexAtom,
-    parseStateAtom,
+    svgModelAtom,
     parseErrorAtom,
     selectedCommandIndexAtom,
 } from "@/store/0-atoms/2-0-svg-path-state";
-import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom, svgPathInputAtom } from "@/store/0-atoms/1-8-all-exports";
+import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-history-input-state";
+import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "@/store/0-atoms/1-3-history-actions";
 import { doDeleteImageAtom, doUpdateImageAtom, focusedImageIdAtom, imagesAtom, isImageEditModeAtom } from "@/store/0-atoms/2-2-images";
 import { CanvasActionsMenu } from "./4-canvas-actions-menu";
 import { cn } from "@/utils";
@@ -34,7 +35,7 @@ const COMMAND_TYPES = ["M", "L", "V", "H", "C", "S", "Q", "T", "A", "Z"] as cons
 
 export function EditorPanels() {
     const error = useAtomValue(parseErrorAtom);
-    const parseState = useAtomValue(parseStateAtom);
+    const parseState = useAtomValue(svgModelAtom);
     const rows = useAtomValue(commandRowsAtom);
     const canUndo = useAtomValue(canUndoAtom);
     const canRedo = useAtomValue(canRedoAtom);
