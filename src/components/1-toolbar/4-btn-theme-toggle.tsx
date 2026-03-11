@@ -1,7 +1,7 @@
 import { useSnapshot } from "valtio";
 import { Button } from "@/components/ui/shadcn/button";
 import { IconThemeMoon, IconThemeSun } from "@/components/ui/icons/normal";
-import { appSettings } from "@/store/1-ui-settings";
+import { appSettings } from "@/store/0-ui-settings";
 import { isThemeDark, toggleTheme } from "@/utils";
 
 export function ButtonThemeToggle() {

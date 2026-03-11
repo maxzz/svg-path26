@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
-import { appSettings } from "@/store/1-ui-settings";
+import { appSettings } from "@/store/0-ui-settings";
 import { canvasStrokeWidthAtom, canvasUnitsPerPixelAtom } from "./5-canvas-viewport-metrics";
 import {
     canvasPreviewAtom,

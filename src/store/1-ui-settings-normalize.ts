@@ -1,4 +1,4 @@
-import type { PathEditorSettings, StoredPathSetting, UiSettings } from "./1-ui-settings-shared";
+import type { PathEditorSettings, StoredPathSetting, UiSettings } from "./9-ui-settings-types-and-defaults";
 
 export function normalizeStoredSettings(
     value: unknown,

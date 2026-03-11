@@ -6,7 +6,7 @@ import {
     DEFAULT_SETTINGS,
     type PathEditorSettings,
     type UiSettings,
-} from "./1-ui-settings-shared";
+} from "./9-ui-settings-types-and-defaults";
 import { normalizeStoredSettings } from "@/store/1-ui-settings-normalize";
 
 const STORE_KEY = "svg-path26";
@@ -17,7 +17,7 @@ export type {
     StoredPathSetting,
     PathEditorSettings,
     UiSettings,
-} from "./1-ui-settings-shared";
+} from "./9-ui-settings-types-and-defaults";
 
 function loadSettings(): UiSettings {
     return normalizeStoredSettings(loadStoredSettings(), DEFAULT_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS);

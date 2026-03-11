@@ -1,3 +1,3 @@
-import { appSettingAtom } from "@/store/1-ui-settings";
+import { appSettingAtom } from "@/store/0-ui-settings";
 
 export const rawPathAtom = appSettingAtom("rawPath");

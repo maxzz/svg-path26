@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
-import { appSettings } from "@/store/1-ui-settings";
+import { appSettings } from "@/store/0-ui-settings";
 import { canvasUnitsPerPixelAtom } from "./5-canvas-viewport-metrics";
 import {
     canvasViewBoxAtom,

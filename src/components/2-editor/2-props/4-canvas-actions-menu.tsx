@@ -45,7 +45,7 @@ import {
     toggleDarkCanvas,
     toggleShowGrid,
     toggleShowHelpers,
-} from "@/store/1-ui-settings";
+} from "@/store/0-ui-settings";
 import { SvgPathModel } from "@/svg-core/model";
 
 export function CanvasActionsMenu() {

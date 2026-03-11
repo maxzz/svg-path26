@@ -13,7 +13,7 @@ import {
     selectedSegmentStrokeWidthAtom,
     useSyncCanvasViewportSize,
 } from "./5-canvas-viewport-metrics";
-import { appSettings } from "@/store/1-ui-settings";
+import { appSettings } from "@/store/0-ui-settings";
 import {
     canvasPreviewAtom,
     canvasViewBoxAtom,

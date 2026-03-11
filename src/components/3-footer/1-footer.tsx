@@ -1,6 +1,6 @@
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
-import { appSettings } from "@/store/1-ui-settings";
+import { appSettings } from "@/store/0-ui-settings";
 import { commandCountAtom } from "@/store/0-atoms/2-svg-path-state";
 
 export function Footer() {

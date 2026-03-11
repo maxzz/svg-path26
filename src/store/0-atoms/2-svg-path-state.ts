@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import { SvgPathModel, type Point, type SvgCanvasLine, type SvgCanvasPoint, type SvgSegmentSummary } from "@/svg-core/model";
-import { appSettingAtom } from "@/store/1-ui-settings";
+import { appSettingAtom } from "@/store/0-ui-settings";
 import {
     rawPathAtom,
     setPathWithoutHistoryAtom,
