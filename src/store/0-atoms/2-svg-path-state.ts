@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import { SvgPathModel, type Point, type SvgCanvasLine, type SvgCanvasPoint, type SvgSegmentSummary } from "@/svg-core/model";
-import { appSettingAtom } from "@/store/0-ui-settings";
+import { createAtomAppSetting } from "@/store/0-ui-settings";
 import {
     rawPathAtom,
     setPathWithoutHistoryAtom,
@@ -17,23 +17,23 @@ export { canRedoAtom, canUndoAtom, commitCurrentPathToHistoryAtom, doRedoPathAto
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 16;
 
-export const strokeWidthAtom = appSettingAtom("strokeWidth");
-export const zoomAtom = appSettingAtom("zoom");
-export const decimalsAtom = appSettingAtom("decimals");
-export const minifyOutputAtom = appSettingAtom("minifyOutput");
-export const snapToGridAtom = appSettingAtom("snapToGrid");
-export const pointPrecisionAtom = appSettingAtom("pointPrecision");
-export const showTicksAtom = appSettingAtom("showTicks");
-export const tickIntervalAtom = appSettingAtom("tickInterval");
-export const fillPreviewAtom = appSettingAtom("fillPreview");
-export const canvasPreviewAtom = appSettingAtom("canvasPreview");
+export const strokeWidthAtom = createAtomAppSetting("strokeWidth");
+export const zoomAtom = createAtomAppSetting("zoom");
+export const decimalsAtom = createAtomAppSetting("decimals");
+export const minifyOutputAtom = createAtomAppSetting("minifyOutput");
+export const snapToGridAtom = createAtomAppSetting("snapToGrid");
+export const pointPrecisionAtom = createAtomAppSetting("pointPrecision");
+export const showTicksAtom = createAtomAppSetting("showTicks");
+export const tickIntervalAtom = createAtomAppSetting("tickInterval");
+export const fillPreviewAtom = createAtomAppSetting("fillPreview");
+export const canvasPreviewAtom = createAtomAppSetting("canvasPreview");
 
-export const viewPortXAtom = appSettingAtom("viewPortX");
-export const viewPortYAtom = appSettingAtom("viewPortY");
-export const viewPortWidthAtom = appSettingAtom("viewPortWidth");
-export const viewPortHeightAtom = appSettingAtom("viewPortHeight");
-export const viewPortLockedAtom = appSettingAtom("viewPortLocked");
-export const pathNameAtom = appSettingAtom("pathName");
+export const viewPortXAtom = createAtomAppSetting("viewPortX");
+export const viewPortYAtom = createAtomAppSetting("viewPortY");
+export const viewPortWidthAtom = createAtomAppSetting("viewPortWidth");
+export const viewPortHeightAtom = createAtomAppSetting("viewPortHeight");
+export const viewPortLockedAtom = createAtomAppSetting("viewPortLocked");
+export const pathNameAtom = createAtomAppSetting("pathName");
 
 export const scaleXAtom = atom(1);
 export const scaleYAtom = atom(1);
@@ -434,7 +434,7 @@ export type StoredPath = {
     updatedAt: number;
 };
 
-export const storedPathsAtom = appSettingAtom("storedPaths");
+export const storedPathsAtom = createAtomAppSetting("storedPaths");
 
 export const doSaveNamedPathAtom = atom(
     null,
@@ -518,11 +518,11 @@ export const doDeleteImageAtom = atom(
     }
 );
 
-export const exportFillAtom = appSettingAtom("exportFill");
-export const exportFillColorAtom = appSettingAtom("exportFillColor");
-export const exportStrokeAtom = appSettingAtom("exportStroke");
-export const exportStrokeColorAtom = appSettingAtom("exportStrokeColor");
-export const exportStrokeWidthAtom = appSettingAtom("exportStrokeWidth");
+export const exportFillAtom = createAtomAppSetting("exportFill");
+export const exportFillColorAtom = createAtomAppSetting("exportFillColor");
+export const exportStrokeAtom = createAtomAppSetting("exportStroke");
+export const exportStrokeColorAtom = createAtomAppSetting("exportStrokeColor");
+export const exportStrokeWidthAtom = createAtomAppSetting("exportStrokeWidth");
 
 const EMPTY_GEOMETRY = {
     targets: [],
