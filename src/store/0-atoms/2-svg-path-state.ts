@@ -1,6 +1,7 @@
 import { atom } from "jotai";
 import { SvgPathModel, type Point, type SvgCanvasLine, type SvgCanvasPoint, type SvgSegmentSummary } from "@/svg-core/model";
 import { createAtomAppSetting } from "@/store/0-ui-settings";
+import { createStoredPathActionsAtoms } from "@/store/0-atoms/5-stored-paths-state";
 import {
     rawPathAtom,
     setPathWithoutHistoryAtom,
@@ -13,6 +14,17 @@ import {
 } from "./1-2-svg-path-history-state";
 
 export { canRedoAtom, canUndoAtom, commitCurrentPathToHistoryAtom, doRedoPathAtom, doUndoPathAtom, svgPathInputAtom };
+export type { StoredPath } from "@/store/0-atoms/5-stored-paths-state";
+export { storedPathsAtom } from "@/store/0-atoms/5-stored-paths-state";
+export type { EditorImage } from "@/store/0-atoms/6-editor-images-state";
+export {
+    isImageEditModeAtom,
+    imagesAtom,
+    focusedImageIdAtom,
+    doAddImageAtom,
+    doUpdateImageAtom,
+    doDeleteImageAtom,
+} from "@/store/0-atoms/6-editor-images-state";
 
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 16;
@@ -40,12 +52,7 @@ export const scaleYAtom = atom(1);
 export const translateXAtom = atom(0);
 export const translateYAtom = atom(0);
 
-type ParseState = {
-    model: SvgPathModel | null;
-    error: string | null;
-};
-
-export const parseStateAtom = atom<ParseState>(
+export const parseStateAtom = atom<{ model: SvgPathModel | null; error: string | null; }>(
     (get) => {
         const path = get(rawPathAtom).trim();
         if (!path) {
@@ -120,6 +127,15 @@ export const hoveredCommandIndexAtom = atom<number | null>(null);
 export const draggedCanvasPointAtom = atom<SvgCanvasPoint | null>(null);
 export const isCanvasDraggingAtom = atom(false);
 
+const storedPathActions = createStoredPathActionsAtoms({
+    pathNameAtom,
+    selectedCommandIndexAtom,
+    hoveredCommandIndexAtom,
+});
+export const doSaveNamedPathAtom = storedPathActions.doSaveNamedPathAtom;
+export const doDeleteNamedPathAtom = storedPathActions.doDeleteNamedPathAtom;
+export const doOpenNamedPathAtom = storedPathActions.doOpenNamedPathAtom;
+
 export const selectedStandaloneSegmentPathAtom = atom(
     (get) => {
         const selected = get(selectedCommandIndexAtom);
@@ -150,6 +166,7 @@ export const doSetViewBoxAtom = atom(
     (_get, set, next: { x: number; y: number; width: number; height: number; }) => {
         if (!Number.isFinite(next.width) || !Number.isFinite(next.height)) return;
         if (next.width <= 0 || next.height <= 0) return;
+
         set(viewPortXAtom, next.x);
         set(viewPortYAtom, next.y);
         set(viewPortWidthAtom, next.width);
@@ -188,6 +205,7 @@ export const doZoomViewBoxAtom = atom(
         set(viewPortYAtom, nextY);
         set(viewPortWidthAtom, Math.max(1e-3, nextWidth));
         set(viewPortHeightAtom, Math.max(1e-3, nextHeight));
+
         set(zoomAtom, clampZoom(get(zoomAtom) / scale));
     }
 );
@@ -313,6 +331,7 @@ export const doDeleteSegmentAtom = atom(
 
         const selected = get(selectedCommandIndexAtom);
         if (selected === null) return;
+        
         if (selected === segmentIndex) {
             set(selectedCommandIndexAtom, null);
         } else if (selected > segmentIndex) {
@@ -426,97 +445,6 @@ function clampZoom(value: number): number {
     if (!Number.isFinite(value) || value <= 0) return 1;
     return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value));
 }
-
-export type StoredPath = {
-    name: string;
-    path: string;
-    createdAt: number;
-    updatedAt: number;
-};
-
-export const storedPathsAtom = createAtomAppSetting("storedPaths");
-
-export const doSaveNamedPathAtom = atom(
-    null,
-    (get, set, nameRaw: string) => {
-        const path = get(rawPathAtom).trim();
-        const name = nameRaw.trim();
-        if (!path || !name) return;
-        const now = Date.now();
-        const existing = get(storedPathsAtom);
-        const match = existing.find((it) => it.name === name);
-        if (match) {
-            set(storedPathsAtom, existing.map((it) => it.name === name ? { ...it, path, updatedAt: now } : it));
-        } else {
-            set(storedPathsAtom, [...existing, { name, path, createdAt: now, updatedAt: now }]);
-        }
-        set(pathNameAtom, name);
-    }
-);
-
-export const doDeleteNamedPathAtom = atom(
-    null,
-    (get, set, name: string) => {
-        set(storedPathsAtom, get(storedPathsAtom).filter((it) => it.name !== name));
-        if (get(pathNameAtom) === name) {
-            set(pathNameAtom, "");
-        }
-    }
-);
-
-export const doOpenNamedPathAtom = atom(
-    null,
-    (get, set, name: string) => {
-        const match = get(storedPathsAtom).find((it) => it.name === name);
-        if (!match) return;
-        set(svgPathInputAtom, match.path);
-        set(pathNameAtom, name);
-        set(selectedCommandIndexAtom, null);
-        set(hoveredCommandIndexAtom, null);
-    }
-);
-
-export type EditorImage = {
-    id: string;
-    x1: number;
-    y1: number;
-    x2: number;
-    y2: number;
-    preserveAspectRatio: boolean;
-    opacity: number;
-    data: string;
-};
-
-export const isImageEditModeAtom = atom(false);
-export const imagesAtom = atom<EditorImage[]>([]);
-export const focusedImageIdAtom = atom<string | null>(null);
-
-export const doAddImageAtom = atom(
-    null,
-    (_get, set, image: Omit<EditorImage, "id">) => {
-        const id = `im:${Date.now()}:${Math.random().toString(36).slice(2, 8)}`;
-        set(imagesAtom, (previous) => [...previous, { ...image, id }]);
-        set(focusedImageIdAtom, id);
-        set(isImageEditModeAtom, true);
-    }
-);
-
-export const doUpdateImageAtom = atom(
-    null,
-    (_get, set, args: { id: string; patch: Partial<EditorImage>; }) => {
-        set(imagesAtom, (previous) => previous.map((it) => it.id === args.id ? { ...it, ...args.patch } : it));
-    }
-);
-
-export const doDeleteImageAtom = atom(
-    null,
-    (get, set, id: string) => {
-        set(imagesAtom, get(imagesAtom).filter((it) => it.id !== id));
-        if (get(focusedImageIdAtom) === id) {
-            set(focusedImageIdAtom, null);
-        }
-    }
-);
 
 export const exportFillAtom = createAtomAppSetting("exportFill");
 export const exportFillColorAtom = createAtomAppSetting("exportFillColor");
