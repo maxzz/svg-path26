@@ -6,13 +6,14 @@ const STORE_KEY = "svg-path26";
 const STORE_VER = "v1";
 const STORAGE_ID = `${STORE_KEY}__${STORE_VER}`;
 
-export interface UiSettings {
-    theme: ThemeMode;
-    showGrid: boolean;
-    showHelpers: boolean;
-    darkCanvas: boolean;
-    transformAccordionOpen: boolean;
-    editorPanelSizes: number[];
+export interface StoredPathSetting {
+    name: string;
+    path: string;
+    createdAt: number;
+    updatedAt: number;
+}
+
+export interface PathEditorSettings {
     strokeWidth: number;
     zoom: number;
     decimals: number;
@@ -35,21 +36,20 @@ export interface UiSettings {
     exportStrokeColor: string;
     exportStrokeWidth: number;
     rawPath: string;
-    storedPaths: Array<{
-        name: string;
-        path: string;
-        createdAt: number;
-        updatedAt: number;
-    }>;
+    storedPaths: StoredPathSetting[];
 }
 
-const DEFAULT_SETTINGS: UiSettings = {
-    theme: "light",
-    showGrid: true,
-    showHelpers: true,
-    darkCanvas: false,
-    transformAccordionOpen: true,
-    editorPanelSizes: [33, 67],
+export interface UiSettings {
+    theme: ThemeMode;
+    showGrid: boolean;
+    showHelpers: boolean;
+    darkCanvas: boolean;
+    transformAccordionOpen: boolean;
+    editorPanelSizes: number[];
+    pathEditor: PathEditorSettings;
+}
+
+const DEFAULT_PATH_EDITOR_SETTINGS: PathEditorSettings = {
     strokeWidth: 3,
     zoom: 1,
     decimals: 3,
@@ -75,79 +75,113 @@ const DEFAULT_SETTINGS: UiSettings = {
     storedPaths: [],
 };
 
-const LEGACY_STORAGE_KEYS = {
-    strokeWidth: "svg-path26:stroke",
-    zoom: "svg-path26:zoom",
-    decimals: "svg-path26:decimals",
-    minifyOutput: "svg-path26:minify",
-    snapToGrid: "svg-path26:snapToGrid",
-    pointPrecision: "svg-path26:pointPrecision",
-    showTicks: "svg-path26:showTicks",
-    tickInterval: "svg-path26:tickInterval",
-    fillPreview: "svg-path26:fillPreview",
-    canvasPreview: "svg-path26:canvasPreview",
-    viewPortX: "svg-path26:viewPortX",
-    viewPortY: "svg-path26:viewPortY",
-    viewPortWidth: "svg-path26:viewPortWidth",
-    viewPortHeight: "svg-path26:viewPortHeight",
-    viewPortLocked: "svg-path26:viewPortLocked",
-    pathName: "svg-path26:pathName",
-    exportFill: "svg-path26:exportFill",
-    exportFillColor: "svg-path26:exportFillColor",
-    exportStroke: "svg-path26:exportStroke",
-    exportStrokeColor: "svg-path26:exportStrokeColor",
-    exportStrokeWidth: "svg-path26:exportStrokeWidth",
-    rawPath: "svg-path26:path",
-    storedPaths: "svg-path26:storedPaths",
-} satisfies Partial<Record<keyof UiSettings, string>>;
+const DEFAULT_SETTINGS: UiSettings = {
+    theme: "light",
+    showGrid: true,
+    showHelpers: true,
+    darkCanvas: false,
+    transformAccordionOpen: true,
+    editorPanelSizes: [33, 67],
+    pathEditor: DEFAULT_PATH_EDITOR_SETTINGS,
+};
 
 function loadSettings(): UiSettings {
-    const stored = loadStoredSettings();
-    const legacy = loadLegacySettings();
-
-    return {
-        ...DEFAULT_SETTINGS,
-        ...legacy,
-        ...stored,
-    };
+    return normalizeStoredSettings(loadStoredSettings());
 }
 
-function loadStoredSettings(): Partial<UiSettings> {
+function loadStoredSettings(): unknown {
     try {
         const raw = localStorage.getItem(STORAGE_ID);
         if (raw) {
-            return JSON.parse(raw) as Partial<UiSettings>;
+            return JSON.parse(raw);
         }
     } catch (error) {
         console.error("Failed to load UI settings", error);
     }
 
-    return {};
+    return null;
 }
 
-function loadLegacySettings(): Partial<UiSettings> {
-    const legacy: Partial<UiSettings> = {};
-    const legacyRecord = legacy as Record<string, unknown>;
+function normalizeStoredSettings(value: unknown): UiSettings {
+    const stored = isRecord(value) ? value : {};
+    const storedPathEditor = isRecord(stored.pathEditor) ? stored.pathEditor : {};
 
-    for (const [key, storageKey] of Object.entries(LEGACY_STORAGE_KEYS) as Array<[keyof typeof LEGACY_STORAGE_KEYS, string]>) {
-        try {
-            const raw = localStorage.getItem(storageKey);
-            if (raw === null) continue;
-            legacyRecord[key] = parseStoredValue(raw);
-        } catch (error) {
-            console.error(`Failed to load legacy setting ${storageKey}`, error);
-        }
-    }
-
-    return legacy;
+    return {
+        ...DEFAULT_SETTINGS,
+        ...pickUiSettings(stored),
+        pathEditor: {
+            ...DEFAULT_PATH_EDITOR_SETTINGS,
+            ...pickPathEditorSettings(stored),
+            ...pickPathEditorSettings(storedPathEditor),
+        },
+    };
 }
 
-function parseStoredValue(raw: string): unknown {
-    try {
-        return JSON.parse(raw);
-    } catch {
-        return raw;
-    }
+function pickUiSettings(source: Record<string, unknown>): Partial<Omit<UiSettings, "pathEditor">> {
+    const next: Partial<Omit<UiSettings, "pathEditor">> = {};
+
+    if (isThemeMode(source.theme)) next.theme = source.theme;
+    if (typeof source.showGrid === "boolean") next.showGrid = source.showGrid;
+    if (typeof source.showHelpers === "boolean") next.showHelpers = source.showHelpers;
+    if (typeof source.darkCanvas === "boolean") next.darkCanvas = source.darkCanvas;
+    if (typeof source.transformAccordionOpen === "boolean") next.transformAccordionOpen = source.transformAccordionOpen;
+    if (isNumberArray(source.editorPanelSizes)) next.editorPanelSizes = source.editorPanelSizes;
+
+    return next;
+}
+
+function pickPathEditorSettings(source: Record<string, unknown>): Partial<PathEditorSettings> {
+    const next: Partial<PathEditorSettings> = {};
+
+    if (typeof source.strokeWidth === "number") next.strokeWidth = source.strokeWidth;
+    if (typeof source.zoom === "number") next.zoom = source.zoom;
+    if (typeof source.decimals === "number") next.decimals = source.decimals;
+    if (typeof source.minifyOutput === "boolean") next.minifyOutput = source.minifyOutput;
+    if (typeof source.snapToGrid === "boolean") next.snapToGrid = source.snapToGrid;
+    if (typeof source.pointPrecision === "number") next.pointPrecision = source.pointPrecision;
+    if (typeof source.showTicks === "boolean") next.showTicks = source.showTicks;
+    if (typeof source.tickInterval === "number") next.tickInterval = source.tickInterval;
+    if (typeof source.fillPreview === "boolean") next.fillPreview = source.fillPreview;
+    if (typeof source.canvasPreview === "boolean") next.canvasPreview = source.canvasPreview;
+    if (typeof source.viewPortX === "number") next.viewPortX = source.viewPortX;
+    if (typeof source.viewPortY === "number") next.viewPortY = source.viewPortY;
+    if (typeof source.viewPortWidth === "number") next.viewPortWidth = source.viewPortWidth;
+    if (typeof source.viewPortHeight === "number") next.viewPortHeight = source.viewPortHeight;
+    if (typeof source.viewPortLocked === "boolean") next.viewPortLocked = source.viewPortLocked;
+    if (typeof source.pathName === "string") next.pathName = source.pathName;
+    if (typeof source.exportFill === "boolean") next.exportFill = source.exportFill;
+    if (typeof source.exportFillColor === "string") next.exportFillColor = source.exportFillColor;
+    if (typeof source.exportStroke === "boolean") next.exportStroke = source.exportStroke;
+    if (typeof source.exportStrokeColor === "string") next.exportStrokeColor = source.exportStrokeColor;
+    if (typeof source.exportStrokeWidth === "number") next.exportStrokeWidth = source.exportStrokeWidth;
+    if (typeof source.rawPath === "string") next.rawPath = source.rawPath;
+    if (isStoredPathArray(source.storedPaths)) next.storedPaths = source.storedPaths;
+
+    return next;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isNumberArray(value: unknown): value is number[] {
+    return Array.isArray(value) && value.every((item) => typeof item === "number");
+}
+
+function isStoredPathArray(value: unknown): value is StoredPathSetting[] {
+    return Array.isArray(value) && value.every(isStoredPath);
+}
+
+function isStoredPath(value: unknown): value is StoredPathSetting {
+    return isRecord(value)
+        && typeof value.name === "string"
+        && typeof value.path === "string"
+        && typeof value.createdAt === "number"
+        && typeof value.updatedAt === "number";
+}
+
+function isThemeMode(value: unknown): value is ThemeMode {
+    return value === "light" || value === "dark" || value === "system";
 }
 
 export const appSettings = proxy<UiSettings>(loadSettings());
@@ -181,25 +215,25 @@ export function setTransformAccordionOpen(isOpen: boolean) {
     appSettings.transformAccordionOpen = isOpen;
 }
 
-export function appSettingAtom<Key extends keyof UiSettings>(key: Key): WritableAtom<UiSettings[Key], [update: SetStateAction<UiSettings[Key]>], void> {
-    const baseAtom = atom(appSettings[key]);
+export function appSettingAtom<Key extends keyof PathEditorSettings>(key: Key): WritableAtom<PathEditorSettings[Key], [update: SetStateAction<PathEditorSettings[Key]>], void> {
+    const baseAtom = atom(appSettings.pathEditor[key]);
 
     baseAtom.onMount = (setValue) => {
-        setValue(appSettings[key]);
+        setValue(appSettings.pathEditor[key]);
         return subscribe(appSettings, () => {
-            setValue(appSettings[key]);
+            setValue(appSettings.pathEditor[key]);
         });
     };
 
     return atom(
         (get) => get(baseAtom),
-        (get, set, update: SetStateAction<UiSettings[Key]>) => {
+        (get, set, update: SetStateAction<PathEditorSettings[Key]>) => {
             const current = get(baseAtom);
             const nextValue = typeof update === "function"
-                ? (update as (previous: UiSettings[Key]) => UiSettings[Key])(current)
+                ? (update as (previous: PathEditorSettings[Key]) => PathEditorSettings[Key])(current)
                 : update;
 
-            appSettings[key] = nextValue;
+            appSettings.pathEditor[key] = nextValue;
             set(baseAtom, nextValue);
         }
     );
