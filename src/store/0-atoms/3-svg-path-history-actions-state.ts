@@ -4,7 +4,7 @@ import {
     historyIndexAtom,
     historyStackAtom,
     setPathWithoutHistoryAtom,
-} from "./5-svg-path-history-internals-state";
+} from "./4-svg-path-history-internals-state";
 
 export const canUndoAtom = atom(
     (get) => {

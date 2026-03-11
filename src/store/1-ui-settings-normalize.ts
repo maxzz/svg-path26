@@ -32,34 +32,34 @@ function pickUiSettings(source: Record<string, unknown>): Partial<Omit<UiSetting
     return next;
 }
 
-function pickPathEditorSettings(source: Record<string, unknown>): Partial<PathEditorSettings> {
-    const next: Partial<PathEditorSettings> = {};
+function pickPathEditorSettings(stored: Record<string, unknown>): Partial<PathEditorSettings> {
+    const rv: Partial<PathEditorSettings> = {};
 
-    if (typeof source.strokeWidth === "number") next.strokeWidth = source.strokeWidth;
-    if (typeof source.zoom === "number") next.zoom = source.zoom;
-    if (typeof source.decimals === "number") next.decimals = source.decimals;
-    if (typeof source.minifyOutput === "boolean") next.minifyOutput = source.minifyOutput;
-    if (typeof source.snapToGrid === "boolean") next.snapToGrid = source.snapToGrid;
-    if (typeof source.pointPrecision === "number") next.pointPrecision = source.pointPrecision;
-    if (typeof source.showTicks === "boolean") next.showTicks = source.showTicks;
-    if (typeof source.tickInterval === "number") next.tickInterval = source.tickInterval;
-    if (typeof source.fillPreview === "boolean") next.fillPreview = source.fillPreview;
-    if (typeof source.canvasPreview === "boolean") next.canvasPreview = source.canvasPreview;
-    if (typeof source.viewPortX === "number") next.viewPortX = source.viewPortX;
-    if (typeof source.viewPortY === "number") next.viewPortY = source.viewPortY;
-    if (typeof source.viewPortWidth === "number") next.viewPortWidth = source.viewPortWidth;
-    if (typeof source.viewPortHeight === "number") next.viewPortHeight = source.viewPortHeight;
-    if (typeof source.viewPortLocked === "boolean") next.viewPortLocked = source.viewPortLocked;
-    if (typeof source.pathName === "string") next.pathName = source.pathName;
-    if (typeof source.exportFill === "boolean") next.exportFill = source.exportFill;
-    if (typeof source.exportFillColor === "string") next.exportFillColor = source.exportFillColor;
-    if (typeof source.exportStroke === "boolean") next.exportStroke = source.exportStroke;
-    if (typeof source.exportStrokeColor === "string") next.exportStrokeColor = source.exportStrokeColor;
-    if (typeof source.exportStrokeWidth === "number") next.exportStrokeWidth = source.exportStrokeWidth;
-    if (typeof source.rawPath === "string") next.rawPath = source.rawPath;
-    if (isStoredPathArray(source.storedPaths)) next.storedPaths = source.storedPaths;
+    if (typeof stored.strokeWidth === "number") rv.strokeWidth = stored.strokeWidth;
+    if (typeof stored.zoom === "number") rv.zoom = stored.zoom;
+    if (typeof stored.decimals === "number") rv.decimals = stored.decimals;
+    if (typeof stored.minifyOutput === "boolean") rv.minifyOutput = stored.minifyOutput;
+    if (typeof stored.snapToGrid === "boolean") rv.snapToGrid = stored.snapToGrid;
+    if (typeof stored.pointPrecision === "number") rv.pointPrecision = stored.pointPrecision;
+    if (typeof stored.showTicks === "boolean") rv.showTicks = stored.showTicks;
+    if (typeof stored.tickInterval === "number") rv.tickInterval = stored.tickInterval;
+    if (typeof stored.fillPreview === "boolean") rv.fillPreview = stored.fillPreview;
+    if (typeof stored.canvasPreview === "boolean") rv.canvasPreview = stored.canvasPreview;
+    if (typeof stored.viewPortX === "number") rv.viewPortX = stored.viewPortX;
+    if (typeof stored.viewPortY === "number") rv.viewPortY = stored.viewPortY;
+    if (typeof stored.viewPortWidth === "number") rv.viewPortWidth = stored.viewPortWidth;
+    if (typeof stored.viewPortHeight === "number") rv.viewPortHeight = stored.viewPortHeight;
+    if (typeof stored.viewPortLocked === "boolean") rv.viewPortLocked = stored.viewPortLocked;
+    if (typeof stored.pathName === "string") rv.pathName = stored.pathName;
+    if (typeof stored.exportFill === "boolean") rv.exportFill = stored.exportFill;
+    if (typeof stored.exportFillColor === "string") rv.exportFillColor = stored.exportFillColor;
+    if (typeof stored.exportStroke === "boolean") rv.exportStroke = stored.exportStroke;
+    if (typeof stored.exportStrokeColor === "string") rv.exportStrokeColor = stored.exportStrokeColor;
+    if (typeof stored.exportStrokeWidth === "number") rv.exportStrokeWidth = stored.exportStrokeWidth;
+    if (typeof stored.rawPath === "string") rv.rawPath = stored.rawPath;
+    if (isStoredPathArray(stored.storedPaths)) rv.storedPaths = stored.storedPaths;
 
-    return next;
+    return rv;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

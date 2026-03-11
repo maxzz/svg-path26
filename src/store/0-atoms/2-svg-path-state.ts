@@ -10,7 +10,7 @@ import {
     canUndoAtom,
     doRedoPathAtom,
     doUndoPathAtom,
-} from "./5-svg-path-history-state";
+} from "./1-2-svg-path-history-state";
 
 export { canRedoAtom, canUndoAtom, commitCurrentPathToHistoryAtom, doRedoPathAtom, doUndoPathAtom, svgPathInputAtom };
 
