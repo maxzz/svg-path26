@@ -38,24 +38,6 @@ subscribe(appSettings, () => {
     }
 });
 
-// UI settings actions
-
-export function toggleShowGrid() {
-    appSettings.showGrid = !appSettings.showGrid;
-}
-
-export function toggleShowHelpers() {
-    appSettings.showHelpers = !appSettings.showHelpers;
-}
-
-export function toggleDarkCanvas() {
-    appSettings.darkCanvas = !appSettings.darkCanvas;
-}
-
-export function setTransformAccordionOpen(isOpen: boolean) {
-    appSettings.transformAccordionOpen = isOpen;
-}
-
 export function createAtomAppSetting<Key extends keyof PathEditorSettings>(key: Key): WritableAtom<PathEditorSettings[Key], [update: SetStateAction<PathEditorSettings[Key]>], void> {
     const baseAtom = atom(appSettings.pathEditor[key]);
 

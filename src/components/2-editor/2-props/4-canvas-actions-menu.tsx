@@ -42,9 +42,6 @@ import {
 import type { EditorImage } from "@/store/0-atoms/2-svg-path-state";
 import {
     appSettings,
-    toggleDarkCanvas,
-    toggleShowGrid,
-    toggleShowHelpers,
 } from "@/store/0-ui-settings";
 import { SvgPathModel } from "@/svg-core/model";
 
@@ -173,19 +170,25 @@ export function CanvasActionsMenu() {
                 <DropdownMenuContent align="end">
                     <DropdownMenuCheckboxItem
                         checked={settings.showGrid}
-                        onCheckedChange={() => toggleShowGrid()}
+                        onCheckedChange={(checked) => {
+                            appSettings.showGrid = Boolean(checked);
+                        }}
                     >
                         Grid
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem
                         checked={settings.showHelpers}
-                        onCheckedChange={() => toggleShowHelpers()}
+                        onCheckedChange={(checked) => {
+                            appSettings.showHelpers = Boolean(checked);
+                        }}
                     >
                         Helpers
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem
                         checked={settings.darkCanvas}
-                        onCheckedChange={() => toggleDarkCanvas()}
+                        onCheckedChange={(checked) => {
+                            appSettings.darkCanvas = Boolean(checked);
+                        }}
                     >
                         Dark Canvas
                     </DropdownMenuCheckboxItem>

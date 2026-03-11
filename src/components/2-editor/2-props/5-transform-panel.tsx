@@ -2,7 +2,7 @@ import { type InputHTMLAttributes } from "react";
 import { useAtom, useSetAtom, type PrimitiveAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
-import { appSettings, setTransformAccordionOpen } from "@/store/0-ui-settings";
+import { appSettings } from "@/store/0-ui-settings";
 import { Button } from "@/components/ui/shadcn/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/shadcn/accordion";
 import { decimalsAtom, doApplyScaleAtom, doApplyTranslateAtom, scaleXAtom, scaleYAtom, translateXAtom, translateYAtom } from "@/store/0-atoms/2-svg-path-state";
@@ -19,7 +19,9 @@ export function TransformPanel() {
                 type="single"
                 collapsible
                 value={settings.transformAccordionOpen ? "transform" : ""}
-                onValueChange={(value) => setTransformAccordionOpen(value === "transform")}
+                onValueChange={(value) => {
+                    appSettings.transformAccordionOpen = value === "transform";
+                }}
             >
                 <AccordionItem value="transform" className="border-none">
                     <AccordionTrigger className="py-2.5 text-xs font-semibold hover:no-underline">
