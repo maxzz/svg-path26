@@ -6,8 +6,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/
 import { Switch } from "@/components/ui/shadcn/switch";
 import {
     canvasPreviewAtom,
-    doFitViewBoxAtom,
-    doZoomViewBoxAtom,
     fillPreviewAtom,
     pointPrecisionAtom,
     showTicksAtom,
@@ -21,6 +19,7 @@ import {
     viewPortYAtom,
     zoomAtom,
 } from "@/store/0-atoms/2-0-svg-model-state";
+import { doFitViewBoxAtom, doZoomViewBoxAtom } from "@/store/0-atoms/2-3-canvas-viewbox-actions";
 import { isImageEditModeAtom } from "@/store/0-atoms/2-2-images";
 
 export function SettingsPopover() {

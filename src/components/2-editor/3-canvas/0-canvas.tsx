@@ -16,9 +16,6 @@ import {
 import { appSettings } from "@/store/0-ui-settings";
 import {
     canvasPreviewAtom,
-    canvasViewBoxAtom,
-    doFitViewBoxAtom,
-    doZoomViewBoxAtom,
     fillPreviewAtom,
     hoveredCommandIndexAtom,
     hoveredStandaloneSegmentPathAtom,
@@ -27,6 +24,7 @@ import {
     selectedStandaloneSegmentPathAtom,
     strokeWidthAtom,
 } from "@/store/0-atoms/2-0-svg-model-state";
+import { canvasViewBoxAtom, doFitViewBoxAtom, doZoomViewBoxAtom } from "@/store/0-atoms/2-3-canvas-viewbox-actions";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-history-input-state";
 import { focusedImageIdAtom, isImageEditModeAtom } from "@/store/0-atoms/2-2-images";
 

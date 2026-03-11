@@ -4,12 +4,12 @@ import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
 import { canvasUnitsPerPixelAtom } from "./5-canvas-viewport-metrics";
 import {
-    canvasViewBoxAtom,
     showTicksAtom,
     tickIntervalAtom,
     viewPortXAtom,
     viewPortYAtom,
 } from "@/store/0-atoms/2-0-svg-model-state";
+import { canvasViewBoxAtom } from "@/store/0-atoms/2-3-canvas-viewbox-actions";
 
 type GridValues = ReturnType<typeof buildGrid>;
 

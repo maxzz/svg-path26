@@ -1,18 +1,15 @@
 import { createStore } from "jotai";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
-    canvasViewBoxAtom,
-    doFitViewBoxAtom,
     doOpenNamedPathAtom,
-    doPanViewBoxAtom,
     doSetPointLocationWithoutHistoryAtom,
     doSaveNamedPathAtom,
-    doZoomViewBoxAtom,
     targetPointsAtom,
     pathNameAtom,
     viewPortLockedAtom,
     zoomAtom,
 } from "./2-0-svg-model-state";
+import { canvasViewBoxAtom, doFitViewBoxAtom, doPanViewBoxAtom, doZoomViewBoxAtom } from "./2-3-canvas-viewbox-actions";
 import {
     canRedoAtom,
     canUndoAtom,

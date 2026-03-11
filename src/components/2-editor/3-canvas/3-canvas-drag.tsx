@@ -4,15 +4,14 @@ import { atom, useAtomValue, useSetAtom } from "jotai";
 import { canvasSvgElementAtom } from "./5-canvas-viewport-metrics";
 import {
     canvasPreviewAtom,
-    doPanViewBoxAtom,
     doSetPointLocationWithoutHistoryAtom,
-    doZoomViewBoxAtom,
     draggedCanvasPointAtom,
     isCanvasDraggingAtom,
     pointPrecisionAtom,
     snapToGridAtom,
     viewPortLockedAtom,
 } from "@/store/0-atoms/2-0-svg-model-state";
+import { doPanViewBoxAtom, doZoomViewBoxAtom } from "@/store/0-atoms/2-3-canvas-viewbox-actions";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-history-input-state";
 import { doCommitCurrentPathToHistoryAtom } from "@/store/0-atoms/1-2-history-internals";
 import { doUpdateImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-2-images";
