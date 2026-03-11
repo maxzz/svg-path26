@@ -1,7 +1,6 @@
-import { type SetStateAction, type WritableAtom, atom } from "jotai";
 import { proxy, subscribe } from "valtio";
 import { themeApplyMode } from "@/utils";
-import { type PathEditorSettings, type UiSettings, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SETTINGS } from "./9-ui-settings-types-and-defaults";
+import { type UiSettings, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SETTINGS } from "./9-ui-settings-types-and-defaults";
 import { normalizeStoredSettings } from "@/store/1-ui-settings-normalize";
 
 const STORE_KEY = "svg-path26";
@@ -37,27 +36,3 @@ subscribe(appSettings, () => {
         console.error("Failed to save UI settings", error);
     }
 });
-
-export function createAtomAppSetting<Key extends keyof PathEditorSettings>(key: Key): WritableAtom<PathEditorSettings[Key], [update: SetStateAction<PathEditorSettings[Key]>], void> {
-    const baseAtom = atom(appSettings.pathEditor[key]);
-
-    baseAtom.onMount = (setValue) => {
-        setValue(appSettings.pathEditor[key]);
-        return subscribe(appSettings, () => {
-            setValue(appSettings.pathEditor[key]);
-        });
-    };
-
-    return atom(
-        (get) => get(baseAtom),
-        (get, set, update: SetStateAction<PathEditorSettings[Key]>) => {
-            const current = get(baseAtom);
-            const nextValue = typeof update === "function"
-                ? (update as (previous: PathEditorSettings[Key]) => PathEditorSettings[Key])(current)
-                : update;
-
-            appSettings.pathEditor[key] = nextValue;
-            set(baseAtom, nextValue);
-        }
-    );
-}
