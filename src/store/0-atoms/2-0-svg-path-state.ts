@@ -1,22 +1,22 @@
 import { atom } from "jotai";
 import { SvgPathModel, type Point, type SvgCanvasLine, type SvgCanvasPoint, type SvgSegmentSummary } from "@/svg-core/model";
 import { createAtomAppSetting } from "@/store/0-ui-settings";
-import { createStoredPathActionsAtoms } from "@/store/0-atoms/5-stored-paths-state";
+import { createStoredPathActionsAtoms } from "@/store/0-atoms/2-1-stored-paths-actions";
 import {
     rawPathAtom,
-    setPathWithoutHistoryAtom,
-    commitCurrentPathToHistoryAtom,
+    doSetPathWithoutHistoryAtom,
+    doCommitCurrentPathToHistoryAtom,
     svgPathInputAtom,
     canRedoAtom,
     canUndoAtom,
     doRedoPathAtom,
     doUndoPathAtom,
-} from "./1-2-svg-path-history-state";
+} from "./1-8-svg-path-history-state";
 
-export { canRedoAtom, canUndoAtom, commitCurrentPathToHistoryAtom, doRedoPathAtom, doUndoPathAtom, svgPathInputAtom };
-export type { StoredPath } from "@/store/0-atoms/5-stored-paths-state";
-export { storedPathsAtom } from "@/store/0-atoms/5-stored-paths-state";
-export type { EditorImage } from "@/store/0-atoms/6-editor-images-state";
+export { canRedoAtom, canUndoAtom, doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom, doRedoPathAtom, doUndoPathAtom, svgPathInputAtom };
+export type { StoredPath } from "@/store/0-atoms/2-1-stored-paths-actions";
+export { storedPathsAtom } from "@/store/0-atoms/2-1-stored-paths-actions";
+export type { EditorImage } from "@/store/0-atoms/2-2-images";
 export {
     isImageEditModeAtom,
     imagesAtom,
@@ -24,7 +24,7 @@ export {
     doAddImageAtom,
     doUpdateImageAtom,
     doDeleteImageAtom,
-} from "@/store/0-atoms/6-editor-images-state";
+} from "@/store/0-atoms/2-2-images";
 
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 16;
@@ -279,7 +279,7 @@ const applyModelWithoutHistoryAtom = atom(
             updater(model);
             const decimals = get(decimalsAtom);
             const minify = get(minifyOutputAtom);
-            set(setPathWithoutHistoryAtom, model.toString(decimals, minify));
+            set(doSetPathWithoutHistoryAtom, model.toString(decimals, minify));
         } catch {
             // no-op if path is currently invalid
         }

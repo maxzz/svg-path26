@@ -22,7 +22,7 @@ import {
     parseErrorAtom,
     selectedCommandIndexAtom,
     svgPathInputAtom,
-} from "@/store/0-atoms/2-svg-path-state";
+} from "@/store/0-atoms/2-0-svg-path-state";
 import { CanvasActionsMenu } from "./4-canvas-actions-menu";
 import { cn } from "@/utils";
 import {

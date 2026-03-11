@@ -19,7 +19,7 @@ import {
     svgPathInputAtom,
     viewPortLockedAtom,
     zoomAtom,
-} from "./2-svg-path-state";
+} from "./2-0-svg-path-state";
 
 describe("svg path state atoms", () => {
     beforeEach(() => {

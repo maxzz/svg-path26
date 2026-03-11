@@ -1,10 +1,5 @@
 import { atom } from "jotai";
-import {
-    ensureHistoryReadyAtom,
-    historyIndexAtom,
-    historyStackAtom,
-    setPathWithoutHistoryAtom,
-} from "./4-svg-path-history-internals-state";
+import { doEnsureHistoryReadyAtom, historyIndexAtom, historyStackAtom, doSetPathWithoutHistoryAtom } from "./1-2-history-internals";
 
 export const canUndoAtom = atom(
     (get) => {
@@ -24,27 +19,27 @@ export const canRedoAtom = atom(
 export const doUndoPathAtom = atom(
     null,
     (get, set) => {
-        set(ensureHistoryReadyAtom);
+        set(doEnsureHistoryReadyAtom);
         const index = get(historyIndexAtom);
         const stack = get(historyStackAtom);
         if (index <= 0) return;
 
         const nextIndex = index - 1;
         set(historyIndexAtom, nextIndex);
-        set(setPathWithoutHistoryAtom, stack[nextIndex]);
+        set(doSetPathWithoutHistoryAtom, stack[nextIndex]);
     }
 );
 
 export const doRedoPathAtom = atom(
     null,
     (get, set) => {
-        set(ensureHistoryReadyAtom);
+        set(doEnsureHistoryReadyAtom);
         const index = get(historyIndexAtom);
         const stack = get(historyStackAtom);
         if (index === -1 || index >= stack.length - 1) return;
 
         const nextIndex = index + 1;
         set(historyIndexAtom, nextIndex);
-        set(setPathWithoutHistoryAtom, stack[nextIndex]);
+        set(doSetPathWithoutHistoryAtom, stack[nextIndex]);
     }
 );

@@ -5,7 +5,7 @@ import {
     focusedImageIdAtom,
     imagesAtom,
     isImageEditModeAtom,
-} from "@/store/0-atoms/2-svg-path-state";
+} from "@/store/0-atoms/2-0-svg-path-state";
 import { buildImageHandles, eventToSvgPoint, startImageDragAtom } from "./3-canvas-drag";
 import { canvasUnitsPerPixelAtom } from "./5-canvas-viewport-metrics";
 

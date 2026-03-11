@@ -5,12 +5,13 @@ const HISTORY_LIMIT = 120;
 
 export const historyStackAtom = atom<string[]>([]);
 export const historyIndexAtom = atom(-1);
-const historyReadyAtom = atom(false);
 
-export const ensureHistoryReadyAtom = atom(
+const historyReadyAtom = atom(false);
+export const doEnsureHistoryReadyAtom = atom(
     null,
     (get, set, initialPath?: string) => {
         if (get(historyReadyAtom)) return;
+        
         const initial = initialPath ?? get(rawPathAtom);
         set(historyStackAtom, [initial]);
         set(historyIndexAtom, 0);
@@ -18,10 +19,10 @@ export const ensureHistoryReadyAtom = atom(
     }
 );
 
-export const pushHistoryAtom = atom(
+export const doPushHistoryAtom = atom(
     null,
     (get, set, nextPath: string) => {
-        set(ensureHistoryReadyAtom);
+        set(doEnsureHistoryReadyAtom);
 
         const stack = get(historyStackAtom);
         const index = get(historyIndexAtom);
@@ -38,15 +39,15 @@ export const pushHistoryAtom = atom(
     }
 );
 
-export const commitCurrentPathToHistoryAtom = atom(
+export const doCommitCurrentPathToHistoryAtom = atom(
     null,
     (get, set, previousPath?: string) => {
-        set(ensureHistoryReadyAtom, previousPath);
-        set(pushHistoryAtom, get(rawPathAtom));
+        set(doEnsureHistoryReadyAtom, previousPath);
+        set(doPushHistoryAtom, get(rawPathAtom));
     }
 );
 
-export const setPathWithoutHistoryAtom = atom(
+export const doSetPathWithoutHistoryAtom = atom(
     null,
     (_get, set, nextPath: string) => {
         set(rawPathAtom, nextPath);

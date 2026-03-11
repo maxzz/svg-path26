@@ -1,7 +1,7 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { IconRadix_ChevronLeft, IconRadix_ChevronRight } from "@/components/ui/icons/normal";
 import { Button } from "@/components/ui/shadcn/button";
-import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "@/store/0-atoms/2-svg-path-state";
+import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "@/store/0-atoms/2-0-svg-path-state";
 
 export function ToolbarUndoRedo() {
     const canUndo = useAtomValue(canUndoAtom);

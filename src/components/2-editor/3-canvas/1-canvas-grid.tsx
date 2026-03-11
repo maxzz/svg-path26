@@ -9,7 +9,7 @@ import {
     tickIntervalAtom,
     viewPortXAtom,
     viewPortYAtom,
-} from "@/store/0-atoms/2-svg-path-state";
+} from "@/store/0-atoms/2-0-svg-path-state";
 
 type GridValues = ReturnType<typeof buildGrid>;
 

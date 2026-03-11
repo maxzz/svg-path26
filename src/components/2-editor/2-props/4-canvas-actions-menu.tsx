@@ -38,8 +38,8 @@ import {
     viewPortWidthAtom,
     viewPortXAtom,
     viewPortYAtom,
-} from "@/store/0-atoms/2-svg-path-state";
-import type { EditorImage } from "@/store/0-atoms/2-svg-path-state";
+} from "@/store/0-atoms/2-0-svg-path-state";
+import type { EditorImage } from "@/store/0-atoms/2-0-svg-path-state";
 import {
     appSettings,
 } from "@/store/0-ui-settings";

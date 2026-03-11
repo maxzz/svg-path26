@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { ensureHistoryReadyAtom, pushHistoryAtom } from "./4-svg-path-history-internals-state";
+import { doEnsureHistoryReadyAtom, doPushHistoryAtom } from "./1-2-history-internals";
 import { rawPathAtom } from "./1-0-raw-path";
 
 export const svgPathInputAtom = atom(
@@ -9,8 +9,8 @@ export const svgPathInputAtom = atom(
         const resolved = typeof nextValue === "function"
             ? nextValue(prev)
             : nextValue;
-        set(ensureHistoryReadyAtom);
+        set(doEnsureHistoryReadyAtom);
         set(rawPathAtom, resolved);
-        set(pushHistoryAtom, resolved);
+        set(doPushHistoryAtom, resolved);
     },
 );

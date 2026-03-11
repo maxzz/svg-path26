@@ -14,7 +14,7 @@ import {
     selectedCommandIndexAtom,
     svgPathInputAtom,
     targetPointsAtom,
-} from "@/store/0-atoms/2-svg-path-state";
+} from "@/store/0-atoms/2-0-svg-path-state";
 import { startPointDragAtom } from "./3-canvas-drag";
 
 export function CanvasHelperOverlays() {

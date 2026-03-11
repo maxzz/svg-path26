@@ -16,8 +16,8 @@ import {
     snapToGridAtom,
     svgPathInputAtom,
     viewPortLockedAtom,
-} from "@/store/0-atoms/2-svg-path-state";
-import type { EditorImage } from "@/store/0-atoms/2-svg-path-state";
+} from "@/store/0-atoms/2-0-svg-path-state";
+import type { EditorImage } from "@/store/0-atoms/2-0-svg-path-state";
 import type { Point, SvgCanvasPoint } from "@/svg-core/model";
 
 export type DragState =
