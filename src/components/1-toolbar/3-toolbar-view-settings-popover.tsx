@@ -12,7 +12,7 @@ import {
     snapToGridAtom,
     strokeWidthAtom,
     tickIntervalAtom,
-} from "@/store/0-atoms/2-0-svg-model-state";
+} from "@/store/0-atoms/2-2-editor-actions";
 import {
     doFitViewBoxAtom,
     doZoomViewBoxAtom,
@@ -22,8 +22,8 @@ import {
     viewPortXAtom,
     viewPortYAtom,
     zoomAtom,
-} from "@/store/0-atoms/2-3-canvas-viewbox-actions";
-import { isImageEditModeAtom } from "@/store/0-atoms/2-2-images";
+} from "@/store/0-atoms/2-1-canvas-viewbox";
+import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 
 export function SettingsPopover() {
     const fitViewBox = useSetAtom(doFitViewBoxAtom);

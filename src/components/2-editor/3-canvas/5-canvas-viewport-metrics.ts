@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
-import { strokeWidthAtom } from "@/store/0-atoms/2-0-svg-model-state";
-import { canvasViewBoxAtom } from "@/store/0-atoms/2-3-canvas-viewbox-actions";
+import { strokeWidthAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { canvasViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 
 export type SvgViewBox = [number, number, number, number];
 

@@ -6,8 +6,8 @@ import { canvasUnitsPerPixelAtom } from "./5-canvas-viewport-metrics";
 import {
     showTicksAtom,
     tickIntervalAtom,
-} from "@/store/0-atoms/2-0-svg-model-state";
-import { canvasViewBoxAtom, viewPortXAtom, viewPortYAtom } from "@/store/0-atoms/2-3-canvas-viewbox-actions";
+} from "@/store/0-atoms/2-2-editor-actions";
+import { canvasViewBoxAtom, viewPortXAtom, viewPortYAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 
 type GridValues = ReturnType<typeof buildGrid>;
 

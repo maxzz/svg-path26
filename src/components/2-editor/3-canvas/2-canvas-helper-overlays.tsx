@@ -5,16 +5,14 @@ import { appSettings } from "@/store/0-ui-settings";
 import { canvasStrokeWidthAtom, canvasUnitsPerPixelAtom } from "./5-canvas-viewport-metrics";
 import {
     canvasPreviewAtom,
-    controlLinesAtom,
-    controlPointsAtom,
     doFocusPointCommandAtom,
     hoveredCommandIndexAtom,
     selectedCommandIndexAtom,
-    targetPointsAtom,
-} from "@/store/0-atoms/2-0-svg-model-state";
-import { canvasViewBoxAtom } from "@/store/0-atoms/2-3-canvas-viewbox-actions";
-import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-history-input-state";
-import { isImageEditModeAtom } from "@/store/0-atoms/2-2-images";
+} from "@/store/0-atoms/2-2-editor-actions";
+import { controlLinesAtom, controlPointsAtom, targetPointsAtom } from "@/store/0-atoms/2-0-svg-model";
+import { canvasViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
+import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
+import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { startPointDragAtom } from "./3-canvas-drag";
 
 export function CanvasHelperOverlays() {

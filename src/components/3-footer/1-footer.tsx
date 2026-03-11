@@ -1,7 +1,7 @@
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
-import { commandCountAtom } from "@/store/0-atoms/2-0-svg-model-state";
+import { commandCountAtom } from "@/store/0-atoms/2-0-svg-model";
 
 export function Footer() {
     const commandCount = useAtomValue(commandCountAtom);

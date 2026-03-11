@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { doEnsureHistoryReadyAtom, doPushHistoryAtom } from "./1-2-history-internals";
+import { doEnsureHistoryReadyAtom, doPushHistoryAtom } from "./1-2-history";
 import { rawPathAtom } from "./1-0-raw-path";
 
 export const svgPathInputAtom = atom(

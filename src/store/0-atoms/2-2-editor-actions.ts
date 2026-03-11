@@ -1,11 +1,12 @@
 import { atom } from "jotai";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
-import type { Point, SvgCanvasLine, SvgCanvasPoint, SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
-import { createAtomAppSetting } from "@/store/0-atoms/8-create-app-settings-atoms";
-import { createStoredPathActionsAtoms } from "@/store/0-atoms/2-1-stored-paths-actions";
+import type { Point, SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
+import { createAtomAppSetting } from "@/store/0-atoms/8-create-atom-app-settings";
 import { rawPathAtom } from "./1-0-raw-path";
-import { svgPathInputAtom } from "./1-1-svg-path-history-input-state";
-import { doSetPathWithoutHistoryAtom } from "./1-2-history-internals";
+import { svgPathInputAtom } from "./1-1-svg-path-input";
+import { doSetPathWithoutHistoryAtom } from "./1-2-history";
+import { commandRowsAtom, standaloneSegmentPathsAtom } from "@/store/0-atoms/2-0-svg-model";
+import { createStoredPathActionsAtoms } from "@/store/0-atoms/2-3-stored-paths-actions";
 
 export const strokeWidthAtom = createAtomAppSetting("strokeWidth");
 export const decimalsAtom = createAtomAppSetting("decimals");
@@ -19,60 +20,16 @@ export const canvasPreviewAtom = createAtomAppSetting("canvasPreview");
 
 export const pathNameAtom = createAtomAppSetting("pathName");
 
+export const exportFillAtom = createAtomAppSetting("exportFill");
+export const exportFillColorAtom = createAtomAppSetting("exportFillColor");
+export const exportStrokeAtom = createAtomAppSetting("exportStroke");
+export const exportStrokeColorAtom = createAtomAppSetting("exportStrokeColor");
+export const exportStrokeWidthAtom = createAtomAppSetting("exportStrokeWidth");
+
 export const scaleXAtom = atom(1);
 export const scaleYAtom = atom(1);
 export const translateXAtom = atom(0);
 export const translateYAtom = atom(0);
-
-// SVG model
-
-export const svgModelAtom = atom<{ model: SvgPathModel | null; error: string | null; }>(
-    (get) => {
-        const path = get(rawPathAtom).trim();
-        if (!path) {
-            return { model: null, error: null };
-        }
-
-        try {
-            return { model: new SvgPathModel(path), error: null };
-        } catch (error) {
-            return {
-                model: null,
-                error: error instanceof Error ? error.message : String(error),
-            };
-        }
-    }
-);
-
-export const commandCountAtom = atom((get) => get(svgModelAtom).model?.getCommandCount() ?? 0);
-export const parseErrorAtom = atom((get) => get(svgModelAtom).error);
-
-export const commandRowsAtom = atom<SvgSegmentSummary[]>(
-    (get) => {
-        const model = get(svgModelAtom).model;
-        return model ? model.getSummaries() : [];
-    }
-);
-
-export const canvasGeometryAtom = atom(
-    (get) => get(svgModelAtom).model?.getCanvasGeometry() ?? EMPTY_GEOMETRY
-);
-
-export const targetPointsAtom = atom<SvgCanvasPoint[]>(
-    (get) => get(canvasGeometryAtom).targets
-);
-
-export const controlPointsAtom = atom<SvgCanvasPoint[]>(
-    (get) => get(canvasGeometryAtom).controls
-);
-
-export const controlLinesAtom = atom<SvgCanvasLine[]>(
-    (get) => get(canvasGeometryAtom).relationLines
-);
-
-export const standaloneSegmentPathsAtom = atom<string[]>(
-    (get) => get(canvasGeometryAtom).standaloneBySegment
-);
 
 const selectedCommandIndexBaseAtom = atom<number | null>(null);
 export const selectedCommandIndexAtom = atom(
@@ -132,7 +89,7 @@ export const hoveredStandaloneSegmentPathAtom = atom(
 
 // Model
 
-const applyModelAtom = atom(
+const doApplySvgModelAtom = atom(
     null,
     (get, set, updater: (svg: SvgPathModel) => void) => {
         const path = get(rawPathAtom).trim();
@@ -150,7 +107,7 @@ const applyModelAtom = atom(
     }
 );
 
-const applyModelWithoutHistoryAtom = atom(
+const doApplySvgModelWithoutHistoryAtom = atom(
     null,
     (get, set, updater: (svg: SvgPathModel) => void) => {
         const path = get(rawPathAtom).trim();
@@ -173,7 +130,7 @@ const applyModelWithoutHistoryAtom = atom(
 export const doSetPointLocationAtom = atom(
     null,
     (_get, set, args: { point: SvgCanvasPoint; to: Point; }) => {
-        set(applyModelAtom, (model) => {
+        set(doApplySvgModelAtom, (model) => {
             model.setCanvasPointLocation(args.point, args.to);
         });
     }
@@ -182,7 +139,7 @@ export const doSetPointLocationAtom = atom(
 export const doSetPointLocationWithoutHistoryAtom = atom(
     null,
     (_get, set, args: { point: SvgCanvasPoint; to: Point; }) => {
-        set(applyModelWithoutHistoryAtom, (model) => {
+        set(doApplySvgModelWithoutHistoryAtom, (model) => {
             model.setCanvasPointLocation(args.point, args.to);
         });
     }
@@ -191,7 +148,7 @@ export const doSetPointLocationWithoutHistoryAtom = atom(
 export const doSetCommandValueAtom = atom(
     null,
     (_get, set, args: { commandIndex: number; valueIndex: number; value: number; }) => {
-        set(applyModelAtom, (model) => {
+        set(doApplySvgModelAtom, (model) => {
             model.setSegmentValue(args.commandIndex, args.valueIndex, args.value);
         });
     }
@@ -202,7 +159,7 @@ export const doSetCommandValueAtom = atom(
 export const doToggleSegmentRelativeAtom = atom(
     null,
     (_get, set, segmentIndex: number) => {
-        set(applyModelAtom, (model) => {
+        set(doApplySvgModelAtom, (model) => {
             model.toggleSegmentRelative(segmentIndex);
         });
     }
@@ -211,7 +168,7 @@ export const doToggleSegmentRelativeAtom = atom(
 export const doDeleteSegmentAtom = atom(
     null,
     (get, set, segmentIndex: number) => {
-        set(applyModelAtom, (model) => {
+        set(doApplySvgModelAtom, (model) => {
             model.deleteSegment(segmentIndex);
         });
 
@@ -241,7 +198,7 @@ export const doInsertSegmentAtom = atom(
         }
 
         let insertedIndex: number | null = null;
-        set(applyModelAtom, (model) => {
+        set(doApplySvgModelAtom, (model) => {
             insertedIndex = model.insertSegment(args.type, args.afterIndex);
         });
         if (insertedIndex !== null) {
@@ -253,7 +210,7 @@ export const doInsertSegmentAtom = atom(
 export const doConvertSegmentAtom = atom(
     null,
     (_get, set, args: { segmentIndex: number; type: string; }) => {
-        set(applyModelAtom, (model) => {
+        set(doApplySvgModelAtom, (model) => {
             model.changeSegmentType(args.segmentIndex, args.type);
         });
     }
@@ -271,7 +228,7 @@ export const doFocusPointCommandAtom = atom(
 export const doNormalizePathAtom = atom(
     null,
     (get, set) => {
-        set(applyModelAtom, () => { });
+        set(doApplySvgModelAtom, () => { });
     }
 );
 
@@ -283,19 +240,23 @@ export const doSetMinifyAtom = atom(
     }
 );
 
+// Set relative/absolute
+
 export const doSetRelativeAtom = atom(
     null,
     (_get, set) => {
-        set(applyModelAtom, (model) => model.setRelative(true));
+        set(doApplySvgModelAtom, (model) => model.setRelative(true));
     }
 );
 
 export const doSetAbsoluteAtom = atom(
     null,
     (_get, set) => {
-        set(applyModelAtom, (model) => model.setRelative(false));
+        set(doApplySvgModelAtom, (model) => model.setRelative(false));
     }
 );
+
+// Scale/translate
 
 export const doApplyScaleAtom = atom(
     null,
@@ -303,7 +264,7 @@ export const doApplyScaleAtom = atom(
         const scaleX = get(scaleXAtom);
         const scaleY = get(scaleYAtom);
         if (scaleX === 0 || scaleY === 0) return;
-        set(applyModelAtom, (model) => model.scale(scaleX, scaleY));
+        set(doApplySvgModelAtom, (model) => model.scale(scaleX, scaleY));
     }
 );
 
@@ -313,11 +274,13 @@ export const doApplyTranslateAtom = atom(
         const dx = get(translateXAtom);
         const dy = get(translateYAtom);
         if (dx === 0 && dy === 0) return;
-        set(applyModelAtom, (model) => model.translate(dx, dy));
+        set(doApplySvgModelAtom, (model) => model.translate(dx, dy));
         set(translateXAtom, 0);
         set(translateYAtom, 0);
     }
 );
+
+// Clear path
 
 export const doClearPathAtom = atom(
     null,
@@ -329,20 +292,4 @@ export const doClearPathAtom = atom(
     }
 );
 
-export const exportFillAtom = createAtomAppSetting("exportFill");
-export const exportFillColorAtom = createAtomAppSetting("exportFillColor");
-export const exportStrokeAtom = createAtomAppSetting("exportStroke");
-export const exportStrokeColorAtom = createAtomAppSetting("exportStrokeColor");
-export const exportStrokeWidthAtom = createAtomAppSetting("exportStrokeWidth");
-
-const EMPTY_GEOMETRY = {
-    targets: [],
-    controls: [],
-    relationLines: [],
-    standaloneBySegment: [],
-} satisfies {
-    targets: SvgCanvasPoint[];
-    controls: SvgCanvasPoint[];
-    relationLines: SvgCanvasLine[];
-    standaloneBySegment: string[];
-};
+//

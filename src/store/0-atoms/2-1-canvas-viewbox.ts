@@ -1,9 +1,7 @@
 import { atom } from "jotai";
-import type { Point } from "@/svg-core/9-types-svg-model";
-import { createAtomAppSetting } from "@/store/0-atoms/8-create-app-settings-atoms";
-import {
-    svgModelAtom,
-} from "@/store/0-atoms/2-0-svg-model-state";
+import { type Point } from "@/svg-core/9-types-svg-model";
+import { createAtomAppSetting } from "@/store/0-atoms/8-create-atom-app-settings";
+import { svgModelAtom } from "@/store/0-atoms/2-0-svg-model";
 
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 16;
@@ -14,6 +12,8 @@ export const viewPortYAtom = createAtomAppSetting("viewPortY");
 export const viewPortWidthAtom = createAtomAppSetting("viewPortWidth");
 export const viewPortHeightAtom = createAtomAppSetting("viewPortHeight");
 export const viewPortLockedAtom = createAtomAppSetting("viewPortLocked");
+
+// Canvas view box
 
 export const canvasViewBoxAtom = atom<[number, number, number, number]>(
     (get) => [
@@ -36,6 +36,8 @@ export const doSetViewBoxAtom = atom(
         set(viewPortHeightAtom, next.height);
     }
 );
+
+// Pan/zoom/fit view box
 
 export const doPanViewBoxAtom = atom(
     null,

@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { canvasPreviewAtom } from "@/store/0-atoms/2-0-svg-model-state";
-import { canvasViewBoxAtom } from "@/store/0-atoms/2-3-canvas-viewbox-actions";
-import { focusedImageIdAtom, imagesAtom, isImageEditModeAtom } from "@/store/0-atoms/2-2-images";
+import { canvasPreviewAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { canvasViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
+import { focusedImageIdAtom, imagesAtom, isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { buildImageHandles, eventToSvgPoint, startImageDragAtom } from "./3-canvas-drag";
 import { canvasUnitsPerPixelAtom } from "./5-canvas-viewport-metrics";
 

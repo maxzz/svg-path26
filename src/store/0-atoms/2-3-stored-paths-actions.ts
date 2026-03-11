@@ -1,7 +1,7 @@
 import { atom, type SetStateAction, type WritableAtom } from "jotai";
-import { createAtomAppSetting } from "@/store/0-atoms/8-create-app-settings-atoms";
+import { createAtomAppSetting } from "@/store/0-atoms/8-create-atom-app-settings";
 import { rawPathAtom } from "./1-0-raw-path";
-import { svgPathInputAtom } from "./1-1-svg-path-history-input-state";
+import { svgPathInputAtom } from "./1-1-svg-path-input";
 
 export type StoredPath = {
     name: string;

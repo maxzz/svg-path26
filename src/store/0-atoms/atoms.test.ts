@@ -4,19 +4,19 @@ import {
     doOpenNamedPathAtom,
     doSetPointLocationWithoutHistoryAtom,
     doSaveNamedPathAtom,
-    targetPointsAtom,
     pathNameAtom,
-} from "./2-0-svg-model-state";
-import { canvasViewBoxAtom, doFitViewBoxAtom, doPanViewBoxAtom, doZoomViewBoxAtom, viewPortLockedAtom, zoomAtom } from "./2-3-canvas-viewbox-actions";
+} from "./2-2-editor-actions";
+import { targetPointsAtom } from "./2-0-svg-model";
+import { canvasViewBoxAtom, doFitViewBoxAtom, doPanViewBoxAtom, doZoomViewBoxAtom, viewPortLockedAtom, zoomAtom } from "./2-1-canvas-viewbox";
 import {
     canRedoAtom,
     canUndoAtom,
     doRedoPathAtom,
     doUndoPathAtom,
-} from "./1-3-history-actions";
-import { svgPathInputAtom } from "./1-1-svg-path-history-input-state";
-import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } from "./1-2-history-internals";
-import { storedPathsAtom } from "./2-1-stored-paths-actions";
+} from "./1-2-history";
+import { svgPathInputAtom } from "./1-1-svg-path-input";
+import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } from "./1-2-history";
+import { storedPathsAtom } from "./2-3-stored-paths-actions";
 
 describe("svg path state atoms", () => {
     beforeEach(() => {

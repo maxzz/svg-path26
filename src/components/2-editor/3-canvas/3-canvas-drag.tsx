@@ -9,11 +9,11 @@ import {
     isCanvasDraggingAtom,
     pointPrecisionAtom,
     snapToGridAtom,
-} from "@/store/0-atoms/2-0-svg-model-state";
-import { doPanViewBoxAtom, doZoomViewBoxAtom, viewPortLockedAtom } from "@/store/0-atoms/2-3-canvas-viewbox-actions";
-import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-history-input-state";
-import { doCommitCurrentPathToHistoryAtom } from "@/store/0-atoms/1-2-history-internals";
-import { doUpdateImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-2-images";
+} from "@/store/0-atoms/2-2-editor-actions";
+import { doPanViewBoxAtom, doZoomViewBoxAtom, viewPortLockedAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
+import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
+import { doCommitCurrentPathToHistoryAtom } from "@/store/0-atoms/1-2-history";
+import { doUpdateImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-4-images";
 import type { Point, SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
 
 export type DragState =
