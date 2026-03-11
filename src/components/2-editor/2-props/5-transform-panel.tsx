@@ -5,7 +5,7 @@ import { classNames } from "@/utils";
 import { appSettings } from "@/store/0-ui-settings";
 import { Button } from "@/components/ui/shadcn/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/shadcn/accordion";
-import { decimalsAtom, doApplyScaleAtom, doApplyTranslateAtom, scaleXAtom, scaleYAtom, translateXAtom, translateYAtom } from "@/store/0-atoms/2-0-svg-path-state";
+import { decimalsAtom, doApplyScaleAtom, doApplyTranslateAtom, scaleXAtom, scaleYAtom, translateXAtom, translateYAtom } from "@/store/0-atoms/2-0-svg-model-state";
 
 export function TransformPanel() {
     const settings = useSnapshot(appSettings);

@@ -12,7 +12,7 @@ import {
     hoveredCommandIndexAtom,
     selectedCommandIndexAtom,
     targetPointsAtom,
-} from "@/store/0-atoms/2-0-svg-path-state";
+} from "@/store/0-atoms/2-0-svg-model-state";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-history-input-state";
 import { isImageEditModeAtom } from "@/store/0-atoms/2-2-images";
 import { startPointDragAtom } from "./3-canvas-drag";

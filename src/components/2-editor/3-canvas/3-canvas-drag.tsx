@@ -12,11 +12,11 @@ import {
     pointPrecisionAtom,
     snapToGridAtom,
     viewPortLockedAtom,
-} from "@/store/0-atoms/2-0-svg-path-state";
+} from "@/store/0-atoms/2-0-svg-model-state";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-history-input-state";
 import { doCommitCurrentPathToHistoryAtom } from "@/store/0-atoms/1-2-history-internals";
 import { doUpdateImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-2-images";
-import type { Point, SvgCanvasPoint } from "@/svg-core/2-svg-model";
+import type { Point, SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
 
 export type DragState =
     | { mode: "point"; pointerId: number; point: SvgCanvasPoint; startPath: string; }

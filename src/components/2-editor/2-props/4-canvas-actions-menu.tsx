@@ -34,7 +34,7 @@ import {
     viewPortWidthAtom,
     viewPortXAtom,
     viewPortYAtom,
-} from "@/store/0-atoms/2-0-svg-path-state";
+} from "@/store/0-atoms/2-0-svg-model-state";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-history-input-state";
 import { storedPathsAtom } from "@/store/0-atoms/2-1-stored-paths-actions";
 import { doAddImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-2-images";

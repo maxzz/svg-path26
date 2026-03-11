@@ -1,59 +1,14 @@
 import { parseSvgPath } from "./1-parser";
-
-export type Point = { x: number; y: number; };
-
-export type Bounds = {
-    xmin: number;
-    ymin: number;
-    xmax: number;
-    ymax: number;
-};
-
-export type SvgSegmentSummary = {
-    index: number;
-    command: string;
-    values: number[];
-    target: Point;
-};
-
-export type SvgCanvasPoint = {
-    id: string;
-    segmentIndex: number;
-    kind: "target" | "control";
-    controlIndex: number;
-    x: number;
-    y: number;
-    movable: boolean;
-    relations: Point[];
-};
-
-export type SvgCanvasLine = {
-    from: Point;
-    to: Point;
-};
-
-export type SvgCanvasGeometry = {
-    targets: SvgCanvasPoint[];
-    controls: SvgCanvasPoint[];
-    relationLines: SvgCanvasLine[];
-    standaloneBySegment: string[];
-};
-
-type SvgSegment = {
-    command: string;
-    values: number[];
-};
-
-type AbsoluteSegment = {
-    index: number;
-    segment: SvgSegment;
-    command: string;
-    start: Point;
-    end: Point;
-    values: number[];
-    reflectedCubicControl: Point;
-    reflectedQuadraticControl: Point;
-};
+import type {
+    AbsoluteSegment,
+    Bounds,
+    Point,
+    SvgCanvasGeometry,
+    SvgCanvasLine,
+    SvgCanvasPoint,
+    SvgSegment,
+    SvgSegmentSummary,
+} from "@/svg-core/9-types-svg-model";
 
 export class SvgPathModel {
     readonly segments: SvgSegment[];

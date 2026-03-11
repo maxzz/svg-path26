@@ -20,7 +20,7 @@ import {
     viewPortXAtom,
     viewPortYAtom,
     zoomAtom,
-} from "@/store/0-atoms/2-0-svg-path-state";
+} from "@/store/0-atoms/2-0-svg-model-state";
 import { isImageEditModeAtom } from "@/store/0-atoms/2-2-images";
 
 export function SettingsPopover() {

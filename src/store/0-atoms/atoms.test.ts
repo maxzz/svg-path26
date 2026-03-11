@@ -12,7 +12,7 @@ import {
     pathNameAtom,
     viewPortLockedAtom,
     zoomAtom,
-} from "./2-0-svg-path-state";
+} from "./2-0-svg-model-state";
 import {
     canRedoAtom,
     canUndoAtom,

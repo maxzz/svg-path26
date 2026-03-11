@@ -12,7 +12,7 @@ import {
     svgModelAtom,
     parseErrorAtom,
     selectedCommandIndexAtom,
-} from "@/store/0-atoms/2-0-svg-path-state";
+} from "@/store/0-atoms/2-0-svg-model-state";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-history-input-state";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "@/store/0-atoms/1-3-history-actions";
 import { doDeleteImageAtom, doUpdateImageAtom, focusedImageIdAtom, imagesAtom, isImageEditModeAtom } from "@/store/0-atoms/2-2-images";
