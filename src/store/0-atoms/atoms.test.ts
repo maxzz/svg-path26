@@ -6,10 +6,8 @@ import {
     doSaveNamedPathAtom,
     targetPointsAtom,
     pathNameAtom,
-    viewPortLockedAtom,
-    zoomAtom,
 } from "./2-0-svg-model-state";
-import { canvasViewBoxAtom, doFitViewBoxAtom, doPanViewBoxAtom, doZoomViewBoxAtom } from "./2-3-canvas-viewbox-actions";
+import { canvasViewBoxAtom, doFitViewBoxAtom, doPanViewBoxAtom, doZoomViewBoxAtom, viewPortLockedAtom, zoomAtom } from "./2-3-canvas-viewbox-actions";
 import {
     canRedoAtom,
     canUndoAtom,

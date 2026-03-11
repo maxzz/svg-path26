@@ -8,7 +8,6 @@ import { svgPathInputAtom } from "./1-1-svg-path-history-input-state";
 import { doSetPathWithoutHistoryAtom } from "./1-2-history-internals";
 
 export const strokeWidthAtom = createAtomAppSetting("strokeWidth");
-export const zoomAtom = createAtomAppSetting("zoom");
 export const decimalsAtom = createAtomAppSetting("decimals");
 export const minifyOutputAtom = createAtomAppSetting("minifyOutput");
 export const snapToGridAtom = createAtomAppSetting("snapToGrid");
@@ -18,11 +17,6 @@ export const tickIntervalAtom = createAtomAppSetting("tickInterval");
 export const fillPreviewAtom = createAtomAppSetting("fillPreview");
 export const canvasPreviewAtom = createAtomAppSetting("canvasPreview");
 
-export const viewPortXAtom = createAtomAppSetting("viewPortX");
-export const viewPortYAtom = createAtomAppSetting("viewPortY");
-export const viewPortWidthAtom = createAtomAppSetting("viewPortWidth");
-export const viewPortHeightAtom = createAtomAppSetting("viewPortHeight");
-export const viewPortLockedAtom = createAtomAppSetting("viewPortLocked");
 export const pathNameAtom = createAtomAppSetting("pathName");
 
 export const scaleXAtom = atom(1);
