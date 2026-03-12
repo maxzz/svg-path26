@@ -29,6 +29,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/shadcn/dropdown-menu";
 import { Button } from "@/components/ui/shadcn/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 import { IconRadix_DotsHorizontal } from "@/components/ui/icons/normal";
 import type { SvgCanvasPoint, SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 
@@ -194,210 +195,224 @@ export function EditorPanels() {
 
             <section className="rounded-lg border p-3">
                 <h2 className="mb-2 text-sm font-semibold">Commands</h2>
-                <div className="max-h-64 space-y-1 overflow-auto rounded border bg-muted/20 p-2 font-mono text-xs">
-                    {rows.length === 0 && <p className="text-muted-foreground">No commands to show.</p>}
-                    {rows.map((row) => {
-                        const isCanvasPointFocused = highlightedCanvasPoint?.segmentIndex === row.index;
-                        const highlightCommandCell = isCommandCellLinkedToPoint(row, highlightedCanvasPoint);
-                        return (
-                            <div
-                            key={row.index}
-                            ref={(element) => {
-                                rowRefs.current[row.index] = element;
-                            }}
-                            className={cn(
-                                "flex items-center gap-2 rounded border px-2 py-1.5 transition-colors",
-                                selectedCommandIndex === row.index
-                                    ? "border-sky-500/50 bg-sky-500/10"
-                                    : (hoveredCommandIndex === row.index || isCanvasPointFocused)
-                                        ? "border-sky-500/25 bg-sky-500/5"
-                                        : "border-transparent bg-background hover:bg-muted/40",
-                            )}
-                            onClick={() => setSelectedCommandIndex(row.index)}
-                            onMouseEnter={() => setHoveredCommandIndex(row.index)}
-                            onMouseLeave={() => setHoveredCommandIndex(null)}
-                        >
-                            <span className="w-6 shrink-0 text-[10px] text-muted-foreground">
-                                {String(row.index + 1).padStart(2, "0")}.
-                            </span>
+                <TooltipProvider delayDuration={250}>
+                    <div className="max-h-64 space-y-1 overflow-auto rounded border bg-muted/20 p-2 font-mono text-xs">
+                        {rows.length === 0 && <p className="text-muted-foreground">No commands to show.</p>}
+                        {rows.map((row) => {
+                            const isCanvasPointFocused = highlightedCanvasPoint?.segmentIndex === row.index;
+                            const highlightCommandCell = isCommandCellLinkedToPoint(row, highlightedCanvasPoint);
+                            return (
+                                <div
+                                    key={row.index}
+                                    ref={(element) => {
+                                        rowRefs.current[row.index] = element;
+                                    }}
+                                    className={cn(
+                                        "flex items-center gap-2 rounded border px-2 py-1.5 transition-colors",
+                                        selectedCommandIndex === row.index
+                                            ? "border-sky-500/50 bg-sky-500/10"
+                                            : (hoveredCommandIndex === row.index || isCanvasPointFocused)
+                                                ? "border-sky-500/25 bg-sky-500/5"
+                                                : "border-transparent bg-background hover:bg-muted/40",
+                                    )}
+                                    onClick={() => setSelectedCommandIndex(row.index)}
+                                    onMouseEnter={() => setHoveredCommandIndex(row.index)}
+                                    onMouseLeave={() => setHoveredCommandIndex(null)}
+                                >
+                                    <span className="w-6 shrink-0 text-[10px] text-muted-foreground">
+                                        {String(row.index + 1).padStart(2, "0")}.
+                                    </span>
 
-                            <button
-                                type="button"
-                                className={cn(
-                                    "w-4 shrink-0 rounded-sm text-center text-sm font-semibold cursor-pointer transition-colors",
-                                    row.command === row.command.toLowerCase()
-                                        ? "text-violet-500"
-                                        : "text-orange-500",
-                                    highlightCommandCell && "bg-sky-500/15 ring-1 ring-sky-500/50",
-                                )}
-                                onClick={(event) => {
-                                    event.stopPropagation();
-                                    setSelectedCommandIndex(row.index);
-                                    doToggleRelative(row.index);
-                                }}
-                                title="Toggle relative/absolute"
-                            >
-                                {row.command}
-                            </button>
-
-                            <div className="flex flex-wrap items-center gap-1.5 min-w-0">
-                                {row.values.length === 0 && (
-                                    <span className="text-[10px] text-muted-foreground">No values</span>
-                                )}
-
-                                {row.values.map((value, valueIndex) => {
-                                    const isLinkedValue = isCommandValueLinkedToPoint(row, valueIndex, highlightedCanvasPoint);
-                                    const isArcFlag = row.command.toLowerCase() === "a" && (valueIndex === 3 || valueIndex === 4);
-                                    if (isArcFlag) {
-                                        return (
-                                            <label
-                                                key={`${row.index}:${valueIndex}`}
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <button
+                                                type="button"
                                                 className={cn(
-                                                    "inline-flex items-center gap-1 rounded px-1 py-0.5 text-[10px] transition-colors",
-                                                    isLinkedValue
-                                                        ? "border border-sky-500/60 bg-sky-500/10"
-                                                        : "border bg-background",
+                                                    "w-4 shrink-0 rounded-sm text-center text-sm font-semibold cursor-pointer transition-colors",
+                                                    row.command === row.command.toLowerCase()
+                                                        ? "text-violet-500"
+                                                        : "text-orange-500",
+                                                    highlightCommandCell && "bg-sky-500/15 ring-1 ring-sky-500/50",
                                                 )}
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    setSelectedCommandIndex(row.index);
+                                                    doToggleRelative(row.index);
+                                                }}
                                             >
-                                                <input
-                                                    type="checkbox"
-                                                    checked={value === 1}
-                                                    ref={(element) => {
-                                                        fieldRefs.current[`${row.index}:${valueIndex}`] = element;
-                                                    }}
+                                                {row.command}
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent sideOffset={6} className="max-w-80">
+                                            {commandSummaryTooltip(row.command)}
+                                        </TooltipContent>
+                                    </Tooltip>
+
+                                    <div className="flex flex-wrap items-center gap-1.5 min-w-0">
+                                        {row.values.length === 0 && (
+                                            <span className="text-[10px] text-muted-foreground">No values</span>
+                                        )}
+
+                                        {row.values.map((value, valueIndex) => {
+                                            const isLinkedValue = isCommandValueLinkedToPoint(row, valueIndex, highlightedCanvasPoint);
+                                            const valueTooltip = commandValueTooltip(row.command, valueIndex);
+                                            const isArcFlag = row.command.toLowerCase() === "a" && (valueIndex === 3 || valueIndex === 4);
+                                            if (isArcFlag) {
+                                                return (
+                                                    <Tooltip key={`${row.index}:${valueIndex}`}>
+                                                        <TooltipTrigger asChild>
+                                                            <label
+                                                                className={cn(
+                                                                    "inline-flex items-center gap-1 rounded px-1 py-0.5 text-[10px] transition-colors",
+                                                                    isLinkedValue
+                                                                        ? "border border-sky-500/60 bg-sky-500/10"
+                                                                        : "border bg-background",
+                                                                )}
+                                                            >
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={value === 1}
+                                                                    ref={(element) => {
+                                                                        fieldRefs.current[`${row.index}:${valueIndex}`] = element;
+                                                                    }}
+                                                                    onFocus={() => setSelectedCommandIndex(row.index)}
+                                                                    onChange={(event) => {
+                                                                        setSelectedCommandIndex(row.index);
+                                                                        setCommandValue({
+                                                                            commandIndex: row.index,
+                                                                            valueIndex,
+                                                                            value: event.target.checked ? 1 : 0,
+                                                                        });
+                                                                    }}
+                                                                    onKeyDown={(event) => {
+                                                                        if (event.key === "ArrowLeft") {
+                                                                            focusField(row.index, Math.max(0, valueIndex - 1));
+                                                                            event.preventDefault();
+                                                                        }
+                                                                        if (event.key === "ArrowRight") {
+                                                                            focusField(row.index, Math.min(row.values.length - 1, valueIndex + 1));
+                                                                            event.preventDefault();
+                                                                        }
+                                                                        if (event.key === "ArrowUp") {
+                                                                            moveVertical(row.index, valueIndex, "up");
+                                                                            event.preventDefault();
+                                                                        }
+                                                                        if (event.key === "ArrowDown") {
+                                                                            moveVertical(row.index, valueIndex, "down");
+                                                                            event.preventDefault();
+                                                                        }
+                                                                    }}
+                                                                />
+                                                                <span className="text-muted-foreground">{valueIndex === 3 ? "laf" : "swp"}</span>
+                                                            </label>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent sideOffset={6}>
+                                                            {valueTooltip}
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                );
+                                            }
+
+                                            return (
+                                                <CommandValueInput
+                                                    key={`${row.index}:${valueIndex}`}
+                                                    value={value}
+                                                    highlighted={isLinkedValue}
+                                                    tooltip={valueTooltip}
                                                     onFocus={() => setSelectedCommandIndex(row.index)}
-                                                    onChange={(event) => {
+                                                    onCommit={(nextValue) => {
                                                         setSelectedCommandIndex(row.index);
                                                         setCommandValue({
                                                             commandIndex: row.index,
                                                             valueIndex,
-                                                            value: event.target.checked ? 1 : 0,
+                                                            value: nextValue,
                                                         });
                                                     }}
-                                                    onKeyDown={(event) => {
-                                                        if (event.key === "ArrowLeft") {
-                                                            focusField(row.index, Math.max(0, valueIndex - 1));
-                                                            event.preventDefault();
-                                                        }
-                                                        if (event.key === "ArrowRight") {
-                                                            focusField(row.index, Math.min(row.values.length - 1, valueIndex + 1));
-                                                            event.preventDefault();
-                                                        }
-                                                        if (event.key === "ArrowUp") {
-                                                            moveVertical(row.index, valueIndex, "up");
-                                                            event.preventDefault();
-                                                        }
-                                                        if (event.key === "ArrowDown") {
-                                                            moveVertical(row.index, valueIndex, "down");
-                                                            event.preventDefault();
-                                                        }
+                                                    inputRef={(element) => {
+                                                        fieldRefs.current[`${row.index}:${valueIndex}`] = element;
                                                     }}
-                                                    title={commandValueTooltip(row.command, valueIndex)}
+                                                    onArrowMove={(direction) => {
+                                                        const nextIndex = direction === "left"
+                                                            ? Math.max(0, valueIndex - 1)
+                                                            : Math.min(row.values.length - 1, valueIndex + 1);
+                                                        focusField(row.index, nextIndex);
+                                                    }}
+                                                    onArrowVertical={(direction) => moveVertical(row.index, valueIndex, direction)}
                                                 />
-                                                <span className="text-muted-foreground">{valueIndex === 3 ? "laf" : "swp"}</span>
-                                            </label>
-                                        );
-                                    }
+                                            );
+                                        })}
+                                    </div>
 
-                                    return (
-                                        <CommandValueInput
-                                            key={`${row.index}:${valueIndex}`}
-                                            value={value}
-                                            highlighted={isLinkedValue}
-                                            onFocus={() => setSelectedCommandIndex(row.index)}
-                                            onCommit={(nextValue) => {
-                                                setSelectedCommandIndex(row.index);
-                                                setCommandValue({
-                                                    commandIndex: row.index,
-                                                    valueIndex,
-                                                    value: nextValue,
-                                                });
-                                            }}
-                                            inputRef={(element) => {
-                                                fieldRefs.current[`${row.index}:${valueIndex}`] = element;
-                                            }}
-                                            onArrowMove={(direction) => {
-                                                const nextIndex = direction === "left"
-                                                    ? Math.max(0, valueIndex - 1)
-                                                    : Math.min(row.values.length - 1, valueIndex + 1);
-                                                focusField(row.index, nextIndex);
-                                            }}
-                                            onArrowVertical={(direction) => moveVertical(row.index, valueIndex, direction)}
-                                            title={commandValueTooltip(row.command, valueIndex)}
-                                        />
-                                    );
-                                })}
-                            </div>
+                                    <div className="ml-auto">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="size-6"
+                                                    onClick={(event) => event.stopPropagation()}
+                                                >
+                                                    <IconRadix_DotsHorizontal className="size-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
 
-                            <div className="ml-auto">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="size-6"
-                                            onClick={(event) => event.stopPropagation()}
-                                        >
-                                            <IconRadix_DotsHorizontal className="size-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
+                                            <DropdownMenuContent
+                                                align="end"
+                                                onClick={(event) => event.stopPropagation()}
+                                            >
+                                                <DropdownMenuSub>
+                                                    <DropdownMenuSubTrigger>Insert After</DropdownMenuSubTrigger>
+                                                    <DropdownMenuSubContent>
+                                                        {COMMAND_TYPES.map((type) => (
+                                                            <DropdownMenuItem
+                                                                key={`insert:${row.index}:${type}`}
+                                                                disabled={parseState.model ? !parseState.model.canInsertAfter(row.index, type) : false}
+                                                                onSelect={() => doInsertSegment({ type, afterIndex: row.index })}
+                                                            >
+                                                                <strong className="mr-1">{type}</strong> {commandLabel(type)}
+                                                            </DropdownMenuItem>
+                                                        ))}
+                                                    </DropdownMenuSubContent>
+                                                </DropdownMenuSub>
 
-                                    <DropdownMenuContent
-                                        align="end"
-                                        onClick={(event) => event.stopPropagation()}
-                                    >
-                                        <DropdownMenuSub>
-                                            <DropdownMenuSubTrigger>Insert After</DropdownMenuSubTrigger>
-                                            <DropdownMenuSubContent>
-                                                {COMMAND_TYPES.map((type) => (
-                                                    <DropdownMenuItem
-                                                        key={`insert:${row.index}:${type}`}
-                                                        disabled={parseState.model ? !parseState.model.canInsertAfter(row.index, type) : false}
-                                                        onSelect={() => doInsertSegment({ type, afterIndex: row.index })}
-                                                    >
-                                                        <strong className="mr-1">{type}</strong> {commandLabel(type)}
-                                                    </DropdownMenuItem>
-                                                ))}
-                                            </DropdownMenuSubContent>
-                                        </DropdownMenuSub>
+                                                <DropdownMenuSub>
+                                                    <DropdownMenuSubTrigger>Convert To</DropdownMenuSubTrigger>
+                                                    <DropdownMenuSubContent>
+                                                        {COMMAND_TYPES.map((type) => {
+                                                            const toType = row.command === row.command.toLowerCase()
+                                                                ? type.toLowerCase()
+                                                                : type;
+                                                            return (
+                                                                <DropdownMenuItem
+                                                                    key={`convert:${row.index}:${type}`}
+                                                                    disabled={parseState.model ? !parseState.model.canConvert(row.index, toType) : false}
+                                                                    onSelect={() => doConvertSegment({ segmentIndex: row.index, type: toType })}
+                                                                >
+                                                                    <strong className="mr-1">{type}</strong> {commandLabel(type)}
+                                                                </DropdownMenuItem>
+                                                            );
+                                                        })}
+                                                    </DropdownMenuSubContent>
+                                                </DropdownMenuSub>
 
-                                        <DropdownMenuSub>
-                                            <DropdownMenuSubTrigger>Convert To</DropdownMenuSubTrigger>
-                                            <DropdownMenuSubContent>
-                                                {COMMAND_TYPES.map((type) => {
-                                                    const toType = row.command === row.command.toLowerCase()
-                                                        ? type.toLowerCase()
-                                                        : type;
-                                                    return (
-                                                        <DropdownMenuItem
-                                                            key={`convert:${row.index}:${type}`}
-                                                            disabled={parseState.model ? !parseState.model.canConvert(row.index, toType) : false}
-                                                            onSelect={() => doConvertSegment({ segmentIndex: row.index, type: toType })}
-                                                        >
-                                                            <strong className="mr-1">{type}</strong> {commandLabel(type)}
-                                                        </DropdownMenuItem>
-                                                    );
-                                                })}
-                                            </DropdownMenuSubContent>
-                                        </DropdownMenuSub>
-
-                                        <DropdownMenuItem onSelect={() => doToggleRelative(row.index)}>
-                                            {row.command === row.command.toLowerCase() ? "Set Absolute" : "Set Relative"}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem
-                                            disabled={row.index === 0}
-                                            onSelect={() => doDeleteSegment(row.index)}
-                                        >
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
-                            </div>
-                        );
-                    })}
-                </div>
+                                                <DropdownMenuItem onSelect={() => doToggleRelative(row.index)}>
+                                                    {row.command === row.command.toLowerCase() ? "Set Absolute" : "Set Relative"}
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem
+                                                    disabled={row.index === 0}
+                                                    onSelect={() => doDeleteSegment(row.index)}
+                                                >
+                                                    Delete
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </TooltipProvider>
             </section>
 
             {(isImageEditMode || images.length > 0) && (
@@ -490,21 +505,21 @@ function PathInputSection() {
 function CommandValueInput({
     value,
     highlighted,
+    tooltip,
     onCommit,
     onFocus,
     inputRef,
     onArrowMove,
     onArrowVertical,
-    title,
 }: {
     value: number;
     highlighted?: boolean;
+    tooltip?: string;
     onCommit: (value: number) => void;
     onFocus: () => void;
     inputRef?: (element: HTMLInputElement | null) => void;
     onArrowMove?: (direction: "left" | "right") => void;
     onArrowVertical?: (direction: "up" | "down") => void;
-    title?: string;
 }) {
     const [draft, setDraft] = useState(String(value));
 
@@ -521,7 +536,7 @@ function CommandValueInput({
         onCommit(parsed);
     };
 
-    return (
+    const input = (
         <input
             type="text"
             inputMode="decimal"
@@ -533,7 +548,6 @@ function CommandValueInput({
             )}
             ref={inputRef}
             value={draft}
-            title={title}
             onFocus={onFocus}
             onChange={(event) => setDraft(event.target.value)}
             onBlur={commit}
@@ -565,6 +579,17 @@ function CommandValueInput({
                 }
             }}
         />
+    );
+
+    if (!tooltip) return input;
+
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>{input}</TooltipTrigger>
+            <TooltipContent sideOffset={6}>
+                {tooltip}
+            </TooltipContent>
+        </Tooltip>
     );
 }
 
@@ -612,6 +637,41 @@ function isCommandValueLinkedToPoint(
     return valueIndex >= row.values.length - 2;
 }
 
+function commandSummaryTooltip(command: string): string {
+    const upper = command.toUpperCase();
+    const relative = command === command.toLowerCase();
+    const modeText = relative ? "Relative coordinates." : "Absolute coordinates.";
+    const cells = commandCellNames(command);
+    const cellsText = cells.length
+        ? `Cells: ${cells.join(", ")}.`
+        : "No value cells.";
+
+    switch (upper) {
+        case "M":
+            return `Move command starts a new subpath at a point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
+        case "L":
+            return `Line command draws a straight segment to the end point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
+        case "H":
+            return `Horizontal line command changes only X. ${modeText} ${cellsText} Click to toggle abs/rel.`;
+        case "V":
+            return `Vertical line command changes only Y. ${modeText} ${cellsText} Click to toggle abs/rel.`;
+        case "C":
+            return `Cubic Bezier command with two control points and an end point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
+        case "S":
+            return `Smooth cubic Bezier command; first control is reflected from previous segment. ${modeText} ${cellsText} Click to toggle abs/rel.`;
+        case "Q":
+            return `Quadratic Bezier command with one control point and an end point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
+        case "T":
+            return `Smooth quadratic Bezier command; control is reflected from previous segment. ${modeText} ${cellsText} Click to toggle abs/rel.`;
+        case "A":
+            return `Arc command draws an elliptical arc to an end point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
+        case "Z":
+            return "Close command draws a straight segment back to the subpath start. No value cells.";
+        default:
+            return `${command} command. ${modeText} ${cellsText}`;
+    }
+}
+
 function commandLabel(type: string): string {
     switch (type) {
         case "M": return "Move";
@@ -628,7 +688,7 @@ function commandLabel(type: string): string {
     }
 }
 
-function commandValueTooltip(command: string, valueIndex: number): string {
+function commandCellNames(command: string): string[] {
     const labels: Record<string, string[]> = {
         M: ["x", "y"],
         m: ["dx", "dy"],
@@ -649,5 +709,56 @@ function commandValueTooltip(command: string, valueIndex: number): string {
         A: ["rx", "ry", "x-axis-rotation", "large-arc-flag", "sweep-flag", "x", "y"],
         a: ["rx", "ry", "x-axis-rotation", "large-arc-flag", "sweep-flag", "dx", "dy"],
     };
-    return labels[command]?.[valueIndex] ?? `value ${valueIndex + 1}`;
+    return labels[command] ?? [];
+}
+
+function commandValueTooltip(command: string, valueIndex: number): string {
+    const relative = command === command.toLowerCase();
+    const upper = command.toUpperCase();
+    const xName = relative ? "dx" : "x";
+    const yName = relative ? "dy" : "y";
+    const xText = relative ? "Horizontal offset from previous point." : "Absolute X coordinate.";
+    const yText = relative ? "Vertical offset from previous point." : "Absolute Y coordinate.";
+
+    if (upper === "M" || upper === "L") {
+        if (valueIndex === 0) return `${xName}: ${xText}`;
+        if (valueIndex === 1) return `${yName}: ${yText}`;
+    }
+    if (upper === "H") return `${xName}: ${xText}`;
+    if (upper === "V") return `${yName}: ${yText}`;
+    if (upper === "C") {
+        if (valueIndex === 0) return relative ? "dx1: First control point horizontal offset." : "x1: First control point X.";
+        if (valueIndex === 1) return relative ? "dy1: First control point vertical offset." : "y1: First control point Y.";
+        if (valueIndex === 2) return relative ? "dx2: Second control point horizontal offset." : "x2: Second control point X.";
+        if (valueIndex === 3) return relative ? "dy2: Second control point vertical offset." : "y2: Second control point Y.";
+        if (valueIndex === 4) return `${xName}: End point ${relative ? "horizontal offset." : "X."}`;
+        if (valueIndex === 5) return `${yName}: End point ${relative ? "vertical offset." : "Y."}`;
+    }
+    if (upper === "S") {
+        if (valueIndex === 0) return relative ? "dx2: Second control point horizontal offset." : "x2: Second control point X.";
+        if (valueIndex === 1) return relative ? "dy2: Second control point vertical offset." : "y2: Second control point Y.";
+        if (valueIndex === 2) return `${xName}: End point ${relative ? "horizontal offset." : "X."}`;
+        if (valueIndex === 3) return `${yName}: End point ${relative ? "vertical offset." : "Y."}`;
+    }
+    if (upper === "Q") {
+        if (valueIndex === 0) return relative ? "dx1: Control point horizontal offset." : "x1: Control point X.";
+        if (valueIndex === 1) return relative ? "dy1: Control point vertical offset." : "y1: Control point Y.";
+        if (valueIndex === 2) return `${xName}: End point ${relative ? "horizontal offset." : "X."}`;
+        if (valueIndex === 3) return `${yName}: End point ${relative ? "vertical offset." : "Y."}`;
+    }
+    if (upper === "T") {
+        if (valueIndex === 0) return `${xName}: End point ${relative ? "horizontal offset." : "X."} (control is auto-reflected).`;
+        if (valueIndex === 1) return `${yName}: End point ${relative ? "vertical offset." : "Y."} (control is auto-reflected).`;
+    }
+    if (upper === "A") {
+        if (valueIndex === 0) return "rx: Ellipse X radius.";
+        if (valueIndex === 1) return "ry: Ellipse Y radius.";
+        if (valueIndex === 2) return "x-axis-rotation: Arc ellipse rotation angle in degrees.";
+        if (valueIndex === 3) return "large-arc-flag: 0 picks smaller arc, 1 picks larger arc.";
+        if (valueIndex === 4) return "sweep-flag: 0 draws negative-angle sweep, 1 draws positive-angle sweep.";
+        if (valueIndex === 5) return `${xName}: Arc end point ${relative ? "horizontal offset." : "X."}`;
+        if (valueIndex === 6) return `${yName}: Arc end point ${relative ? "vertical offset." : "Y."}`;
+    }
+
+    return `${commandCellNames(command)[valueIndex] ?? `value ${valueIndex + 1}`}`;
 }
