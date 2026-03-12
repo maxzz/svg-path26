@@ -18,19 +18,11 @@ import {
     doClearPathAtom,
     doNormalizePathAtom,
     doSetAbsoluteAtom,
-    doSetMinifyAtom,
     doSetRelativeAtom,
-    exportFillAtom,
-    exportFillColorAtom,
-    exportStrokeAtom,
-    exportStrokeColorAtom,
-    exportStrokeWidthAtom,
-    minifyOutputAtom,
-    pathNameAtom,
 } from "@/store/0-atoms/2-2-editor-actions";
 import { viewPortHeightAtom, viewPortWidthAtom, viewPortXAtom, viewPortYAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { doDeleteNamedPathAtom, doOpenNamedPathAtom, doSaveNamedPathAtom, storedPathsAtom } from "@/store/0-atoms/2-3-stored-paths-actions";
+import { doDeleteNamedPathAtom, doOpenNamedPathAtom, doSaveNamedPathAtom } from "@/store/0-atoms/2-3-stored-paths-actions";
 import { doAddImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-4-images";
 import {
     appSettings,
@@ -39,16 +31,17 @@ import { SvgPathModel } from "@/svg-core/2-svg-model";
 
 export function CanvasActionsMenu() {
     const settings = useSnapshot(appSettings);
-    const minified = useAtomValue(minifyOutputAtom);
     const pathValue = useAtomValue(svgPathInputAtom);
-    const storedPaths = useAtomValue(storedPathsAtom);
-    const [pathName, setPathName] = useAtom(pathNameAtom);
+    const pathEditor = settings.pathEditor;
+    const minified = pathEditor.minifyOutput;
+    const storedPaths = pathEditor.storedPaths;
+    const pathName = pathEditor.pathName;
+    const exportFill = pathEditor.exportFill;
+    const exportFillColor = pathEditor.exportFillColor;
+    const exportStroke = pathEditor.exportStroke;
+    const exportStrokeColor = pathEditor.exportStrokeColor;
+    const exportStrokeWidth = pathEditor.exportStrokeWidth;
     const [isImageEditMode, setIsImageEditMode] = useAtom(isImageEditModeAtom);
-    const [exportFill, setExportFill] = useAtom(exportFillAtom);
-    const [exportFillColor, setExportFillColor] = useAtom(exportFillColorAtom);
-    const [exportStroke, setExportStroke] = useAtom(exportStrokeAtom);
-    const [exportStrokeColor, setExportStrokeColor] = useAtom(exportStrokeColorAtom);
-    const [exportStrokeWidth, setExportStrokeWidth] = useAtom(exportStrokeWidthAtom);
     const exportX = useAtomValue(viewPortXAtom);
     const exportY = useAtomValue(viewPortYAtom);
     const exportWidth = useAtomValue(viewPortWidthAtom);
@@ -58,7 +51,6 @@ export function CanvasActionsMenu() {
     const doSetRelative = useSetAtom(doSetRelativeAtom);
     const doSetAbsolute = useSetAtom(doSetAbsoluteAtom);
     const doClear = useSetAtom(doClearPathAtom);
-    const doSetMinify = useSetAtom(doSetMinifyAtom);
     const doSaveNamedPath = useSetAtom(doSaveNamedPathAtom);
     const doDeleteNamedPath = useSetAtom(doDeleteNamedPathAtom);
     const doOpenNamedPath = useSetAtom(doOpenNamedPathAtom);
@@ -202,7 +194,10 @@ export function CanvasActionsMenu() {
                     </DropdownMenuItem>
                     <DropdownMenuCheckboxItem
                         checked={minified}
-                        onCheckedChange={(checked) => doSetMinify(Boolean(checked))}
+                        onCheckedChange={(checked) => {
+                            appSettings.pathEditor.minifyOutput = Boolean(checked);
+                            doNormalize();
+                        }}
                     >
                         Minify
                     </DropdownMenuCheckboxItem>
@@ -265,7 +260,6 @@ export function CanvasActionsMenu() {
                             disabled={!pathValue.trim() || !saveNameDraft.trim()}
                             onClick={() => {
                                 doSaveNamedPath(saveNameDraft);
-                                setPathName(saveNameDraft.trim());
                                 setOpenSaveDialog(false);
                             }}
                         >
@@ -334,19 +328,41 @@ export function CanvasActionsMenu() {
                         <div className="grid grid-cols-2 gap-2">
                             <label className="flex items-center justify-between rounded border px-2 py-1.5">
                                 <span>Fill</span>
-                                <Switch checked={exportFill} onCheckedChange={(checked) => setExportFill(Boolean(checked))} />
+                                <Switch
+                                    checked={exportFill}
+                                    onCheckedChange={(checked) => {
+                                        appSettings.pathEditor.exportFill = Boolean(checked);
+                                    }}
+                                />
                             </label>
                             <label className="flex items-center justify-between rounded border px-2 py-1.5">
                                 <span>Stroke</span>
-                                <Switch checked={exportStroke} onCheckedChange={(checked) => setExportStroke(Boolean(checked))} />
+                                <Switch
+                                    checked={exportStroke}
+                                    onCheckedChange={(checked) => {
+                                        appSettings.pathEditor.exportStroke = Boolean(checked);
+                                    }}
+                                />
                             </label>
                             <label className="space-y-1">
                                 <span className="text-muted-foreground">Fill color</span>
-                                <Input type="color" value={exportFillColor} onChange={(event) => setExportFillColor(event.target.value)} />
+                                <Input
+                                    type="color"
+                                    value={exportFillColor}
+                                    onChange={(event) => {
+                                        appSettings.pathEditor.exportFillColor = event.target.value;
+                                    }}
+                                />
                             </label>
                             <label className="space-y-1">
                                 <span className="text-muted-foreground">Stroke color</span>
-                                <Input type="color" value={exportStrokeColor} onChange={(event) => setExportStrokeColor(event.target.value)} />
+                                <Input
+                                    type="color"
+                                    value={exportStrokeColor}
+                                    onChange={(event) => {
+                                        appSettings.pathEditor.exportStrokeColor = event.target.value;
+                                    }}
+                                />
                             </label>
                             <label className="space-y-1">
                                 <span className="text-muted-foreground">Stroke width</span>
@@ -355,7 +371,9 @@ export function CanvasActionsMenu() {
                                     min={0}
                                     step={0.05}
                                     value={exportStrokeWidth}
-                                    onChange={(event) => setExportStrokeWidth(Number(event.target.value))}
+                                    onChange={(event) => {
+                                        appSettings.pathEditor.exportStrokeWidth = Number(event.target.value);
+                                    }}
                                 />
                             </label>
                             <div className="col-span-2 grid grid-cols-4 gap-2 rounded border px-2 py-2">

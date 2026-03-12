@@ -1,19 +1,18 @@
 import { useEffect, useRef } from "react";
 import type { TouchEventHandler } from "react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
+import { useSnapshot } from "valtio";
 import { canvasSvgElementAtom } from "./5-canvas-viewport-metrics";
 import {
-    canvasPreviewAtom,
     doSetPointLocationWithoutHistoryAtom,
     draggedCanvasPointAtom,
     isCanvasDraggingAtom,
-    pointPrecisionAtom,
-    snapToGridAtom,
 } from "@/store/0-atoms/2-2-editor-actions";
-import { doPanViewBoxAtom, doZoomViewBoxAtom, viewPortLockedAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
+import { doPanViewBoxAtom, doZoomViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { doCommitCurrentPathToHistoryAtom } from "@/store/0-atoms/1-2-history";
 import { doUpdateImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-4-images";
+import { appSettings } from "@/store/0-ui-settings";
 import type { Point, SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
 
 export type DragState =
@@ -88,11 +87,12 @@ export function useCanvasDragAndDrop(
 ) {
     const svgElement = useAtomValue(canvasSvgElementAtom);
     const dragState = useAtomValue(canvasDragStateAtom);
-    const preview = useAtomValue(canvasPreviewAtom);
+    const settings = useSnapshot(appSettings);
+    const preview = settings.pathEditor.canvasPreview;
     const imageEditMode = useAtomValue(isImageEditModeAtom);
-    const snapToGrid = useAtomValue(snapToGridAtom);
-    const pointPrecision = useAtomValue(pointPrecisionAtom);
-    const viewPortLocked = useAtomValue(viewPortLockedAtom);
+    const snapToGrid = settings.pathEditor.snapToGrid;
+    const pointPrecision = settings.pathEditor.pointPrecision;
+    const viewPortLocked = settings.pathEditor.viewPortLocked;
 
     const setDragState = useSetAtom(canvasDragStateAtom);
     const stopCanvasDrag = useSetAtom(stopCanvasDragAtom);

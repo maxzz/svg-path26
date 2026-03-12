@@ -10,20 +10,8 @@ import { commandRowsAtom, standaloneSegmentPathsAtom } from "./2-0-svg-model";
 export const strokeWidthAtom = createAtomAppSetting("strokeWidth");
 export const decimalsAtom = createAtomAppSetting("decimals");
 export const minifyOutputAtom = createAtomAppSetting("minifyOutput");
-export const snapToGridAtom = createAtomAppSetting("snapToGrid");
-export const pointPrecisionAtom = createAtomAppSetting("pointPrecision");
-export const showTicksAtom = createAtomAppSetting("showTicks");
-export const tickIntervalAtom = createAtomAppSetting("tickInterval");
-export const fillPreviewAtom = createAtomAppSetting("fillPreview");
-export const canvasPreviewAtom = createAtomAppSetting("canvasPreview");
 
 export const pathNameAtom = createAtomAppSetting("pathName");
-
-export const exportFillAtom = createAtomAppSetting("exportFill");
-export const exportFillColorAtom = createAtomAppSetting("exportFillColor");
-export const exportStrokeAtom = createAtomAppSetting("exportStroke");
-export const exportStrokeColorAtom = createAtomAppSetting("exportStrokeColor");
-export const exportStrokeWidthAtom = createAtomAppSetting("exportStrokeWidth");
 
 export const scaleXAtom = atom(1);
 export const scaleYAtom = atom(1);
@@ -217,14 +205,6 @@ export const doNormalizePathAtom = atom(
     null,
     (get, set) => {
         set(doApplySvgModelAtom, () => { });
-    }
-);
-
-export const doSetMinifyAtom = atom(
-    null,
-    (_get, set, minify: boolean) => {
-        set(minifyOutputAtom, minify);
-        set(doNormalizePathAtom);
     }
 );
 

@@ -3,10 +3,6 @@ import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
 import { canvasUnitsPerPixelAtom } from "./5-canvas-viewport-metrics";
-import {
-    showTicksAtom,
-    tickIntervalAtom,
-} from "@/store/0-atoms/2-2-editor-actions";
 import { canvasViewBoxAtom, viewPortXAtom, viewPortYAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 
 type GridValues = ReturnType<typeof buildGrid>;
@@ -17,8 +13,8 @@ export function CanvasGrid() {
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
     const viewPortX = useAtomValue(viewPortXAtom);
     const viewPortY = useAtomValue(viewPortYAtom);
-    const showTicks = useAtomValue(showTicksAtom);
-    const tickInterval = useAtomValue(tickIntervalAtom);
+    const showTicks = settings.pathEditor.showTicks;
+    const tickInterval = settings.pathEditor.tickInterval;
 
     if (!settings.showGrid) return null;
 

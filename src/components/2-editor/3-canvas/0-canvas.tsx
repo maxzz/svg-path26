@@ -15,13 +15,10 @@ import {
 } from "./5-canvas-viewport-metrics";
 import { appSettings } from "@/store/0-ui-settings";
 import {
-    canvasPreviewAtom,
-    fillPreviewAtom,
     hoveredCommandIndexAtom,
     hoveredStandaloneSegmentPathAtom,
     selectedCommandIndexAtom,
     selectedStandaloneSegmentPathAtom,
-    strokeWidthAtom,
 } from "@/store/0-atoms/2-2-editor-actions";
 import { parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
 import { canvasViewBoxAtom, doFitViewBoxAtom, doZoomViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
@@ -29,15 +26,16 @@ import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { focusedImageIdAtom, isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 
 export function PathCanvas() {
-    const { darkCanvas } = useSnapshot(appSettings);
+    const settings = useSnapshot(appSettings);
+    const { darkCanvas } = settings;
+    const preview = settings.pathEditor.canvasPreview;
+    const fillPreview = settings.pathEditor.fillPreview;
 
     const pathValue = useAtomValue(svgPathInputAtom);
     const parseError = useAtomValue(parseErrorAtom);
     const viewBox = useAtomValue(canvasViewBoxAtom);
     const selectedSegmentPath = useAtomValue(selectedStandaloneSegmentPathAtom);
     const hoveredSegmentPath = useAtomValue(hoveredStandaloneSegmentPathAtom);
-    const fillPreview = useAtomValue(fillPreviewAtom);
-    const preview = useAtomValue(canvasPreviewAtom);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
     const canvasStrokeWidth = useAtomValue(canvasStrokeWidthAtom);
     const hoveredSegmentStrokeWidth = useAtomValue(hoveredSegmentStrokeWidthAtom);

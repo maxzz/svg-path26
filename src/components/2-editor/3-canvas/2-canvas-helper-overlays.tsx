@@ -4,20 +4,18 @@ import { classNames } from "@/utils";
 import { appSettings } from "@/store/0-ui-settings";
 import { canvasStrokeWidthAtom, canvasUnitsPerPixelAtom } from "./5-canvas-viewport-metrics";
 import {
-    canvasPreviewAtom,
     doFocusPointCommandAtom,
     hoveredCommandIndexAtom,
     selectedCommandIndexAtom,
 } from "@/store/0-atoms/2-2-editor-actions";
 import { controlLinesAtom, controlPointsAtom, targetPointsAtom } from "@/store/0-atoms/2-0-svg-model";
-import { canvasViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { startPointDragAtom } from "./3-canvas-drag";
 
 export function CanvasHelperOverlays() {
     const settings = useSnapshot(appSettings);
-    const preview = useAtomValue(canvasPreviewAtom);
+    const preview = settings.pathEditor.canvasPreview;
     const imageEditMode = useAtomValue(isImageEditModeAtom);
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
 

@@ -1,31 +1,26 @@
 import { type InputHTMLAttributes } from "react";
 import { useAtom, useSetAtom, type PrimitiveAtom } from "jotai";
+import { useSnapshot } from "valtio";
 import { Settings as IconSettings } from "lucide-react";
 import { Button } from "@/components/ui/shadcn/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
 import { Switch } from "@/components/ui/shadcn/switch";
 import {
-    canvasPreviewAtom,
-    fillPreviewAtom,
-    pointPrecisionAtom,
-    showTicksAtom,
-    snapToGridAtom,
     strokeWidthAtom,
-    tickIntervalAtom,
 } from "@/store/0-atoms/2-2-editor-actions";
 import {
     doFitViewBoxAtom,
     doZoomViewBoxAtom,
     viewPortHeightAtom,
-    viewPortLockedAtom,
     viewPortWidthAtom,
     viewPortXAtom,
     viewPortYAtom,
-    zoomAtom,
 } from "@/store/0-atoms/2-1-canvas-viewbox";
 import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
+import { appSettings } from "@/store/0-ui-settings";
 
 export function SettingsPopover() {
+    const settings = useSnapshot(appSettings);
     const fitViewBox = useSetAtom(doFitViewBoxAtom);
     const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
 
@@ -66,7 +61,12 @@ export function SettingsPopover() {
 
                     <div className="flex items-center justify-between text-xs">
                         <span>Lock viewBox</span>
-                        <SettingsSwitch atom={viewPortLockedAtom} />
+                        <Switch
+                            checked={settings.pathEditor.viewPortLocked}
+                            onCheckedChange={(checked) => {
+                                appSettings.pathEditor.viewPortLocked = Boolean(checked);
+                            }}
+                        />
                     </div>
 
                     <div className="grid grid-cols-3 gap-1">
@@ -82,16 +82,57 @@ export function SettingsPopover() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 rounded-md border p-2">
-                        <ToggleRow label="Snap to grid" atom={snapToGridAtom} />
-                        <ToggleRow label="Show ticks" atom={showTicksAtom} />
-                        <ToggleRow label="Fill path" atom={fillPreviewAtom} />
-                        <ToggleRow label="Preview mode" atom={canvasPreviewAtom} />
+                        <ToggleValueRow
+                            label="Snap to grid"
+                            value={settings.pathEditor.snapToGrid}
+                            onChange={(nextValue) => {
+                                appSettings.pathEditor.snapToGrid = nextValue;
+                            }}
+                        />
+                        <ToggleValueRow
+                            label="Show ticks"
+                            value={settings.pathEditor.showTicks}
+                            onChange={(nextValue) => {
+                                appSettings.pathEditor.showTicks = nextValue;
+                            }}
+                        />
+                        <ToggleValueRow
+                            label="Fill path"
+                            value={settings.pathEditor.fillPreview}
+                            onChange={(nextValue) => {
+                                appSettings.pathEditor.fillPreview = nextValue;
+                            }}
+                        />
+                        <ToggleValueRow
+                            label="Preview mode"
+                            value={settings.pathEditor.canvasPreview}
+                            onChange={(nextValue) => {
+                                appSettings.pathEditor.canvasPreview = nextValue;
+                            }}
+                        />
                         <ToggleRow label="Image edit mode" atom={isImageEditModeAtom} />
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 text-xs">
-                        <SettingsNumberField label="Tick interval" valueAtom={tickIntervalAtom} min={1} step={1} />
-                        <SettingsNumberField label="Point precision" valueAtom={pointPrecisionAtom} min={0} max={8} step={1} />
+                        <SettingsValueNumberField
+                            label="Tick interval"
+                            value={settings.pathEditor.tickInterval}
+                            min={1}
+                            step={1}
+                            onValueChange={(nextValue) => {
+                                appSettings.pathEditor.tickInterval = nextValue;
+                            }}
+                        />
+                        <SettingsValueNumberField
+                            label="Point precision"
+                            value={settings.pathEditor.pointPrecision}
+                            min={0}
+                            max={8}
+                            step={1}
+                            onValueChange={(nextValue) => {
+                                appSettings.pathEditor.pointPrecision = nextValue;
+                            }}
+                        />
                     </div>
                 </div>
             </PopoverContent>
@@ -117,7 +158,8 @@ function SettingsRangeField({ valueAtom, label, valueClassName, formatValue, ...
 }
 
 function ZoomSettingsField() {
-    const [zoom] = useAtom(zoomAtom);
+    const settings = useSnapshot(appSettings);
+    const zoom = settings.pathEditor.zoom;
     const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
 
     return (
@@ -166,10 +208,27 @@ function ToggleRow({ label, atom }: { label: string; atom: PrimitiveAtom<boolean
     );
 }
 
-function SettingsSwitch({ atom }: { atom: PrimitiveAtom<boolean>; }) {
-    const [value, setValue] = useAtom(atom);
+function ToggleValueRow({ label, value, onChange }: { label: string; value: boolean; onChange: (value: boolean) => void; }) {
     return (
-        <Switch checked={value} onCheckedChange={(checked) => setValue(Boolean(checked))} />
+        <label className="flex items-center justify-between gap-2 text-xs">
+            <span>{label}</span>
+            <Switch checked={value} onCheckedChange={(checked) => onChange(Boolean(checked))} />
+        </label>
+    );
+}
+
+function SettingsValueNumberField({ label, value, onValueChange, ...rest }: { label: string; value: number; onValueChange: (value: number) => void; } & InputHTMLAttributes<HTMLInputElement>) {
+    return (
+        <label className="space-y-1 text-xs">
+            <span className="text-muted-foreground">{label}</span>
+            <input
+                type="number"
+                className="h-7 w-full rounded border bg-background px-2 text-xs"
+                value={value}
+                onChange={(event) => onValueChange(Number(event.target.value))}
+                {...rest}
+            />
+        </label>
     );
 }
 
