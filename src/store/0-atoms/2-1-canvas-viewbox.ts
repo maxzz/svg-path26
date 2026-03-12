@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 import { type Point } from "@/svg-core/9-types-svg-model";
-import { createAtomAppSetting } from "@/store/0-atoms/8-create-atom-app-settings";
 import { svgModelAtom } from "@/store/0-atoms/2-0-svg-model";
+import { appSettings } from "@/store/0-ui-settings";
 
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 16;
@@ -10,12 +10,10 @@ const DEFAULT_VIEWPORT_Y = 0;
 const DEFAULT_VIEWPORT_WIDTH = 120;
 const DEFAULT_VIEWPORT_HEIGHT = 90;
 
-export const zoomAtom = createAtomAppSetting("zoom");
 export const viewPortXAtom = atom(DEFAULT_VIEWPORT_X);
 export const viewPortYAtom = atom(DEFAULT_VIEWPORT_Y);
 export const viewPortWidthAtom = atom(DEFAULT_VIEWPORT_WIDTH);
 export const viewPortHeightAtom = atom(DEFAULT_VIEWPORT_HEIGHT);
-export const viewPortLockedAtom = createAtomAppSetting("viewPortLocked");
 
 // Canvas view box
 
@@ -46,7 +44,7 @@ export const doSetViewBoxAtom = atom(
 export const doPanViewBoxAtom = atom(
     null,
     (get, set, delta: { dx: number; dy: number; }) => {
-        if (get(viewPortLockedAtom)) return;
+        if (appSettings.pathEditor.viewPortLocked) return;
         set(viewPortXAtom, get(viewPortXAtom) + delta.dx);
         set(viewPortYAtom, get(viewPortYAtom) + delta.dy);
     }
@@ -55,7 +53,7 @@ export const doPanViewBoxAtom = atom(
 export const doZoomViewBoxAtom = atom(
     null,
     (get, set, viewBoxArgs: { scale: number; center?: Point; }) => {
-        if (get(viewPortLockedAtom)) return;
+        if (appSettings.pathEditor.viewPortLocked) return;
         
         const scale = viewBoxArgs.scale;
         if (!Number.isFinite(scale) || scale <= 0) return;
@@ -76,14 +74,14 @@ export const doZoomViewBoxAtom = atom(
         set(viewPortWidthAtom, Math.max(1e-3, nextWidth));
         set(viewPortHeightAtom, Math.max(1e-3, nextHeight));
 
-        set(zoomAtom, clampZoom(get(zoomAtom) / scale));
+        appSettings.pathEditor.zoom = clampZoom(appSettings.pathEditor.zoom / scale);
     }
 );
 
 export const doFitViewBoxAtom = atom(
     null,
     (get, set) => {
-        if (get(viewPortLockedAtom)) return;
+        if (appSettings.pathEditor.viewPortLocked) return;
 
         const model = get(svgModelAtom).model;
         if (!model) {
@@ -108,7 +106,7 @@ export const doFitViewBoxAtom = atom(
             width = height * aspect;
         }
 
-        const zoom = clampZoom(get(zoomAtom));
+        const zoom = clampZoom(appSettings.pathEditor.zoom);
         width /= zoom;
         height /= zoom;
         const centerX = (bounds.xmin + bounds.xmax) / 2;

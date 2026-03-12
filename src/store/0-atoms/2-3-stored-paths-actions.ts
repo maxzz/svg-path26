@@ -1,8 +1,8 @@
 import { atom } from "jotai";
-import { createAtomAppSetting } from "@/store/0-atoms/8-create-atom-app-settings";
 import { rawPathAtom } from "./1-0-raw-path";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
-import { hoveredCommandIndexAtom, pathNameAtom, selectedCommandIndexAtom } from "./2-2-editor-actions";
+import { hoveredCommandIndexAtom, selectedCommandIndexAtom } from "./2-2-editor-actions";
+import { appSettings } from "@/store/0-ui-settings";
 
 export type StoredPath = {
     name: string;
@@ -11,8 +11,6 @@ export type StoredPath = {
     updatedAt: number;
 };
 
-export const storedPathsAtom = createAtomAppSetting("storedPaths");
-
 export const doSaveNamedPathAtom = atom(
     null,
     (get, set, nameRaw: string) => {
@@ -20,23 +18,23 @@ export const doSaveNamedPathAtom = atom(
         const name = nameRaw.trim();
         if (!path || !name) return;
         const now = Date.now();
-        const existing = get(storedPathsAtom);
+        const existing = appSettings.pathEditor.storedPaths;
         const match = existing.find((it) => it.name === name);
         if (match) {
-            set(storedPathsAtom, existing.map((it) => it.name === name ? { ...it, path, updatedAt: now } : it));
+            appSettings.pathEditor.storedPaths = existing.map((it) => it.name === name ? { ...it, path, updatedAt: now } : it);
         } else {
-            set(storedPathsAtom, [...existing, { name, path, createdAt: now, updatedAt: now }]);
+            appSettings.pathEditor.storedPaths = [...existing, { name, path, createdAt: now, updatedAt: now }];
         }
-        set(pathNameAtom, name);
+        appSettings.pathEditor.pathName = name;
     }
 );
 
 export const doDeleteNamedPathAtom = atom(
     null,
     (get, set, name: string) => {
-        set(storedPathsAtom, get(storedPathsAtom).filter((it) => it.name !== name));
-        if (get(pathNameAtom) === name) {
-            set(pathNameAtom, "");
+        appSettings.pathEditor.storedPaths = appSettings.pathEditor.storedPaths.filter((it) => it.name !== name);
+        if (appSettings.pathEditor.pathName === name) {
+            appSettings.pathEditor.pathName = "";
         }
     }
 );
@@ -44,10 +42,10 @@ export const doDeleteNamedPathAtom = atom(
 export const doOpenNamedPathAtom = atom(
     null,
     (get, set, name: string) => {
-        const match = get(storedPathsAtom).find((it) => it.name === name);
+        const match = appSettings.pathEditor.storedPaths.find((it) => it.name === name);
         if (!match) return;
         set(svgPathInputAtom, match.path);
-        set(pathNameAtom, name);
+        appSettings.pathEditor.pathName = name;
         set(selectedCommandIndexAtom, null);
         set(hoveredCommandIndexAtom, null);
     }

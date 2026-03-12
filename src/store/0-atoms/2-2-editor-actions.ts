@@ -6,12 +6,9 @@ import { createAtomAppSetting } from "./8-create-atom-app-settings";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { doSetPathWithoutHistoryAtom } from "./1-2-history";
 import { commandRowsAtom, standaloneSegmentPathsAtom } from "./2-0-svg-model";
+import { appSettings } from "@/store/0-ui-settings";
 
 export const strokeWidthAtom = createAtomAppSetting("strokeWidth");
-export const decimalsAtom = createAtomAppSetting("decimals");
-export const minifyOutputAtom = createAtomAppSetting("minifyOutput");
-
-export const pathNameAtom = createAtomAppSetting("pathName");
 
 export const scaleXAtom = atom(1);
 export const scaleYAtom = atom(1);
@@ -74,8 +71,7 @@ const doApplySvgModelAtom = atom(
         try {
             const model = new SvgPathModel(path);
             updater(model);
-            const decimals = get(decimalsAtom);
-            const minify = get(minifyOutputAtom);
+            const { decimals, minifyOutput: minify } = appSettings.pathEditor;
             set(svgPathInputAtom, model.toString(decimals, minify));
         } catch {
             // no-op if path is currently invalid
@@ -92,8 +88,7 @@ const doApplySvgModelWithoutHistoryAtom = atom(
         try {
             const model = new SvgPathModel(path);
             updater(model);
-            const decimals = get(decimalsAtom);
-            const minify = get(minifyOutputAtom);
+            const { decimals, minifyOutput: minify } = appSettings.pathEditor;
             set(doSetPathWithoutHistoryAtom, model.toString(decimals, minify));
         } catch {
             // no-op if path is currently invalid
@@ -166,8 +161,7 @@ export const doInsertSegmentAtom = atom(
         if (!path) {
             const initial = new SvgPathModel("M 0 0");
             const inserted = initial.insertSegment(args.type, null);
-            const decimals = get(decimalsAtom);
-            const minify = get(minifyOutputAtom);
+            const { decimals, minifyOutput: minify } = appSettings.pathEditor;
             set(svgPathInputAtom, initial.toString(decimals, minify));
             set(selectedCommandIndexAtom, inserted ?? 0);
             return;

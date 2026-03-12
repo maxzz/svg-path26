@@ -2,10 +2,9 @@ import { createStore } from "jotai";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
     doSetPointLocationWithoutHistoryAtom,
-    pathNameAtom,
 } from "./2-2-editor-actions";
 import { targetPointsAtom } from "./2-0-svg-model";
-import { canvasViewBoxAtom, doFitViewBoxAtom, doPanViewBoxAtom, doZoomViewBoxAtom, viewPortLockedAtom, zoomAtom } from "./2-1-canvas-viewbox";
+import { canvasViewBoxAtom, doFitViewBoxAtom, doPanViewBoxAtom, doZoomViewBoxAtom } from "./2-1-canvas-viewbox";
 import {
     canRedoAtom,
     canUndoAtom,
@@ -14,11 +13,18 @@ import {
 } from "./1-2-history";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } from "./1-2-history";
-import { doOpenNamedPathAtom, doSaveNamedPathAtom, storedPathsAtom } from "./2-3-stored-paths-actions";
+import { doOpenNamedPathAtom, doSaveNamedPathAtom } from "./2-3-stored-paths-actions";
+import { appSettings } from "@/store/0-ui-settings";
 
 describe("svg path state atoms", () => {
     beforeEach(() => {
         localStorage.clear();
+        appSettings.pathEditor.zoom = 1;
+        appSettings.pathEditor.viewPortLocked = false;
+        appSettings.pathEditor.pathName = "";
+        appSettings.pathEditor.storedPaths = [];
+        appSettings.pathEditor.decimals = 3;
+        appSettings.pathEditor.minifyOutput = false;
     });
 
     it("supports undo/redo flow", () => {
@@ -76,7 +82,7 @@ describe("svg path state atoms", () => {
         const zoomed = store.get(canvasViewBoxAtom);
         expect(zoomed[2]).toBeLessThan(panned[2]);
 
-        store.set(viewPortLockedAtom, true);
+        appSettings.pathEditor.viewPortLocked = true;
         const lockedBefore = store.get(canvasViewBoxAtom);
         store.set(doPanViewBoxAtom, { dx: 5, dy: 5 });
         expect(store.get(canvasViewBoxAtom)).toEqual(lockedBefore);
@@ -84,7 +90,7 @@ describe("svg path state atoms", () => {
 
     it("applies zoom scale to the viewport independently from stored zoom", () => {
         const store = createStore();
-        store.set(zoomAtom, 2);
+        appSettings.pathEditor.zoom = 2;
         store.set(svgPathInputAtom, "M 0 0 L 50 25");
         store.set(doFitViewBoxAtom);
 
@@ -94,7 +100,7 @@ describe("svg path state atoms", () => {
 
         expect(after[2]).toBeCloseTo(before[2] * 0.9);
         expect(after[3]).toBeCloseTo(before[3] * 0.9);
-        expect(store.get(zoomAtom)).toBeCloseTo(2 / 0.9);
+        expect(appSettings.pathEditor.zoom).toBeCloseTo(2 / 0.9);
     });
 
     it("stores and opens named paths", () => {
@@ -102,8 +108,8 @@ describe("svg path state atoms", () => {
         store.set(svgPathInputAtom, "M 0 0 L 33 44");
         store.set(doSaveNamedPathAtom, "example");
 
-        expect(store.get(storedPathsAtom).length).toBe(1);
-        expect(store.get(pathNameAtom)).toBe("example");
+        expect(appSettings.pathEditor.storedPaths.length).toBe(1);
+        expect(appSettings.pathEditor.pathName).toBe("example");
 
         store.set(svgPathInputAtom, "M 0 0 L 1 1");
         store.set(doOpenNamedPathAtom, "example");
