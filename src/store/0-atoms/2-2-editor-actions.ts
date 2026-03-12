@@ -39,6 +39,7 @@ export const selectedCommandIndexAtom = atom(
 );
 
 export const hoveredCommandIndexAtom = atom<number | null>(null);
+export const hoveredCanvasPointAtom = atom<SvgCanvasPoint | null>(null);
 export const draggedCanvasPointAtom = atom<SvgCanvasPoint | null>(null);
 export const isCanvasDraggingAtom = atom(false);
 
@@ -250,6 +251,7 @@ export const doClearPathAtom = atom(
         set(svgPathInputAtom, "");
         set(selectedCommandIndexAtom, null);
         set(hoveredCommandIndexAtom, null);
+        set(hoveredCanvasPointAtom, null);
         set(draggedCanvasPointAtom, null);
     }
 );

@@ -5,6 +5,7 @@ import { appSettings } from "@/store/0-ui-settings";
 import { canvasStrokeWidthAtom, canvasUnitsPerPixelAtom } from "./5-canvas-viewport-metrics";
 import {
     doFocusPointCommandAtom,
+    hoveredCanvasPointAtom,
     hoveredCommandIndexAtom,
     selectedCommandIndexAtom,
 } from "@/store/0-atoms/2-2-editor-actions";
@@ -54,6 +55,7 @@ function CanvasControlPoints({ unitsPerPixel }: { unitsPerPixel: number; }) {
     const controlPoints = useAtomValue(controlPointsAtom);
     const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
     const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
+    const setHoveredCanvasPoint = useSetAtom(hoveredCanvasPointAtom);
     const setFocusPointCommand = useSetAtom(doFocusPointCommandAtom);
     const startPointDrag = useSetAtom(startPointDragAtom);
 
@@ -72,8 +74,14 @@ function CanvasControlPoints({ unitsPerPixel }: { unitsPerPixel: number; }) {
                 setSelectedCommandIndex(point.segmentIndex);
                 startPointDrag({ point, pointerId: event.pointerId, startPath: pathValue });
             }}
-            onMouseEnter={() => setHoveredCommandIndex(point.segmentIndex)}
-            onMouseLeave={() => setHoveredCommandIndex(null)}
+            onMouseEnter={() => {
+                setHoveredCommandIndex(point.segmentIndex);
+                setHoveredCanvasPoint(point);
+            }}
+            onMouseLeave={() => {
+                setHoveredCommandIndex(null);
+                setHoveredCanvasPoint(null);
+            }}
         />
     ));
 }
@@ -83,6 +91,7 @@ function CanvasTargetPoints({ unitsPerPixel }: { unitsPerPixel: number; }) {
     const targetPoints = useAtomValue(targetPointsAtom);
     const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
     const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
+    const setHoveredCanvasPoint = useSetAtom(hoveredCanvasPointAtom);
     const setFocusPointCommand = useSetAtom(doFocusPointCommandAtom);
     const startPointDrag = useSetAtom(startPointDragAtom);
 
@@ -102,8 +111,14 @@ function CanvasTargetPoints({ unitsPerPixel }: { unitsPerPixel: number; }) {
                     if (!point.movable) return;
                     startPointDrag({ point, pointerId: event.pointerId, startPath: pathValue });
                 }}
-                onMouseEnter={() => setHoveredCommandIndex(point.segmentIndex)}
-                onMouseLeave={() => setHoveredCommandIndex(null)}
+                onMouseEnter={() => {
+                    setHoveredCommandIndex(point.segmentIndex);
+                    setHoveredCanvasPoint(point);
+                }}
+                onMouseLeave={() => {
+                    setHoveredCommandIndex(null);
+                    setHoveredCanvasPoint(null);
+                }}
             />
         )
     );

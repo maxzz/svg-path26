@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 import { rawPathAtom } from "./1-0-raw-path";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
-import { hoveredCommandIndexAtom, selectedCommandIndexAtom } from "./2-2-editor-actions";
+import { hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "./2-2-editor-actions";
 import { appSettings } from "@/store/0-ui-settings";
 
 export type StoredPath = {
@@ -48,5 +48,6 @@ export const doOpenNamedPathAtom = atom(
         appSettings.pathEditor.pathName = name;
         set(selectedCommandIndexAtom, null);
         set(hoveredCommandIndexAtom, null);
+        set(hoveredCanvasPointAtom, null);
     }
 );

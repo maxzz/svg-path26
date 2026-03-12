@@ -15,6 +15,7 @@ import {
 } from "./5-canvas-viewport-metrics";
 import { appSettings } from "@/store/0-ui-settings";
 import {
+    hoveredCanvasPointAtom,
     hoveredCommandIndexAtom,
     hoveredStandaloneSegmentPathAtom,
     selectedCommandIndexAtom,
@@ -43,6 +44,7 @@ export function PathCanvas() {
     const setFocusedImageId = useSetAtom(focusedImageIdAtom);
     const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
     const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
+    const setHoveredCanvasPoint = useSetAtom(hoveredCanvasPointAtom);
     const setCanvasSvgElement = useSetAtom(canvasSvgElementAtom);
     const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
     const fitViewBox = useSetAtom(doFitViewBoxAtom);
@@ -59,7 +61,7 @@ export function PathCanvas() {
     return (
         <div
             className={classNames(
-                "relative mx-auto aspect-4/3 w-full max-w-4xl overflow-hidden rounded-xl border",
+                "relative mx-auto aspect-4/3 w-full overflow-hidden rounded-xl border",
                 preview ? "bg-white" : (darkCanvas ? "bg-zinc-900" : "bg-white"),
             )}
         >
@@ -88,6 +90,7 @@ export function PathCanvas() {
                         if (dragState?.mode === "canvas" && dragState.moved) return;
                         setSelectedCommandIndex(null);
                         setHoveredCommandIndex(null);
+                        setHoveredCanvasPoint(null);
                         setFocusedImageId(null);
                     }
                 }}

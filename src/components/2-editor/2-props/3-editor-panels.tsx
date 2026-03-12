@@ -7,6 +7,8 @@ import {
     doInsertSegmentAtom,
     doSetCommandValueAtom,
     doToggleSegmentRelativeAtom,
+    draggedCanvasPointAtom,
+    hoveredCanvasPointAtom,
     hoveredCommandIndexAtom,
     selectedCommandIndexAtom,
 } from "@/store/0-atoms/2-2-editor-actions";
@@ -28,6 +30,7 @@ import {
 } from "@/components/ui/shadcn/dropdown-menu";
 import { Button } from "@/components/ui/shadcn/button";
 import { IconRadix_DotsHorizontal } from "@/components/ui/icons/normal";
+import type { SvgCanvasPoint, SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 
 const COMMAND_TYPES = ["M", "L", "V", "H", "C", "S", "Q", "T", "A", "Z"] as const;
 
@@ -38,7 +41,9 @@ export function EditorPanels() {
     const canUndo = useAtomValue(canUndoAtom);
     const canRedo = useAtomValue(canRedoAtom);
     const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
-    const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
+    const [hoveredCommandIndex, setHoveredCommandIndex] = useAtom(hoveredCommandIndexAtom);
+    const draggedCanvasPoint = useAtomValue(draggedCanvasPointAtom);
+    const hoveredCanvasPoint = useAtomValue(hoveredCanvasPointAtom);
     const [isImageEditMode] = useAtom(isImageEditModeAtom);
     const images = useAtomValue(imagesAtom);
     const [focusedImageId, setFocusedImageId] = useAtom(focusedImageIdAtom);
@@ -51,6 +56,8 @@ export function EditorPanels() {
     const doRedo = useSetAtom(doRedoPathAtom);
     const doDeleteImage = useSetAtom(doDeleteImageAtom);
     const doUpdateImage = useSetAtom(doUpdateImageAtom);
+    const highlightedCanvasPoint = draggedCanvasPoint
+        ?? (hoveredCanvasPoint && hoveredCanvasPoint.segmentIndex === hoveredCommandIndex ? hoveredCanvasPoint : null);
     const rowRefs = useRef<Record<number, HTMLDivElement | null>>({});
     const fieldRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
@@ -189,8 +196,11 @@ export function EditorPanels() {
                 <h2 className="mb-2 text-sm font-semibold">Commands</h2>
                 <div className="max-h-64 space-y-1 overflow-auto rounded border bg-muted/20 p-2 font-mono text-xs">
                     {rows.length === 0 && <p className="text-muted-foreground">No commands to show.</p>}
-                    {rows.map((row) => (
-                        <div
+                    {rows.map((row) => {
+                        const isCanvasPointFocused = highlightedCanvasPoint?.segmentIndex === row.index;
+                        const highlightCommandCell = isCommandCellLinkedToPoint(row, highlightedCanvasPoint);
+                        return (
+                            <div
                             key={row.index}
                             ref={(element) => {
                                 rowRefs.current[row.index] = element;
@@ -199,7 +209,9 @@ export function EditorPanels() {
                                 "flex items-center gap-2 rounded border px-2 py-1.5 transition-colors",
                                 selectedCommandIndex === row.index
                                     ? "border-sky-500/50 bg-sky-500/10"
-                                    : "border-transparent bg-background hover:bg-muted/40",
+                                    : (hoveredCommandIndex === row.index || isCanvasPointFocused)
+                                        ? "border-sky-500/25 bg-sky-500/5"
+                                        : "border-transparent bg-background hover:bg-muted/40",
                             )}
                             onClick={() => setSelectedCommandIndex(row.index)}
                             onMouseEnter={() => setHoveredCommandIndex(row.index)}
@@ -212,10 +224,11 @@ export function EditorPanels() {
                             <button
                                 type="button"
                                 className={cn(
-                                    "w-4 shrink-0 text-center text-sm font-semibold cursor-pointer",
+                                    "w-4 shrink-0 rounded-sm text-center text-sm font-semibold cursor-pointer transition-colors",
                                     row.command === row.command.toLowerCase()
                                         ? "text-violet-500"
                                         : "text-orange-500",
+                                    highlightCommandCell && "bg-sky-500/15 ring-1 ring-sky-500/50",
                                 )}
                                 onClick={(event) => {
                                     event.stopPropagation();
@@ -233,10 +246,19 @@ export function EditorPanels() {
                                 )}
 
                                 {row.values.map((value, valueIndex) => {
+                                    const isLinkedValue = isCommandValueLinkedToPoint(row, valueIndex, highlightedCanvasPoint);
                                     const isArcFlag = row.command.toLowerCase() === "a" && (valueIndex === 3 || valueIndex === 4);
                                     if (isArcFlag) {
                                         return (
-                                            <label key={`${row.index}:${valueIndex}`} className="inline-flex items-center gap-1 rounded border bg-background px-1 py-0.5 text-[10px]">
+                                            <label
+                                                key={`${row.index}:${valueIndex}`}
+                                                className={cn(
+                                                    "inline-flex items-center gap-1 rounded px-1 py-0.5 text-[10px] transition-colors",
+                                                    isLinkedValue
+                                                        ? "border border-sky-500/60 bg-sky-500/10"
+                                                        : "border bg-background",
+                                                )}
+                                            >
                                                 <input
                                                     type="checkbox"
                                                     checked={value === 1}
@@ -281,6 +303,7 @@ export function EditorPanels() {
                                         <CommandValueInput
                                             key={`${row.index}:${valueIndex}`}
                                             value={value}
+                                            highlighted={isLinkedValue}
                                             onFocus={() => setSelectedCommandIndex(row.index)}
                                             onCommit={(nextValue) => {
                                                 setSelectedCommandIndex(row.index);
@@ -371,8 +394,9 @@ export function EditorPanels() {
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
-                        </div>
-                    ))}
+                            </div>
+                        );
+                    })}
                 </div>
             </section>
 
@@ -465,6 +489,7 @@ function PathInputSection() {
 
 function CommandValueInput({
     value,
+    highlighted,
     onCommit,
     onFocus,
     inputRef,
@@ -473,6 +498,7 @@ function CommandValueInput({
     title,
 }: {
     value: number;
+    highlighted?: boolean;
     onCommit: (value: number) => void;
     onFocus: () => void;
     inputRef?: (element: HTMLInputElement | null) => void;
@@ -499,7 +525,12 @@ function CommandValueInput({
         <input
             type="text"
             inputMode="decimal"
-            className="h-6 w-14 rounded border bg-background px-1.5 text-center text-[11px]"
+            className={cn(
+                "h-6 w-14 rounded px-1.5 text-center text-[11px] transition-colors",
+                highlighted
+                    ? "border border-sky-500/60 bg-sky-500/10"
+                    : "border bg-background",
+            )}
             ref={inputRef}
             value={draft}
             title={title}
@@ -535,6 +566,50 @@ function CommandValueInput({
             }}
         />
     );
+}
+
+function isCommandCellLinkedToPoint(
+    row: SvgSegmentSummary,
+    point: SvgCanvasPoint | null,
+): boolean {
+    if (!point || point.segmentIndex !== row.index || point.kind !== "control") return false;
+    const command = row.command.toUpperCase();
+    return (
+        (command === "S" && point.controlIndex === 0)
+        || (command === "T" && point.controlIndex === 0)
+    );
+}
+
+function isCommandValueLinkedToPoint(
+    row: SvgSegmentSummary,
+    valueIndex: number,
+    point: SvgCanvasPoint | null,
+): boolean {
+    if (!point || point.segmentIndex !== row.index) return false;
+    const command = row.command.toUpperCase();
+
+    if (point.kind === "control") {
+        if (command === "C") {
+            if (point.controlIndex === 0) {
+                return valueIndex === 0 || valueIndex === 1;
+            }
+            return point.controlIndex === 1 && (valueIndex === 2 || valueIndex === 3);
+        }
+        if (command === "S" && point.controlIndex === 1) {
+            return valueIndex === 0 || valueIndex === 1;
+        }
+        if (command === "Q" && point.controlIndex === 0) {
+            return valueIndex === 0 || valueIndex === 1;
+        }
+        return false;
+    }
+
+    if (command === "Z") return false;
+    if (command === "H" || command === "V") return valueIndex === 0;
+    if (command === "A") return valueIndex === 5 || valueIndex === 6;
+    if (row.values.length === 0) return false;
+    if (row.values.length === 1) return valueIndex === 0;
+    return valueIndex >= row.values.length - 2;
 }
 
 function commandLabel(type: string): string {
