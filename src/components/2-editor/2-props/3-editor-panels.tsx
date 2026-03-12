@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { TransformPanel } from "./5-transform-panel";
+import { EditorPathStatusPanel } from "./3-editor-panels-path-status";
 import {
     doConvertSegmentAtom,
     doDeleteSegmentAtom,
@@ -12,7 +13,7 @@ import {
     hoveredCommandIndexAtom,
     selectedCommandIndexAtom,
 } from "@/store/0-atoms/2-2-editor-actions";
-import { commandRowsAtom, parseErrorAtom, svgModelAtom } from "@/store/0-atoms/2-0-svg-model";
+import { commandRowsAtom, svgModelAtom } from "@/store/0-atoms/2-0-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "@/store/0-atoms/1-2-history";
 import { doDeleteImageAtom, doUpdateImageAtom, focusedImageIdAtom, imagesAtom, isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
@@ -37,12 +38,11 @@ import {
     commandValueTooltip,
     isCommandCellLinkedToPoint,
     isCommandValueLinkedToPoint,
-} from "./3-editor-panels-helpers.ts";
+} from "./3-editor-panels-helpers";
 
 const COMMAND_TYPES = ["M", "L", "V", "H", "C", "S", "Q", "T", "A", "Z"] as const;
 
 export function EditorPanels() {
-    const error = useAtomValue(parseErrorAtom);
     const parseState = useAtomValue(svgModelAtom);
     const rows = useAtomValue(commandRowsAtom);
     const canUndo = useAtomValue(canUndoAtom);
@@ -76,68 +76,69 @@ export function EditorPanels() {
         });
     }, [selectedCommandIndex, rows.length]);
 
-    useEffect(() => {
-        const onKeyDown = (event: KeyboardEvent) => {
-            const target = event.target as HTMLElement | null;
-            const inInput = target?.tagName === "INPUT" || target?.tagName === "TEXTAREA";
-            if (event.key === "Escape" && !inInput) {
-                setSelectedCommandIndex(null);
-                setHoveredCommandIndex(null);
-                return;
-            }
+    useEffect(
+        () => {
+            const onKeyDown = (event: KeyboardEvent) => {
+                const target = event.target as HTMLElement | null;
+                const inInput = target?.tagName === "INPUT" || target?.tagName === "TEXTAREA";
 
-            const key = event.key.toLowerCase();
-            const withCtrl = event.metaKey || event.ctrlKey;
-            if (withCtrl && key === "z") {
-                event.preventDefault();
-                if (event.shiftKey) {
-                    if (canRedo) doRedo();
-                } else if (canUndo) {
-                    doUndo();
+                if (event.key === "Escape" && !inInput) {
+                    setSelectedCommandIndex(null);
+                    setHoveredCommandIndex(null);
+                    return;
                 }
-                return;
-            }
 
-            if (inInput) return;
+                const key = event.key.toLowerCase();
+                const withCtrl = event.metaKey || event.ctrlKey;
+                if (withCtrl && key === "z") {
+                    event.preventDefault();
+                    if (event.shiftKey) {
+                        if (canRedo) doRedo();
+                    } else if (canUndo) {
+                        doUndo();
+                    }
+                    return;
+                }
 
-            if ((event.key === "Backspace" || event.key === "Delete") && selectedCommandIndex !== null) {
+                if (inInput) return;
+
+                if ((event.key === "Backspace" || event.key === "Delete") && selectedCommandIndex !== null) {
+                    event.preventDefault();
+                    doDeleteSegment(selectedCommandIndex);
+                    return;
+                }
+                if ((event.key === "Backspace" || event.key === "Delete") && focusedImageId) {
+                    event.preventDefault();
+                    doDeleteImage(focusedImageId);
+                    return;
+                }
+
+                if (!/^[mlvhcsqtaz]$/i.test(event.key)) return;
                 event.preventDefault();
-                doDeleteSegment(selectedCommandIndex);
-                return;
-            }
-            if ((event.key === "Backspace" || event.key === "Delete") && focusedImageId) {
-                event.preventDefault();
-                doDeleteImage(focusedImageId);
-                return;
-            }
 
-            if (!/^[mlvhcsqtaz]$/i.test(event.key)) return;
-            event.preventDefault();
+                if (event.shiftKey) {
+                    if (selectedCommandIndex === null) return;
+                    const row = rows[selectedCommandIndex];
+                    if (!row) return;
+                    if (parseState.model && !parseState.model.canConvert(selectedCommandIndex, key)) return;
+                    const toType = row.command === row.command.toLowerCase() ? key.toLowerCase() : key.toUpperCase();
+                    doConvertSegment({ segmentIndex: selectedCommandIndex, type: toType });
+                    return;
+                }
 
-            if (event.shiftKey) {
-                if (selectedCommandIndex === null) return;
-                const row = rows[selectedCommandIndex];
-                if (!row) return;
-                if (parseState.model && !parseState.model.canConvert(selectedCommandIndex, key)) return;
-                const toType = row.command === row.command.toLowerCase()
-                    ? key.toLowerCase()
-                    : key.toUpperCase();
-                doConvertSegment({ segmentIndex: selectedCommandIndex, type: toType });
-                return;
-            }
+                if (parseState.model && !parseState.model.canInsertAfter(selectedCommandIndex, key)) {
+                    return;
+                }
+                doInsertSegment({
+                    type: key,
+                    afterIndex: selectedCommandIndex,
+                });
+            };
 
-            if (parseState.model && !parseState.model.canInsertAfter(selectedCommandIndex, key)) {
-                return;
-            }
-            doInsertSegment({
-                type: key,
-                afterIndex: selectedCommandIndex,
-            });
-        };
-
-        window.addEventListener("keydown", onKeyDown);
-        return () => window.removeEventListener("keydown", onKeyDown);
-    }, [canRedo, canUndo, doConvertSegment, doDeleteImage, doDeleteSegment, doInsertSegment, doRedo, doUndo, focusedImageId, parseState.model, rows, selectedCommandIndex, setHoveredCommandIndex, setSelectedCommandIndex]);
+            window.addEventListener("keydown", onKeyDown);
+            return () => window.removeEventListener("keydown", onKeyDown);
+        },
+        [canRedo, canUndo, doConvertSegment, doDeleteImage, doDeleteSegment, doInsertSegment, doRedo, doUndo, focusedImageId, parseState.model, rows, selectedCommandIndex, setHoveredCommandIndex, setSelectedCommandIndex]);
 
     const focusField = (rowIndex: number, valueIndex: number) => {
         const row = rows[rowIndex];
@@ -181,21 +182,7 @@ export function EditorPanels() {
     return (<>
         <PathInputSection />
         <div className="space-y-4">
-            <section className="rounded-lg border p-3">
-                <h2 className="mb-2 text-sm font-semibold">Path Status</h2>
-                {error ? (
-                    <p className="rounded bg-destructive/10 px-2 py-1 text-xs text-destructive">
-                        {error}
-                    </p>
-                ) : (
-                    <p className="rounded bg-emerald-500/10 px-2 py-1 text-xs text-emerald-700 dark:text-emerald-300">
-                        Path parsed successfully.
-                    </p>
-                )}
-                <p className="mt-2 text-xs text-muted-foreground">
-                    Commands parsed: {rows.length}
-                </p>
-            </section>
+            <EditorPathStatusPanel />
 
             <TransformPanel />
 
