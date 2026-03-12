@@ -5,12 +5,16 @@ import { svgModelAtom } from "@/store/0-atoms/2-0-svg-model";
 
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 16;
+const DEFAULT_VIEWPORT_X = 0;
+const DEFAULT_VIEWPORT_Y = 0;
+const DEFAULT_VIEWPORT_WIDTH = 120;
+const DEFAULT_VIEWPORT_HEIGHT = 90;
 
 export const zoomAtom = createAtomAppSetting("zoom");
-export const viewPortXAtom = createAtomAppSetting("viewPortX");
-export const viewPortYAtom = createAtomAppSetting("viewPortY");
-export const viewPortWidthAtom = createAtomAppSetting("viewPortWidth");
-export const viewPortHeightAtom = createAtomAppSetting("viewPortHeight");
+export const viewPortXAtom = atom(DEFAULT_VIEWPORT_X);
+export const viewPortYAtom = atom(DEFAULT_VIEWPORT_Y);
+export const viewPortWidthAtom = atom(DEFAULT_VIEWPORT_WIDTH);
+export const viewPortHeightAtom = atom(DEFAULT_VIEWPORT_HEIGHT);
 export const viewPortLockedAtom = createAtomAppSetting("viewPortLocked");
 
 // Canvas view box
@@ -83,10 +87,10 @@ export const doFitViewBoxAtom = atom(
 
         const model = get(svgModelAtom).model;
         if (!model) {
-            set(viewPortXAtom, 0);
-            set(viewPortYAtom, 0);
-            set(viewPortWidthAtom, 120);
-            set(viewPortHeightAtom, 90);
+            set(viewPortXAtom, DEFAULT_VIEWPORT_X);
+            set(viewPortYAtom, DEFAULT_VIEWPORT_Y);
+            set(viewPortWidthAtom, DEFAULT_VIEWPORT_WIDTH);
+            set(viewPortHeightAtom, DEFAULT_VIEWPORT_HEIGHT);
             return;
         }
 

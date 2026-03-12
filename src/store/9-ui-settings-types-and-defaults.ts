@@ -18,10 +18,6 @@ export interface PathEditorSettings {
     tickInterval: number;                 // Tick interval on axis
     fillPreview: boolean;                 // Fill preview or not (when enabled, the fill will be previewed)
     canvasPreview: boolean;               // Canvas preview or not (when enabled, the canvas will be previewed)
-    viewPortX: number;                    // View port X
-    viewPortY: number;                    // View port Y
-    viewPortWidth: number;                // View port width
-    viewPortHeight: number;               // View port height
     viewPortLocked: boolean;              // View port locked or not
     pathName: string;                     // Path name
     exportFill: boolean;                  // Export fill or not
@@ -54,10 +50,6 @@ export const DEFAULT_PATH_EDITOR_SETTINGS: PathEditorSettings = {
     tickInterval: 5,
     fillPreview: false,
     canvasPreview: false,
-    viewPortX: 0,
-    viewPortY: 0,
-    viewPortWidth: 120,
-    viewPortHeight: 90,
     viewPortLocked: false,
     pathName: "",
     exportFill: true,

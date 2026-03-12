@@ -45,10 +45,6 @@ function pickPathEditorSettings(stored: Record<string, unknown>): Partial<PathEd
     if (typeof stored.tickInterval === "number") rv.tickInterval = stored.tickInterval;
     if (typeof stored.fillPreview === "boolean") rv.fillPreview = stored.fillPreview;
     if (typeof stored.canvasPreview === "boolean") rv.canvasPreview = stored.canvasPreview;
-    if (typeof stored.viewPortX === "number") rv.viewPortX = stored.viewPortX;
-    if (typeof stored.viewPortY === "number") rv.viewPortY = stored.viewPortY;
-    if (typeof stored.viewPortWidth === "number") rv.viewPortWidth = stored.viewPortWidth;
-    if (typeof stored.viewPortHeight === "number") rv.viewPortHeight = stored.viewPortHeight;
     if (typeof stored.viewPortLocked === "boolean") rv.viewPortLocked = stored.viewPortLocked;
     if (typeof stored.pathName === "string") rv.pathName = stored.pathName;
     if (typeof stored.exportFill === "boolean") rv.exportFill = stored.exportFill;
