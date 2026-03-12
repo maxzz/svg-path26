@@ -20,7 +20,15 @@ import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { appSettings } from "@/store/0-ui-settings";
 
 export function SettingsPopover() {
-    const settings = useSnapshot(appSettings);
+    const {
+        viewPortLocked,
+        snapToGrid,
+        showTicks,
+        fillPreview,
+        canvasPreview,
+        tickInterval,
+        pointPrecision,
+    } = useSnapshot(appSettings.pathEditor);
     const fitViewBox = useSetAtom(doFitViewBoxAtom);
     const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
 
@@ -62,7 +70,7 @@ export function SettingsPopover() {
                     <div className="flex items-center justify-between text-xs">
                         <span>Lock viewBox</span>
                         <Switch
-                            checked={settings.pathEditor.viewPortLocked}
+                            checked={viewPortLocked}
                             onCheckedChange={(checked) => {
                                 appSettings.pathEditor.viewPortLocked = Boolean(checked);
                             }}
@@ -84,28 +92,28 @@ export function SettingsPopover() {
                     <div className="grid grid-cols-2 gap-2 rounded-md border p-2">
                         <ToggleValueRow
                             label="Snap to grid"
-                            value={settings.pathEditor.snapToGrid}
+                            value={snapToGrid}
                             onChange={(nextValue) => {
                                 appSettings.pathEditor.snapToGrid = nextValue;
                             }}
                         />
                         <ToggleValueRow
                             label="Show ticks"
-                            value={settings.pathEditor.showTicks}
+                            value={showTicks}
                             onChange={(nextValue) => {
                                 appSettings.pathEditor.showTicks = nextValue;
                             }}
                         />
                         <ToggleValueRow
                             label="Fill path"
-                            value={settings.pathEditor.fillPreview}
+                            value={fillPreview}
                             onChange={(nextValue) => {
                                 appSettings.pathEditor.fillPreview = nextValue;
                             }}
                         />
                         <ToggleValueRow
                             label="Preview mode"
-                            value={settings.pathEditor.canvasPreview}
+                            value={canvasPreview}
                             onChange={(nextValue) => {
                                 appSettings.pathEditor.canvasPreview = nextValue;
                             }}
@@ -116,7 +124,7 @@ export function SettingsPopover() {
                     <div className="grid grid-cols-2 gap-2 text-xs">
                         <SettingsValueNumberField
                             label="Tick interval"
-                            value={settings.pathEditor.tickInterval}
+                            value={tickInterval}
                             min={1}
                             step={1}
                             onValueChange={(nextValue) => {
@@ -125,7 +133,7 @@ export function SettingsPopover() {
                         />
                         <SettingsValueNumberField
                             label="Point precision"
-                            value={settings.pathEditor.pointPrecision}
+                            value={pointPrecision}
                             min={0}
                             max={8}
                             step={1}
@@ -158,8 +166,7 @@ function SettingsRangeField({ valueAtom, label, valueClassName, formatValue, ...
 }
 
 function ZoomSettingsField() {
-    const settings = useSnapshot(appSettings);
-    const zoom = settings.pathEditor.zoom;
+    const { zoom } = useSnapshot(appSettings.pathEditor);
     const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
 
     return (

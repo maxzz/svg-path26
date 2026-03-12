@@ -87,12 +87,13 @@ export function useCanvasDragAndDrop(
 ) {
     const svgElement = useAtomValue(canvasSvgElementAtom);
     const dragState = useAtomValue(canvasDragStateAtom);
-    const settings = useSnapshot(appSettings);
-    const preview = settings.pathEditor.canvasPreview;
+    const {
+        canvasPreview: preview,
+        snapToGrid,
+        pointPrecision,
+        viewPortLocked,
+    } = useSnapshot(appSettings.pathEditor);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
-    const snapToGrid = settings.pathEditor.snapToGrid;
-    const pointPrecision = settings.pathEditor.pointPrecision;
-    const viewPortLocked = settings.pathEditor.viewPortLocked;
 
     const setDragState = useSetAtom(canvasDragStateAtom);
     const stopCanvasDrag = useSetAtom(stopCanvasDragAtom);

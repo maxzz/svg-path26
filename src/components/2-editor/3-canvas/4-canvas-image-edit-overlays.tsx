@@ -26,8 +26,7 @@ export function PathCanvasImages() {
 }
 
 export function PathCanvasImageEditOverlays() {
-    const settings = useSnapshot(appSettings);
-    const preview = settings.pathEditor.canvasPreview;
+    const { canvasPreview: preview } = useSnapshot(appSettings.pathEditor);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
     const images = useAtomValue(imagesAtom);
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);

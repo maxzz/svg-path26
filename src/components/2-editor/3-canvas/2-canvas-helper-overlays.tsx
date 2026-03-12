@@ -14,12 +14,12 @@ import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { startPointDragAtom } from "./3-canvas-drag";
 
 export function CanvasHelperOverlays() {
-    const settings = useSnapshot(appSettings);
-    const preview = settings.pathEditor.canvasPreview;
+    const { showHelpers } = useSnapshot(appSettings);
+    const { canvasPreview: preview } = useSnapshot(appSettings.pathEditor);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
 
-    if (preview || imageEditMode || !settings.showHelpers) return null;
+    if (preview || imageEditMode || !showHelpers) return null;
 
     return (<>
         <CanvasControlLines unitsPerPixel={unitsPerPixel} />
@@ -29,10 +29,10 @@ export function CanvasHelperOverlays() {
 }
 
 function CanvasControlLines({ unitsPerPixel }: { unitsPerPixel: number; }) {
-    const settings = useSnapshot(appSettings);
+    const { darkCanvas } = useSnapshot(appSettings);
     const controlLines = useAtomValue(controlLinesAtom);
     const strokeWidth = useAtomValue(canvasStrokeWidthAtom);
-    const controlLinesClasses = getControlLinesClasses(settings.darkCanvas);
+    const controlLinesClasses = getControlLinesClasses(darkCanvas);
 
     return controlLines.map(
         (line, index) => (

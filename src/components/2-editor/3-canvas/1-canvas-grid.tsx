@@ -8,15 +8,14 @@ import { canvasViewBoxAtom, viewPortXAtom, viewPortYAtom } from "@/store/0-atoms
 type GridValues = ReturnType<typeof buildGrid>;
 
 export function CanvasGrid() {
-    const settings = useSnapshot(appSettings);
+    const { showGrid, darkCanvas } = useSnapshot(appSettings);
+    const { showTicks, tickInterval } = useSnapshot(appSettings.pathEditor);
     const viewBox = useAtomValue(canvasViewBoxAtom);
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
     const viewPortX = useAtomValue(viewPortXAtom);
     const viewPortY = useAtomValue(viewPortYAtom);
-    const showTicks = settings.pathEditor.showTicks;
-    const tickInterval = settings.pathEditor.tickInterval;
 
-    if (!settings.showGrid) return null;
+    if (!showGrid) return null;
 
     const [vx, vy, vw, vh] = viewBox;
     const grid = useMemo(() => buildGrid(vx, vy, vw, vh), [vx, vy, vw, vh]);
@@ -35,7 +34,7 @@ export function CanvasGrid() {
             />
             {showTicks && (
                 <CanvasGridTicks
-                    darkCanvas={settings.darkCanvas}
+                    darkCanvas={darkCanvas}
                     grid={grid}
                     tickInterval={tickInterval}
                     unitsPerPixel={unitsPerPixel}

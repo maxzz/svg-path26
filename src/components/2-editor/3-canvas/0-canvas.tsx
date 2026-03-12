@@ -26,10 +26,8 @@ import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { focusedImageIdAtom, isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 
 export function PathCanvas() {
-    const settings = useSnapshot(appSettings);
-    const { darkCanvas } = settings;
-    const preview = settings.pathEditor.canvasPreview;
-    const fillPreview = settings.pathEditor.fillPreview;
+    const { darkCanvas } = useSnapshot(appSettings);
+    const { canvasPreview: preview, fillPreview } = useSnapshot(appSettings.pathEditor);
 
     const pathValue = useAtomValue(svgPathInputAtom);
     const parseError = useAtomValue(parseErrorAtom);
