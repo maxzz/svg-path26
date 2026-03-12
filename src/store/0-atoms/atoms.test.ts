@@ -1,9 +1,7 @@
 import { createStore } from "jotai";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
-    doOpenNamedPathAtom,
     doSetPointLocationWithoutHistoryAtom,
-    doSaveNamedPathAtom,
     pathNameAtom,
 } from "./2-2-editor-actions";
 import { targetPointsAtom } from "./2-0-svg-model";
@@ -16,7 +14,7 @@ import {
 } from "./1-2-history";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } from "./1-2-history";
-import { storedPathsAtom } from "./2-3-stored-paths-actions";
+import { doOpenNamedPathAtom, doSaveNamedPathAtom, storedPathsAtom } from "./2-3-stored-paths-actions";
 
 describe("svg path state atoms", () => {
     beforeEach(() => {

@@ -6,7 +6,6 @@ import { rawPathAtom } from "./1-0-raw-path";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { doSetPathWithoutHistoryAtom } from "./1-2-history";
 import { commandRowsAtom, standaloneSegmentPathsAtom } from "@/store/0-atoms/2-0-svg-model";
-import { createStoredPathActionsAtoms } from "@/store/0-atoms/2-3-stored-paths-actions";
 
 export const strokeWidthAtom = createAtomAppSetting("strokeWidth");
 export const decimalsAtom = createAtomAppSetting("decimals");
@@ -57,17 +56,6 @@ export const selectedCommandIndexAtom = atom(
 export const hoveredCommandIndexAtom = atom<number | null>(null);
 export const draggedCanvasPointAtom = atom<SvgCanvasPoint | null>(null);
 export const isCanvasDraggingAtom = atom(false);
-
-// Stored paths actions
-
-const storedPathActions = createStoredPathActionsAtoms({
-    pathNameAtom,
-    selectedCommandIndexAtom,
-    hoveredCommandIndexAtom,
-});
-export const doSaveNamedPathAtom = storedPathActions.doSaveNamedPathAtom;
-export const doDeleteNamedPathAtom = storedPathActions.doDeleteNamedPathAtom;
-export const doOpenNamedPathAtom = storedPathActions.doOpenNamedPathAtom;
 
 // Selected standalone segment path
 

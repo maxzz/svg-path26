@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 import { subscribe } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
-import type { PathEditorSettings } from "@/store/9-ui-settings-types-and-defaults";
+import { type PathEditorSettings } from "@/store/9-ui-settings-types-and-defaults";
 
 export function createAtomAppSetting<Key extends keyof PathEditorSettings>(key: Key): PA<PathEditorSettings[Key]> {
     const baseAtom = atom(appSettings.pathEditor[key]);

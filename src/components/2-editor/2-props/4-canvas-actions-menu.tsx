@@ -16,10 +16,7 @@ import { Input } from "@/components/ui/shadcn/input";
 import { Switch } from "@/components/ui/shadcn/switch";
 import {
     doClearPathAtom,
-    doDeleteNamedPathAtom,
     doNormalizePathAtom,
-    doOpenNamedPathAtom,
-    doSaveNamedPathAtom,
     doSetAbsoluteAtom,
     doSetMinifyAtom,
     doSetRelativeAtom,
@@ -33,7 +30,7 @@ import {
 } from "@/store/0-atoms/2-2-editor-actions";
 import { viewPortHeightAtom, viewPortWidthAtom, viewPortXAtom, viewPortYAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { storedPathsAtom } from "@/store/0-atoms/2-3-stored-paths-actions";
+import { doDeleteNamedPathAtom, doOpenNamedPathAtom, doSaveNamedPathAtom, storedPathsAtom } from "@/store/0-atoms/2-3-stored-paths-actions";
 import { doAddImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-4-images";
 import {
     appSettings,
