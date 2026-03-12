@@ -52,6 +52,7 @@ export const doZoomViewBoxAtom = atom(
     null,
     (get, set, viewBoxArgs: { scale: number; center?: Point; }) => {
         if (get(viewPortLockedAtom)) return;
+        
         const scale = viewBoxArgs.scale;
         if (!Number.isFinite(scale) || scale <= 0) return;
 
@@ -79,6 +80,7 @@ export const doFitViewBoxAtom = atom(
     null,
     (get, set) => {
         if (get(viewPortLockedAtom)) return;
+
         const model = get(svgModelAtom).model;
         if (!model) {
             set(viewPortXAtom, 0);
@@ -116,6 +118,8 @@ export const doFitViewBoxAtom = atom(
 );
 
 function clampZoom(value: number): number {
-    if (!Number.isFinite(value) || value <= 0) return 1;
+    if (!Number.isFinite(value) || value <= 0) {
+        return 1;
+    }
     return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value));
 }

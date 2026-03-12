@@ -8,29 +8,29 @@ export interface StoredPathSetting {
 }
 
 export interface PathEditorSettings {
-    strokeWidth: number;
-    zoom: number;
-    decimals: number;
-    minifyOutput: boolean;
-    snapToGrid: boolean;
-    pointPrecision: number;
-    showTicks: boolean;
-    tickInterval: number;
-    fillPreview: boolean;
-    canvasPreview: boolean;
-    viewPortX: number;
-    viewPortY: number;
-    viewPortWidth: number;
-    viewPortHeight: number;
-    viewPortLocked: boolean;
-    pathName: string;
-    exportFill: boolean;
-    exportFillColor: string;
-    exportStroke: boolean;
-    exportStrokeColor: string;
-    exportStrokeWidth: number;
-    rawPath: string;
-    storedPaths: StoredPathSetting[];
+    strokeWidth: number;                  // Stroke width
+    zoom: number;                         // Zoom level
+    decimals: number;                     // Number of decimals to show
+    minifyOutput: boolean;                // Minify output or not
+    snapToGrid: boolean;                  // Snap to grid or not (when enabled, the path will be snapped to the grid)
+    pointPrecision: number;               // Point precision (number of decimal places to show)
+    showTicks: boolean;                   // Show ticks or not (when enabled, the ticks will be shown on the axis)
+    tickInterval: number;                 // Tick interval on axis
+    fillPreview: boolean;                 // Fill preview or not (when enabled, the fill will be previewed)
+    canvasPreview: boolean;               // Canvas preview or not (when enabled, the canvas will be previewed)
+    viewPortX: number;                    // View port X
+    viewPortY: number;                    // View port Y
+    viewPortWidth: number;                // View port width
+    viewPortHeight: number;               // View port height
+    viewPortLocked: boolean;              // View port locked or not
+    pathName: string;                     // Path name
+    exportFill: boolean;                  // Export fill or not
+    exportFillColor: string;              // Export fill color
+    exportStroke: boolean;                // Export stroke or not
+    exportStrokeColor: string;            // Export stroke color
+    exportStrokeWidth: number;            // Export stroke width
+    rawPath: string;                      // Raw path
+    storedPaths: StoredPathSetting[];     // Stored paths
 }
 
 export interface UiSettings {

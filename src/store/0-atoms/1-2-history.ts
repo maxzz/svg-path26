@@ -54,6 +54,8 @@ export const doSetPathWithoutHistoryAtom = atom(
     }
 );
 
+// History actions
+
 export const canUndoAtom = atom(
     (get) => {
         const index = get(historyIndexAtom);

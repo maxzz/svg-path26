@@ -1,11 +1,11 @@
 import { atom } from "jotai";
-import { SvgPathModel } from "@/svg-core/2-svg-model";
-import type { Point, SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
-import { createAtomAppSetting } from "@/store/0-atoms/8-create-atom-app-settings";
 import { rawPathAtom } from "./1-0-raw-path";
+import { SvgPathModel } from "@/svg-core/2-svg-model";
+import { type Point, type SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
+import { createAtomAppSetting } from "./8-create-atom-app-settings";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { doSetPathWithoutHistoryAtom } from "./1-2-history";
-import { commandRowsAtom, standaloneSegmentPathsAtom } from "@/store/0-atoms/2-0-svg-model";
+import { commandRowsAtom, standaloneSegmentPathsAtom } from "./2-0-svg-model";
 
 export const strokeWidthAtom = createAtomAppSetting("strokeWidth");
 export const decimalsAtom = createAtomAppSetting("decimals");
