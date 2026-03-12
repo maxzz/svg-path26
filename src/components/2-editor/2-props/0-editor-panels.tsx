@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { TransformPanel } from "./5-transform-panel";
-import { EditorPathStatusPanel } from "./3-editor-panels-path-status";
+import { TransformPanel } from "./2-transform-panel";
+import { EditorPathStatusPanel } from "./1-1-path-status";
 import {
     doConvertSegmentAtom,
     doDeleteSegmentAtom,
@@ -17,7 +17,7 @@ import { commandRowsAtom, svgModelAtom } from "@/store/0-atoms/2-0-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "@/store/0-atoms/1-2-history";
 import { doDeleteImageAtom, doUpdateImageAtom, focusedImageIdAtom, imagesAtom, isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
-import { CanvasActionsMenu } from "./4-canvas-actions-menu";
+import { CanvasActionsMenu } from "./7-canvas-actions-menu";
 import { cn } from "@/utils";
 import {
     DropdownMenu,
@@ -38,7 +38,7 @@ import {
     commandValueTooltip,
     isCommandCellLinkedToPoint,
     isCommandValueLinkedToPoint,
-} from "./3-editor-panels-helpers";
+} from "./8-editor-panels-helpers";
 
 const COMMAND_TYPES = ["M", "L", "V", "H", "C", "S", "Q", "T", "A", "Z"] as const;
 
