@@ -11,6 +11,10 @@ export type EditorImage = {
     data: string;
 };
 
+export type PendingImage = Omit<EditorImage, "id">;
+
+export const pendingImageAtom = atom<PendingImage | null>(null);
+
 export const isImageEditModeAtom = atom(false);
 export const imagesAtom = atom<EditorImage[]>([]);
 export const focusedImageIdAtom = atom<string | null>(null);

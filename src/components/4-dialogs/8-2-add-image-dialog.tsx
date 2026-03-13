@@ -2,10 +2,8 @@ import type { Dispatch, SetStateAction } from "react";
 import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
 import { Switch } from "@/components/ui/shadcn/switch";
-import type { EditorImage } from "@/store/0-atoms/2-4-images";
+import type { PendingImage } from "@/store/0-atoms/2-4-images";
 import { NumberField } from "../2-editor/2-props/8-helpers";
-
-type PendingImage = Omit<EditorImage, "id">;
 
 export function AddImageDialog({
     open,
