@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { TransformPanel } from "./2-transform-panel";
-import { EditorPathStatusPanel } from "./1-1-path-status";
 import { CommandSelectionSection } from "./3-command-selection";
 import { ImagesPanel } from "./4-images-panel";
 import { doHandleEditorKeyDownAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { commandCountAtom, parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { CanvasActionsMenu } from "./7-canvas-actions-menu";
 
@@ -52,6 +52,31 @@ function PathInputSection() {
                 onChange={(event) => setPathValue(event.target.value)}
                 placeholder="M 10 10 L 100 100"
             />
+        </section>
+    );
+}
+
+function EditorPathStatusPanel() {
+    const error = useAtomValue(parseErrorAtom);
+    const commandCount = useAtomValue(commandCountAtom);
+
+    return (
+        <section className="rounded-lg border p-3">
+            <h2 className="mb-2 text-sm font-semibold">
+                Path Status
+            </h2>
+            {error ? (
+                <p className="rounded bg-destructive/10 px-2 py-1 text-xs text-destructive">
+                    {error}
+                </p>
+            ) : (
+                <p className="rounded bg-emerald-500/10 px-2 py-1 text-xs text-emerald-700 dark:text-emerald-300">
+                    Path parsed successfully.
+                </p>
+            )}
+            <p className="mt-2 text-xs text-muted-foreground">
+                Commands parsed: {commandCount}
+            </p>
         </section>
     );
 }
