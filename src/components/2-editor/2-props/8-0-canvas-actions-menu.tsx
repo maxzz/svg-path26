@@ -22,7 +22,7 @@ import {
     doSetRelativeAtom,
 } from "@/store/0-atoms/2-2-editor-actions";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { doAddImageAtom, isImageEditModeAtom, pendingImageAtom } from "@/store/0-atoms/2-4-images";
+import { isImageEditModeAtom, pendingImageAtom } from "@/store/0-atoms/2-4-images";
 import {
     addImageDialogOpenAtom,
     exportSvgDialogOpenAtom,
@@ -41,14 +41,11 @@ export function CanvasActionsMenu() {
     const doSetRelative = useSetAtom(doSetRelativeAtom);
     const doSetAbsolute = useSetAtom(doSetAbsoluteAtom);
     const doClear = useSetAtom(doClearPathAtom);
-    const doAddImage = useSetAtom(doAddImageAtom);
 
     const setOpenExportDialog = useSetAtom(exportSvgDialogOpenAtom);
     const setSaveDialogOpen = useSetAtom(savePathDialogOpenAtom);
     const setOpenDialogOpen = useSetAtom(openPathDialogOpenAtom);
 
-    const [openImageDialog, setOpenImageDialog] = useAtom(addImageDialogOpenAtom);
-    const [pendingImage, setPendingImage] = useAtom(pendingImageAtom);
     const fileRef = useRef<HTMLInputElement | null>(null);
 
     return (<>
@@ -121,24 +118,13 @@ export function CanvasActionsMenu() {
 
         <ExportSvgDialog />
 
-        <AddImageDialog
-            open={openImageDialog}
-            onOpenChange={setOpenImageDialog}
-            pendingImage={pendingImage}
-            setPendingImage={setPendingImage}
-            onAddImage={() => {
-                if (!pendingImage) return;
-                doAddImage(pendingImage);
-                setOpenImageDialog(false);
-                setIsImageEditMode(true);
-            }}
-        />
+        <AddImageDialog />
     </>);
 }
 
 function ImageUploadInput({ fileRef }: { fileRef: React.RefObject<HTMLInputElement | null>; }) {
-    const [, setPendingImage] = useAtom(pendingImageAtom);
-    const [, setOpenImageDialog] = useAtom(addImageDialogOpenAtom);
+    const setPendingImage = useSetAtom(pendingImageAtom);
+    const setOpenImageDialog = useSetAtom(addImageDialogOpenAtom);
 
     const handleFileInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];

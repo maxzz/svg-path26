@@ -1,25 +1,20 @@
-import type { Dispatch, SetStateAction } from "react";
+import { useAtom, useSetAtom } from "jotai";
 import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
 import { Switch } from "@/components/ui/shadcn/switch";
-import type { PendingImage } from "@/store/0-atoms/2-4-images";
+import { doAddImageAtom, isImageEditModeAtom, pendingImageAtom } from "@/store/0-atoms/2-4-images";
+import { addImageDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-actions-menu";
 import { NumberField } from "../2-editor/2-props/8-helpers";
 
-export function AddImageDialog({
-    open,
-    onOpenChange,
-    pendingImage,
-    setPendingImage,
-    onAddImage,
-}: {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    pendingImage: PendingImage | null;
-    setPendingImage: Dispatch<SetStateAction<PendingImage | null>>;
-    onAddImage: () => void;
-}) {
+export function AddImageDialog() {
+    const [open, setOpen] = useAtom(addImageDialogOpenAtom);
+    const [pendingImage, setPendingImage] = useAtom(pendingImageAtom);
+
+    const doAddImage = useSetAtom(doAddImageAtom);
+    const setIsImageEditMode = useSetAtom(isImageEditModeAtom);
+
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="max-w-md">
                 <DialogHeader>
                     <DialogTitle>Add image to canvas</DialogTitle>
@@ -62,10 +57,15 @@ export function AddImageDialog({
                     </div>
                 )}
                 <DialogFooter>
-                    <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+                    <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
                     <Button
                         disabled={!pendingImage}
-                        onClick={onAddImage}
+                        onClick={() => {
+                            if (!pendingImage) return;
+                            doAddImage(pendingImage);
+                            setOpen(false);
+                            setIsImageEditMode(true);
+                        }}
                     >
                         Add image
                     </Button>
