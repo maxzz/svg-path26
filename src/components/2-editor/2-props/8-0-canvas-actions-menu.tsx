@@ -3,7 +3,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { IconRadix_DotsHorizontal } from "@/components/ui/icons/normal";
 import { Button } from "@/components/ui/shadcn/button";
-import { AddImageDialog } from "./8-0-add-image-dialog";
+import { AddImageDialog } from "./8-2-add-image-dialog";
 import { ExportSvgDialog } from "./8-1-export-svg-dialog";
 import {
     DropdownMenu,
@@ -25,7 +25,12 @@ import {
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { doDeleteNamedPathAtom, doOpenNamedPathAtom, doSaveNamedPathAtom } from "@/store/0-atoms/2-3-stored-paths-actions";
 import { doAddImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-4-images";
-import { exportSvgDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-actions-menu";
+import {
+    addImageDialogOpenAtom,
+    exportSvgDialogOpenAtom,
+    openPathDialogOpenAtom,
+    savePathDialogOpenAtom,
+} from "@/store/0-atoms/2-5-canvas-actions-menu";
 import {
     appSettings,
 } from "@/store/0-ui-settings";
@@ -53,11 +58,11 @@ export function CanvasActionsMenu() {
     const doOpenNamedPath = useSetAtom(doOpenNamedPathAtom);
     const doAddImage = useSetAtom(doAddImageAtom);
 
-    const [openSaveDialog, setOpenSaveDialog] = useState(false);
-    const [openOpenDialog, setOpenOpenDialog] = useState(false);
+    const [openSaveDialog, setOpenSaveDialog] = useAtom(savePathDialogOpenAtom);
+    const [openOpenDialog, setOpenOpenDialog] = useAtom(openPathDialogOpenAtom);
+    const [openImageDialog, setOpenImageDialog] = useAtom(addImageDialogOpenAtom);
     const [saveNameDraft, setSaveNameDraft] = useState(pathName || "My path");
     const [pendingImage, setPendingImage] = useState<Omit<EditorImage, "id"> | null>(null);
-    const [openImageDialog, setOpenImageDialog] = useState(false);
     const setOpenExportDialog = useSetAtom(exportSvgDialogOpenAtom);
     const fileRef = useRef<HTMLInputElement | null>(null);
 

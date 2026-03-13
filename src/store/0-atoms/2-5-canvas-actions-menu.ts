@@ -11,8 +11,6 @@ export type ExportViewBoxDraft = {
     height: number;
 };
 
-const exportSvgDialogOpenBaseAtom = atom(false);
-
 export const exportViewBoxDraftAtom = atom<ExportViewBoxDraft>({
     x: 0,
     y: 0,
@@ -42,6 +40,13 @@ export const doResetExportViewBoxDraftAtom = atom(
     },
 );
 
+// Dialog atoms
+
+const exportSvgDialogOpenBaseAtom = atom(false);
+const savePathDialogOpenBaseAtom = atom(false);
+const openPathDialogOpenBaseAtom = atom(false);
+const addImageDialogOpenBaseAtom = atom(false);
+
 export const exportSvgDialogOpenAtom = atom(
     (get) => get(exportSvgDialogOpenBaseAtom),
     (_get, set, open: boolean) => {
@@ -49,5 +54,26 @@ export const exportSvgDialogOpenAtom = atom(
             set(doResetExportViewBoxDraftAtom);
         }
         set(exportSvgDialogOpenBaseAtom, open);
+    },
+);
+
+export const savePathDialogOpenAtom = atom(
+    (get) => get(savePathDialogOpenBaseAtom),
+    (_get, set, open: boolean) => {
+        set(savePathDialogOpenBaseAtom, open);
+    },
+);
+
+export const openPathDialogOpenAtom = atom(
+    (get) => get(openPathDialogOpenBaseAtom),
+    (_get, set, open: boolean) => {
+        set(openPathDialogOpenBaseAtom, open);
+    },
+);
+
+export const addImageDialogOpenAtom = atom(
+    (get) => get(addImageDialogOpenBaseAtom),
+    (_get, set, open: boolean) => {
+        set(addImageDialogOpenBaseAtom, open);
     },
 );

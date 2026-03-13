@@ -6,7 +6,7 @@ import { ImagesPanel } from "./3-images-panel";
 import { doHandleEditorKeyDownAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { commandCountAtom, parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { CanvasActionsMenu } from "./7-canvas-actions-menu";
+import { CanvasActionsMenu } from "./8-0-canvas-actions-menu";
 
 export function EditorPanels() {
     const handleEditorKeyDown = useSetAtom(doHandleEditorKeyDownAtom);
