@@ -5,6 +5,7 @@ import { EditorPathStatusPanel } from "./1-1-path-status";
 import {
     doConvertSegmentAtom,
     doDeleteSegmentAtom,
+    doHandleEditorKeyDownAtom,
     doInsertSegmentAtom,
     doSetCommandValueAtom,
     doToggleSegmentRelativeAtom,
@@ -43,10 +44,8 @@ import {
 const COMMAND_TYPES = ["M", "L", "V", "H", "C", "S", "Q", "T", "A", "Z"] as const;
 
 export function EditorPanels() {
-    const parseState = useAtomValue(svgModelAtom);
     const rows = useAtomValue(commandRowsAtom);
-    const canUndo = useAtomValue(canUndoAtom);
-    const canRedo = useAtomValue(canRedoAtom);
+    const parseState = useAtomValue(svgModelAtom);
     const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
     const [hoveredCommandIndex, setHoveredCommandIndex] = useAtom(hoveredCommandIndexAtom);
     const draggedCanvasPoint = useAtomValue(draggedCanvasPointAtom);
@@ -61,84 +60,31 @@ export function EditorPanels() {
     const doConvertSegment = useSetAtom(doConvertSegmentAtom);
     const doUndo = useSetAtom(doUndoPathAtom);
     const doRedo = useSetAtom(doRedoPathAtom);
+    const handleEditorKeyDown = useSetAtom(doHandleEditorKeyDownAtom);
     const doDeleteImage = useSetAtom(doDeleteImageAtom);
     const doUpdateImage = useSetAtom(doUpdateImageAtom);
-    const highlightedCanvasPoint = draggedCanvasPoint
-        ?? (hoveredCanvasPoint && hoveredCanvasPoint.segmentIndex === hoveredCommandIndex ? hoveredCanvasPoint : null);
+    const highlightedCanvasPoint = draggedCanvasPoint ?? (hoveredCanvasPoint && hoveredCanvasPoint.segmentIndex === hoveredCommandIndex ? hoveredCanvasPoint : null);
     const rowRefs = useRef<Record<number, HTMLDivElement | null>>({});
     const fieldRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
-    useEffect(() => {
-        if (selectedCommandIndex === null) return;
-        rowRefs.current[selectedCommandIndex]?.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest",
-        });
-    }, [selectedCommandIndex, rows.length]);
+    useEffect(
+        () => {
+            if (selectedCommandIndex === null) return;
+            rowRefs.current[selectedCommandIndex]?.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest",
+            });
+        },
+        [selectedCommandIndex, rows.length]);
 
     useEffect(
         () => {
-            const onKeyDown = (event: KeyboardEvent) => {
-                const target = event.target as HTMLElement | null;
-                const inInput = target?.tagName === "INPUT" || target?.tagName === "TEXTAREA";
-
-                if (event.key === "Escape" && !inInput) {
-                    setSelectedCommandIndex(null);
-                    setHoveredCommandIndex(null);
-                    return;
-                }
-
-                const key = event.key.toLowerCase();
-                const withCtrl = event.metaKey || event.ctrlKey;
-                if (withCtrl && key === "z") {
-                    event.preventDefault();
-                    if (event.shiftKey) {
-                        if (canRedo) doRedo();
-                    } else if (canUndo) {
-                        doUndo();
-                    }
-                    return;
-                }
-
-                if (inInput) return;
-
-                if ((event.key === "Backspace" || event.key === "Delete") && selectedCommandIndex !== null) {
-                    event.preventDefault();
-                    doDeleteSegment(selectedCommandIndex);
-                    return;
-                }
-                if ((event.key === "Backspace" || event.key === "Delete") && focusedImageId) {
-                    event.preventDefault();
-                    doDeleteImage(focusedImageId);
-                    return;
-                }
-
-                if (!/^[mlvhcsqtaz]$/i.test(event.key)) return;
-                event.preventDefault();
-
-                if (event.shiftKey) {
-                    if (selectedCommandIndex === null) return;
-                    const row = rows[selectedCommandIndex];
-                    if (!row) return;
-                    if (parseState.model && !parseState.model.canConvert(selectedCommandIndex, key)) return;
-                    const toType = row.command === row.command.toLowerCase() ? key.toLowerCase() : key.toUpperCase();
-                    doConvertSegment({ segmentIndex: selectedCommandIndex, type: toType });
-                    return;
-                }
-
-                if (parseState.model && !parseState.model.canInsertAfter(selectedCommandIndex, key)) {
-                    return;
-                }
-                doInsertSegment({
-                    type: key,
-                    afterIndex: selectedCommandIndex,
-                });
-            };
+            const onKeyDown = (event: KeyboardEvent) => handleEditorKeyDown(event);
 
             window.addEventListener("keydown", onKeyDown);
             return () => window.removeEventListener("keydown", onKeyDown);
         },
-        [canRedo, canUndo, doConvertSegment, doDeleteImage, doDeleteSegment, doInsertSegment, doRedo, doUndo, focusedImageId, parseState.model, rows, selectedCommandIndex, setHoveredCommandIndex, setSelectedCommandIndex]);
+        [handleEditorKeyDown]);
 
     const focusField = (rowIndex: number, valueIndex: number) => {
         const row = rows[rowIndex];
