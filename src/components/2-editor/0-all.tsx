@@ -14,9 +14,7 @@ export function Editor() {
         <main className="flex-1 min-h-0">
             <ResizablePanelGroup orientation="horizontal" onLayoutChange={setEditorPanelLayout}>
                 <ResizablePanel id="editor-controls" defaultSize={`${defaultLeftPanelSize}`} minSize="20%">
-                    <aside className="h-full border-r p-4 overflow-auto space-y-3">
-                        <EditorPanels />
-                    </aside>
+                    <EditorPanels />
                 </ResizablePanel>
 
                 <ResizableHandle withHandle />
