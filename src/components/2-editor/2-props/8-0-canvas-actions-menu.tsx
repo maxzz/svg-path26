@@ -34,7 +34,7 @@ import { appSettings } from "@/store/0-ui-settings";
 export function CanvasActionsMenu() {
     const uiSettings = useSnapshot(appSettings);
     const pathValue = useAtomValue(svgPathInputAtom);
-    const { minifyOutput: minified } = useSnapshot(appSettings.pathEditor);
+    const { minifyOutput } = useSnapshot(appSettings.pathEditor);
     const [isImageEditMode, setIsImageEditMode] = useAtom(isImageEditModeAtom);
 
     const doNormalize = useSetAtom(doNormalizePathAtom);
@@ -50,11 +50,6 @@ export function CanvasActionsMenu() {
     const [openImageDialog, setOpenImageDialog] = useAtom(addImageDialogOpenAtom);
     const [pendingImage, setPendingImage] = useAtom(pendingImageAtom);
     const fileRef = useRef<HTMLInputElement | null>(null);
-
-    const handleCopy = async () => {
-        if (!pathValue) return;
-        await navigator.clipboard.writeText(pathValue);
-    };
 
     return (<>
         <ImageUploadInput fileRef={fileRef} />
@@ -91,7 +86,7 @@ export function CanvasActionsMenu() {
                 <DropdownMenuItem className="pl-8" onSelect={() => doSetRelative()}>
                     To Rel...
                 </DropdownMenuItem>
-                <DropdownMenuCheckboxItem checked={minified} onCheckedChange={(checked) => { appSettings.pathEditor.minifyOutput = Boolean(checked); doNormalize(); }}>
+                <DropdownMenuCheckboxItem checked={minifyOutput} onCheckedChange={(checked) => { appSettings.pathEditor.minifyOutput = Boolean(checked); doNormalize(); }}>
                     Minify path
                 </DropdownMenuCheckboxItem>
 
@@ -112,7 +107,7 @@ export function CanvasActionsMenu() {
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem className="pl-8" disabled={!pathValue} onSelect={async () => { await handleCopy(); }}>
+                <DropdownMenuItem className="pl-8" disabled={!pathValue} onSelect={async () => { !!pathValue && await navigator.clipboard.writeText(pathValue); }}>
                     Copy
                 </DropdownMenuItem>
                 <DropdownMenuItem className="pl-8" disabled={!pathValue} onSelect={() => doClear()}>
