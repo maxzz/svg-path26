@@ -32,7 +32,7 @@ import {
     commandValueTooltip,
     isCommandCellLinkedToPoint,
     isCommandValueLinkedToPoint,
-} from "./8-editor-panels-helpers";
+} from "./8-helpers";
 
 const COMMAND_TYPES = ["M", "L", "V", "H", "C", "S", "Q", "T", "A", "Z"] as const;
 

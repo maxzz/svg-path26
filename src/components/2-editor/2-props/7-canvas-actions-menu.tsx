@@ -185,13 +185,13 @@ export function CanvasActionsMenu() {
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onSelect={() => doNormalize()}>
-                        Normalize
+                        Normalize...
                     </DropdownMenuItem>
                     <DropdownMenuItem onSelect={() => doSetAbsolute()}>
-                        To Abs
+                        To Abs...
                     </DropdownMenuItem>
                     <DropdownMenuItem onSelect={() => doSetRelative()}>
-                        To Rel
+                        To Rel...
                     </DropdownMenuItem>
                     <DropdownMenuCheckboxItem
                         checked={minified}
@@ -200,7 +200,7 @@ export function CanvasActionsMenu() {
                             doNormalize();
                         }}
                     >
-                        Minify
+                        Minify...
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onSelect={() => setOpenSaveDialog(true)}>

@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { TransformPanel } from "./2-transform-panel";
-import { CommandSelectionSection } from "./3-command-selection";
-import { ImagesPanel } from "./4-images-panel";
+import { TransformPanel } from "./1-transform-panel";
+import { CommandSelectionSection } from "./2-0-command-selection";
+import { ImagesPanel } from "./3-images-panel";
 import { doHandleEditorKeyDownAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { commandCountAtom, parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
@@ -24,7 +24,7 @@ export function EditorPanels() {
     return (
         <aside className="p-4 h-full border-r overflow-auto space-y-1">
             <PathInputSection />
-            <EditorPathStatusPanel />
+            <PathInputSectionStatus />
 
             <TransformPanel />
 
@@ -56,13 +56,13 @@ function PathInputSection() {
     );
 }
 
-function EditorPathStatusPanel() {
+function PathInputSectionStatus() {
     const error = useAtomValue(parseErrorAtom);
     const commandCount = useAtomValue(commandCountAtom);
 
     return (
         <section className="rounded-lg border p-3">
-            <h2 className="mb-2 text-sm font-semibold">
+            <h2 className="mb-2 text-xs font-semibold">
                 Path Status
             </h2>
             {error ? (
