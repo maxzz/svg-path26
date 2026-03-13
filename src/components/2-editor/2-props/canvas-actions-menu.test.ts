@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeExportViewBox } from "./7-canvas-actions-menu";
+import { computeExportViewBox } from "./8-helpers";
 
 describe("computeExportViewBox", () => {
     it("computes bounds with stroke padding and falls back on invalid input", () => {

@@ -1,0 +1,102 @@
+import type { Dispatch, SetStateAction } from "react";
+import { Button } from "@/components/ui/shadcn/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
+import { Input } from "@/components/ui/shadcn/input";
+import { Switch } from "@/components/ui/shadcn/switch";
+import type { EditorImage } from "@/store/0-atoms/2-4-images";
+
+type PendingImage = Omit<EditorImage, "id">;
+
+export function AddImageDialog({
+    open,
+    onOpenChange,
+    pendingImage,
+    setPendingImage,
+    onAddImage,
+}: {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    pendingImage: PendingImage | null;
+    setPendingImage: Dispatch<SetStateAction<PendingImage | null>>;
+    onAddImage: () => void;
+}) {
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Add image to canvas</DialogTitle>
+                    <DialogDescription>Set initial image placement.</DialogDescription>
+                </DialogHeader>
+                {pendingImage && (
+                    <div className="space-y-3">
+                        <img src={pendingImage.data} alt="upload preview" className="max-h-36 w-full rounded border object-contain" />
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                            <NumberField
+                                label="x"
+                                value={pendingImage.x1}
+                                onChange={(value) => setPendingImage((previous) => previous ? { ...previous, x1: value } : previous)}
+                            />
+                            <NumberField
+                                label="y"
+                                value={pendingImage.y1}
+                                onChange={(value) => setPendingImage((previous) => previous ? { ...previous, y1: value } : previous)}
+                            />
+                            <NumberField
+                                label="width"
+                                value={pendingImage.x2 - pendingImage.x1}
+                                min={0.1}
+                                onChange={(value) => setPendingImage((previous) => previous ? { ...previous, x2: previous.x1 + value } : previous)}
+                            />
+                            <NumberField
+                                label="height"
+                                value={pendingImage.y2 - pendingImage.y1}
+                                min={0.1}
+                                onChange={(value) => setPendingImage((previous) => previous ? { ...previous, y2: previous.y1 + value } : previous)}
+                            />
+                            <label className="col-span-2 flex items-center justify-between rounded border px-2 py-1.5">
+                                <span>Preserve aspect ratio</span>
+                                <Switch
+                                    checked={pendingImage.preserveAspectRatio}
+                                    onCheckedChange={(checked) => setPendingImage((previous) => previous ? { ...previous, preserveAspectRatio: Boolean(checked) } : previous)}
+                                />
+                            </label>
+                        </div>
+                    </div>
+                )}
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+                    <Button
+                        disabled={!pendingImage}
+                        onClick={onAddImage}
+                    >
+                        Add image
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+function NumberField({
+    label,
+    value,
+    onChange,
+    min,
+}: {
+    label: string;
+    value: number;
+    onChange: (value: number) => void;
+    min?: number;
+}) {
+    return (
+        <label className="space-y-1">
+            <span className="text-muted-foreground">{label}</span>
+            <Input
+                type="number"
+                value={value}
+                min={min}
+                onChange={(event) => onChange(Number(event.target.value))}
+            />
+        </label>
+    );
+}

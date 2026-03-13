@@ -1,4 +1,5 @@
 import type { SvgCanvasPoint, SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
+import { SvgPathModel } from "@/svg-core/2-svg-model";
 
 export function isCommandCellLinkedToPoint(
     row: SvgSegmentSummary,
@@ -168,4 +169,26 @@ export function commandValueTooltip(command: string, valueIndex: number): string
     }
 
     return `${commandCellNames(command)[valueIndex] ?? `value ${valueIndex + 1}`}`;
+}
+
+export function computeExportViewBox(
+    path: string,
+    strokePadding: number,
+    fallback: { x: number; y: number; width: number; height: number; },
+) {
+    try {
+        const model = new SvgPathModel(path);
+        const bounds = model.getBounds();
+        const width = Math.max(1e-6, bounds.xmax - bounds.xmin);
+        const height = Math.max(1e-6, bounds.ymax - bounds.ymin);
+        const pad = Math.max(0, strokePadding);
+        return {
+            x: bounds.xmin - pad,
+            y: bounds.ymin - pad,
+            width: width + 2 * pad,
+            height: height + 2 * pad,
+        };
+    } catch {
+        return fallback;
+    }
 }
