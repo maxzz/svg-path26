@@ -14,9 +14,10 @@ export function EditorPanels() {
     useEffect(
         () => {
             const onKeyDown = (event: KeyboardEvent) => handleEditorKeyDown(event);
-
-            window.addEventListener("keydown", onKeyDown);
-            return () => window.removeEventListener("keydown", onKeyDown);
+            
+            const controller = new AbortController();
+            window.addEventListener("keydown", onKeyDown, { signal: controller.signal });
+            return () => controller.abort();
         },
         [handleEditorKeyDown]);
 
