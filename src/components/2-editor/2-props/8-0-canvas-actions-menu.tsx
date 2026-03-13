@@ -46,7 +46,7 @@ export function CanvasActionsMenu() {
     const setOpenExportDialog = useSetAtom(exportSvgDialogOpenAtom);
     const setSaveDialogOpen = useSetAtom(savePathDialogOpenAtom);
     const setOpenDialogOpen = useSetAtom(openPathDialogOpenAtom);
-    
+
     const [openImageDialog, setOpenImageDialog] = useAtom(addImageDialogOpenAtom);
     const [pendingImage, setPendingImage] = useAtom(pendingImageAtom);
     const fileRef = useRef<HTMLInputElement | null>(null);
@@ -56,122 +56,90 @@ export function CanvasActionsMenu() {
         await navigator.clipboard.writeText(pathValue);
     };
 
+    return (<>
+        <ImageUploadInput fileRef={fileRef} />
 
-    return (
-        <>
-            <ImageUploadInput fileRef={fileRef} />
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="size-7" title="More actions">
+                    <IconRadix_DotsHorizontal className="size-4" />
+                </Button>
+            </DropdownMenuTrigger>
 
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="icon" className="size-7" title="More actions">
-                        <IconRadix_DotsHorizontal className="size-4" />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                    <DropdownMenuCheckboxItem
-                        checked={uiSettings.showGrid}
-                        onCheckedChange={(checked) => {
-                            appSettings.showGrid = Boolean(checked);
-                        }}
-                    >
-                        Grid
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                        checked={uiSettings.showHelpers}
-                        onCheckedChange={(checked) => {
-                            appSettings.showHelpers = Boolean(checked);
-                        }}
-                    >
-                        Helpers
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                        checked={uiSettings.darkCanvas}
-                        onCheckedChange={(checked) => {
-                            appSettings.darkCanvas = Boolean(checked);
-                        }}
-                    >
-                        Dark Canvas
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                        checked={isImageEditMode}
-                        onCheckedChange={(checked) => setIsImageEditMode(Boolean(checked))}
-                    >
-                        Image Edit Mode
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onSelect={() => doNormalize()}>
-                        Normalize...
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => doSetAbsolute()}>
-                        To Abs...
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => doSetRelative()}>
-                        To Rel...
-                    </DropdownMenuItem>
-                    <DropdownMenuCheckboxItem
-                        checked={minified}
-                        onCheckedChange={(checked) => {
-                            appSettings.pathEditor.minifyOutput = Boolean(checked);
-                            doNormalize();
-                        }}
-                    >
-                        Minify...
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onSelect={() => setSaveDialogOpen(true)}>
-                        Save Path
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => setOpenDialogOpen(true)}>
-                        Open Path
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                        disabled={!pathValue.trim()}
-                        onSelect={() => setOpenExportDialog(true)}
-                    >
-                        Export SVG
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => fileRef.current?.click()}>
-                        Upload Image
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                        disabled={!pathValue}
-                        onSelect={async () => {
-                            await handleCopy();
-                        }}
-                    >
-                        Copy
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                        disabled={!pathValue}
-                        onSelect={() => doClear()}
-                    >
-                        Clear
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+            <DropdownMenuContent align="end">
+                <DropdownMenuCheckboxItem checked={uiSettings.showGrid} onCheckedChange={(checked) => { appSettings.showGrid = Boolean(checked); }}>
+                    Grid
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem checked={uiSettings.showHelpers} onCheckedChange={(checked) => { appSettings.showHelpers = Boolean(checked); }}>
+                    Helpers
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem checked={uiSettings.darkCanvas} onCheckedChange={(checked) => { appSettings.darkCanvas = Boolean(checked); }}>
+                    Dark Canvas
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem checked={isImageEditMode} onCheckedChange={(checked) => setIsImageEditMode(Boolean(checked))}>
+                    Image Edit Mode
+                </DropdownMenuCheckboxItem>
 
-            <SavePathDialog />
-            <OpenPathDialog />
+                <DropdownMenuSeparator />
 
-            <ExportSvgDialog />
+                <DropdownMenuItem className="pl-8" onSelect={() => doNormalize()}>
+                    Normalize...
+                </DropdownMenuItem>
+                <DropdownMenuItem className="pl-8" onSelect={() => doSetAbsolute()}>
+                    To Abs...
+                </DropdownMenuItem>
+                <DropdownMenuItem className="pl-8" onSelect={() => doSetRelative()}>
+                    To Rel...
+                </DropdownMenuItem>
+                <DropdownMenuCheckboxItem checked={minified} onCheckedChange={(checked) => { appSettings.pathEditor.minifyOutput = Boolean(checked); doNormalize(); }}>
+                    Minify path
+                </DropdownMenuCheckboxItem>
 
-            <AddImageDialog
-                open={openImageDialog}
-                onOpenChange={setOpenImageDialog}
-                pendingImage={pendingImage}
-                setPendingImage={setPendingImage}
-                onAddImage={() => {
-                    if (!pendingImage) return;
-                    doAddImage(pendingImage);
-                    setOpenImageDialog(false);
-                    setIsImageEditMode(true);
-                }}
-            />
-        </>
-    );
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem className="pl-8" onSelect={() => setSaveDialogOpen(true)}>
+                    Save Path to browser storage
+                </DropdownMenuItem>
+                <DropdownMenuItem className="pl-8" onSelect={() => setOpenDialogOpen(true)}>
+                    Open saved path
+                </DropdownMenuItem>
+                <DropdownMenuItem className="pl-8" disabled={!pathValue.trim()} onSelect={() => setOpenExportDialog(true)}>
+                    Export SVG
+                </DropdownMenuItem>
+                <DropdownMenuItem className="pl-8" onSelect={() => fileRef.current?.click()}>
+                    Upload Image
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem className="pl-8" disabled={!pathValue} onSelect={async () => { await handleCopy(); }}>
+                    Copy
+                </DropdownMenuItem>
+                <DropdownMenuItem className="pl-8" disabled={!pathValue} onSelect={() => doClear()}>
+                    Clear
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+
+        <SavePathDialog />
+        <OpenPathDialog />
+
+        <ExportSvgDialog />
+
+        <AddImageDialog
+            open={openImageDialog}
+            onOpenChange={setOpenImageDialog}
+            pendingImage={pendingImage}
+            setPendingImage={setPendingImage}
+            onAddImage={() => {
+                if (!pendingImage) return;
+                doAddImage(pendingImage);
+                setOpenImageDialog(false);
+                setIsImageEditMode(true);
+            }}
+        />
+    </>);
 }
-
 
 function ImageUploadInput({ fileRef }: { fileRef: React.RefObject<HTMLInputElement | null>; }) {
     const [, setPendingImage] = useAtom(pendingImageAtom);
