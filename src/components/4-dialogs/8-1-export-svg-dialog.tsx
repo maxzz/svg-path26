@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
 import { Input } from "@/components/ui/shadcn/input";
 import { Switch } from "@/components/ui/shadcn/switch";
-import { NumberField } from "./8-helpers";
+import { NumberField } from "../2-editor/2-props/8-helpers";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { doResetExportViewBoxDraftAtom, exportSvgDialogOpenAtom, exportViewBoxDraftAtom } from "@/store/0-atoms/2-5-canvas-actions-menu";
 import { appSettings } from "@/store/0-ui-settings";
