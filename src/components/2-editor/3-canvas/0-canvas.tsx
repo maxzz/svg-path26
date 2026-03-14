@@ -94,8 +94,10 @@ export function PathCanvas() {
             >
                 {!preview && <CanvasGrid />}
 
+                <PathCanvasImages />
+
                 <path
-                    className={classNames(getCanvasPathFillClasses(preview, fillPreview), getCanvasPathStrokeClasses(preview, darkCanvas))}
+                    className={getCanvasPathClasses(preview, fillPreview, darkCanvas)}
                     d={parseError ? "M 0 0" : (pathValue || "M 0 0")}
                     strokeWidth={canvasStrokeWidth}
                     strokeLinecap="round"
@@ -104,7 +106,7 @@ export function PathCanvas() {
 
                 {!preview && hoveredSegmentPath && (
                     <path
-                        className={hoveredSegmentPathClasses}
+                        className={segmentHoveredClasses}
                         d={hoveredSegmentPath}
                         strokeWidth={hoveredSegmentStrokeWidth}
                         strokeLinecap="round"
@@ -114,15 +116,13 @@ export function PathCanvas() {
 
                 {!preview && selectedSegmentPath && (
                     <path
-                        className={selectedSegmentPathClasses}
+                        className={segmentSelectedClasses}
                         d={selectedSegmentPath}
                         strokeWidth={selectedSegmentStrokeWidth}
                         strokeLinecap="round"
                         strokeLinejoin="round"
                     />
                 )}
-
-                <PathCanvasImages />
 
                 <CanvasHelperOverlays />
 
@@ -138,22 +138,26 @@ export function PathCanvas() {
     );
 }
 
-function getCanvasPathFillClasses(preview: boolean, fillPreview: boolean): string {
-    if (!fillPreview) return canvasPathNoFillClasses;
-    return preview ? canvasPathPreviewFillClasses : canvasPathEditorFillClasses;
+function getCanvasPathClasses(preview: boolean, fillPreview: boolean, darkCanvas: boolean): string {
+    const fill =
+        !fillPreview
+            ? pathNoFillClasses
+            : (preview ? pathPreviewFillClasses : pathEditorFillClasses);
+    const stroke =
+        preview
+            ? pathPreviewStrokeClasses
+            : (darkCanvas ? pathDarkStrokeClasses : pathLightStrokeClasses);
+
+    return classNames(fill, stroke);
 }
 
-function getCanvasPathStrokeClasses(preview: boolean, darkCanvas: boolean): string {
-    if (preview) return canvasPathPreviewStrokeClasses;
-    return darkCanvas ? canvasPathDarkStrokeClasses : canvasPathLightStrokeClasses;
-}
+const pathPreviewFillClasses = "fill-black/20";
+const pathEditorFillClasses = "fill-blue-500/25";
+const pathNoFillClasses = "fill-none";
 
-const canvasPathPreviewFillClasses = "fill-black/20";
-const canvasPathEditorFillClasses = "fill-blue-500/25";
-const canvasPathNoFillClasses = "fill-none";
-const canvasPathPreviewStrokeClasses = "stroke-black";
-const canvasPathDarkStrokeClasses = "stroke-slate-200";
-const canvasPathLightStrokeClasses = "stroke-blue-700";
+const pathPreviewStrokeClasses = "stroke-black";
+const pathDarkStrokeClasses = "stroke-slate-200";
+const pathLightStrokeClasses = "stroke-blue-700";
 
-const hoveredSegmentPathClasses = "fill-none stroke-red-400";
-const selectedSegmentPathClasses = "fill-none stroke-sky-500";
+const segmentHoveredClasses = "fill-none stroke-red-400";
+const segmentSelectedClasses = "fill-none stroke-sky-500";
