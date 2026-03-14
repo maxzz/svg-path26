@@ -28,41 +28,34 @@ export function CommandCellInput(props: CommandProps) {
     return <CommandValueInput {...props} tooltip={tooltip} />;
 }
 
-function CommandValueInput(props: CommandProps & { tooltip?: string }) {
+function CommandValueInput(props: CommandProps & { tooltip?: string; }) {
     const { rowIndex, valueIndex, rowValueCount, value, highlighted, tooltip, focusField, moveVertical, registerFieldRef } = props;
 
     const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
     const setCommandValue = useSetAtom(doSetCommandValueAtom);
     const [draft, setDraft] = useState(String(value));
 
-    useEffect(() => {
-        setDraft(String(value));
-    }, [value]);
+    useEffect(
+        () => {
+            setDraft(String(value));
+        },
+        [value]);
 
-    const commit = () => {
+    function commit() {
         const parsed = Number.parseFloat(draft);
         if (!Number.isFinite(parsed)) {
             setDraft(String(value));
             return;
         }
         setSelectedCommandIndex(rowIndex);
-        setCommandValue({
-            commandIndex: rowIndex,
-            valueIndex,
-            value: parsed,
-        });
-    };
+        setCommandValue({ commandIndex: rowIndex, valueIndex, value: parsed, });
+    }
 
     const input = (
         <input
             type="text"
             inputMode="decimal"
-            className={cn(
-                "h-6 w-14 rounded px-1.5 text-center text-[11px] transition-colors",
-                highlighted
-                    ? "border border-sky-500/60 bg-sky-500/10"
-                    : "border bg-background"
-            )}
+            className={getCommandValueInputClassName(highlighted)}
             ref={(element) => registerFieldRef(rowIndex, valueIndex, element)}
             value={draft}
             onFocus={() => setSelectedCommandIndex(rowIndex)}
@@ -110,21 +103,14 @@ function CommandValueInput(props: CommandProps & { tooltip?: string }) {
     );
 }
 
-function CommandFlagInput(props: CommandProps & { tooltip?: string }) {
+function CommandFlagInput(props: CommandProps & { tooltip?: string; }) {
     const { rowIndex, valueIndex, rowValueCount, value, highlighted, tooltip, focusField, moveVertical, registerFieldRef } = props;
 
     const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
     const setCommandValue = useSetAtom(doSetCommandValueAtom);
 
     const input = (
-        <label
-            className={cn(
-                "inline-flex items-center gap-1 rounded px-1 py-0.5 text-[10px] transition-colors",
-                highlighted
-                    ? "border border-sky-500/60 bg-sky-500/10"
-                    : "border bg-background"
-            )}
-        >
+        <label className={getCommandFlagInputClassName(highlighted)}>
             <input
                 type="checkbox"
                 checked={value === 1}
@@ -172,5 +158,21 @@ function CommandFlagInput(props: CommandProps & { tooltip?: string }) {
                 {tooltip}
             </TooltipContent>
         </Tooltip>
+    );
+}
+
+function getCommandValueInputClassName(highlighted?: boolean) {
+    return cn(
+        "h-6 w-14 rounded px-1.5 text-center text-[11px] transition-colors",
+        highlighted
+            ? "border border-sky-500/60 bg-sky-500/10"
+            : "border bg-background"
+    );
+}
+
+function getCommandFlagInputClassName(highlighted?: boolean) {
+    return cn(
+        "inline-flex items-center gap-1 rounded px-1 py-0.5 text-[10px] transition-colors",
+        highlighted ? "border border-sky-500/60 bg-sky-500/10" : "border bg-background"
     );
 }
