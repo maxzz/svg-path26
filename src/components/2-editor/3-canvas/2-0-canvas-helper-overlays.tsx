@@ -167,18 +167,10 @@ function CanvasTargetPoints({ unitsPerPixel }: { unitsPerPixel: number; }) {
 
 function getCanvasPathClasses(preview: boolean, fillPreview: boolean, darkCanvas: boolean): string {
     return classNames(
-        !fillPreview ? pathNoFillClasses : (preview ? pathPreviewFillClasses : pathEditorFillClasses),
-        preview ? pathPreviewStrokeClasses : (darkCanvas ? pathDarkStrokeClasses : pathLightStrokeClasses)
+        !fillPreview ? "fill-none" : (preview ? "fill-black/20" : "fill-blue-500/25"),
+        preview ? "stroke-black" : (darkCanvas ? "stroke-slate-200" : "stroke-blue-700")
     );
 }
-
-const pathPreviewFillClasses = "fill-black/20";
-const pathEditorFillClasses = "fill-blue-500/25";
-const pathNoFillClasses = "fill-none";
-
-const pathPreviewStrokeClasses = "stroke-black";
-const pathDarkStrokeClasses = "stroke-slate-200";
-const pathLightStrokeClasses = "stroke-blue-700";
 
 const segmentHoveredClasses = "fill-none stroke-red-400";
 const segmentSelectedClasses = "fill-none stroke-sky-500";
@@ -186,31 +178,19 @@ const segmentSelectedClasses = "fill-none stroke-sky-500";
 // Canvas Helper Overlays
 
 function getControlLinesClasses(darkCanvas: boolean): string {
-    return darkCanvas ? controlLinesDarkClasses : controlLinesLightClasses;
+    return darkCanvas ? "stroke-zinc-400/60" : "stroke-zinc-700/60";
 }
 
 function getControlPointClasses(selected: boolean, movable: boolean): string {
     return classNames(
-        selected ? controlPointSelectedClasses : controlPointDefaultClasses,
-        movable ? cursorPointerClasses : cursorDefaultClasses,
+        selected ? "fill-sky-500 stroke-transparent" : "fill-zinc-500 stroke-transparent",
+        movable ? "cursor-pointer" : "cursor-default",
     );
 }
 
 function getTargetPointClasses(selected: boolean, movable: boolean): string {
     return classNames(
-        selected ? targetPointSelectedClasses : targetPointDefaultClasses,
-        movable ? targetPointInteractiveClasses : cursorDefaultClasses,
+        selected ? "fill-sky-500 stroke-white/75" : "fill-orange-400 stroke-transparent",
+        movable ? "cursor-pointer transition-all" : "cursor-default",
     );
 }
-
-const controlLinesDarkClasses = "stroke-zinc-400/60";
-const controlLinesLightClasses = "stroke-zinc-700/60";
-
-const controlPointSelectedClasses = "fill-sky-500 stroke-transparent";
-const controlPointDefaultClasses = "fill-zinc-500 stroke-transparent";
-const cursorPointerClasses = "cursor-pointer";
-const cursorDefaultClasses = "cursor-default";
-
-const targetPointSelectedClasses = "fill-sky-500 stroke-white/75";
-const targetPointDefaultClasses = "fill-orange-400 stroke-transparent";
-const targetPointInteractiveClasses = "cursor-pointer transition-all";
