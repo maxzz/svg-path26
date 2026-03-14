@@ -46,7 +46,11 @@ export function CommandsList() {
         if (nextRowIndex < 0 || nextRowIndex >= rows.length) return;
 
         setSelectedCommandIndex(nextRowIndex);
-        focusField(rows, rowRefs.current, fieldRefs.current, nextRowIndex, valueIndex, setSelectedCommandIndex);
+        focusCommandCell(nextRowIndex, valueIndex);
+    }
+
+    function focusCommandCell(nextRowIndex: number, nextValueIndex: number) {
+        focusField(rows, rowRefs.current, fieldRefs.current, nextRowIndex, nextValueIndex, setSelectedCommandIndex)
     }
 
     function registerFieldRef(rowIndex: number, valueIndex: number, element: HTMLInputElement | null) {
@@ -124,7 +128,7 @@ export function CommandsList() {
                                             value,
                                             highlighted: isLinkedValue,
                                             tooltip: valueTooltip,
-                                            focusField: (nextRowIndex: number, nextValueIndex: number) => focusField(rows, rowRefs.current, fieldRefs.current, nextRowIndex, nextValueIndex, setSelectedCommandIndex),
+                                            focusField: focusCommandCell,
                                             moveVertical,
                                             registerFieldRef,
                                         };
@@ -176,6 +180,7 @@ function focusField(rows: SvgSegmentSummary[], rowRefs: Record<number, HTMLDivEl
             return;
         }
     }
+    
     for (let i = clampedIndex + 1; i < row.values.length; i += 1) {
         const candidate = fieldRefs[`${rowIndex}:${i}`];
         if (candidate) {
