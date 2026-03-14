@@ -17,27 +17,19 @@ export type CommandProps = {
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
 };
 
-type CommandInputWithTooltipProps = CommandProps & {
-    tooltip?: string;
-};
-
 export function CommandCellInput(props: CommandProps) {
     const isArcFlag = props.command.toLowerCase() === "a" && (props.valueIndex === 3 || props.valueIndex === 4);
     const tooltip = commandValueTooltip(props.command, props.valueIndex);
-    const inputProps: CommandInputWithTooltipProps = {
-        ...props,
-        tooltip,
-    };
 
     if (isArcFlag) {
-        return <CommandFlagInput {...inputProps} />;
+        return <CommandFlagInput {...props} tooltip={tooltip} />;
     }
 
-    return <CommandValueInput {...inputProps} />;
+    return <CommandValueInput {...props} tooltip={tooltip} />;
 }
 
-function CommandValueInput(props: CommandInputWithTooltipProps) {
-    const { rowIndex, valueIndex, rowValueCount, value, highlighted, tooltip, focusField, moveVertical, registerFieldRef }: CommandInputWithTooltipProps = props;
+function CommandValueInput(props: CommandProps & { tooltip?: string }) {
+    const { rowIndex, valueIndex, rowValueCount, value, highlighted, tooltip, focusField, moveVertical, registerFieldRef } = props;
 
     const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
     const setCommandValue = useSetAtom(doSetCommandValueAtom);
@@ -118,8 +110,8 @@ function CommandValueInput(props: CommandInputWithTooltipProps) {
     );
 }
 
-function CommandFlagInput(props: CommandInputWithTooltipProps) {
-    const { rowIndex, valueIndex, rowValueCount, value, highlighted, tooltip, focusField, moveVertical, registerFieldRef }: CommandInputWithTooltipProps = props;
+function CommandFlagInput(props: CommandProps & { tooltip?: string }) {
+    const { rowIndex, valueIndex, rowValueCount, value, highlighted, tooltip, focusField, moveVertical, registerFieldRef } = props;
 
     const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
     const setCommandValue = useSetAtom(doSetCommandValueAtom);
