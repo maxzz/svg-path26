@@ -3,24 +3,12 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
 import { CanvasGrid } from "./1-canvas-grid";
-import { CanvasHelperOverlays } from "./2-canvas-helper-overlays";
+import { CanvasHelperOverlays, CanvasPathOverlays } from "./2-canvas-helper-overlays";
 import { canvasDragStateAtom, eventToSvgPoint, useCanvasDragAndDrop } from "./3-canvas-drag";
 import { PathCanvasImageEditOverlays, PathCanvasImages } from "./4-canvas-image-edit-overlays";
-import {
-    canvasStrokeWidthAtom,
-    canvasSvgElementAtom,
-    hoveredSegmentStrokeWidthAtom,
-    selectedSegmentStrokeWidthAtom,
-    useSyncCanvasViewportSize,
-} from "./5-canvas-viewport-metrics";
+import { canvasSvgElementAtom, useSyncCanvasViewportSize } from "./5-canvas-viewport-metrics";
 import { appSettings } from "@/store/0-ui-settings";
-import {
-    hoveredCanvasPointAtom,
-    hoveredCommandIndexAtom,
-    hoveredStandaloneSegmentPathAtom,
-    selectedCommandIndexAtom,
-    selectedStandaloneSegmentPathAtom,
-} from "@/store/0-atoms/2-2-editor-actions";
+import { hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
 import { canvasViewBoxAtom, doFitViewBoxAtom, doZoomViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
@@ -28,17 +16,12 @@ import { focusedImageIdAtom, isImageEditModeAtom } from "@/store/0-atoms/2-4-ima
 
 export function PathCanvas() {
     const { darkCanvas } = useSnapshot(appSettings);
-    const { canvasPreview: preview, fillPreview } = useSnapshot(appSettings.pathEditor);
+    const { canvasPreview: preview } = useSnapshot(appSettings.pathEditor);
 
     const pathValue = useAtomValue(svgPathInputAtom);
     const parseError = useAtomValue(parseErrorAtom);
     const viewBox = useAtomValue(canvasViewBoxAtom);
-    const selectedSegmentPath = useAtomValue(selectedStandaloneSegmentPathAtom);
-    const hoveredSegmentPath = useAtomValue(hoveredStandaloneSegmentPathAtom);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
-    const canvasStrokeWidth = useAtomValue(canvasStrokeWidthAtom);
-    const hoveredSegmentStrokeWidth = useAtomValue(hoveredSegmentStrokeWidthAtom);
-    const selectedSegmentStrokeWidth = useAtomValue(selectedSegmentStrokeWidthAtom);
     const svgElement = useAtomValue(canvasSvgElementAtom);
 
     const setFocusedImageId = useSetAtom(focusedImageIdAtom);
@@ -96,33 +79,7 @@ export function PathCanvas() {
 
                 <PathCanvasImages />
 
-                <path
-                    className={getCanvasPathClasses(preview, fillPreview, darkCanvas)}
-                    d={parseError ? "M 0 0" : (pathValue || "M 0 0")}
-                    strokeWidth={canvasStrokeWidth}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                />
-
-                {!preview && hoveredSegmentPath && (
-                    <path
-                        className={segmentHoveredClasses}
-                        d={hoveredSegmentPath}
-                        strokeWidth={hoveredSegmentStrokeWidth}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
-                )}
-
-                {!preview && selectedSegmentPath && (
-                    <path
-                        className={segmentSelectedClasses}
-                        d={selectedSegmentPath}
-                        strokeWidth={selectedSegmentStrokeWidth}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
-                )}
+                <CanvasPathOverlays />
 
                 <CanvasHelperOverlays />
 
@@ -137,27 +94,3 @@ export function PathCanvas() {
         </div>
     );
 }
-
-function getCanvasPathClasses(preview: boolean, fillPreview: boolean, darkCanvas: boolean): string {
-    const fill =
-        !fillPreview
-            ? pathNoFillClasses
-            : (preview ? pathPreviewFillClasses : pathEditorFillClasses);
-    const stroke =
-        preview
-            ? pathPreviewStrokeClasses
-            : (darkCanvas ? pathDarkStrokeClasses : pathLightStrokeClasses);
-
-    return classNames(fill, stroke);
-}
-
-const pathPreviewFillClasses = "fill-black/20";
-const pathEditorFillClasses = "fill-blue-500/25";
-const pathNoFillClasses = "fill-none";
-
-const pathPreviewStrokeClasses = "stroke-black";
-const pathDarkStrokeClasses = "stroke-slate-200";
-const pathLightStrokeClasses = "stroke-blue-700";
-
-const segmentHoveredClasses = "fill-none stroke-red-400";
-const segmentSelectedClasses = "fill-none stroke-sky-500";
