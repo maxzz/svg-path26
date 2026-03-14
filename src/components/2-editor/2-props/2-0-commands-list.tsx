@@ -1,23 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { cn } from "@/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
-import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 import { commandSummaryTooltip, commandValueTooltip, isCommandCellLinkedToPoint, isCommandValueLinkedToPoint } from "./8-helpers";
+import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 import { commandRowsAtom } from "@/store/0-atoms/2-0-svg-model";
-import {
-    doSetCommandValueAtom,
-    doToggleSegmentRelativeAtom,
-    draggedCanvasPointAtom,
-    hoveredCanvasPointAtom,
-    hoveredCommandIndexAtom,
-    selectedCommandIndexAtom,
-} from "@/store/0-atoms/2-2-editor-actions";
-import { CommandSelectionMenu } from "./2-1-commands-list-row-menu";
+import { CommandSelectionMenu } from "./2-2-commands-list-row-menu.tsx";
+import { doToggleSegmentRelativeAtom, draggedCanvasPointAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { CommandFlagInput, CommandValueInput, type CommandProps } from "./2-1-commands-list-cells.tsx";
 
-const COMMAND_TYPES = ["M", "L", "V", "H", "C", "S", "Q", "T", "A", "Z"] as const;
-
-export function CommandSelectionSection() {
+export function CommandsList() {
     const rows = useAtomValue(commandRowsAtom);
     const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
     const [hoveredCommandIndex, setHoveredCommandIndex] = useAtom(hoveredCommandIndexAtom);
@@ -113,8 +105,7 @@ export function CommandSelectionSection() {
                                                 const isLinkedValue = isCommandValueLinkedToPoint(row, valueIndex, highlightedCanvasPoint);
                                                 const valueTooltip = commandValueTooltip(row.command, valueIndex);
                                                 const isArcFlag = row.command.toLowerCase() === "a" && (valueIndex === 3 || valueIndex === 4);
-                                                const inputProps = {
-                                                    key: `${row.index}:${valueIndex}`,
+                                                const inputProps: CommandProps = {
                                                     rowIndex: row.index,
                                                     valueIndex,
                                                     rowValueCount: row.values.length,
@@ -127,11 +118,11 @@ export function CommandSelectionSection() {
                                                 };
                                                 if (isArcFlag) {
                                                     return (
-                                                        <CommandFlagInput {...inputProps} />
+                                                        <CommandFlagInput key={`${row.index}:${valueIndex}`} {...inputProps} />
                                                     );
                                                 } else {
                                                     return (
-                                                        <CommandValueInput {...inputProps} />
+                                                        <CommandValueInput key={`${row.index}:${valueIndex}`} {...inputProps} />
                                                     );
                                                 }
                                             }
@@ -148,187 +139,6 @@ export function CommandSelectionSection() {
                 </div>
             </TooltipProvider>
         </section>
-    );
-}
-
-function CommandValueInput({
-    rowIndex,
-    valueIndex,
-    rowValueCount,
-    value,
-    highlighted,
-    tooltip,
-    focusField,
-    moveVertical,
-    registerFieldRef,
-}: {
-    rowIndex: number;
-    valueIndex: number;
-    rowValueCount: number;
-    value: number;
-    highlighted?: boolean;
-    tooltip?: string;
-    focusField: (rowIndex: number, valueIndex: number) => void;
-    moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
-    registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
-}) {
-    const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
-    const setCommandValue = useSetAtom(doSetCommandValueAtom);
-    const [draft, setDraft] = useState(String(value));
-
-    useEffect(() => {
-        setDraft(String(value));
-    }, [value]);
-
-    const commit = () => {
-        const parsed = Number.parseFloat(draft);
-        if (!Number.isFinite(parsed)) {
-            setDraft(String(value));
-            return;
-        }
-        setSelectedCommandIndex(rowIndex);
-        setCommandValue({
-            commandIndex: rowIndex,
-            valueIndex,
-            value: parsed,
-        });
-    };
-
-    const input = (
-        <input
-            type="text"
-            inputMode="decimal"
-            className={cn(
-                "h-6 w-14 rounded px-1.5 text-center text-[11px] transition-colors",
-                highlighted
-                    ? "border border-sky-500/60 bg-sky-500/10"
-                    : "border bg-background"
-            )}
-            ref={(element) => registerFieldRef(rowIndex, valueIndex, element)}
-            value={draft}
-            onFocus={() => setSelectedCommandIndex(rowIndex)}
-            onChange={(event) => setDraft(event.target.value)}
-            onBlur={commit}
-            onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                    commit();
-                    event.currentTarget.blur();
-                    return;
-                }
-                if (event.key === "Escape") {
-                    setDraft(String(value));
-                    event.currentTarget.blur();
-                }
-                if (event.key === "ArrowLeft" && event.currentTarget.selectionStart === 0 && event.currentTarget.selectionEnd === 0) {
-                    focusField(rowIndex, Math.max(0, valueIndex - 1));
-                    event.preventDefault();
-                }
-                if (event.key === "ArrowRight" && event.currentTarget.selectionStart === event.currentTarget.value.length && event.currentTarget.selectionEnd === event.currentTarget.value.length) {
-                    focusField(rowIndex, Math.min(rowValueCount - 1, valueIndex + 1));
-                    event.preventDefault();
-                }
-                if (event.key === "ArrowUp") {
-                    moveVertical(rowIndex, valueIndex, "up");
-                    event.preventDefault();
-                }
-                if (event.key === "ArrowDown") {
-                    moveVertical(rowIndex, valueIndex, "down");
-                    event.preventDefault();
-                }
-            }}
-        />
-    );
-
-    if (!tooltip) return input;
-
-    return (
-        <Tooltip>
-            <TooltipTrigger asChild>{input}</TooltipTrigger>
-            <TooltipContent sideOffset={6}>
-                {tooltip}
-            </TooltipContent>
-        </Tooltip>
-    );
-}
-
-function CommandFlagInput({
-    rowIndex,
-    valueIndex,
-    rowValueCount,
-    value,
-    highlighted,
-    tooltip,
-    focusField,
-    moveVertical,
-    registerFieldRef,
-}: {
-    rowIndex: number;
-    valueIndex: number;
-    rowValueCount: number;
-    value: number;
-    highlighted?: boolean;
-    tooltip?: string;
-    focusField: (rowIndex: number, valueIndex: number) => void;
-    moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
-    registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
-}) {
-    const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
-    const setCommandValue = useSetAtom(doSetCommandValueAtom);
-
-    const input = (
-        <label
-            className={cn(
-                "inline-flex items-center gap-1 rounded px-1 py-0.5 text-[10px] transition-colors",
-                highlighted
-                    ? "border border-sky-500/60 bg-sky-500/10"
-                    : "border bg-background"
-            )}
-        >
-            <input
-                type="checkbox"
-                checked={value === 1}
-                ref={(element) => registerFieldRef(rowIndex, valueIndex, element)}
-                onFocus={() => setSelectedCommandIndex(rowIndex)}
-                onChange={(event) => {
-                    setSelectedCommandIndex(rowIndex);
-                    setCommandValue({
-                        commandIndex: rowIndex,
-                        valueIndex,
-                        value: event.target.checked ? 1 : 0,
-                    });
-                }}
-                onKeyDown={(event) => {
-                    if (event.key === "ArrowLeft") {
-                        focusField(rowIndex, Math.max(0, valueIndex - 1));
-                        event.preventDefault();
-                    }
-                    if (event.key === "ArrowRight") {
-                        focusField(rowIndex, Math.min(rowValueCount - 1, valueIndex + 1));
-                        event.preventDefault();
-                    }
-                    if (event.key === "ArrowUp") {
-                        moveVertical(rowIndex, valueIndex, "up");
-                        event.preventDefault();
-                    }
-                    if (event.key === "ArrowDown") {
-                        moveVertical(rowIndex, valueIndex, "down");
-                        event.preventDefault();
-                    }
-                }}
-            />
-            <span className="text-muted-foreground">{valueIndex === 3 ? "laf" : "swp"}</span>
-        </label>
-    );
-
-    if (!tooltip) return input;
-
-    return (
-        <Tooltip>
-            <TooltipTrigger asChild>{input}</TooltipTrigger>
-            <TooltipContent sideOffset={6}>
-                {tooltip}
-            </TooltipContent>
-        </Tooltip>
     );
 }
 
