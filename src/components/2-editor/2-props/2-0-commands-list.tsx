@@ -2,12 +2,12 @@ import { useEffect, useRef } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { cn } from "@/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
-import { commandSummaryTooltip, commandValueTooltip, isCommandCellLinkedToPoint, isCommandValueLinkedToPoint } from "./8-helpers";
+import { commandSummaryTooltip, isCommandCellLinkedToPoint, isCommandValueLinkedToPoint } from "./8-helpers";
 import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 import { commandRowsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { CommandSelectionMenu } from "./2-2-commands-list-row-menu.tsx";
 import { doToggleSegmentRelativeAtom, draggedCanvasPointAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-2-editor-actions";
-import { CommandFlagInput, CommandValueInput, type CommandProps } from "./2-1-commands-list-cells.tsx";
+import { CommandCellInput, type CommandProps } from "./2-1-commands-list-cells.tsx";
 
 export function CommandsListPanel() {
     return (
@@ -119,28 +119,18 @@ export function CommandsList() {
                                 {row.values.map(
                                     (value, valueIndex) => {
                                         const isLinkedValue = isCommandValueLinkedToPoint(row, valueIndex, highlightedCanvasPoint);
-                                        const valueTooltip = commandValueTooltip(row.command, valueIndex);
-                                        const isArcFlag = row.command.toLowerCase() === "a" && (valueIndex === 3 || valueIndex === 4);
                                         const inputProps: CommandProps = {
                                             rowIndex: row.index,
                                             valueIndex,
                                             rowValueCount: row.values.length,
                                             value,
+                                            command: row.command,
                                             highlighted: isLinkedValue,
-                                            tooltip: valueTooltip,
                                             focusField: focusCommandCell,
                                             moveVertical,
                                             registerFieldRef,
                                         };
-                                        if (isArcFlag) {
-                                            return (
-                                                <CommandFlagInput key={`${row.index}:${valueIndex}`} {...inputProps} />
-                                            );
-                                        } else {
-                                            return (
-                                                <CommandValueInput key={`${row.index}:${valueIndex}`} {...inputProps} />
-                                            );
-                                        }
+                                        return <CommandCellInput key={`${row.index}:${valueIndex}`} {...inputProps} />;
                                     }
                                 )}
                             </div>
