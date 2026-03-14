@@ -35,37 +35,35 @@ export function CanvasPathOverlays() {
     const hoveredSegmentStrokeWidth = useAtomValue(hoveredSegmentStrokeWidthAtom);
     const selectedSegmentStrokeWidth = useAtomValue(selectedSegmentStrokeWidthAtom);
 
-    return (
-        <>
+    return (<>
+        <path
+            className={getCanvasPathClasses(preview, fillPreview, darkCanvas)}
+            d={parseError ? "M 0 0" : (pathValue || "M 0 0")}
+            strokeWidth={canvasStrokeWidth}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+
+        {!preview && hoveredSegmentPath && (
             <path
-                className={getCanvasPathClasses(preview, fillPreview, darkCanvas)}
-                d={parseError ? "M 0 0" : (pathValue || "M 0 0")}
-                strokeWidth={canvasStrokeWidth}
+                className={segmentHoveredClasses}
+                d={hoveredSegmentPath}
+                strokeWidth={hoveredSegmentStrokeWidth}
                 strokeLinecap="round"
                 strokeLinejoin="round"
             />
+        )}
 
-            {!preview && hoveredSegmentPath && (
-                <path
-                    className={segmentHoveredClasses}
-                    d={hoveredSegmentPath}
-                    strokeWidth={hoveredSegmentStrokeWidth}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                />
-            )}
-
-            {!preview && selectedSegmentPath && (
-                <path
-                    className={segmentSelectedClasses}
-                    d={selectedSegmentPath}
-                    strokeWidth={selectedSegmentStrokeWidth}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                />
-            )}
-        </>
-    );
+        {!preview && selectedSegmentPath && (
+            <path
+                className={segmentSelectedClasses}
+                d={selectedSegmentPath}
+                strokeWidth={selectedSegmentStrokeWidth}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        )}
+    </>);
 }
 
 function CanvasControlLines({ unitsPerPixel }: { unitsPerPixel: number; }) {
@@ -98,31 +96,33 @@ function CanvasControlPoints({ unitsPerPixel }: { unitsPerPixel: number; }) {
     const setFocusPointCommand = useSetAtom(doFocusPointCommandAtom);
     const startPointDrag = useSetAtom(startPointDragAtom);
 
-    return controlPoints.map((point) => (
-        <circle
-            key={point.id}
-            cx={point.x}
-            cy={point.y}
-            r={unitsPerPixel * (point.movable ? 3 : 2.5)}
-            strokeWidth={unitsPerPixel * (point.movable ? 12 : 4)}
-            className={getControlPointClasses(point.segmentIndex === selectedCommandIndex, point.movable)}
-            onPointerDown={(event) => {
-                if (!point.movable) return;
-                event.stopPropagation();
-                setFocusPointCommand(point);
-                setSelectedCommandIndex(point.segmentIndex);
-                startPointDrag({ point, pointerId: event.pointerId, startPath: pathValue });
-            }}
-            onMouseEnter={() => {
-                setHoveredCommandIndex(point.segmentIndex);
-                setHoveredCanvasPoint(point);
-            }}
-            onMouseLeave={() => {
-                setHoveredCommandIndex(null);
-                setHoveredCanvasPoint(null);
-            }}
-        />
-    ));
+    return controlPoints.map(
+        (point) => (
+            <circle
+                key={point.id}
+                cx={point.x}
+                cy={point.y}
+                r={unitsPerPixel * (point.movable ? 3 : 2.5)}
+                strokeWidth={unitsPerPixel * (point.movable ? 12 : 4)}
+                className={getControlPointClasses(point.segmentIndex === selectedCommandIndex, point.movable)}
+                onPointerDown={(event) => {
+                    if (!point.movable) return;
+                    event.stopPropagation();
+                    setFocusPointCommand(point);
+                    setSelectedCommandIndex(point.segmentIndex);
+                    startPointDrag({ point, pointerId: event.pointerId, startPath: pathValue });
+                }}
+                onMouseEnter={() => {
+                    setHoveredCommandIndex(point.segmentIndex);
+                    setHoveredCanvasPoint(point);
+                }}
+                onMouseLeave={() => {
+                    setHoveredCommandIndex(null);
+                    setHoveredCanvasPoint(null);
+                }}
+            />
+        )
+    );
 }
 
 function CanvasTargetPoints({ unitsPerPixel }: { unitsPerPixel: number; }) {
@@ -166,16 +166,10 @@ function CanvasTargetPoints({ unitsPerPixel }: { unitsPerPixel: number; }) {
 // Canvas Helper Overlays
 
 function getCanvasPathClasses(preview: boolean, fillPreview: boolean, darkCanvas: boolean): string {
-    const fill =
-        !fillPreview
-            ? pathNoFillClasses
-            : (preview ? pathPreviewFillClasses : pathEditorFillClasses);
-    const stroke =
-        preview
-            ? pathPreviewStrokeClasses
-            : (darkCanvas ? pathDarkStrokeClasses : pathLightStrokeClasses);
-
-    return classNames(fill, stroke);
+    return classNames(
+        !fillPreview ? pathNoFillClasses : (preview ? pathPreviewFillClasses : pathEditorFillClasses),
+        preview ? pathPreviewStrokeClasses : (darkCanvas ? pathDarkStrokeClasses : pathLightStrokeClasses)
+    );
 }
 
 const pathPreviewFillClasses = "fill-black/20";
@@ -190,18 +184,6 @@ const segmentHoveredClasses = "fill-none stroke-red-400";
 const segmentSelectedClasses = "fill-none stroke-sky-500";
 
 // Canvas Helper Overlays
-
-const controlLinesDarkClasses = "stroke-zinc-400/60";
-const controlLinesLightClasses = "stroke-zinc-700/60";
-
-const controlPointSelectedClasses = "fill-sky-500 stroke-transparent";
-const controlPointDefaultClasses = "fill-zinc-500 stroke-transparent";
-const cursorPointerClasses = "cursor-pointer";
-const cursorDefaultClasses = "cursor-default";
-
-const targetPointSelectedClasses = "fill-sky-500 stroke-white/75";
-const targetPointDefaultClasses = "fill-orange-400 stroke-transparent";
-const targetPointInteractiveClasses = "cursor-pointer transition-all";
 
 function getControlLinesClasses(darkCanvas: boolean): string {
     return darkCanvas ? controlLinesDarkClasses : controlLinesLightClasses;
@@ -220,3 +202,15 @@ function getTargetPointClasses(selected: boolean, movable: boolean): string {
         movable ? targetPointInteractiveClasses : cursorDefaultClasses,
     );
 }
+
+const controlLinesDarkClasses = "stroke-zinc-400/60";
+const controlLinesLightClasses = "stroke-zinc-700/60";
+
+const controlPointSelectedClasses = "fill-sky-500 stroke-transparent";
+const controlPointDefaultClasses = "fill-zinc-500 stroke-transparent";
+const cursorPointerClasses = "cursor-pointer";
+const cursorDefaultClasses = "cursor-default";
+
+const targetPointSelectedClasses = "fill-sky-500 stroke-white/75";
+const targetPointDefaultClasses = "fill-orange-400 stroke-transparent";
+const targetPointInteractiveClasses = "cursor-pointer transition-all";
