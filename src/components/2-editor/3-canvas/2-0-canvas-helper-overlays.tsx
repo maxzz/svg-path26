@@ -2,6 +2,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
 import { appSettings } from "@/store/0-ui-settings";
+import { type SvgCanvasLine, type SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { canvasStrokeWidthAtom, canvasUnitsPerPixelAtom, hoveredSegmentStrokeWidthAtom, selectedSegmentStrokeWidthAtom } from "./5-canvas-viewport-metrics";
 import { doFocusPointCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, hoveredStandaloneSegmentPathAtom, selectedCommandIndexAtom, selectedStandaloneSegmentPathAtom } from "@/store/0-atoms/2-2-editor-actions";
@@ -13,59 +14,66 @@ import { PathCanvasImageEditOverlays } from "./4-canvas-image-edit-overlays";
 export function CanvasHelperOverlays() {
     const { showHelpers } = useSnapshot(appSettings);
     const { canvasPreview: preview } = useSnapshot(appSettings.pathEditor);
+
     const imageEditMode = useAtomValue(isImageEditModeAtom);
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
 
     return (<>
         <CanvasPathOverlays />
-        {!preview && !imageEditMode && showHelpers && (
-            <>
-                <CanvasControlLines unitsPerPixel={unitsPerPixel} />
-                <CanvasControlPoints unitsPerPixel={unitsPerPixel} />
-                <CanvasTargetPoints unitsPerPixel={unitsPerPixel} />
-            </>
-        )}
+
+        {!preview && !imageEditMode && showHelpers && (<>
+            <CanvasControlLines unitsPerPixel={unitsPerPixel} />
+            <CanvasControlPoints unitsPerPixel={unitsPerPixel} />
+            <CanvasTargetPoints unitsPerPixel={unitsPerPixel} />
+        </>)}
+
         <PathCanvasImageEditOverlays />
     </>);
 }
 
 function CanvasPathOverlays() {
     const { darkCanvas } = useSnapshot(appSettings);
-    const { canvasPreview: preview, fillPreview } = useSnapshot(appSettings.pathEditor);
+    const { canvasPreview, fillPreview } = useSnapshot(appSettings.pathEditor);
+
     const pathValue = useAtomValue(svgPathInputAtom);
     const parseError = useAtomValue(parseErrorAtom);
     const canvasStrokeWidth = useAtomValue(canvasStrokeWidthAtom);
+
     const hoveredSegmentPath = useAtomValue(hoveredStandaloneSegmentPathAtom);
     const selectedSegmentPath = useAtomValue(selectedStandaloneSegmentPathAtom);
+
     const hoveredSegmentStrokeWidth = useAtomValue(hoveredSegmentStrokeWidthAtom);
     const selectedSegmentStrokeWidth = useAtomValue(selectedSegmentStrokeWidthAtom);
 
     return (<>
+        {/* Path */}
         <path
-            className={getCanvasPathClasses(preview, fillPreview, darkCanvas)}
-            d={parseError ? "M 0 0" : (pathValue || "M 0 0")}
+            className={getCanvasPathClasses(canvasPreview, fillPreview, darkCanvas)}
             strokeWidth={canvasStrokeWidth}
             strokeLinecap="round"
             strokeLinejoin="round"
+            d={parseError ? "M 0 0" : (pathValue || "M 0 0")}
         />
 
-        {!preview && hoveredSegmentPath && (
+        {/* Hovered segment */}
+        {!canvasPreview && hoveredSegmentPath && (
             <path
-                className={segmentHoveredClasses}
-                d={hoveredSegmentPath}
+                className={"fill-none stroke-red-400"}
                 strokeWidth={hoveredSegmentStrokeWidth}
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                d={hoveredSegmentPath}
             />
         )}
 
-        {!preview && selectedSegmentPath && (
+        {/* Selected segment */}
+        {!canvasPreview && selectedSegmentPath && (
             <path
-                className={segmentSelectedClasses}
-                d={selectedSegmentPath}
+                className={"fill-none stroke-sky-500"}
                 strokeWidth={selectedSegmentStrokeWidth}
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                d={selectedSegmentPath}
             />
         )}
     </>);
@@ -78,15 +86,15 @@ function CanvasControlLines({ unitsPerPixel }: { unitsPerPixel: number; }) {
     const controlLinesClasses = getControlLinesClasses(darkCanvas);
 
     return controlLines.map(
-        (line, index) => (
+        (line: SvgCanvasLine, index: number) => (
             <line
-                key={`line:${index}`}
+                className={controlLinesClasses}
+                strokeWidth={strokeWidth}
                 x1={line.from.x}
                 y1={line.from.y}
                 x2={line.to.x}
                 y2={line.to.y}
-                className={controlLinesClasses}
-                strokeWidth={strokeWidth}
+                key={`line:${index}`}
             />
         )
     );
@@ -102,14 +110,13 @@ function CanvasControlPoints({ unitsPerPixel }: { unitsPerPixel: number; }) {
     const startPointDrag = useSetAtom(startPointDragAtom);
 
     return controlPoints.map(
-        (point) => (
+        (point: SvgCanvasPoint) => (
             <circle
-                key={point.id}
+                className={getControlPointClasses(point.segmentIndex === selectedCommandIndex, point.movable)}
+                strokeWidth={unitsPerPixel * (point.movable ? 12 : 4)}
                 cx={point.x}
                 cy={point.y}
                 r={unitsPerPixel * (point.movable ? 3 : 2.5)}
-                strokeWidth={unitsPerPixel * (point.movable ? 12 : 4)}
-                className={getControlPointClasses(point.segmentIndex === selectedCommandIndex, point.movable)}
                 onPointerDown={(event) => {
                     if (!point.movable) return;
                     event.stopPropagation();
@@ -117,14 +124,9 @@ function CanvasControlPoints({ unitsPerPixel }: { unitsPerPixel: number; }) {
                     setSelectedCommandIndex(point.segmentIndex);
                     startPointDrag({ point, pointerId: event.pointerId, startPath: pathValue });
                 }}
-                onMouseEnter={() => {
-                    setHoveredCommandIndex(point.segmentIndex);
-                    setHoveredCanvasPoint(point);
-                }}
-                onMouseLeave={() => {
-                    setHoveredCommandIndex(null);
-                    setHoveredCanvasPoint(null);
-                }}
+                onMouseEnter={() => { setHoveredCommandIndex(point.segmentIndex); setHoveredCanvasPoint(point); }}
+                onMouseLeave={() => { setHoveredCommandIndex(null); setHoveredCanvasPoint(null); }}
+                key={point.id}
             />
         )
     );
@@ -140,47 +142,38 @@ function CanvasTargetPoints({ unitsPerPixel }: { unitsPerPixel: number; }) {
     const startPointDrag = useSetAtom(startPointDragAtom);
 
     return targetPoints.map(
-        (point) => (
+        (point: SvgCanvasPoint) => (
             <circle
-                key={point.id}
+                className={getTargetPointClasses(point.segmentIndex === selectedCommandIndex, point.movable)}
+                strokeWidth={unitsPerPixel * (point.movable ? 12 : 0)}
                 cx={point.x}
                 cy={point.y}
                 r={unitsPerPixel * (point.segmentIndex === selectedCommandIndex ? 3.35 : 3)}
-                strokeWidth={unitsPerPixel * (point.movable ? 12 : 0)}
-                className={getTargetPointClasses(point.segmentIndex === selectedCommandIndex, point.movable)}
-                onPointerDown={(event) => {
-                    event.stopPropagation();
-                    setFocusPointCommand(point);
-                    setSelectedCommandIndex(point.segmentIndex);
-                    if (!point.movable) return;
-                    startPointDrag({ point, pointerId: event.pointerId, startPath: pathValue });
-                }}
-                onMouseEnter={() => {
-                    setHoveredCommandIndex(point.segmentIndex);
-                    setHoveredCanvasPoint(point);
-                }}
-                onMouseLeave={() => {
-                    setHoveredCommandIndex(null);
-                    setHoveredCanvasPoint(null);
-                }}
+                onPointerDown={
+                    (event) => {
+                        event.stopPropagation();
+                        setFocusPointCommand(point);
+                        setSelectedCommandIndex(point.segmentIndex);
+                        if (!point.movable) return;
+                        startPointDrag({ point, pointerId: event.pointerId, startPath: pathValue });
+                    }
+                }
+                onMouseEnter={() => { setHoveredCommandIndex(point.segmentIndex); setHoveredCanvasPoint(point); }}
+                onMouseLeave={() => { setHoveredCommandIndex(null); setHoveredCanvasPoint(null); }}
+                key={point.id}
             />
         )
     );
 }
 
-// Canvas Helper Overlays
+// Classes functions
 
-function getCanvasPathClasses(preview: boolean, fillPreview: boolean, darkCanvas: boolean): string {
+function getCanvasPathClasses(canvasPreview: boolean, fillPreview: boolean, darkCanvas: boolean): string {
     return classNames(
-        !fillPreview ? "fill-none" : (preview ? "fill-black/20" : "fill-blue-500/25"),
-        preview ? "stroke-black" : (darkCanvas ? "stroke-slate-200" : "stroke-blue-700")
+        !fillPreview ? "fill-none" : (canvasPreview ? "fill-black/20" : "fill-blue-500/25"),
+        canvasPreview ? "stroke-black" : (darkCanvas ? "stroke-slate-200" : "stroke-blue-700")
     );
 }
-
-const segmentHoveredClasses = "fill-none stroke-red-400";
-const segmentSelectedClasses = "fill-none stroke-sky-500";
-
-// Canvas Helper Overlays
 
 function getControlLinesClasses(darkCanvas: boolean): string {
     return darkCanvas ? "stroke-zinc-400/60" : "stroke-zinc-700/60";
