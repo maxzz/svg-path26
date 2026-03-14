@@ -8,6 +8,7 @@ import { doFocusPointCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAto
 import { controlLinesAtom, controlPointsAtom, parseErrorAtom, targetPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { startPointDragAtom } from "./3-canvas-drag";
+import { PathCanvasImageEditOverlays } from "./4-canvas-image-edit-overlays";
 
 export function CanvasHelperOverlays() {
     const { showHelpers } = useSnapshot(appSettings);
@@ -15,16 +16,20 @@ export function CanvasHelperOverlays() {
     const imageEditMode = useAtomValue(isImageEditModeAtom);
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
 
-    if (preview || imageEditMode || !showHelpers) return null;
-
     return (<>
-        <CanvasControlLines unitsPerPixel={unitsPerPixel} />
-        <CanvasControlPoints unitsPerPixel={unitsPerPixel} />
-        <CanvasTargetPoints unitsPerPixel={unitsPerPixel} />
+        <CanvasPathOverlays />
+        {!preview && !imageEditMode && showHelpers && (
+            <>
+                <CanvasControlLines unitsPerPixel={unitsPerPixel} />
+                <CanvasControlPoints unitsPerPixel={unitsPerPixel} />
+                <CanvasTargetPoints unitsPerPixel={unitsPerPixel} />
+            </>
+        )}
+        <PathCanvasImageEditOverlays />
     </>);
 }
 
-export function CanvasPathOverlays() {
+function CanvasPathOverlays() {
     const { darkCanvas } = useSnapshot(appSettings);
     const { canvasPreview: preview, fillPreview } = useSnapshot(appSettings.pathEditor);
     const pathValue = useAtomValue(svgPathInputAtom);

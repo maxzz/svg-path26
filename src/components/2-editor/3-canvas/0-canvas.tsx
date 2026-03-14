@@ -3,9 +3,9 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
 import { CanvasGrid } from "./1-canvas-grid";
-import { CanvasHelperOverlays, CanvasPathOverlays } from "./2-0-canvas-helper-overlays";
+import { CanvasHelperOverlays } from "./2-0-canvas-helper-overlays";
 import { canvasDragStateAtom, eventToSvgPoint, useCanvasDragAndDrop } from "./3-canvas-drag";
-import { PathCanvasImageEditOverlays, PathCanvasImages } from "./4-canvas-image-edit-overlays";
+import { PathCanvasImages } from "./4-canvas-image-edit-overlays";
 import { canvasSvgElementAtom, useSyncCanvasViewportSize } from "./5-canvas-viewport-metrics";
 import { appSettings } from "@/store/0-ui-settings";
 import { hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-2-editor-actions";
@@ -75,15 +75,11 @@ export function PathCanvas() {
                     }
                 }}
             >
-                {!preview && <CanvasGrid />}
-
                 <PathCanvasImages />
 
-                <CanvasPathOverlays />
+                {!preview && <CanvasGrid />}
 
                 <CanvasHelperOverlays />
-
-                <PathCanvasImageEditOverlays />
             </svg>
 
             {parseError && (
