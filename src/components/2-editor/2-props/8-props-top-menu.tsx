@@ -3,10 +3,6 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { IconRadix_DotsHorizontal } from "@/components/ui/icons/normal";
 import { Button } from "@/components/ui/shadcn/button";
-import { AddImageDialog } from "../../4-dialogs/8-2-add-image-dialog";
-import { ExportSvgDialog } from "../../4-dialogs/8-1-export-svg-dialog";
-import { SavePathDialog } from "../../4-dialogs/8-3-save-path-dialog";
-import { OpenPathDialog } from "../../4-dialogs/8-4-open-path-dialog";
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -113,12 +109,6 @@ export function CanvasActionsMenu() {
             </DropdownMenuContent>
         </DropdownMenu>
 
-        <SavePathDialog />
-        <OpenPathDialog />
-
-        <ExportSvgDialog />
-
-        <AddImageDialog />
     </>);
 }
 

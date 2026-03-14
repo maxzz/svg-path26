@@ -2,17 +2,26 @@ import { UISymbolDefs } from "../ui/icons/symbols";
 import { Toolbar } from "../1-toolbar/1-toolbar";
 import { Editor } from "../2-editor/0-all";
 import { Footer } from "../3-footer/1-footer";
+import { SavePathDialog } from "../4-dialogs/8-3-save-path-dialog";
+import { OpenPathDialog } from "../4-dialogs/8-4-open-path-dialog";
+import { ExportSvgDialog } from "../4-dialogs/8-1-export-svg-dialog";
+import { AddImageDialog } from "../4-dialogs/8-2-add-image-dialog";
 
 export function App() {
     return (<>
         <UISymbolDefs />
-        
+
         <div className="h-screen w-screen text-foreground bg-background overflow-hidden">
             <div className="h-full flex flex-col">
                 <Toolbar />
                 <Editor />
                 <Footer />
             </div>
+
+            <SavePathDialog />
+            <OpenPathDialog />
+            <ExportSvgDialog />
+            <AddImageDialog />
         </div>
     </>);
 }
