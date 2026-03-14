@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { TransformPanel } from "./1-transform-panel";
-import { CommandSelectionSection } from "./2-0-command-selection";
+import { CommandSelectionSection } from "./2-0-commands-list";
 import { ImagesPanel } from "./3-images-panel";
 import { doHandleEditorKeyDownAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { commandCountAtom, parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
