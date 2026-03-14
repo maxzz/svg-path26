@@ -54,17 +54,14 @@ export function PathCanvas() {
 
     useSyncCanvasViewportSize();
 
-    useEffect(() => {
-        fitViewBox();
-    }, [fitViewBox, pathValue]);
+    useEffect(
+        () => {
+            fitViewBox();
+        },
+        [fitViewBox, pathValue]);
 
     return (
-        <div
-            className={classNames(
-                "relative mx-auto aspect-4/3 w-full overflow-hidden rounded-xl border",
-                preview ? "bg-white" : (darkCanvas ? "bg-zinc-900" : "bg-white"),
-            )}
-        >
+        <div className={classNames("relative mx-auto aspect-4/3 w-full overflow-hidden rounded-xl border", preview ? "bg-white" : (darkCanvas ? "bg-zinc-900" : "bg-white"))}>
             <svg
                 ref={(node) => setCanvasSvgElement(node)}
                 viewBox={viewBox.join(" ")}
@@ -98,8 +95,8 @@ export function PathCanvas() {
                 {!preview && <CanvasGrid />}
 
                 <path
-                    d={parseError ? "M 0 0" : (pathValue || "M 0 0")}
                     className={classNames(getCanvasPathFillClasses(preview, fillPreview), getCanvasPathStrokeClasses(preview, darkCanvas))}
+                    d={parseError ? "M 0 0" : (pathValue || "M 0 0")}
                     strokeWidth={canvasStrokeWidth}
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -107,8 +104,8 @@ export function PathCanvas() {
 
                 {!preview && hoveredSegmentPath && (
                     <path
-                        d={hoveredSegmentPath}
                         className={hoveredSegmentPathClasses}
+                        d={hoveredSegmentPath}
                         strokeWidth={hoveredSegmentStrokeWidth}
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -117,8 +114,8 @@ export function PathCanvas() {
 
                 {!preview && selectedSegmentPath && (
                     <path
-                        d={selectedSegmentPath}
                         className={selectedSegmentPathClasses}
+                        d={selectedSegmentPath}
                         strokeWidth={selectedSegmentStrokeWidth}
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -141,16 +138,6 @@ export function PathCanvas() {
     );
 }
 
-const canvasPathPreviewFillClasses = "fill-black/20";
-const canvasPathEditorFillClasses = "fill-blue-500/25";
-const canvasPathNoFillClasses = "fill-none";
-const canvasPathPreviewStrokeClasses = "stroke-black";
-const canvasPathDarkStrokeClasses = "stroke-slate-200";
-const canvasPathLightStrokeClasses = "stroke-blue-700";
-
-const hoveredSegmentPathClasses = "fill-none stroke-red-400";
-const selectedSegmentPathClasses = "fill-none stroke-sky-500";
-
 function getCanvasPathFillClasses(preview: boolean, fillPreview: boolean): string {
     if (!fillPreview) return canvasPathNoFillClasses;
     return preview ? canvasPathPreviewFillClasses : canvasPathEditorFillClasses;
@@ -160,3 +147,13 @@ function getCanvasPathStrokeClasses(preview: boolean, darkCanvas: boolean): stri
     if (preview) return canvasPathPreviewStrokeClasses;
     return darkCanvas ? canvasPathDarkStrokeClasses : canvasPathLightStrokeClasses;
 }
+
+const canvasPathPreviewFillClasses = "fill-black/20";
+const canvasPathEditorFillClasses = "fill-blue-500/25";
+const canvasPathNoFillClasses = "fill-none";
+const canvasPathPreviewStrokeClasses = "stroke-black";
+const canvasPathDarkStrokeClasses = "stroke-slate-200";
+const canvasPathLightStrokeClasses = "stroke-blue-700";
+
+const hoveredSegmentPathClasses = "fill-none stroke-red-400";
+const selectedSegmentPathClasses = "fill-none stroke-sky-500";
