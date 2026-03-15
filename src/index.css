@@ -4,7 +4,22 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+    font-family: "Yanone";
+    src: url("./assets/fonts/YanoneKaffeesatz-VariableFont_wght.ttf") format("truetype supports variations"),
+        url("./assets/fonts/YanoneKaffeesatz-VariableFont_wght.ttf") format("truetype-variations");
+    font-weight: 200 700;
+}
+
+@font-face {
+    font-family: "RobotoThin";
+    src: url("./assets/fonts/RobotoMono-Thin.ttf");
+    font-weight: 400;
+}
+
 @theme inline {
+    --font-ui: "Yanone", sans-serif;
+    --font-numbers: "RobotoThin", monospace;
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);
     --radius-lg: var(--radius);
