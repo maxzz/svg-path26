@@ -73,7 +73,7 @@ export function CommandsList() {
                             key={row.index}
                             ref={(element) => { rowRefs.current[row.index] = element; }}
                             className={cn(
-                                "flex items-center gap-1 rounded border px-1.5 py-0.5 transition-colors",
+                                "px-1.5 py-0.5 rounded border flex items-center gap-1 transition-colors",
                                 selectedCommandIndex === row.index
                                     ? "border-sky-500/50 bg-sky-500/10"
                                     : (hoveredCommandIndex === row.index || isCanvasPointFocused)
@@ -93,7 +93,7 @@ export function CommandsList() {
                                     <button
                                         type="button"
                                         className={cn(
-                                            "w-5 h-5 shrink-0 rounded-l-[0.2rem] text-center text-xs leading-3 font-semibold cursor-pointer transition-colors",
+                                            "w-5 h-5 shrink-0 text-xs leading-3 text-center font-semibold rounded-l-[0.2rem] cursor-pointer transition-colors",
                                             row.command === row.command.toLowerCase() ? "bg-muted-foreground/20 text-violet-500" : "bg-muted-foreground/30 text-orange-500",
                                             highlightCommandCell && "bg-sky-500/15 ring-1 ring-sky-500/50"
                                         )}
@@ -111,7 +111,7 @@ export function CommandsList() {
                                 </TooltipContent>
                             </Tooltip>
 
-                            <div className="flex flex-wrap items-center gap-0.5 min-w-0 font-numbers">
+                            <div className="min-w-0 font-mono text-right flex items-center flex-wrap gap-0.5">
                                 {row.values.length === 0 && (
                                     <span className="text-[10px] text-muted-foreground">No values</span>
                                 )}
