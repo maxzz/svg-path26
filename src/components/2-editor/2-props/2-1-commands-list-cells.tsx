@@ -163,7 +163,7 @@ function CommandFlagInput(props: CommandProps & { tooltip?: string; }) {
 
 function getCommandValueInputClassName(highlighted?: boolean) {
     return cn(
-        "h-6 w-14 rounded px-1.5 text-center text-[11px] transition-colors",
+        "h-5 w-[2.4rem] flex-1 rounded px-px text-center text-[10px] tracking-tighter transition-colors",
         highlighted
             ? "border border-sky-500/60 bg-sky-500/10"
             : "border bg-background"
@@ -172,7 +172,7 @@ function getCommandValueInputClassName(highlighted?: boolean) {
 
 function getCommandFlagInputClassName(highlighted?: boolean) {
     return cn(
-        "inline-flex items-center gap-1 rounded px-1 py-0.5 text-[10px] transition-colors",
+        "inline-flex items-center gap-0.5 rounded px-0.5 h-5 text-[10px] transition-colors",
         highlighted ? "border border-sky-500/60 bg-sky-500/10" : "border bg-background"
     );
 }

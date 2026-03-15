@@ -13,7 +13,7 @@ export function CommandsListPanel() {
     return (
         <section className="rounded-lg border p-3 font-ui">
             <h2 className="mb-2 text-xs font-semibold">
-                Commands
+                Path Commands
             </h2>
             <div className="p-2 max-h-64 text-xs font-ui border bg-muted/20 rounded space-y-1 overflow-auto">
                 <CommandsList />
@@ -73,7 +73,7 @@ export function CommandsList() {
                             key={row.index}
                             ref={(element) => { rowRefs.current[row.index] = element; }}
                             className={cn(
-                                "flex items-center gap-2 rounded border px-2 py-1.5 transition-colors",
+                                "flex items-center gap-1 rounded border px-1.5 py-0.5 transition-colors",
                                 selectedCommandIndex === row.index
                                     ? "border-sky-500/50 bg-sky-500/10"
                                     : (hoveredCommandIndex === row.index || isCanvasPointFocused)
@@ -84,17 +84,17 @@ export function CommandsList() {
                             onMouseEnter={() => setHoveredCommandIndex(row.index)}
                             onMouseLeave={() => setHoveredCommandIndex(null)}
                         >
-                            <span className="w-6 shrink-0 text-[10px] text-muted-foreground">
+                            {/* <span className="w-6 shrink-0 text-[10px] text-muted-foreground">
                                 {String(row.index + 1).padStart(2, "0")}.
-                            </span>
+                            </span> */}
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <button
                                         type="button"
                                         className={cn(
-                                            "w-4 shrink-0 rounded-sm text-center text-sm font-semibold cursor-pointer transition-colors",
-                                            row.command === row.command.toLowerCase() ? "text-violet-500" : "text-orange-500",
+                                            "w-5 h-5 shrink-0 rounded-l-[0.2rem] text-center text-xs leading-3 font-semibold cursor-pointer transition-colors",
+                                            row.command === row.command.toLowerCase() ? "bg-muted-foreground/20 text-violet-500" : "bg-muted-foreground/30 text-orange-500",
                                             highlightCommandCell && "bg-sky-500/15 ring-1 ring-sky-500/50"
                                         )}
                                         onClick={(event) => {
@@ -111,7 +111,7 @@ export function CommandsList() {
                                 </TooltipContent>
                             </Tooltip>
 
-                            <div className="flex flex-wrap items-center gap-1.5 min-w-0">
+                            <div className="flex flex-wrap items-center gap-0.5 min-w-0 font-numbers">
                                 {row.values.length === 0 && (
                                     <span className="text-[10px] text-muted-foreground">No values</span>
                                 )}
