@@ -4,63 +4,44 @@ import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
 import { appSettings } from "@/store/0-ui-settings";
 import { Button } from "@/components/ui/shadcn/button";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/shadcn/accordion";
+import { SectionPanel } from "./0-section-panel";
 import { doApplyScaleAtom, doApplyTranslateAtom, scaleXAtom, scaleYAtom, translateXAtom, translateYAtom } from "@/store/0-atoms/2-2-editor-actions";
 
 export function TransformPanel() {
-    const { transformAccordionOpen } = useSnapshot(appSettings);
     const { decimals } = useSnapshot(appSettings.pathEditor);
 
     const applyScale = useSetAtom(doApplyScaleAtom);
     const applyTranslate = useSetAtom(doApplyTranslateAtom);
 
     return (
-        <section className="rounded-lg border px-3">
-            <Accordion
-                type="single"
-                collapsible
-                value={transformAccordionOpen ? "transform" : ""}
-                onValueChange={(value) => {
-                    appSettings.transformAccordionOpen = value === "transform";
-                }}
-            >
-                <AccordionItem value="transform" className="border-none">
-                    <AccordionTrigger className="py-2.5 text-xs font-semibold hover:no-underline">
-                        Transform
-                    </AccordionTrigger>
+        <SectionPanel sectionKey="transform" label="Transform">
+            <div className="grid grid-cols-2 gap-2 text-xs">
+                <TransformNumberField label="Scale X" valueAtom={scaleXAtom} step={0.1} />
+                <TransformNumberField label="Scale Y" valueAtom={scaleYAtom} step={0.1} />
+                <TransformNumberField label="Translate X" valueAtom={translateXAtom} step={1} />
+                <TransformNumberField label="Translate Y" valueAtom={translateYAtom} step={1} />
+                <TransformSettingsNumberField
+                    label="Precision (decimals)"
+                    value={decimals}
+                    wrapperClassName="col-span-2"
+                    min={0}
+                    max={8}
+                    step={1}
+                    onValueChange={(nextValue) => {
+                        appSettings.pathEditor.decimals = nextValue;
+                    }}
+                />
+            </div>
 
-                    <AccordionContent>
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                            <TransformNumberField label="Scale X" valueAtom={scaleXAtom} step={0.1} />
-                            <TransformNumberField label="Scale Y" valueAtom={scaleYAtom} step={0.1} />
-                            <TransformNumberField label="Translate X" valueAtom={translateXAtom} step={1} />
-                            <TransformNumberField label="Translate Y" valueAtom={translateYAtom} step={1} />
-                            <TransformSettingsNumberField
-                                label="Precision (decimals)"
-                                value={decimals}
-                                wrapperClassName="col-span-2"
-                                min={0}
-                                max={8}
-                                step={1}
-                                onValueChange={(nextValue) => {
-                                    appSettings.pathEditor.decimals = nextValue;
-                                }}
-                            />
-                        </div>
-
-                        <div className="mt-3 flex flex-wrap gap-2">
-                            <Button variant="outline" className="h-7 px-2.5" onClick={() => applyScale()}>
-                                Apply Scale
-                            </Button>
-                            <Button variant="outline" className="h-7 px-2.5" onClick={() => applyTranslate()}>
-                                Apply Translate
-                            </Button>
-                        </div>
-
-                    </AccordionContent>
-                </AccordionItem>
-            </Accordion>
-        </section>
+            <div className="mt-3 flex flex-wrap gap-2">
+                <Button variant="outline" className="h-7 px-2.5" onClick={() => applyScale()}>
+                    Apply Scale
+                </Button>
+                <Button variant="outline" className="h-7 px-2.5" onClick={() => applyTranslate()}>
+                    Apply Translate
+                </Button>
+            </div>
+        </SectionPanel>
     );
 }
 
