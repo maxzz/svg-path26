@@ -13,25 +13,30 @@ import { PathCanvasImageEditOverlays } from "./4-canvas-image-edit-overlays";
 
 export function CanvasHelperOverlays() {
     const { showHelpers } = useSnapshot(appSettings);
-    const { canvasPreview: preview } = useSnapshot(appSettings.pathEditor);
+    const { canvasPreview } = useSnapshot(appSettings.pathEditor);
 
     const imageEditMode = useAtomValue(isImageEditModeAtom);
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
 
     return (<>
-        <CanvasPathOverlays />
+        <CanvasMainPathOverlay />
 
-        {!preview && !imageEditMode && showHelpers && (<>
-            <CanvasControlLines unitsPerPixel={unitsPerPixel} />
-            <CanvasControlPoints unitsPerPixel={unitsPerPixel} />
-            <CanvasTargetPoints unitsPerPixel={unitsPerPixel} />
+        {!canvasPreview && (<>
+            <CanvasHoveredSegmentOverlay />
+            <CanvasSelectedSegmentOverlay />
+
+            {!imageEditMode && showHelpers && (<>
+                <CanvasControlLines unitsPerPixel={unitsPerPixel} />
+                <CanvasControlPoints unitsPerPixel={unitsPerPixel} />
+                <CanvasTargetPoints unitsPerPixel={unitsPerPixel} />
+            </>)}
         </>)}
 
         <PathCanvasImageEditOverlays />
     </>);
 }
 
-function CanvasPathOverlays() {
+function CanvasMainPathOverlay() {
     const { darkCanvas } = useSnapshot(appSettings);
     const { canvasPreview, fillPreview } = useSnapshot(appSettings.pathEditor);
 
@@ -39,14 +44,7 @@ function CanvasPathOverlays() {
     const parseError = useAtomValue(parseErrorAtom);
     const canvasStrokeWidth = useAtomValue(canvasStrokeWidthAtom);
 
-    const hoveredSegmentPath = useAtomValue(hoveredStandaloneSegmentPathAtom);
-    const selectedSegmentPath = useAtomValue(selectedStandaloneSegmentPathAtom);
-
-    const hoveredSegmentStrokeWidth = useAtomValue(hoveredSegmentStrokeWidthAtom);
-    const selectedSegmentStrokeWidth = useAtomValue(selectedSegmentStrokeWidthAtom);
-
-    return (<>
-        {/* Path */}
+    return (
         <path
             className={getCanvasPathClasses(canvasPreview, fillPreview, darkCanvas)}
             strokeWidth={canvasStrokeWidth}
@@ -54,29 +52,39 @@ function CanvasPathOverlays() {
             strokeLinejoin="round"
             d={parseError ? "M 0 0" : (pathValue || "M 0 0")}
         />
+    );
+}
 
-        {/* Hovered segment */}
-        {!canvasPreview && hoveredSegmentPath && (
-            <path
-                className={"fill-none stroke-red-400"}
-                strokeWidth={hoveredSegmentStrokeWidth}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d={hoveredSegmentPath}
-            />
-        )}
+function CanvasHoveredSegmentOverlay() {
+    const hoveredSegmentPath = useAtomValue(hoveredStandaloneSegmentPathAtom);
+    const hoveredSegmentStrokeWidth = useAtomValue(hoveredSegmentStrokeWidthAtom);
+    if (!hoveredSegmentPath) return null;
 
-        {/* Selected segment */}
-        {!canvasPreview && selectedSegmentPath && (
-            <path
-                className={"fill-none stroke-sky-500"}
-                strokeWidth={selectedSegmentStrokeWidth}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d={selectedSegmentPath}
-            />
-        )}
-    </>);
+    return (
+        <path
+            className="fill-none stroke-red-400"
+            strokeWidth={hoveredSegmentStrokeWidth}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d={hoveredSegmentPath}
+        />
+    );
+}
+
+function CanvasSelectedSegmentOverlay() {
+    const selectedSegmentPath = useAtomValue(selectedStandaloneSegmentPathAtom);
+    const selectedSegmentStrokeWidth = useAtomValue(selectedSegmentStrokeWidthAtom);
+    if (!selectedSegmentPath) return null;
+
+    return (
+        <path
+            className="fill-none stroke-sky-500"
+            strokeWidth={selectedSegmentStrokeWidth}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d={selectedSegmentPath}
+        />
+    );
 }
 
 function CanvasControlLines({ unitsPerPixel }: { unitsPerPixel: number; }) {
