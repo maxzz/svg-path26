@@ -26,7 +26,7 @@ function pickUiSettings(source: Record<string, unknown>): Partial<Omit<UiSetting
     if (typeof source.showGrid === "boolean") next.showGrid = source.showGrid;
     if (typeof source.showHelpers === "boolean") next.showHelpers = source.showHelpers;
     if (typeof source.darkCanvas === "boolean") next.darkCanvas = source.darkCanvas;
-    if (typeof source.transformAccordionOpen === "boolean") next.transformAccordionOpen = source.transformAccordionOpen;
+    if (isRecord(source.sections) && Object.values(source.sections).every((v) => typeof v === "boolean")) next.sections = source.sections as Record<string, boolean>;
     if (isNumberArray(source.editorPanelSizes)) next.editorPanelSizes = source.editorPanelSizes;
 
     return next;

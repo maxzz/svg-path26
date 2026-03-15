@@ -34,7 +34,7 @@ export interface UiSettings {
     showGrid: boolean;
     showHelpers: boolean;
     darkCanvas: boolean;
-    transformAccordionOpen: boolean;
+    sections: Record<string, boolean>;
     editorPanelSizes: number[];
     pathEditor: PathEditorSettings;
 }
@@ -66,7 +66,7 @@ export const DEFAULT_SETTINGS: UiSettings = {
     showGrid: true,
     showHelpers: true,
     darkCanvas: false,
-    transformAccordionOpen: true,
+    sections: { transform: true },
     editorPanelSizes: [33, 67],
     pathEditor: DEFAULT_PATH_EDITOR_SETTINGS,
 };
