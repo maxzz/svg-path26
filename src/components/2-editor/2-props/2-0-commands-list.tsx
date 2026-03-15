@@ -11,11 +11,11 @@ import { CommandCellInput, type CommandProps } from "./2-1-commands-list-cells.t
 
 export function CommandsListPanel() {
     return (
-        <section className="rounded-lg border p-3">
+        <section className="rounded-lg border p-3 font-ui">
             <h2 className="mb-2 text-xs font-semibold">
                 Commands
             </h2>
-            <div className="p-2 max-h-64 text-xs font-mono border bg-muted/20 rounded space-y-1 overflow-auto">
+            <div className="p-2 max-h-64 text-xs font-ui border bg-muted/20 rounded space-y-1 overflow-auto">
                 <CommandsList />
             </div>
         </section>
