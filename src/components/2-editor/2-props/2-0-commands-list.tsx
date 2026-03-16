@@ -13,7 +13,7 @@ import { type CommandProps, CommandCellInput } from "./2-1-commands-list-cells.t
 export function CommandsListPanel() {
     return (
         <SectionPanel sectionKey="commands" label="Path Commands" contentClassName="px-0 pt-0.5 pb-4">
-            <div className="px-1 py-2 max-h-64 text-xs font-ui border bg-muted/20 rounded space-y-1 overflow-auto">
+            <div className="px-1 py-2 max-h-64 text-xs font-ui border bg-muted/20 rounded overflow-auto">
                 <CommandsList />
             </div>
         </SectionPanel>
@@ -69,7 +69,7 @@ export function CommandsList() {
                             key={row.index}
                             ref={(element) => { rowRefs.current[row.index] = element; }}
                             className={cn(
-                                "px-1.5 py-0.5 rounded border flex items-center gap-1 transition-colors",
+                                "px-1.5 border rounded flex items-center gap-1 transition-colors",
                                 selectedCommandIndex === row.index
                                     ? "border-sky-500/50 bg-sky-500/10"
                                     : (hoveredCommandIndex === row.index || isCanvasPointFocused)
