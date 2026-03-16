@@ -1,83 +1,89 @@
-import type { PathEditorSettings, StoredPathSetting, UiSettings } from "./9-ui-settings-types-and-defaults";
+import { z } from "zod";
+import { type PathEditorSettings, type UiSettings } from "./9-ui-settings-types-and-defaults";
 
-export function normalizeStoredSettings(
-    value: unknown,
-    defaultSettings: UiSettings,
-    defaultPathEditorSettings: PathEditorSettings
-): UiSettings {
-    const stored = isRecord(value) ? value : {};
-    const storedPathEditor = isRecord(stored.pathEditor) ? stored.pathEditor : {};
-
-    return {
+export function normalizeStoredSettings(value: unknown, defaultSettings: UiSettings, defaultPathEditorSettings: PathEditorSettings): UiSettings {
+    const fallbackSettings = cloneUiSettings({
         ...defaultSettings,
-        ...pickUiSettings(stored),
+        pathEditor: defaultPathEditorSettings,
+    });
+
+    const pathEditorSchema = createPathEditorSettingsSchema(defaultPathEditorSettings);
+
+    const uiSettingsSchema = z.preprocess(
+        toRecord,
+        z.object({
+            theme: themeModeSchema.catch(defaultSettings.theme),
+            showGrid: z.boolean().catch(defaultSettings.showGrid),
+            showHelpers: z.boolean().catch(defaultSettings.showHelpers),
+            darkCanvas: z.boolean().catch(defaultSettings.darkCanvas),
+            sections: z.record(z.string(), z.boolean()).catch(defaultSettings.sections),
+            editorPanelSizes: z.array(z.number()).catch(defaultSettings.editorPanelSizes),
+            pathEditor: pathEditorSchema.catch(defaultPathEditorSettings),
+        })
+    );
+
+    try {
+        const parseResult = uiSettingsSchema.safeParse(value);
+        if (!parseResult.success) {
+            console.error("Failed to normalize UI settings. Using defaults.", parseResult.error);
+            return fallbackSettings;
+        }
+
+        return cloneUiSettings(parseResult.data);
+    } catch (error) {
+        console.error("Unexpected error while normalizing UI settings. Using defaults.", error);
+        return fallbackSettings;
+    }
+}
+
+function cloneUiSettings(settings: UiSettings): UiSettings {
+    return {
+        ...settings,
+        sections: { ...settings.sections },
+        editorPanelSizes: [...settings.editorPanelSizes],
         pathEditor: {
-            ...defaultPathEditorSettings,
-            ...pickPathEditorSettings(stored),
-            ...pickPathEditorSettings(storedPathEditor),
+            ...settings.pathEditor,
+            storedPaths: settings.pathEditor.storedPaths.map((storedPath) => ({ ...storedPath })),
         },
     };
 }
 
-function pickUiSettings(source: Record<string, unknown>): Partial<Omit<UiSettings, "pathEditor">> {
-    const next: Partial<Omit<UiSettings, "pathEditor">> = {};
-
-    if (isThemeMode(source.theme)) next.theme = source.theme;
-    if (typeof source.showGrid === "boolean") next.showGrid = source.showGrid;
-    if (typeof source.showHelpers === "boolean") next.showHelpers = source.showHelpers;
-    if (typeof source.darkCanvas === "boolean") next.darkCanvas = source.darkCanvas;
-    if (isRecord(source.sections) && Object.values(source.sections).every((v) => typeof v === "boolean")) next.sections = source.sections as Record<string, boolean>;
-    if (isNumberArray(source.editorPanelSizes)) next.editorPanelSizes = source.editorPanelSizes;
-
-    return next;
+function createPathEditorSettingsSchema(defaultSettings: PathEditorSettings) {
+    return z.preprocess(
+        toRecord,
+        z.object({
+            strokeWidth: z.number().catch(defaultSettings.strokeWidth),
+            zoom: z.number().catch(defaultSettings.zoom),
+            decimals: z.number().catch(defaultSettings.decimals),
+            minifyOutput: z.boolean().catch(defaultSettings.minifyOutput),
+            snapToGrid: z.boolean().catch(defaultSettings.snapToGrid),
+            pointPrecision: z.number().catch(defaultSettings.pointPrecision),
+            showTicks: z.boolean().catch(defaultSettings.showTicks),
+            tickInterval: z.number().catch(defaultSettings.tickInterval),
+            fillPreview: z.boolean().catch(defaultSettings.fillPreview),
+            canvasPreview: z.boolean().catch(defaultSettings.canvasPreview),
+            viewPortLocked: z.boolean().catch(defaultSettings.viewPortLocked),
+            pathName: z.string().catch(defaultSettings.pathName),
+            exportFill: z.boolean().catch(defaultSettings.exportFill),
+            exportFillColor: z.string().catch(defaultSettings.exportFillColor),
+            exportStroke: z.boolean().catch(defaultSettings.exportStroke),
+            exportStrokeColor: z.string().catch(defaultSettings.exportStrokeColor),
+            exportStrokeWidth: z.number().catch(defaultSettings.exportStrokeWidth),
+            rawPath: z.string().catch(defaultSettings.rawPath),
+            storedPaths: z.array(storedPathSchema).catch(defaultSettings.storedPaths),
+        })
+    );
 }
 
-function pickPathEditorSettings(stored: Record<string, unknown>): Partial<PathEditorSettings> {
-    const rv: Partial<PathEditorSettings> = {};
-
-    if (typeof stored.strokeWidth === "number") rv.strokeWidth = stored.strokeWidth;
-    if (typeof stored.zoom === "number") rv.zoom = stored.zoom;
-    if (typeof stored.decimals === "number") rv.decimals = stored.decimals;
-    if (typeof stored.minifyOutput === "boolean") rv.minifyOutput = stored.minifyOutput;
-    if (typeof stored.snapToGrid === "boolean") rv.snapToGrid = stored.snapToGrid;
-    if (typeof stored.pointPrecision === "number") rv.pointPrecision = stored.pointPrecision;
-    if (typeof stored.showTicks === "boolean") rv.showTicks = stored.showTicks;
-    if (typeof stored.tickInterval === "number") rv.tickInterval = stored.tickInterval;
-    if (typeof stored.fillPreview === "boolean") rv.fillPreview = stored.fillPreview;
-    if (typeof stored.canvasPreview === "boolean") rv.canvasPreview = stored.canvasPreview;
-    if (typeof stored.viewPortLocked === "boolean") rv.viewPortLocked = stored.viewPortLocked;
-    if (typeof stored.pathName === "string") rv.pathName = stored.pathName;
-    if (typeof stored.exportFill === "boolean") rv.exportFill = stored.exportFill;
-    if (typeof stored.exportFillColor === "string") rv.exportFillColor = stored.exportFillColor;
-    if (typeof stored.exportStroke === "boolean") rv.exportStroke = stored.exportStroke;
-    if (typeof stored.exportStrokeColor === "string") rv.exportStrokeColor = stored.exportStrokeColor;
-    if (typeof stored.exportStrokeWidth === "number") rv.exportStrokeWidth = stored.exportStrokeWidth;
-    if (typeof stored.rawPath === "string") rv.rawPath = stored.rawPath;
-    if (isStoredPathArray(stored.storedPaths)) rv.storedPaths = stored.storedPaths;
-
-    return rv;
+function toRecord(value: unknown): Record<string, unknown> {
+    return typeof value === "object" && value !== null && !Array.isArray(value) ? value as Record<string, unknown> : {};
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
-}
+const themeModeSchema = z.enum(["light", "dark", "system"]);
 
-function isNumberArray(value: unknown): value is number[] {
-    return Array.isArray(value) && value.every((item) => typeof item === "number");
-}
-
-function isStoredPathArray(value: unknown): value is StoredPathSetting[] {
-    return Array.isArray(value) && value.every(isStoredPath);
-}
-
-function isStoredPath(value: unknown): value is StoredPathSetting {
-    return isRecord(value)
-        && typeof value.name === "string"
-        && typeof value.path === "string"
-        && typeof value.createdAt === "number"
-        && typeof value.updatedAt === "number";
-}
-
-function isThemeMode(value: unknown): value is UiSettings["theme"] {
-    return value === "light" || value === "dark" || value === "system";
-}
+const storedPathSchema = z.object({
+    name: z.string(),
+    path: z.string(),
+    createdAt: z.number(),
+    updatedAt: z.number(),
+});

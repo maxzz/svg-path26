@@ -36,6 +36,8 @@ export function CanvasHelperOverlays() {
     </>);
 }
 
+// Main Path Overlay
+
 function CanvasMainPathOverlay() {
     const { darkCanvas } = useSnapshot(appSettings);
     const { canvasPreview, fillPreview } = useSnapshot(appSettings.pathEditor);
@@ -50,10 +52,19 @@ function CanvasMainPathOverlay() {
             strokeWidth={canvasStrokeWidth}
             strokeLinecap="round"
             strokeLinejoin="round"
-            d={parseError ? "M 0 0" : (pathValue || "M 0 0")}
+            d={parseError || !pathValue ? "M 0 0" : pathValue}
         />
     );
 }
+
+function getCanvasPathClasses(canvasPreview: boolean, fillPreview: boolean, darkCanvas: boolean): string {
+    return classNames(
+        !fillPreview ? "fill-none" : (canvasPreview ? "fill-black/20" : "fill-blue-500/25"),
+        canvasPreview ? "stroke-black" : (darkCanvas ? "stroke-slate-200" : "stroke-blue-700")
+    );
+}
+
+// Hovered Segment Overlay
 
 function CanvasHoveredSegmentOverlay() {
     const hoveredSegmentPath = useAtomValue(hoveredStandaloneSegmentPathAtom);
@@ -71,6 +82,8 @@ function CanvasHoveredSegmentOverlay() {
     );
 }
 
+// Selected Segment Overlay
+
 function CanvasSelectedSegmentOverlay() {
     const selectedSegmentPath = useAtomValue(selectedStandaloneSegmentPathAtom);
     const selectedSegmentStrokeWidth = useAtomValue(selectedSegmentStrokeWidthAtom);
@@ -86,6 +99,8 @@ function CanvasSelectedSegmentOverlay() {
         />
     );
 }
+
+// Control Lines Overlay
 
 function CanvasControlLines({ unitsPerPixel }: { unitsPerPixel: number; }) {
     const { darkCanvas } = useSnapshot(appSettings);
@@ -107,6 +122,12 @@ function CanvasControlLines({ unitsPerPixel }: { unitsPerPixel: number; }) {
         )
     );
 }
+
+function getControlLinesClasses(darkCanvas: boolean): string {
+    return darkCanvas ? "stroke-zinc-400/60" : "stroke-zinc-700/60";
+}
+
+// Control Points Overlay
 
 function CanvasControlPoints({ unitsPerPixel }: { unitsPerPixel: number; }) {
     const pathValue = useAtomValue(svgPathInputAtom);
@@ -139,6 +160,15 @@ function CanvasControlPoints({ unitsPerPixel }: { unitsPerPixel: number; }) {
         )
     );
 }
+
+function getControlPointClasses(selected: boolean, movable: boolean): string {
+    return classNames(
+        selected ? "fill-sky-500 stroke-transparent" : "fill-zinc-500 stroke-transparent",
+        movable ? "cursor-pointer" : "cursor-default",
+    );
+}
+
+// Target Points Overlay
 
 function CanvasTargetPoints({ unitsPerPixel }: { unitsPerPixel: number; }) {
     const pathValue = useAtomValue(svgPathInputAtom);
@@ -174,29 +204,11 @@ function CanvasTargetPoints({ unitsPerPixel }: { unitsPerPixel: number; }) {
     );
 }
 
-// Classes functions
-
-function getCanvasPathClasses(canvasPreview: boolean, fillPreview: boolean, darkCanvas: boolean): string {
-    return classNames(
-        !fillPreview ? "fill-none" : (canvasPreview ? "fill-black/20" : "fill-blue-500/25"),
-        canvasPreview ? "stroke-black" : (darkCanvas ? "stroke-slate-200" : "stroke-blue-700")
-    );
-}
-
-function getControlLinesClasses(darkCanvas: boolean): string {
-    return darkCanvas ? "stroke-zinc-400/60" : "stroke-zinc-700/60";
-}
-
-function getControlPointClasses(selected: boolean, movable: boolean): string {
-    return classNames(
-        selected ? "fill-sky-500 stroke-transparent" : "fill-zinc-500 stroke-transparent",
-        movable ? "cursor-pointer" : "cursor-default",
-    );
-}
-
 function getTargetPointClasses(selected: boolean, movable: boolean): string {
     return classNames(
         selected ? "fill-sky-500 stroke-white/75" : "fill-orange-400 stroke-transparent",
         movable ? "cursor-pointer transition-all" : "cursor-default",
     );
 }
+
+//
