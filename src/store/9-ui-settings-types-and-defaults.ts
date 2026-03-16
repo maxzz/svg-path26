@@ -20,13 +20,16 @@ export interface PathEditorSettings {
     canvasPreview: boolean;               // Canvas preview or not (when enabled, the canvas will be previewed)
     viewPortLocked: boolean;              // View port locked or not
     pathName: string;                     // Path name
+    storedPaths: StoredPathSetting[];     // Stored paths
+}
+
+export interface ExportSettings {
     exportFill: boolean;                  // Export fill or not
     exportFillColor: string;              // Export fill color
     exportStroke: boolean;                // Export stroke or not
     exportStrokeColor: string;            // Export stroke color
     exportStrokeWidth: number;            // Export stroke width
     rawPath: string;                      // Raw path
-    storedPaths: StoredPathSetting[];     // Stored paths
 }
 
 export interface UiSettings {
@@ -37,6 +40,7 @@ export interface UiSettings {
     sections: Record<string, boolean>;
     editorPanelSizes: number[];
     pathEditor: PathEditorSettings;
+    export: ExportSettings;
 }
 
 export const DEFAULT_PATH_EDITOR_SETTINGS: PathEditorSettings = {
@@ -52,13 +56,16 @@ export const DEFAULT_PATH_EDITOR_SETTINGS: PathEditorSettings = {
     canvasPreview: false,
     viewPortLocked: false,
     pathName: "",
+    storedPaths: [],
+};
+
+export const DEFAULT_EXPORT_SETTINGS: ExportSettings = {
     exportFill: true,
     exportFillColor: "#000000",
     exportStroke: false,
     exportStrokeColor: "#ff0000",
     exportStrokeWidth: 0.1,
     rawPath: "M 20 140 C 40 20, 65 20, 95 140 S 150 260, 180 140",
-    storedPaths: [],
 };
 
 export const DEFAULT_SETTINGS: UiSettings = {
@@ -69,4 +76,5 @@ export const DEFAULT_SETTINGS: UiSettings = {
     sections: { transform: true },
     editorPanelSizes: [33, 67],
     pathEditor: DEFAULT_PATH_EDITOR_SETTINGS,
+    export: DEFAULT_EXPORT_SETTINGS,
 };

@@ -21,7 +21,7 @@ export const exportViewBoxDraftAtom = atom<ExportViewBoxDraft>({
 export const doResetExportViewBoxDraftAtom = atom(
     null,
     (get, set) => {
-        const { exportStroke, exportStrokeWidth } = appSettings.pathEditor;
+        const { exportStroke, exportStrokeWidth } = appSettings.export;
         const fallback = {
             x: get(viewPortXAtom),
             y: get(viewPortYAtom),

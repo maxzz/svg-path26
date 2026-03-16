@@ -1,13 +1,20 @@
 import { z } from "zod";
-import { type PathEditorSettings, type UiSettings } from "./9-ui-settings-types-and-defaults";
+import { type ExportSettings, type PathEditorSettings, type UiSettings } from "./9-ui-settings-types-and-defaults";
 
-export function normalizeStoredSettings(value: unknown, defaultSettings: UiSettings, defaultPathEditorSettings: PathEditorSettings): UiSettings {
+export function normalizeStoredSettings(
+    value: unknown,
+    defaultSettings: UiSettings,
+    defaultPathEditorSettings: PathEditorSettings,
+    defaultExportSettings: ExportSettings,
+): UiSettings {
     const fallbackSettings = cloneUiSettings({
         ...defaultSettings,
         pathEditor: defaultPathEditorSettings,
+        export: defaultExportSettings,
     });
 
     const pathEditorSchema = createPathEditorSettingsSchema(defaultPathEditorSettings);
+    const exportSettingsSchema = createExportSettingsSchema(defaultExportSettings);
 
     const uiSettingsSchema = z.preprocess(
         toRecord,
@@ -19,11 +26,12 @@ export function normalizeStoredSettings(value: unknown, defaultSettings: UiSetti
             sections: z.record(z.string(), z.boolean()).catch(defaultSettings.sections),
             editorPanelSizes: z.array(z.number()).catch(defaultSettings.editorPanelSizes),
             pathEditor: pathEditorSchema.catch(defaultPathEditorSettings),
+            export: exportSettingsSchema.catch(defaultExportSettings),
         })
     );
 
     try {
-        const parseResult = uiSettingsSchema.safeParse(value);
+        const parseResult = uiSettingsSchema.safeParse(migrateLegacyExportSettings(value, defaultExportSettings));
         if (!parseResult.success) {
             console.error("Failed to normalize UI settings. Using defaults.", parseResult.error);
             return fallbackSettings;
@@ -41,6 +49,7 @@ function cloneUiSettings(settings: UiSettings): UiSettings {
         ...settings,
         sections: { ...settings.sections },
         editorPanelSizes: [...settings.editorPanelSizes],
+        export: { ...settings.export },
         pathEditor: {
             ...settings.pathEditor,
             storedPaths: settings.pathEditor.storedPaths.map((storedPath) => ({ ...storedPath })),
@@ -64,15 +73,50 @@ function createPathEditorSettingsSchema(defaultSettings: PathEditorSettings) {
             canvasPreview: z.boolean().catch(defaultSettings.canvasPreview),
             viewPortLocked: z.boolean().catch(defaultSettings.viewPortLocked),
             pathName: z.string().catch(defaultSettings.pathName),
+            storedPaths: z.array(storedPathSchema).catch(defaultSettings.storedPaths),
+        })
+    );
+}
+
+function createExportSettingsSchema(defaultSettings: ExportSettings) {
+    return z.preprocess(
+        toRecord,
+        z.object({
             exportFill: z.boolean().catch(defaultSettings.exportFill),
             exportFillColor: z.string().catch(defaultSettings.exportFillColor),
             exportStroke: z.boolean().catch(defaultSettings.exportStroke),
             exportStrokeColor: z.string().catch(defaultSettings.exportStrokeColor),
             exportStrokeWidth: z.number().catch(defaultSettings.exportStrokeWidth),
             rawPath: z.string().catch(defaultSettings.rawPath),
-            storedPaths: z.array(storedPathSchema).catch(defaultSettings.storedPaths),
         })
     );
+}
+
+function migrateLegacyExportSettings(value: unknown, defaultSettings: ExportSettings): Record<string, unknown> {
+    const root = toRecord(value);
+    const currentExport = toRecord(root.export);
+    const hasCurrentExportValues = EXPORT_SETTINGS_KEYS.some((key) => Object.prototype.hasOwnProperty.call(currentExport, key));
+    if (hasCurrentExportValues) {
+        return root;
+    }
+
+    const legacyPathEditor = toRecord(root.pathEditor);
+    const hasLegacyExportValues = EXPORT_SETTINGS_KEYS.some((key) => Object.prototype.hasOwnProperty.call(legacyPathEditor, key));
+    if (!hasLegacyExportValues) {
+        return root;
+    }
+
+    return {
+        ...root,
+        export: {
+            exportFill: legacyPathEditor.exportFill ?? defaultSettings.exportFill,
+            exportFillColor: legacyPathEditor.exportFillColor ?? defaultSettings.exportFillColor,
+            exportStroke: legacyPathEditor.exportStroke ?? defaultSettings.exportStroke,
+            exportStrokeColor: legacyPathEditor.exportStrokeColor ?? defaultSettings.exportStrokeColor,
+            exportStrokeWidth: legacyPathEditor.exportStrokeWidth ?? defaultSettings.exportStrokeWidth,
+            rawPath: legacyPathEditor.rawPath ?? defaultSettings.rawPath,
+        },
+    };
 }
 
 function toRecord(value: unknown): Record<string, unknown> {
@@ -87,3 +131,12 @@ const storedPathSchema = z.object({
     createdAt: z.number(),
     updatedAt: z.number(),
 });
+
+const EXPORT_SETTINGS_KEYS: Array<keyof ExportSettings> = [
+    "exportFill",
+    "exportFillColor",
+    "exportStroke",
+    "exportStrokeColor",
+    "exportStrokeWidth",
+    "rawPath",
+];

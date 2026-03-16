@@ -1,6 +1,6 @@
 import { proxy, subscribe } from "valtio";
 import { themeApplyMode } from "@/utils";
-import { type UiSettings, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SETTINGS } from "./9-ui-settings-types-and-defaults";
+import { type UiSettings, DEFAULT_EXPORT_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SETTINGS } from "./9-ui-settings-types-and-defaults";
 import { normalizeStoredSettings } from "@/store/1-ui-settings-normalize";
 
 const STORE_KEY = "svg-path26";
@@ -8,7 +8,7 @@ const STORE_VER = "v1";
 const STORAGE_ID = `${STORE_KEY}__${STORE_VER}`;
 
 function loadSettings(): UiSettings {
-    return normalizeStoredSettings(loadStoredSettings(), DEFAULT_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS);
+    return normalizeStoredSettings(loadStoredSettings(), DEFAULT_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_EXPORT_SETTINGS);
 
     function loadStoredSettings(): unknown {
         try {

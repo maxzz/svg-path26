@@ -14,14 +14,14 @@ export function ExportSvgDialog() {
     const [openExportDialog, setOpenExportDialog] = useAtom(exportSvgDialogOpenAtom);
     const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
     const resetExportViewBox = useSetAtom(doResetExportViewBoxDraftAtom);
+    const { pathName } = useSnapshot(appSettings.pathEditor);
     const {
-        pathName,
         exportFill,
         exportFillColor,
         exportStroke,
         exportStrokeColor,
         exportStrokeWidth,
-    } = useSnapshot(appSettings.pathEditor);
+    } = useSnapshot(appSettings.export);
 
     const handleExport = () => {
         if (!pathValue.trim()) return;
@@ -59,7 +59,7 @@ export function ExportSvgDialog() {
                             <Switch
                                 checked={exportFill}
                                 onCheckedChange={(checked) => {
-                                    appSettings.pathEditor.exportFill = Boolean(checked);
+                                    appSettings.export.exportFill = Boolean(checked);
                                 }}
                             />
                         </label>
@@ -68,7 +68,7 @@ export function ExportSvgDialog() {
                             <Switch
                                 checked={exportStroke}
                                 onCheckedChange={(checked) => {
-                                    appSettings.pathEditor.exportStroke = Boolean(checked);
+                                    appSettings.export.exportStroke = Boolean(checked);
                                 }}
                             />
                         </label>
@@ -78,7 +78,7 @@ export function ExportSvgDialog() {
                                 type="color"
                                 value={exportFillColor}
                                 onChange={(event) => {
-                                    appSettings.pathEditor.exportFillColor = event.target.value;
+                                    appSettings.export.exportFillColor = event.target.value;
                                 }}
                             />
                         </label>
@@ -88,7 +88,7 @@ export function ExportSvgDialog() {
                                 type="color"
                                 value={exportStrokeColor}
                                 onChange={(event) => {
-                                    appSettings.pathEditor.exportStrokeColor = event.target.value;
+                                    appSettings.export.exportStrokeColor = event.target.value;
                                 }}
                             />
                         </label>
@@ -100,7 +100,7 @@ export function ExportSvgDialog() {
                                 step={0.05}
                                 value={exportStrokeWidth}
                                 onChange={(event) => {
-                                    appSettings.pathEditor.exportStrokeWidth = Number(event.target.value);
+                                    appSettings.export.exportStrokeWidth = Number(event.target.value);
                                 }}
                             />
                         </label>
