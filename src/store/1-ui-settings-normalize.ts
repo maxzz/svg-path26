@@ -1,12 +1,5 @@
 import { z } from "zod";
-import {
-    DEFAULT_EXPORT_SETTINGS,
-    DEFAULT_PATH_EDITOR_SETTINGS,
-    DEFAULT_SETTINGS,
-    type ExportSettings,
-    type PathEditorSettings,
-    type UiSettings,
-} from "./9-ui-settings-types-and-defaults";
+import { type ExportSettings, type PathEditorSettings, type UiSettings, DEFAULT_EXPORT_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SETTINGS } from "./9-ui-settings-types-and-defaults";
 
 export function normalizeStoredSettings(value: unknown): UiSettings {
     const defaultSettings = DEFAULT_SETTINGS;

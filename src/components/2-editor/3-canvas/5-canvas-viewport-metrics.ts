@@ -50,16 +50,16 @@ export function useSyncCanvasViewportSize() {
             const observer = new ResizeObserver(() => updateSize());
             observer.observe(svgElement);
             return () => observer.disconnect();
-        }, [setViewportSize, svgElement]
-    );
+        },
+        [setViewportSize, svgElement]);
 }
 
 function getSvgUnitsPerPixel(viewBox: SvgViewBox, size: SvgViewportSize | null): number {
     const [, , width, height] = viewBox;
-    
+
     if (!size || size.width <= 0 || size.height <= 0) {
         return Math.max(width, height) / 1000;
     }
-    
+
     return Math.max(width / size.width, height / size.height);
 }

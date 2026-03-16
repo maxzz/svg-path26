@@ -4,7 +4,7 @@ import { type UiSettings } from "./9-ui-settings-types-and-defaults";
 import { normalizeStoredSettings } from "@/store/1-ui-settings-normalize";
 
 const STORE_KEY = "svg-path26";
-const STORE_VER = "v1";
+const STORE_VER = "v2";
 const STORAGE_ID = `${STORE_KEY}__${STORE_VER}`;
 
 function loadSettings(): UiSettings {

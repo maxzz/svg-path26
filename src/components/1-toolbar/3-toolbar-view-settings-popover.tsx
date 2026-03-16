@@ -5,30 +5,13 @@ import { Settings as IconSettings } from "lucide-react";
 import { Button } from "@/components/ui/shadcn/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
 import { Switch } from "@/components/ui/shadcn/switch";
-import {
-    strokeWidthAtom,
-} from "@/store/0-atoms/2-2-editor-actions";
-import {
-    doFitViewBoxAtom,
-    doZoomViewBoxAtom,
-    viewPortHeightAtom,
-    viewPortWidthAtom,
-    viewPortXAtom,
-    viewPortYAtom,
-} from "@/store/0-atoms/2-1-canvas-viewbox";
+import { strokeWidthAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { doFitViewBoxAtom, doZoomViewBoxAtom, viewPortHeightAtom, viewPortWidthAtom, viewPortXAtom, viewPortYAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { appSettings } from "@/store/0-ui-settings";
 
 export function SettingsPopover() {
-    const {
-        viewPortLocked,
-        snapToGrid,
-        showTicks,
-        fillPreview,
-        canvasPreview,
-        tickInterval,
-        pointPrecision,
-    } = useSnapshot(appSettings.pathEditor);
+    const { viewPortLocked, snapToGrid, showTicks, fillPreview, canvasPreview, tickInterval, pointPrecision } = useSnapshot(appSettings.pathEditor);
     const fitViewBox = useSetAtom(doFitViewBoxAtom);
     const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
 
@@ -69,12 +52,7 @@ export function SettingsPopover() {
 
                     <div className="flex items-center justify-between text-xs">
                         <span>Lock viewBox</span>
-                        <Switch
-                            checked={viewPortLocked}
-                            onCheckedChange={(checked) => {
-                                appSettings.pathEditor.viewPortLocked = Boolean(checked);
-                            }}
-                        />
+                        <Switch checked={viewPortLocked} onCheckedChange={(checked) => { appSettings.pathEditor.viewPortLocked = Boolean(checked); }} />
                     </div>
 
                     <div className="grid grid-cols-3 gap-1">
@@ -93,30 +71,22 @@ export function SettingsPopover() {
                         <ToggleValueRow
                             label="Snap to grid"
                             value={snapToGrid}
-                            onChange={(nextValue) => {
-                                appSettings.pathEditor.snapToGrid = nextValue;
-                            }}
+                            onChange={(nextValue) => { appSettings.pathEditor.snapToGrid = nextValue; }}
                         />
                         <ToggleValueRow
                             label="Show ticks"
                             value={showTicks}
-                            onChange={(nextValue) => {
-                                appSettings.pathEditor.showTicks = nextValue;
-                            }}
+                            onChange={(nextValue) => { appSettings.pathEditor.showTicks = nextValue; }}
                         />
                         <ToggleValueRow
                             label="Fill path"
                             value={fillPreview}
-                            onChange={(nextValue) => {
-                                appSettings.pathEditor.fillPreview = nextValue;
-                            }}
+                            onChange={(nextValue) => { appSettings.pathEditor.fillPreview = nextValue; }}
                         />
                         <ToggleValueRow
                             label="Preview mode"
                             value={canvasPreview}
-                            onChange={(nextValue) => {
-                                appSettings.pathEditor.canvasPreview = nextValue;
-                            }}
+                            onChange={(nextValue) => { appSettings.pathEditor.canvasPreview = nextValue; }}
                         />
                         <ToggleRow label="Image edit mode" atom={isImageEditModeAtom} />
                     </div>
@@ -127,9 +97,7 @@ export function SettingsPopover() {
                             value={tickInterval}
                             min={1}
                             step={1}
-                            onValueChange={(nextValue) => {
-                                appSettings.pathEditor.tickInterval = nextValue;
-                            }}
+                            onValueChange={(nextValue) => { appSettings.pathEditor.tickInterval = nextValue; }}
                         />
                         <SettingsValueNumberField
                             label="Point precision"
@@ -137,9 +105,7 @@ export function SettingsPopover() {
                             min={0}
                             max={8}
                             step={1}
-                            onValueChange={(nextValue) => {
-                                appSettings.pathEditor.pointPrecision = nextValue;
-                            }}
+                            onValueChange={(nextValue) => { appSettings.pathEditor.pointPrecision = nextValue; }}
                         />
                     </div>
                 </div>

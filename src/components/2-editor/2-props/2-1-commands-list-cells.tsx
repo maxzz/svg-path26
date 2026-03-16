@@ -61,33 +61,42 @@ function CommandValueInput(props: CommandProps & { tooltip?: string; }) {
             onFocus={() => setSelectedCommandIndex(rowIndex)}
             onChange={(event) => setDraft(event.target.value)}
             onBlur={commit}
-            onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                    commit();
-                    event.currentTarget.blur();
-                    return;
+            onKeyDown={
+                (event) => {
+                    switch (event.key) {
+                        case "Enter":
+                            commit();
+                            event.currentTarget.blur();
+                            break;
+                        case "Escape":
+                            setDraft(String(value));
+                            event.currentTarget.blur();
+                            break;
+                        case "ArrowLeft":
+                            if (event.currentTarget.selectionStart === 0 && event.currentTarget.selectionEnd === 0) {
+                                focusField(rowIndex, Math.max(0, valueIndex - 1));
+                                event.preventDefault();
+                            }
+                            break;
+                        case "ArrowRight":
+                            if (event.currentTarget.selectionStart === event.currentTarget.value.length && event.currentTarget.selectionEnd === event.currentTarget.value.length) {
+                                focusField(rowIndex, Math.min(rowValueCount - 1, valueIndex + 1));
+                                event.preventDefault();
+                            }
+                            break;
+                        case "ArrowUp":
+                            moveVertical(rowIndex, valueIndex, "up");
+                            event.preventDefault();
+                            break;
+                        case "ArrowDown":
+                            moveVertical(rowIndex, valueIndex, "down");
+                            event.preventDefault();
+                            break;
+                        default:
+                            break;
+                    }
                 }
-                if (event.key === "Escape") {
-                    setDraft(String(value));
-                    event.currentTarget.blur();
-                }
-                if (event.key === "ArrowLeft" && event.currentTarget.selectionStart === 0 && event.currentTarget.selectionEnd === 0) {
-                    focusField(rowIndex, Math.max(0, valueIndex - 1));
-                    event.preventDefault();
-                }
-                if (event.key === "ArrowRight" && event.currentTarget.selectionStart === event.currentTarget.value.length && event.currentTarget.selectionEnd === event.currentTarget.value.length) {
-                    focusField(rowIndex, Math.min(rowValueCount - 1, valueIndex + 1));
-                    event.preventDefault();
-                }
-                if (event.key === "ArrowUp") {
-                    moveVertical(rowIndex, valueIndex, "up");
-                    event.preventDefault();
-                }
-                if (event.key === "ArrowDown") {
-                    moveVertical(rowIndex, valueIndex, "down");
-                    event.preventDefault();
-                }
-            }}
+            }
         />
     );
 
@@ -125,21 +134,25 @@ function CommandFlagInput(props: CommandProps & { tooltip?: string; }) {
                     });
                 }}
                 onKeyDown={(event) => {
-                    if (event.key === "ArrowLeft") {
-                        focusField(rowIndex, Math.max(0, valueIndex - 1));
-                        event.preventDefault();
-                    }
-                    if (event.key === "ArrowRight") {
-                        focusField(rowIndex, Math.min(rowValueCount - 1, valueIndex + 1));
-                        event.preventDefault();
-                    }
-                    if (event.key === "ArrowUp") {
-                        moveVertical(rowIndex, valueIndex, "up");
-                        event.preventDefault();
-                    }
-                    if (event.key === "ArrowDown") {
-                        moveVertical(rowIndex, valueIndex, "down");
-                        event.preventDefault();
+                    switch (event.key) {
+                        case "ArrowLeft":
+                            focusField(rowIndex, Math.max(0, valueIndex - 1));
+                            event.preventDefault();
+                            break;
+                        case "ArrowRight":
+                            focusField(rowIndex, Math.min(rowValueCount - 1, valueIndex + 1));
+                            event.preventDefault();
+                            break;
+                        case "ArrowUp":
+                            moveVertical(rowIndex, valueIndex, "up");
+                            event.preventDefault();
+                            break;
+                        case "ArrowDown":
+                            moveVertical(rowIndex, valueIndex, "down");
+                            event.preventDefault();
+                            break;
+                        default:
+                            break;
                     }
                 }}
             />
