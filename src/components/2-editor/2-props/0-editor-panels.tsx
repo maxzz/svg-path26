@@ -22,7 +22,7 @@ export function EditorPanels() {
         [handleEditorKeyDown]);
 
     return (
-        <aside className="p-4 h-full border-r overflow-auto space-y-1">
+        <aside className="h-full border-r overflow-auto space-y-1">
             <PathInputSection />
             <PathInputSectionStatus />
 
@@ -40,7 +40,7 @@ function PathInputSection() {
         <SectionPanel sectionKey="path-input" label="Path Input">
             <textarea
                 id="svg-path-input"
-                className="p-3 w-full min-h-8 field-sizing-content font-mono tracking-tight text-xs border bg-background outline-ring/50 focus:outline-2 rounded-md resize-y"
+                className="px-2 py-1 w-full min-h-8 field-sizing-content font-mono tracking-tight text-xs bg-background outline-ring/50 focus:outline-2 resize-y"
                 value={pathValue}
                 onChange={(event) => setPathValue(event.target.value)}
                 placeholder="M 10 10 L 100 100"
