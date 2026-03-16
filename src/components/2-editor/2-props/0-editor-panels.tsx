@@ -25,11 +25,9 @@ export function EditorPanels() {
         <aside className="h-full border-r flex flex-col justify-between">
             <div className="grow flex-1 overflow-auto [scrollbar-gutter:stable]">
                 <PathInputSection />
-
-                <TransformPanel />
-
                 <CommandsListPanel />
                 <ImagesPanel />
+                <TransformPanel />
             </div>
 
             <PathInputSectionStatus />
