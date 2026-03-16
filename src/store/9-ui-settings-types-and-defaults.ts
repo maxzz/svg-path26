@@ -20,6 +20,7 @@ export interface PathEditorSettings {
     canvasPreview: boolean;               // Canvas preview or not (when enabled, the canvas will be previewed)
     viewPortLocked: boolean;              // View port locked or not
     pathName: string;                     // Path name
+    rawPath: string;                      // Raw path
     storedPaths: StoredPathSetting[];     // Stored paths
 }
 
@@ -29,7 +30,6 @@ export interface ExportSettings {
     exportStroke: boolean;                // Export stroke or not
     exportStrokeColor: string;            // Export stroke color
     exportStrokeWidth: number;            // Export stroke width
-    rawPath: string;                      // Raw path
 }
 
 export interface UiSettings {
@@ -56,6 +56,7 @@ export const DEFAULT_PATH_EDITOR_SETTINGS: PathEditorSettings = {
     canvasPreview: false,
     viewPortLocked: false,
     pathName: "",
+    rawPath: "M 20 140 C 40 20, 65 20, 95 140 S 150 260, 180 140",
     storedPaths: [],
 };
 
@@ -65,7 +66,6 @@ export const DEFAULT_EXPORT_SETTINGS: ExportSettings = {
     exportStroke: false,
     exportStrokeColor: "#ff0000",
     exportStrokeWidth: 0.1,
-    rawPath: "M 20 140 C 40 20, 65 20, 95 140 S 150 260, 180 140",
 };
 
 export const DEFAULT_SETTINGS: UiSettings = {
