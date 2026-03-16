@@ -37,14 +37,16 @@ export function EditorPanels() {
 function PathInputSection() {
     const [pathValue, setPathValue] = useAtom(svgPathInputAtom);
     return (
-        <SectionPanel sectionKey="path-input" label="Path Input">
-            <textarea
-                id="svg-path-input"
-                className="px-2 py-1 w-full min-h-8 field-sizing-content font-mono tracking-tight text-xs bg-background outline-ring/50 focus:outline-2 resize-y"
-                value={pathValue}
-                onChange={(event) => setPathValue(event.target.value)}
-                placeholder="M 10 10 L 100 100"
-            />
+        <SectionPanel sectionKey="path-input" label="Path Input" contentClassName="px-0">
+            <div tabIndex={0}>
+                <textarea
+                    id="svg-path-input"
+                    className="pl-4 py-1 w-full min-h-8 field-sizing-content font-mono tracking-tight text-xs bg-background outline-ring/50 focus:-outline resize-y"
+                    value={pathValue}
+                    onChange={(event) => setPathValue(event.target.value)}
+                    placeholder="M 10 10 L 100 100"
+                />
+            </div>
         </SectionPanel>
     );
 }
