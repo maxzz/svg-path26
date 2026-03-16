@@ -22,14 +22,17 @@ export function EditorPanels() {
         [handleEditorKeyDown]);
 
     return (
-        <aside className="h-full border-r overflow-auto space-y-1">
-            <PathInputSection />
+        <aside className="h-full border-r flex flex-col justify-between">
+            <div className="grow flex-1 overflow-auto [scrollbar-gutter:stable]">
+                <PathInputSection />
+
+                <TransformPanel />
+
+                <CommandsListPanel />
+                <ImagesPanel />
+            </div>
+
             <PathInputSectionStatus />
-
-            <TransformPanel />
-
-            <CommandsListPanel />
-            <ImagesPanel />
         </aside>
     );
 }
