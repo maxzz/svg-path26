@@ -1,3 +1,4 @@
+import { CanvasActionsMenu } from "../2-editor/2-props/8-props-top-menu";
 import { ToolbarUndoRedo } from "./2-toolbar-undo-redo";
 import { SettingsPopover } from "./3-toolbar-view-settings-popover";
 import { ButtonThemeToggle } from "./4-btn-theme-toggle";
@@ -12,7 +13,7 @@ export function Toolbar() {
                     <ToolbarUndoRedo />
                     <SettingsPopover />
                 </div>
-
+                <CanvasActionsMenu />
                 <ButtonThemeToggle />
             </div>
         </header>

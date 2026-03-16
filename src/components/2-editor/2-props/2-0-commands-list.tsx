@@ -2,23 +2,24 @@ import { useEffect, useRef } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { cn } from "@/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
+import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel.tsx";
 import { commandSummaryTooltip, isCommandCellLinkedToPoint, isCommandValueLinkedToPoint } from "./8-helpers";
 import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 import { commandRowsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { CommandSelectionMenu } from "./2-2-commands-list-row-menu.tsx";
 import { doToggleSegmentRelativeAtom, draggedCanvasPointAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-2-editor-actions";
-import { CommandCellInput, type CommandProps } from "./2-1-commands-list-cells.tsx";
+import { type CommandProps, CommandCellInput } from "./2-1-commands-list-cells.tsx";
 
 export function CommandsListPanel() {
     return (
-        <section className="rounded-lg border p-3 font-ui">
+        <SectionPanel sectionKey="commands" label="Commands">
             <h2 className="mb-2 text-xs font-semibold">
                 Path Commands
             </h2>
             <div className="p-2 max-h-64 text-xs font-ui border bg-muted/20 rounded space-y-1 overflow-auto">
                 <CommandsList />
             </div>
-        </section>
+        </SectionPanel>
     );
 }
 

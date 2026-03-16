@@ -24,7 +24,7 @@ export function SectionPanel({ sectionKey, label, children }: SectionPanelProps)
                 }}
             >
                 <AccordionItem value={sectionKey} className="border-none">
-                    <AccordionTrigger className="py-2.5 text-xs font-semibold hover:no-underline">
+                    <AccordionTrigger className="py-2.5 text-sm font-semibold font-ui hover:no-underline">
                         {label}
                     </AccordionTrigger>
                     <AccordionContent>
