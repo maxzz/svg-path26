@@ -12,11 +12,8 @@ import { type CommandProps, CommandCellInput } from "./2-1-commands-list-cells.t
 
 export function CommandsListPanel() {
     return (
-        <SectionPanel sectionKey="commands" label="Commands">
-            <h2 className="mb-2 text-xs font-semibold">
-                Path Commands
-            </h2>
-            <div className="p-2 max-h-64 text-xs font-ui border bg-muted/20 rounded space-y-1 overflow-auto">
+        <SectionPanel sectionKey="commands" label="Path Commands" contentClassName="px-0 pt-0.5 pb-4">
+            <div className="px-1 py-2 max-h-64 text-xs font-ui border bg-muted/20 rounded space-y-1 overflow-auto">
                 <CommandsList />
             </div>
         </SectionPanel>
@@ -39,8 +36,7 @@ export function CommandsList() {
             if (selectedCommandIndex === null) return;
             rowRefs.current[selectedCommandIndex]?.scrollIntoView({ behavior: "smooth", block: "nearest", });
         },
-        [selectedCommandIndex, rows.length]
-    );
+        [selectedCommandIndex, rows.length]);
 
     function moveVertical(rowIndex: number, valueIndex: number, direction: "up" | "down") {
         const nextRowIndex = direction === "up" ? rowIndex - 1 : rowIndex + 1;
@@ -51,7 +47,7 @@ export function CommandsList() {
     }
 
     function focusCommandCell(nextRowIndex: number, nextValueIndex: number) {
-        focusField(rows, rowRefs.current, fieldRefs.current, nextRowIndex, nextValueIndex, setSelectedCommandIndex)
+        focusField(rows, rowRefs.current, fieldRefs.current, nextRowIndex, nextValueIndex, setSelectedCommandIndex);
     }
 
     function registerFieldRef(rowIndex: number, valueIndex: number, element: HTMLInputElement | null) {
@@ -63,7 +59,6 @@ export function CommandsList() {
     }
 
     return (
-
         <TooltipProvider delayDuration={250}>
             {rows.map(
                 (row: SvgSegmentSummary) => {
@@ -107,6 +102,7 @@ export function CommandsList() {
                                         {row.command}
                                     </button>
                                 </TooltipTrigger>
+
                                 <TooltipContent sideOffset={6} className="max-w-80">
                                     {commandSummaryTooltip(row.command)}
                                 </TooltipContent>
@@ -171,7 +167,7 @@ function focusField(rows: SvgSegmentSummary[], rowRefs: Record<number, HTMLDivEl
             return;
         }
     }
-    
+
     for (let i = clampedIndex + 1; i < row.values.length; i += 1) {
         const candidate = fieldRefs[`${rowIndex}:${i}`];
         if (candidate) {

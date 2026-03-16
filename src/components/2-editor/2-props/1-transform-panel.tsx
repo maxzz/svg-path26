@@ -14,8 +14,8 @@ export function TransformPanel() {
     const applyTranslate = useSetAtom(doApplyTranslateAtom);
 
     return (
-        <SectionPanel sectionKey="transform" label="Transform">
-            <div className="grid grid-cols-2 gap-2 text-xs">
+        <SectionPanel sectionKey="transform" label="Transform" contentClassName="px-0 pt-1 pb-4">
+            <div className="pl-3 grid grid-cols-2 gap-2 text-xs">
                 <TransformNumberField label="Scale X" valueAtom={scaleXAtom} step={0.1} />
                 <TransformNumberField label="Scale Y" valueAtom={scaleYAtom} step={0.1} />
                 <TransformNumberField label="Translate X" valueAtom={translateXAtom} step={1} />
@@ -33,7 +33,7 @@ export function TransformPanel() {
                 />
             </div>
 
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-3 pl-3 flex flex-wrap gap-2">
                 <Button variant="outline" className="h-7 px-2.5" onClick={() => applyScale()}>
                     Apply Scale
                 </Button>

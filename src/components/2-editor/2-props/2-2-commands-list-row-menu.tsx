@@ -19,7 +19,7 @@ export function CommandSelectionMenu({ rowIndex, command }: { rowIndex: number; 
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="size-6" onClick={(event) => event.stopPropagation()}>
-                    <IconRadix_DotsHorizontal className="size-4" />
+                    <IconRadix_DotsHorizontal className="size-3" />
                 </Button>
             </DropdownMenuTrigger>
 
