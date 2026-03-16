@@ -31,7 +31,7 @@ export function normalizeStoredSettings(
     );
 
     try {
-        const parseResult = uiSettingsSchema.safeParse(migrateLegacySettings(value, defaultPathEditorSettings, defaultExportSettings));
+        const parseResult = uiSettingsSchema.safeParse(value);
         if (!parseResult.success) {
             console.error("Failed to normalize UI settings. Using defaults.", parseResult.error);
             return fallbackSettings;
@@ -92,48 +92,6 @@ function createExportSettingsSchema(defaultSettings: ExportSettings) {
     );
 }
 
-function migrateLegacySettings(
-    value: unknown,
-    defaultPathEditorSettings: PathEditorSettings,
-    defaultExportSettings: ExportSettings,
-): Record<string, unknown> {
-    const root = toRecord(value);
-    const currentPathEditor = toRecord(root.pathEditor);
-    const currentExport = toRecord(root.export);
-
-    let nextPathEditor = currentPathEditor;
-    let nextExport = currentExport;
-    let didChange = false;
-
-    const hasCurrentExportStyleValues = EXPORT_SETTINGS_KEYS.some((key) => Object.prototype.hasOwnProperty.call(currentExport, key));
-    const hasLegacyExportStyleValues = EXPORT_SETTINGS_KEYS.some((key) => Object.prototype.hasOwnProperty.call(currentPathEditor, key));
-    if (!hasCurrentExportStyleValues && hasLegacyExportStyleValues) {
-        nextExport = {
-            ...nextExport,
-            exportFill: currentPathEditor.exportFill ?? defaultExportSettings.exportFill,
-            exportFillColor: currentPathEditor.exportFillColor ?? defaultExportSettings.exportFillColor,
-            exportStroke: currentPathEditor.exportStroke ?? defaultExportSettings.exportStroke,
-            exportStrokeColor: currentPathEditor.exportStrokeColor ?? defaultExportSettings.exportStrokeColor,
-            exportStrokeWidth: currentPathEditor.exportStrokeWidth ?? defaultExportSettings.exportStrokeWidth,
-        };
-        didChange = true;
-    }
-
-    const hasCurrentPathEditorRawPath = Object.prototype.hasOwnProperty.call(currentPathEditor, "rawPath");
-    const hasExportRawPath = Object.prototype.hasOwnProperty.call(currentExport, "rawPath");
-    if (!hasCurrentPathEditorRawPath && hasExportRawPath) {
-        nextPathEditor = {
-            ...nextPathEditor,
-            rawPath: currentExport.rawPath ?? defaultPathEditorSettings.rawPath,
-        };
-        didChange = true;
-    }
-
-    if (!didChange) return root;
-
-    return { ...root, pathEditor: nextPathEditor, export: nextExport };
-}
-
 function toRecord(value: unknown): Record<string, unknown> {
     return typeof value === "object" && value !== null && !Array.isArray(value) ? value as Record<string, unknown> : {};
 }
@@ -146,11 +104,3 @@ const storedPathSchema = z.object({
     createdAt: z.number(),
     updatedAt: z.number(),
 });
-
-const EXPORT_SETTINGS_KEYS: Array<keyof ExportSettings> = [
-    "exportFill",
-    "exportFillColor",
-    "exportStroke",
-    "exportStrokeColor",
-    "exportStrokeWidth",
-];
