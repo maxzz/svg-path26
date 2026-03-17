@@ -27,6 +27,7 @@ export interface PathEditorSettings {
     fillPreview: boolean;                 // Fill preview or not (when enabled, the fill will be previewed)
     canvasPreview: boolean;               // Canvas preview or not (when enabled, the canvas will be previewed)
     viewPortLocked: boolean;              // View port locked or not
+    showViewBoxFrame: boolean;            // Show stored viewBox frame on canvas
     viewBox: StoredViewBoxSetting;        // Stored canvas viewBox
     pathName: string;                     // Path name
     rawPath: string;                      // Raw path
@@ -71,6 +72,7 @@ export const DEFAULT_PATH_EDITOR_SETTINGS: PathEditorSettings = {
     fillPreview: false,
     canvasPreview: false,
     viewPortLocked: false,
+    showViewBoxFrame: false,
     viewBox: { ...DEFAULT_VIEWBOX_SETTINGS },
     pathName: "",
     rawPath: "M 20 140 C 40 20, 65 20, 95 140 S 150 260, 180 140",

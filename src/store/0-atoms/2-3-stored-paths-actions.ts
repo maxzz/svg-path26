@@ -1,8 +1,8 @@
 import { atom } from "jotai";
 import { rawPathAtom } from "./1-0-raw-path";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
-import { canvasViewBoxAtom, doSetViewBoxAtom } from "./2-1-canvas-viewbox";
 import { hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "./2-2-editor-actions";
+import { doSetPathViewBoxAtom, pathViewBoxAtom } from "./2-6-path-viewbox";
 import { appSettings } from "@/store/0-ui-settings";
 
 export type StoredPath = {
@@ -19,8 +19,7 @@ export const doSaveNamedPathAtom = atom(
         const path = get(rawPathAtom).trim();
         const name = nameRaw.trim();
         if (!path || !name) return;
-        const [x, y, width, height] = get(canvasViewBoxAtom);
-        const viewBox = { x, y, width, height };
+        const viewBox = get(pathViewBoxAtom);
         const now = Date.now();
         const existing = appSettings.pathEditor.storedPaths;
         const match = existing.find((it) => it.name === name);
@@ -49,7 +48,7 @@ export const doOpenNamedPathAtom = atom(
         const match = appSettings.pathEditor.storedPaths.find((it) => it.name === name);
         if (!match) return;
         set(svgPathInputAtom, match.path);
-        set(doSetViewBoxAtom, match.viewBox);
+        set(doSetPathViewBoxAtom, match.viewBox);
         appSettings.pathEditor.pathName = name;
         set(selectedCommandIndexAtom, null);
         set(hoveredCommandIndexAtom, null);

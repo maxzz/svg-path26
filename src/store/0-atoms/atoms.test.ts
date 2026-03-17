@@ -14,6 +14,7 @@ import {
 import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } from "./1-2-history";
 import { doOpenNamedPathAtom, doSaveNamedPathAtom } from "./2-3-stored-paths-actions";
+import { doSetPathViewBoxAtom } from "./2-6-path-viewbox";
 import { appSettings } from "@/store/0-ui-settings";
 
 describe("svg path state atoms", () => {
@@ -23,6 +24,7 @@ describe("svg path state atoms", () => {
         appSettings.pathEditor.viewPortLocked = false;
         appSettings.pathEditor.pathName = "";
         appSettings.pathEditor.storedPaths = [];
+        appSettings.pathEditor.showViewBoxFrame = false;
         appSettings.pathEditor.viewBox = { x: 0, y: 0, width: 24, height: 24 };
         appSettings.pathEditor.decimals = 3;
         appSettings.pathEditor.minifyOutput = false;
@@ -107,7 +109,7 @@ describe("svg path state atoms", () => {
     it("stores and opens named paths", () => {
         const store = createStore();
         store.set(svgPathInputAtom, "M 0 0 L 33 44");
-        store.set(doSetViewBoxAtom, { x: 1, y: 2, width: 30, height: 40 });
+        store.set(doSetPathViewBoxAtom, { x: 1, y: 2, width: 30, height: 40 });
         store.set(doSaveNamedPathAtom, "example");
 
         expect(appSettings.pathEditor.storedPaths.length).toBe(1);
@@ -118,6 +120,7 @@ describe("svg path state atoms", () => {
         store.set(doSetViewBoxAtom, { x: 9, y: 9, width: 12, height: 12 });
         store.set(doOpenNamedPathAtom, "example");
         expect(store.get(svgPathInputAtom)).toContain("33 44");
-        expect(store.get(canvasViewBoxAtom)).toEqual([1, 2, 30, 40]);
+        expect(appSettings.pathEditor.viewBox).toEqual({ x: 1, y: 2, width: 30, height: 40 });
+        expect(store.get(canvasViewBoxAtom)).toEqual([9, 9, 12, 12]);
     });
 });

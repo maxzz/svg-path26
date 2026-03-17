@@ -1,6 +1,6 @@
 import { atom } from "jotai";
-import { viewPortHeightAtom, viewPortWidthAtom, viewPortXAtom, viewPortYAtom } from "./2-1-canvas-viewbox";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
+import { pathViewBoxAtom } from "./2-6-path-viewbox";
 import { appSettings } from "@/store/0-ui-settings";
 import { computeExportViewBox } from "@/components/2-editor/2-props/8-helpers";
 
@@ -22,12 +22,7 @@ export const doResetExportViewBoxDraftAtom = atom(
     null,
     (get, set) => {
         const { exportStroke, exportStrokeWidth } = appSettings.export;
-        const fallback = {
-            x: get(viewPortXAtom),
-            y: get(viewPortYAtom),
-            width: get(viewPortWidthAtom),
-            height: get(viewPortHeightAtom),
-        };
+        const fallback = get(pathViewBoxAtom);
 
         set(
             exportViewBoxDraftAtom,

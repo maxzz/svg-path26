@@ -75,6 +75,7 @@ function createPathEditorSettingsSchema(defaultSettings: PathEditorSettings) {
             fillPreview: z.boolean().catch(defaultSettings.fillPreview),
             canvasPreview: z.boolean().catch(defaultSettings.canvasPreview),
             viewPortLocked: z.boolean().catch(defaultSettings.viewPortLocked),
+            showViewBoxFrame: z.boolean().catch(defaultSettings.showViewBoxFrame),
             viewBox: createStoredViewBoxSchema(defaultSettings.viewBox).catch(defaultSettings.viewBox),
             pathName: z.string().catch(defaultSettings.pathName),
             rawPath: z.string().catch(defaultSettings.rawPath),

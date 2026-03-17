@@ -11,7 +11,7 @@ import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { appSettings } from "@/store/0-ui-settings";
 
 export function SettingsPopover() {
-    const { viewPortLocked, snapToGrid, showTicks, fillPreview, canvasPreview, tickInterval, pointPrecision } = useSnapshot(appSettings.pathEditor);
+    const { viewPortLocked, snapToGrid, showTicks, fillPreview, canvasPreview, tickInterval, pointPrecision, showViewBoxFrame } = useSnapshot(appSettings.pathEditor);
     const fitViewBox = useSetAtom(doFitViewBoxAtom);
     const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
 
@@ -51,7 +51,7 @@ export function SettingsPopover() {
                     </div>
 
                     <div className="flex items-center justify-between text-xs">
-                        <span>Lock viewBox</span>
+                        <span>Lock viewport</span>
                         <Switch checked={viewPortLocked} onCheckedChange={(checked) => { appSettings.pathEditor.viewPortLocked = Boolean(checked); }} />
                     </div>
 
@@ -77,6 +77,11 @@ export function SettingsPopover() {
                             label="Show ticks"
                             value={showTicks}
                             onChange={(nextValue) => { appSettings.pathEditor.showTicks = nextValue; }}
+                        />
+                        <ToggleValueRow
+                            label="Show viewBox frame"
+                            value={showViewBoxFrame}
+                            onChange={(nextValue) => { appSettings.pathEditor.showViewBoxFrame = nextValue; }}
                         />
                         <ToggleValueRow
                             label="Fill path"

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/shadcn/button";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
 import { doNormalizePathAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { doFitViewBoxAtom, doZoomViewBoxAtom, viewPortHeightAtom, viewPortWidthAtom, viewPortXAtom, viewPortYAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
+import { pathViewBoxHeightAtom, pathViewBoxWidthAtom, pathViewBoxXAtom, pathViewBoxYAtom } from "@/store/0-atoms/2-6-path-viewbox";
 import { appSettings } from "@/store/0-ui-settings";
 
 export function OptionsPanel() {
@@ -18,6 +19,7 @@ export function OptionsPanel() {
         tickInterval,
         fillPreview,
         viewPortLocked,
+        showViewBoxFrame,
     } = useSnapshot(appSettings.pathEditor);
 
     const fitViewBox = useSetAtom(doFitViewBoxAtom);
@@ -28,21 +30,21 @@ export function OptionsPanel() {
         <SectionPanel sectionKey="options" label="Options" contentClassName="px-0 pt-1 pb-4">
             <div className="space-y-3 pl-3 text-xs">
                 <div className="space-y-2">
-                    <span className="text-muted-foreground">viewBox</span>
+                    <span className="text-muted-foreground">viewport</span>
 
                     <div className="flex items-end gap-2">
                         <div className="grid flex-1 grid-cols-4 gap-2">
-                            <ViewBoxNumberField label="x" valueAtom={viewPortXAtom} />
-                            <ViewBoxNumberField label="y" valueAtom={viewPortYAtom} />
-                            <ViewBoxNumberField label="width" valueAtom={viewPortWidthAtom} min={1e-3} />
-                            <ViewBoxNumberField label="height" valueAtom={viewPortHeightAtom} min={1e-3} />
+                            <ValueNumberField label="x" valueAtom={viewPortXAtom} />
+                            <ValueNumberField label="y" valueAtom={viewPortYAtom} />
+                            <ValueNumberField label="width" valueAtom={viewPortWidthAtom} min={1e-3} />
+                            <ValueNumberField label="height" valueAtom={viewPortHeightAtom} min={1e-3} />
                         </div>
 
                         <Button
                             variant="outline"
                             size="icon"
                             className="size-8 shrink-0"
-                            title={viewPortLocked ? "Unlock viewBox" : "Lock viewBox"}
+                            title={viewPortLocked ? "Unlock viewport" : "Lock viewport"}
                             onClick={() => {
                                 appSettings.pathEditor.viewPortLocked = !viewPortLocked;
                             }}
@@ -62,6 +64,25 @@ export function OptionsPanel() {
                             +
                         </Button>
                     </div>
+                </div>
+
+                <div className="space-y-2">
+                    <span className="text-muted-foreground">viewBox</span>
+
+                    <div className="grid grid-cols-4 gap-2">
+                        <ValueNumberField label="x" valueAtom={pathViewBoxXAtom} />
+                        <ValueNumberField label="y" valueAtom={pathViewBoxYAtom} />
+                        <ValueNumberField label="width" valueAtom={pathViewBoxWidthAtom} min={1e-3} />
+                        <ValueNumberField label="height" valueAtom={pathViewBoxHeightAtom} min={1e-3} />
+                    </div>
+
+                    <CheckboxRow
+                        label="Show viewBox frame"
+                        checked={showViewBoxFrame}
+                        onCheckedChange={(checked) => {
+                            appSettings.pathEditor.showViewBoxFrame = checked;
+                        }}
+                    />
                 </div>
 
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-2 items-center">
@@ -142,7 +163,7 @@ export function OptionsPanel() {
     );
 }
 
-function ViewBoxNumberField({ valueAtom, label, ...rest }: { valueAtom: PrimitiveAtom<number>; label: string; } & InputHTMLAttributes<HTMLInputElement>) {
+function ValueNumberField({ valueAtom, label, ...rest }: { valueAtom: PrimitiveAtom<number>; label: string; } & InputHTMLAttributes<HTMLInputElement>) {
     const [value, setValue] = useAtom(valueAtom);
 
     return (
