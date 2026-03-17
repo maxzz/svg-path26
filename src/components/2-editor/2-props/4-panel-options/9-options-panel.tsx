@@ -28,7 +28,7 @@ export function OptionsPanel() {
 
     return (
         <SectionPanel sectionKey="options" label="Options" contentClassName="px-0 pt-1 pb-4">
-            <div className="space-y-2.5 pl-2.5 pr-2 text-[11px]">
+            <div className="pl-2.5 pr-2 text-[11px] space-y-2.5">
                 <div className="space-y-1.5">
                     <span className="text-[11px] text-muted-foreground">viewport</span>
 
@@ -176,10 +176,10 @@ function CompactViewBoxField({ valueAtom, label, className, ...rest }: { valueAt
 
     return (
         <label className="relative text-xs select-none">
-            <span className="pointer-events-none absolute left-1.5 top-1 text-[9px] leading-none text-slate-500">{label}</span>
+            <span className="absolute left-1.5 top-1 text-[9px] leading-none text-slate-500 pointer-events-none">{label}</span>
             <input
                 type="number"
-                className={`h-9 w-full rounded-md border border-slate-400/70 bg-slate-100/90 px-1.5 pt-3.5 text-[12px] text-slate-800 shadow-sm outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${className ?? ""}`}
+                className={`px-1.5 pt-3.5 w-full h-9 text-[12px] border border-slate-400/70 bg-slate-100/90 text-slate-800 shadow-sm outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none rounded-md ${className ?? ""}`}
                 value={value}
                 onChange={(event) => setValue(Number(event.target.value))}
                 {...rest}
@@ -190,7 +190,7 @@ function CompactViewBoxField({ valueAtom, label, className, ...rest }: { valueAt
 
 function LabeledNumberField({ label, value, onValueChange, ...rest }: { label: string; value: number; onValueChange: (value: number) => void; } & InputHTMLAttributes<HTMLInputElement>) {
     return (
-        <label className="flex items-center gap-1.5 justify-self-end whitespace-nowrap text-[11px]">
+        <label className="text-[11px] flex items-center justify-self-end whitespace-nowrap gap-1.5">
             <span>{label}</span>
             <input
                 type="number"
