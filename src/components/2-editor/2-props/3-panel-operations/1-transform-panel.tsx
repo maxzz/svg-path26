@@ -1,5 +1,5 @@
 import { type ComponentProps, type InputHTMLAttributes, type ReactNode } from "react";
-import { atom, useAtom, useSetAtom, type PrimitiveAtom } from "jotai";
+import { useAtom, useSetAtom, type PrimitiveAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { Link2, Unlink2 } from "lucide-react";
 import { classNames } from "@/utils";
@@ -8,11 +8,8 @@ import { Button } from "@/components/ui/shadcn/button";
 import { SectionPanel } from "../../../ui/loacal-ui/1-section-panel";
 import { doApplyScaleAtom, doApplyTranslateAtom, doNormalizePathAtom, doSetAbsoluteAtom, doSetRelativeAtom, scaleXAtom, scaleYAtom, translateXAtom, translateYAtom } from "@/store/0-atoms/2-2-editor-actions";
 
-const uniformScaleAtom = atom(true);
-
 export function TransformPanel() {
-    const { decimals } = useSnapshot(appSettings.pathEditor);
-    const [uniformScale, setUniformScale] = useAtom(uniformScaleAtom);
+    const { decimals, uniformScale } = useSnapshot(appSettings.pathEditor);
     const [scaleX, setScaleX] = useAtom(scaleXAtom);
     const [scaleY, setScaleY] = useAtom(scaleYAtom);
 
@@ -45,7 +42,7 @@ export function TransformPanel() {
                                 onMouseDown={(event) => event.preventDefault()}
                                 onClick={() => {
                                     const next = !uniformScale;
-                                    setUniformScale(next);
+                                    appSettings.pathEditor.uniformScale = next;
                                     if (next) {
                                         setScaleY(scaleX);
                                     }

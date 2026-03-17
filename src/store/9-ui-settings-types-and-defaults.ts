@@ -13,6 +13,7 @@ export interface StoredPathSetting {
 export interface PathEditorSettings {
     strokeWidth: number;                  // Stroke width
     zoom: number;                         // Zoom level
+    uniformScale: boolean;                // Lock scale X and Y together in Path Operations
     decimals: number;                     // Number of decimals to show
     minifyOutput: boolean;                // Minify output or not
     snapToGrid: boolean;                  // Snap to grid or not (when enabled, the path will be snapped to the grid)
@@ -53,6 +54,7 @@ export const DEFAULT_VIEWBOX_SETTINGS: ViewBox = [0, 0, 24, 24];
 export const DEFAULT_PATH_EDITOR_SETTINGS: PathEditorSettings = {
     strokeWidth: 3,
     zoom: 1,
+    uniformScale: true,
     decimals: 3,
     minifyOutput: false,
     snapToGrid: true,

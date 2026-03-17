@@ -66,6 +66,7 @@ function createPathEditorSettingsSchema(defaultSettings: PathEditorSettings) {
         z.object({
             strokeWidth: z.number().catch(defaultSettings.strokeWidth),
             zoom: z.number().catch(defaultSettings.zoom),
+            uniformScale: z.boolean().catch(defaultSettings.uniformScale),
             decimals: z.number().catch(defaultSettings.decimals),
             minifyOutput: z.boolean().catch(defaultSettings.minifyOutput),
             snapToGrid: z.boolean().catch(defaultSettings.snapToGrid),
