@@ -20,7 +20,7 @@ export function Editor() {
                 <ResizableHandle withHandle />
 
                 <ResizablePanel id="editor-canvas" defaultSize={`${defaultRightPanelSize}`} minSize="30%">
-                    <section className="h-full min-w-0 p-4">
+                    <section className="relative h-full min-w-0">
                         <PathCanvas />
                     </section>
                 </ResizablePanel>

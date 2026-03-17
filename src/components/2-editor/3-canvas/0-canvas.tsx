@@ -44,7 +44,7 @@ export function PathCanvas() {
         [fitViewBox, pathValue]);
 
     return (
-        <div className={classNames("relative mx-auto aspect-4/3 w-full overflow-hidden rounded-xl border", preview ? "bg-white" : (darkCanvas ? "bg-zinc-900" : "bg-white"))}>
+        <div className={classNames("absolute w-full h-full overflow-hidden", preview ? "bg-white" : (darkCanvas ? "bg-zinc-900" : "bg-white"))}>
             <svg
                 ref={(node) => setCanvasSvgElement(node)}
                 viewBox={viewBox.join(" ")}
