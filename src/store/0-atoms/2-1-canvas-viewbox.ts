@@ -2,20 +2,58 @@ import { atom } from "jotai";
 import { type Point } from "@/svg-core/9-types-svg-model";
 import { svgModelAtom } from "@/store/0-atoms/2-0-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
+import { createAtomAppSetting } from "./8-create-atom-app-settings";
 
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 16;
-const DEFAULT_VIEWPORT_X = 0;
-const DEFAULT_VIEWPORT_Y = 0;
-const DEFAULT_VIEWPORT_WIDTH = 120;
-const DEFAULT_VIEWPORT_HEIGHT = 90;
+const DEFAULT_VIEWPORT_X = appSettings.pathEditor.viewBox.x;
+const DEFAULT_VIEWPORT_Y = appSettings.pathEditor.viewBox.y;
+const DEFAULT_VIEWPORT_WIDTH = appSettings.pathEditor.viewBox.width;
+const DEFAULT_VIEWPORT_HEIGHT = appSettings.pathEditor.viewBox.height;
 
 export const canvasViewportSizeAtom = atom<{ width: number; height: number; } | null>(null);
 
-export const viewPortXAtom = atom(DEFAULT_VIEWPORT_X);
-export const viewPortYAtom = atom(DEFAULT_VIEWPORT_Y);
-export const viewPortWidthAtom = atom(DEFAULT_VIEWPORT_WIDTH);
-export const viewPortHeightAtom = atom(DEFAULT_VIEWPORT_HEIGHT);
+const storedViewBoxAtom = createAtomAppSetting("viewBox");
+
+export const viewPortXAtom = atom(
+    (get) => get(storedViewBoxAtom).x,
+    (get, set, nextValue: SetStateAction<number>) => {
+        const current = get(storedViewBoxAtom);
+        const next = typeof nextValue === "function" ? nextValue(current.x) : nextValue;
+        if (!Number.isFinite(next)) return;
+        set(storedViewBoxAtom, { ...current, x: next });
+    }
+);
+
+export const viewPortYAtom = atom(
+    (get) => get(storedViewBoxAtom).y,
+    (get, set, nextValue: SetStateAction<number>) => {
+        const current = get(storedViewBoxAtom);
+        const next = typeof nextValue === "function" ? nextValue(current.y) : nextValue;
+        if (!Number.isFinite(next)) return;
+        set(storedViewBoxAtom, { ...current, y: next });
+    }
+);
+
+export const viewPortWidthAtom = atom(
+    (get) => get(storedViewBoxAtom).width,
+    (get, set, nextValue: SetStateAction<number>) => {
+        const current = get(storedViewBoxAtom);
+        const next = typeof nextValue === "function" ? nextValue(current.width) : nextValue;
+        if (!Number.isFinite(next) || next <= 0) return;
+        set(storedViewBoxAtom, { ...current, width: Math.max(1e-3, next) });
+    }
+);
+
+export const viewPortHeightAtom = atom(
+    (get) => get(storedViewBoxAtom).height,
+    (get, set, nextValue: SetStateAction<number>) => {
+        const current = get(storedViewBoxAtom);
+        const next = typeof nextValue === "function" ? nextValue(current.height) : nextValue;
+        if (!Number.isFinite(next) || next <= 0) return;
+        set(storedViewBoxAtom, { ...current, height: Math.max(1e-3, next) });
+    }
+);
 
 // Canvas view box
 
@@ -33,13 +71,16 @@ export const canvasViewBoxAtom = atom<ViewBox>(
 export const doSetViewBoxAtom = atom(
     null,
     (_get, set, next: { x: number; y: number; width: number; height: number; }) => {
+        if (!Number.isFinite(next.x) || !Number.isFinite(next.y)) return;
         if (!Number.isFinite(next.width) || !Number.isFinite(next.height)) return;
         if (next.width <= 0 || next.height <= 0) return;
 
-        set(viewPortXAtom, next.x);
-        set(viewPortYAtom, next.y);
-        set(viewPortWidthAtom, next.width);
-        set(viewPortHeightAtom, next.height);
+        set(storedViewBoxAtom, {
+            x: next.x,
+            y: next.y,
+            width: Math.max(1e-3, next.width),
+            height: Math.max(1e-3, next.height),
+        });
     }
 );
 
@@ -49,8 +90,12 @@ export const doPanViewBoxAtom = atom(
     null,
     (get, set, delta: { dx: number; dy: number; }) => {
         if (appSettings.pathEditor.viewPortLocked) return;
-        set(viewPortXAtom, get(viewPortXAtom) + delta.dx);
-        set(viewPortYAtom, get(viewPortYAtom) + delta.dy);
+        const current = get(storedViewBoxAtom);
+        set(storedViewBoxAtom, {
+            ...current,
+            x: current.x + delta.dx,
+            y: current.y + delta.dy,
+        });
     }
 );
 
@@ -62,10 +107,8 @@ export const doZoomViewBoxAtom = atom(
         const scale = viewBoxArgs.scale;
         if (!Number.isFinite(scale) || scale <= 0) return;
 
-        const x = get(viewPortXAtom);
-        const y = get(viewPortYAtom);
-        const width = get(viewPortWidthAtom);
-        const height = get(viewPortHeightAtom);
+        const current = get(storedViewBoxAtom);
+        const { x, y, width, height } = current;
         const center = viewBoxArgs.center ?? { x: x + width / 2, y: y + height / 2 };
 
         const nextWidth = width * scale;
@@ -73,10 +116,12 @@ export const doZoomViewBoxAtom = atom(
         const nextX = x + (center.x - x) - scale * (center.x - x);
         const nextY = y + (center.y - y) - scale * (center.y - y);
 
-        set(viewPortXAtom, nextX);
-        set(viewPortYAtom, nextY);
-        set(viewPortWidthAtom, Math.max(1e-3, nextWidth));
-        set(viewPortHeightAtom, Math.max(1e-3, nextHeight));
+        set(storedViewBoxAtom, {
+            x: nextX,
+            y: nextY,
+            width: Math.max(1e-3, nextWidth),
+            height: Math.max(1e-3, nextHeight),
+        });
 
         appSettings.pathEditor.zoom = clampZoom(appSettings.pathEditor.zoom / scale);
     }
@@ -89,10 +134,12 @@ export const doFitViewBoxAtom = atom(
 
         const model = get(svgModelAtom).model;
         if (!model) {
-            set(viewPortXAtom, DEFAULT_VIEWPORT_X);
-            set(viewPortYAtom, DEFAULT_VIEWPORT_Y);
-            set(viewPortWidthAtom, DEFAULT_VIEWPORT_WIDTH);
-            set(viewPortHeightAtom, DEFAULT_VIEWPORT_HEIGHT);
+            set(storedViewBoxAtom, {
+                x: DEFAULT_VIEWPORT_X,
+                y: DEFAULT_VIEWPORT_Y,
+                width: DEFAULT_VIEWPORT_WIDTH,
+                height: DEFAULT_VIEWPORT_HEIGHT,
+            });
             return;
         }
 
@@ -119,10 +166,12 @@ export const doFitViewBoxAtom = atom(
         const centerX = (bounds.xmin + bounds.xmax) / 2;
         const centerY = (bounds.ymin + bounds.ymax) / 2;
 
-        set(viewPortXAtom, centerX - width / 2);
-        set(viewPortYAtom, centerY - height / 2);
-        set(viewPortWidthAtom, width);
-        set(viewPortHeightAtom, height);
+        set(storedViewBoxAtom, {
+            x: centerX - width / 2,
+            y: centerY - height / 2,
+            width,
+            height,
+        });
     }
 );
 
@@ -133,10 +182,11 @@ export const doAdjustViewBoxToAspectAtom = atom(
         if (!viewport || viewport.width <= 0 || viewport.height <= 0) return;
 
         const aspect = viewport.width / viewport.height;
-        const oldWidth = get(viewPortWidthAtom);
-        const oldHeight = get(viewPortHeightAtom);
-        const oldCenterX = get(viewPortXAtom) + oldWidth / 2;
-        const oldCenterY = get(viewPortYAtom) + oldHeight / 2;
+        const current = get(storedViewBoxAtom);
+        const oldWidth = current.width;
+        const oldHeight = current.height;
+        const oldCenterX = current.x + oldWidth / 2;
+        const oldCenterY = current.y + oldHeight / 2;
 
         let width = oldWidth;
         let height = oldHeight;
@@ -146,10 +196,12 @@ export const doAdjustViewBoxToAspectAtom = atom(
             width = height * aspect;
         }
 
-        set(viewPortXAtom, oldCenterX - width / 2);
-        set(viewPortYAtom, oldCenterY - height / 2);
-        set(viewPortWidthAtom, width);
-        set(viewPortHeightAtom, height);
+        set(storedViewBoxAtom, {
+            x: oldCenterX - width / 2,
+            y: oldCenterY - height / 2,
+            width,
+            height,
+        });
     }
 );
 

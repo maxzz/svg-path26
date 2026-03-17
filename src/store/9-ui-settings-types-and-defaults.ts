@@ -1,8 +1,16 @@
 import type { ThemeMode } from "@/utils";
 
+export interface StoredViewBoxSetting {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+
 export interface StoredPathSetting {
     name: string;
     path: string;
+    viewBox: StoredViewBoxSetting;
     createdAt: number;
     updatedAt: number;
 }
@@ -19,6 +27,7 @@ export interface PathEditorSettings {
     fillPreview: boolean;                 // Fill preview or not (when enabled, the fill will be previewed)
     canvasPreview: boolean;               // Canvas preview or not (when enabled, the canvas will be previewed)
     viewPortLocked: boolean;              // View port locked or not
+    viewBox: StoredViewBoxSetting;        // Stored canvas viewBox
     pathName: string;                     // Path name
     rawPath: string;                      // Raw path
     storedPaths: StoredPathSetting[];     // Stored paths
@@ -43,6 +52,13 @@ export interface UiSettings {
     export: ExportSettings;
 }
 
+export const DEFAULT_VIEWBOX_SETTINGS: StoredViewBoxSetting = {
+    x: 0,
+    y: 0,
+    width: 24,
+    height: 24,
+};
+
 export const DEFAULT_PATH_EDITOR_SETTINGS: PathEditorSettings = {
     strokeWidth: 3,
     zoom: 1,
@@ -55,6 +71,7 @@ export const DEFAULT_PATH_EDITOR_SETTINGS: PathEditorSettings = {
     fillPreview: false,
     canvasPreview: false,
     viewPortLocked: false,
+    viewBox: { ...DEFAULT_VIEWBOX_SETTINGS },
     pathName: "",
     rawPath: "M 20 140 C 40 20, 65 20, 95 140 S 150 260, 180 140",
     storedPaths: [],
@@ -73,7 +90,7 @@ export const DEFAULT_SETTINGS: UiSettings = {
     showGrid: true,
     showHelpers: true,
     darkCanvas: false,
-    sections: { transform: true },
+    sections: { transform: true, options: true },
     editorPanelSizes: [33, 67],
     pathEditor: DEFAULT_PATH_EDITOR_SETTINGS,
     export: DEFAULT_EXPORT_SETTINGS,

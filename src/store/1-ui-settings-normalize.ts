@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { type ExportSettings, type PathEditorSettings, type UiSettings, DEFAULT_EXPORT_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SETTINGS } from "./9-ui-settings-types-and-defaults";
+import { type ExportSettings, type PathEditorSettings, type StoredViewBoxSetting, type UiSettings, DEFAULT_EXPORT_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SETTINGS, DEFAULT_VIEWBOX_SETTINGS } from "./9-ui-settings-types-and-defaults";
 
 export function normalizeStoredSettings(value: unknown): UiSettings {
     const defaultSettings = DEFAULT_SETTINGS;
@@ -51,7 +51,11 @@ function cloneUiSettings(settings: UiSettings): UiSettings {
         export: { ...settings.export },
         pathEditor: {
             ...settings.pathEditor,
-            storedPaths: settings.pathEditor.storedPaths.map((storedPath) => ({ ...storedPath })),
+            viewBox: { ...settings.pathEditor.viewBox },
+            storedPaths: settings.pathEditor.storedPaths.map((storedPath) => ({
+                ...storedPath,
+                viewBox: { ...storedPath.viewBox },
+            })),
         },
     };
 }
@@ -71,6 +75,7 @@ function createPathEditorSettingsSchema(defaultSettings: PathEditorSettings) {
             fillPreview: z.boolean().catch(defaultSettings.fillPreview),
             canvasPreview: z.boolean().catch(defaultSettings.canvasPreview),
             viewPortLocked: z.boolean().catch(defaultSettings.viewPortLocked),
+            viewBox: createStoredViewBoxSchema(defaultSettings.viewBox).catch(defaultSettings.viewBox),
             pathName: z.string().catch(defaultSettings.pathName),
             rawPath: z.string().catch(defaultSettings.rawPath),
             storedPaths: z.array(storedPathSchema).catch(defaultSettings.storedPaths),
@@ -97,9 +102,22 @@ function toRecord(value: unknown): Record<string, unknown> {
 
 const themeModeSchema = z.enum(["light", "dark", "system"]);
 
+function createStoredViewBoxSchema(defaultSettings: StoredViewBoxSetting) {
+    return z.preprocess(
+        toRecord,
+        z.object({
+            x: z.number().catch(defaultSettings.x),
+            y: z.number().catch(defaultSettings.y),
+            width: z.number().catch(defaultSettings.width),
+            height: z.number().catch(defaultSettings.height),
+        })
+    );
+}
+
 const storedPathSchema = z.object({
     name: z.string(),
     path: z.string(),
+    viewBox: createStoredViewBoxSchema(DEFAULT_VIEWBOX_SETTINGS).catch(DEFAULT_VIEWBOX_SETTINGS),
     createdAt: z.number(),
     updatedAt: z.number(),
 });

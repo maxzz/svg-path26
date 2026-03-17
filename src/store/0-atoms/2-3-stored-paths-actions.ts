@@ -1,12 +1,14 @@
 import { atom } from "jotai";
 import { rawPathAtom } from "./1-0-raw-path";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
+import { canvasViewBoxAtom, doSetViewBoxAtom } from "./2-1-canvas-viewbox";
 import { hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "./2-2-editor-actions";
 import { appSettings } from "@/store/0-ui-settings";
 
 export type StoredPath = {
     name: string;
     path: string;
+    viewBox: { x: number; y: number; width: number; height: number; };
     createdAt: number;
     updatedAt: number;
 };
@@ -17,13 +19,15 @@ export const doSaveNamedPathAtom = atom(
         const path = get(rawPathAtom).trim();
         const name = nameRaw.trim();
         if (!path || !name) return;
+        const [x, y, width, height] = get(canvasViewBoxAtom);
+        const viewBox = { x, y, width, height };
         const now = Date.now();
         const existing = appSettings.pathEditor.storedPaths;
         const match = existing.find((it) => it.name === name);
         if (match) {
-            appSettings.pathEditor.storedPaths = existing.map((it) => it.name === name ? { ...it, path, updatedAt: now } : it);
+            appSettings.pathEditor.storedPaths = existing.map((it) => it.name === name ? { ...it, path, viewBox, updatedAt: now } : it);
         } else {
-            appSettings.pathEditor.storedPaths = [...existing, { name, path, createdAt: now, updatedAt: now }];
+            appSettings.pathEditor.storedPaths = [...existing, { name, path, viewBox, createdAt: now, updatedAt: now }];
         }
         appSettings.pathEditor.pathName = name;
     }
@@ -45,6 +49,7 @@ export const doOpenNamedPathAtom = atom(
         const match = appSettings.pathEditor.storedPaths.find((it) => it.name === name);
         if (!match) return;
         set(svgPathInputAtom, match.path);
+        set(doSetViewBoxAtom, match.viewBox);
         appSettings.pathEditor.pathName = name;
         set(selectedCommandIndexAtom, null);
         set(hoveredCommandIndexAtom, null);
