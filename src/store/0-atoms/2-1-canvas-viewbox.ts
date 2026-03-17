@@ -10,6 +10,8 @@ const DEFAULT_VIEWPORT_Y = 0;
 const DEFAULT_VIEWPORT_WIDTH = 120;
 const DEFAULT_VIEWPORT_HEIGHT = 90;
 
+export const canvasViewportSizeAtom = atom<{ width: number; height: number; } | null>(null);
+
 export const viewPortXAtom = atom(DEFAULT_VIEWPORT_X);
 export const viewPortYAtom = atom(DEFAULT_VIEWPORT_Y);
 export const viewPortWidthAtom = atom(DEFAULT_VIEWPORT_WIDTH);
@@ -99,7 +101,10 @@ export const doFitViewBoxAtom = atom(
 
         let width = widthRaw + padding * 2;
         let height = heightRaw + padding * 2;
-        const aspect = 4 / 3;
+        const viewport = get(canvasViewportSizeAtom);
+        const aspect = (viewport && viewport.width > 0 && viewport.height > 0)
+            ? viewport.width / viewport.height
+            : 4 / 3;
         if (width / height > aspect) {
             height = width / aspect;
         } else {
@@ -114,6 +119,33 @@ export const doFitViewBoxAtom = atom(
 
         set(viewPortXAtom, centerX - width / 2);
         set(viewPortYAtom, centerY - height / 2);
+        set(viewPortWidthAtom, width);
+        set(viewPortHeightAtom, height);
+    }
+);
+
+export const doAdjustViewBoxToAspectAtom = atom(
+    null,
+    (get, set) => {
+        const viewport = get(canvasViewportSizeAtom);
+        if (!viewport || viewport.width <= 0 || viewport.height <= 0) return;
+
+        const aspect = viewport.width / viewport.height;
+        const oldWidth = get(viewPortWidthAtom);
+        const oldHeight = get(viewPortHeightAtom);
+        const oldCenterX = get(viewPortXAtom) + oldWidth / 2;
+        const oldCenterY = get(viewPortYAtom) + oldHeight / 2;
+
+        let width = oldWidth;
+        let height = oldHeight;
+        if (width / height > aspect) {
+            height = width / aspect;
+        } else {
+            width = height * aspect;
+        }
+
+        set(viewPortXAtom, oldCenterX - width / 2);
+        set(viewPortYAtom, oldCenterY - height / 2);
         set(viewPortWidthAtom, width);
         set(viewPortHeightAtom, height);
     }

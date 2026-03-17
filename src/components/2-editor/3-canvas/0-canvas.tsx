@@ -10,7 +10,7 @@ import { canvasSvgElementAtom, useSyncCanvasViewportSize } from "./5-canvas-view
 import { appSettings } from "@/store/0-ui-settings";
 import { hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
-import { canvasViewBoxAtom, doFitViewBoxAtom, doZoomViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
+import { canvasViewBoxAtom, canvasViewportSizeAtom, doAdjustViewBoxToAspectAtom, doFitViewBoxAtom, doZoomViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { focusedImageIdAtom, isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 
@@ -31,6 +31,8 @@ export function PathCanvas() {
     const setCanvasSvgElement = useSetAtom(canvasSvgElementAtom);
     const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
     const fitViewBox = useSetAtom(doFitViewBoxAtom);
+    const adjustViewBoxToAspect = useSetAtom(doAdjustViewBoxToAspectAtom);
+    const viewportSize = useAtomValue(canvasViewportSizeAtom);
 
     const dragState = useAtomValue(canvasDragStateAtom);
     const { onTouchEnd, onTouchMove, onTouchStart, startCanvasDrag } = useCanvasDragAndDrop(viewBox);
@@ -42,6 +44,12 @@ export function PathCanvas() {
             fitViewBox();
         },
         [fitViewBox, pathValue]);
+
+    useEffect(
+        () => {
+            adjustViewBoxToAspect();
+        },
+        [adjustViewBoxToAspect, viewportSize]);
 
     return (
         <div className={classNames("absolute w-full h-full overflow-hidden", preview ? "bg-white" : (darkCanvas ? "bg-zinc-900" : "bg-white"))}>
