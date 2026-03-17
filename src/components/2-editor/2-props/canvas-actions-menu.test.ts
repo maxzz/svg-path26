@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeExportViewBox } from "./8-helpers";
+import { computeExportViewBox } from "./2-panel-commands/8-helpers";
 import { type ViewBox } from "@/store/9-ui-settings-types-and-defaults";
 
 describe("computeExportViewBox", () => {
