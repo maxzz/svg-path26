@@ -19,7 +19,9 @@ export const viewPortHeightAtom = atom(DEFAULT_VIEWPORT_HEIGHT);
 
 // Canvas view box
 
-export const canvasViewBoxAtom = atom<[number, number, number, number]>(
+export type ViewBox = [number, number, number, number];
+
+export const canvasViewBoxAtom = atom<ViewBox>(
     (get) => [
         get(viewPortXAtom),
         get(viewPortYAtom),

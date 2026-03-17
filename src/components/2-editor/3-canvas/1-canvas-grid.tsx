@@ -3,17 +3,7 @@ import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
 import { canvasUnitsPerPixelAtom, canvasViewportSizeAtom } from "./5-canvas-viewport-metrics";
-import { canvasViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
-
-type ViewBox = [number, number, number, number];
-
-function calcGrid(viewBox: ViewBox, canvasWidth: number) {
-    const doGrid = 5 * viewBox[2] <= canvasWidth;
-    return {
-        xGrid: doGrid ? Array(Math.ceil(viewBox[2]) + 1).fill(null).map((_, i) => Math.floor(viewBox[0]) + i) : [],
-        yGrid: doGrid ? Array(Math.ceil(viewBox[3]) + 1).fill(null).map((_, i) => Math.floor(viewBox[1]) + i) : [],
-    };
-}
+import { canvasViewBoxAtom, type ViewBox } from "@/store/0-atoms/2-1-canvas-viewbox";
 
 export function CanvasGrid() {
     const { showGrid } = useSnapshot(appSettings);
@@ -75,4 +65,12 @@ export function CanvasGrid() {
             </>}
         </g>
     );
+}
+
+function calcGrid(viewBox: ViewBox, canvasWidth: number) {
+    const doGrid = 5 * viewBox[2] <= canvasWidth;
+    return {
+        xGrid: doGrid ? Array(Math.ceil(viewBox[2]) + 1).fill(null).map((_, i) => Math.floor(viewBox[0]) + i) : [],
+        yGrid: doGrid ? Array(Math.ceil(viewBox[3]) + 1).fill(null).map((_, i) => Math.floor(viewBox[1]) + i) : [],
+    };
 }
