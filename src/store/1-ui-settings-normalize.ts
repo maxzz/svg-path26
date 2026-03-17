@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { type ExportSettings, type PathEditorSettings, type StoredViewBoxSetting, type UiSettings, DEFAULT_EXPORT_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SETTINGS, DEFAULT_VIEWBOX_SETTINGS } from "./9-ui-settings-types-and-defaults";
+import { type ExportSettings, type PathEditorSettings, type UiSettings, type ViewBox, DEFAULT_EXPORT_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SETTINGS, DEFAULT_VIEWBOX_SETTINGS } from "./9-ui-settings-types-and-defaults";
 
 export function normalizeStoredSettings(value: unknown): UiSettings {
     const defaultSettings = DEFAULT_SETTINGS;
@@ -51,10 +51,10 @@ function cloneUiSettings(settings: UiSettings): UiSettings {
         export: { ...settings.export },
         pathEditor: {
             ...settings.pathEditor,
-            viewBox: { ...settings.pathEditor.viewBox },
+            viewBox: [...settings.pathEditor.viewBox] as ViewBox,
             storedPaths: settings.pathEditor.storedPaths.map((storedPath) => ({
                 ...storedPath,
-                viewBox: { ...storedPath.viewBox },
+                viewBox: [...storedPath.viewBox] as ViewBox,
             })),
         },
     };
@@ -103,16 +103,13 @@ function toRecord(value: unknown): Record<string, unknown> {
 
 const themeModeSchema = z.enum(["light", "dark", "system"]);
 
-function createStoredViewBoxSchema(defaultSettings: StoredViewBoxSetting) {
-    return z.preprocess(
-        toRecord,
-        z.object({
-            x: z.number().catch(defaultSettings.x),
-            y: z.number().catch(defaultSettings.y),
-            width: z.number().catch(defaultSettings.width),
-            height: z.number().catch(defaultSettings.height),
-        })
-    );
+function createStoredViewBoxSchema(defaultSettings: ViewBox) {
+    return z.tuple([
+        z.number().catch(defaultSettings[0]),
+        z.number().catch(defaultSettings[1]),
+        z.number().catch(defaultSettings[2]),
+        z.number().catch(defaultSettings[3]),
+    ]);
 }
 
 const storedPathSchema = z.object({

@@ -66,10 +66,10 @@ function CanvasViewBoxFrame({ unitsPerPixel }: { unitsPerPixel: number; }) {
 
     return (
         <rect
-            x={viewBox.x}
-            y={viewBox.y}
-            width={viewBox.width}
-            height={viewBox.height}
+            x={viewBox[0]}
+            y={viewBox[1]}
+            width={viewBox[2]}
+            height={viewBox[3]}
             fill="none"
             stroke={darkCanvas ? "rgba(255,255,255,0.72)" : "rgba(18,18,18,0.72)"}
             strokeDasharray={`${unitsPerPixel * 6} ${unitsPerPixel * 3}`}

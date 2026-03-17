@@ -3,20 +3,11 @@ import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { pathViewBoxAtom } from "./2-6-path-viewbox";
 import { appSettings } from "@/store/0-ui-settings";
 import { computeExportViewBox } from "@/components/2-editor/2-props/8-helpers";
+import { type ViewBox } from "@/store/9-ui-settings-types-and-defaults";
 
-export type ExportViewBoxDraft = {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-};
+export type ExportViewBoxDraft = ViewBox;
 
-export const exportViewBoxDraftAtom = atom<ExportViewBoxDraft>({
-    x: 0,
-    y: 0,
-    width: 1,
-    height: 1,
-});
+export const exportViewBoxDraftAtom = atom<ExportViewBoxDraft>([0, 0, 1, 1]);
 
 export const doResetExportViewBoxDraftAtom = atom(
     null,

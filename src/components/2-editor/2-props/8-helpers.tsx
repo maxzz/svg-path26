@@ -175,7 +175,7 @@ export function commandValueTooltip(command: string, valueIndex: number): string
 export function computeExportViewBox(
     path: string,
     strokePadding: number,
-    fallback: { x: number; y: number; width: number; height: number; },
+    fallback: import("@/store/9-ui-settings-types-and-defaults").ViewBox,
 ) {
     try {
         const model = new SvgPathModel(path);
@@ -183,12 +183,12 @@ export function computeExportViewBox(
         const width = Math.max(1e-6, bounds.xmax - bounds.xmin);
         const height = Math.max(1e-6, bounds.ymax - bounds.ymin);
         const pad = Math.max(0, strokePadding);
-        return {
-            x: bounds.xmin - pad,
-            y: bounds.ymin - pad,
-            width: width + 2 * pad,
-            height: height + 2 * pad,
-        };
+        return [
+            bounds.xmin - pad,
+            bounds.ymin - pad,
+            width + 2 * pad,
+            height + 2 * pad,
+        ] as import("@/store/9-ui-settings-types-and-defaults").ViewBox;
     } catch {
         return fallback;
     }

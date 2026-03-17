@@ -26,13 +26,13 @@ export function ExportSvgDialog() {
     const handleExport = () => {
         if (!pathValue.trim()) return;
 
-        const width = Math.max(1e-6, exportViewBoxDraft.width);
-        const height = Math.max(1e-6, exportViewBoxDraft.height);
+        const width = Math.max(1e-6, exportViewBoxDraft[2]);
+        const height = Math.max(1e-6, exportViewBoxDraft[3]);
         const fillPart = exportFill ? ` fill="${exportFillColor}"` : " fill=\"none\"";
         const strokePart = exportStroke
             ? ` stroke="${exportStrokeColor}" stroke-width="${exportStrokeWidth}"`
             : "";
-        const svgData = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${exportViewBoxDraft.x} ${exportViewBoxDraft.y} ${width} ${height}"><path d="${pathValue}"${strokePart}${fillPart} /></svg>`;
+        const svgData = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${exportViewBoxDraft[0]} ${exportViewBoxDraft[1]} ${width} ${height}"><path d="${pathValue}"${strokePart}${fillPart} /></svg>`;
         const blob = new Blob([svgData], { type: "image/svg+xml" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -107,25 +107,25 @@ export function ExportSvgDialog() {
                         <div className="col-span-2 grid grid-cols-4 gap-2 rounded border px-2 py-2">
                             <NumberField
                                 label="x"
-                                value={exportViewBoxDraft.x}
-                                onChange={(value) => setExportViewBoxDraft((previous) => ({ ...previous, x: value }))}
+                                value={exportViewBoxDraft[0]}
+                                onChange={(value) => setExportViewBoxDraft((previous) => [value, previous[1], previous[2], previous[3]])}
                             />
                             <NumberField
                                 label="y"
-                                value={exportViewBoxDraft.y}
-                                onChange={(value) => setExportViewBoxDraft((previous) => ({ ...previous, y: value }))}
+                                value={exportViewBoxDraft[1]}
+                                onChange={(value) => setExportViewBoxDraft((previous) => [previous[0], value, previous[2], previous[3]])}
                             />
                             <NumberField
                                 label="width"
                                 min={0.000001}
-                                value={exportViewBoxDraft.width}
-                                onChange={(value) => setExportViewBoxDraft((previous) => ({ ...previous, width: value }))}
+                                value={exportViewBoxDraft[2]}
+                                onChange={(value) => setExportViewBoxDraft((previous) => [previous[0], previous[1], value, previous[3]])}
                             />
                             <NumberField
                                 label="height"
                                 min={0.000001}
-                                value={exportViewBoxDraft.height}
-                                onChange={(value) => setExportViewBoxDraft((previous) => ({ ...previous, height: value }))}
+                                value={exportViewBoxDraft[3]}
+                                onChange={(value) => setExportViewBoxDraft((previous) => [previous[0], previous[1], previous[2], value])}
                             />
                         </div>
                         <Button
@@ -141,7 +141,7 @@ export function ExportSvgDialog() {
                         <p className="mb-2 text-[11px] text-muted-foreground">Live preview</p>
                         <svg
                             className="h-40 w-full rounded bg-muted/20"
-                            viewBox={`${exportViewBoxDraft.x} ${exportViewBoxDraft.y} ${Math.max(1e-6, exportViewBoxDraft.width)} ${Math.max(1e-6, exportViewBoxDraft.height)}`}
+                            viewBox={`${exportViewBoxDraft[0]} ${exportViewBoxDraft[1]} ${Math.max(1e-6, exportViewBoxDraft[2])} ${Math.max(1e-6, exportViewBoxDraft[3])}`}
                         >
                             <defs>
                                 <pattern id="export-preview-grid" width="10" height="10" patternUnits="userSpaceOnUse">
@@ -149,10 +149,10 @@ export function ExportSvgDialog() {
                                 </pattern>
                             </defs>
                             <rect
-                                x={exportViewBoxDraft.x}
-                                y={exportViewBoxDraft.y}
-                                width={Math.max(1e-6, exportViewBoxDraft.width)}
-                                height={Math.max(1e-6, exportViewBoxDraft.height)}
+                                x={exportViewBoxDraft[0]}
+                                y={exportViewBoxDraft[1]}
+                                width={Math.max(1e-6, exportViewBoxDraft[2])}
+                                height={Math.max(1e-6, exportViewBoxDraft[3])}
                                 fill="url(#export-preview-grid)"
                             />
                             <path

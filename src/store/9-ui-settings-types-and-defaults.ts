@@ -1,16 +1,11 @@
 import type { ThemeMode } from "@/utils";
 
-export interface StoredViewBoxSetting {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-}
+export type ViewBox = [number, number, number, number];
 
 export interface StoredPathSetting {
     name: string;
     path: string;
-    viewBox: StoredViewBoxSetting;
+    viewBox: ViewBox;
     createdAt: number;
     updatedAt: number;
 }
@@ -28,7 +23,7 @@ export interface PathEditorSettings {
     canvasPreview: boolean;               // Canvas preview or not (when enabled, the canvas will be previewed)
     viewPortLocked: boolean;              // View port locked or not
     showViewBoxFrame: boolean;            // Show stored viewBox frame on canvas
-    viewBox: StoredViewBoxSetting;        // Stored canvas viewBox
+    viewBox: ViewBox;                     // Stored canvas viewBox
     pathName: string;                     // Path name
     rawPath: string;                      // Raw path
     storedPaths: StoredPathSetting[];     // Stored paths
@@ -53,12 +48,7 @@ export interface UiSettings {
     export: ExportSettings;
 }
 
-export const DEFAULT_VIEWBOX_SETTINGS: StoredViewBoxSetting = {
-    x: 0,
-    y: 0,
-    width: 24,
-    height: 24,
-};
+export const DEFAULT_VIEWBOX_SETTINGS: ViewBox = [0, 0, 24, 24];
 
 export const DEFAULT_PATH_EDITOR_SETTINGS: PathEditorSettings = {
     strokeWidth: 3,
@@ -73,7 +63,7 @@ export const DEFAULT_PATH_EDITOR_SETTINGS: PathEditorSettings = {
     canvasPreview: false,
     viewPortLocked: false,
     showViewBoxFrame: false,
-    viewBox: { ...DEFAULT_VIEWBOX_SETTINGS },
+    viewBox: [...DEFAULT_VIEWBOX_SETTINGS],
     pathName: "",
     rawPath: "M 20 140 C 40 20, 65 20, 95 140 S 150 260, 180 140",
     storedPaths: [],

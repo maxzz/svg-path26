@@ -2,6 +2,7 @@ import { atom } from "jotai";
 import { type Point } from "@/svg-core/9-types-svg-model";
 import { svgModelAtom } from "@/store/0-atoms/2-0-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
+import { type ViewBox } from "@/store/9-ui-settings-types-and-defaults";
 
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 16;
@@ -17,10 +18,6 @@ export const viewPortYAtom = atom(DEFAULT_VIEWPORT_Y);
 export const viewPortWidthAtom = atom(DEFAULT_VIEWPORT_WIDTH);
 export const viewPortHeightAtom = atom(DEFAULT_VIEWPORT_HEIGHT);
 
-// Canvas view box
-
-export type ViewBox = [number, number, number, number];
-
 export const canvasViewBoxAtom = atom<ViewBox>(
     (get) => [
         get(viewPortXAtom),
@@ -32,15 +29,15 @@ export const canvasViewBoxAtom = atom<ViewBox>(
 
 export const doSetViewBoxAtom = atom(
     null,
-    (_get, set, next: { x: number; y: number; width: number; height: number; }) => {
-        if (!Number.isFinite(next.x) || !Number.isFinite(next.y)) return;
-        if (!Number.isFinite(next.width) || !Number.isFinite(next.height)) return;
-        if (next.width <= 0 || next.height <= 0) return;
+    (_get, set, next: ViewBox) => {
+        if (!Number.isFinite(next[0]) || !Number.isFinite(next[1])) return;
+        if (!Number.isFinite(next[2]) || !Number.isFinite(next[3])) return;
+        if (next[2] <= 0 || next[3] <= 0) return;
 
-        set(viewPortXAtom, next.x);
-        set(viewPortYAtom, next.y);
-        set(viewPortWidthAtom, Math.max(1e-3, next.width));
-        set(viewPortHeightAtom, Math.max(1e-3, next.height));
+        set(viewPortXAtom, next[0]);
+        set(viewPortYAtom, next[1]);
+        set(viewPortWidthAtom, Math.max(1e-3, next[2]));
+        set(viewPortHeightAtom, Math.max(1e-3, next[3]));
     }
 );
 

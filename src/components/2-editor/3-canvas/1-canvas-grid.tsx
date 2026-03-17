@@ -2,8 +2,9 @@ import { Fragment } from "react";
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
+import { type ViewBox } from "@/store/9-ui-settings-types-and-defaults";
 import { canvasUnitsPerPixelAtom, canvasViewportSizeAtom } from "./5-canvas-viewport-metrics";
-import { canvasViewBoxAtom, type ViewBox } from "@/store/0-atoms/2-1-canvas-viewbox";
+import { canvasViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 
 export function CanvasGrid() {
     const { showGrid } = useSnapshot(appSettings);

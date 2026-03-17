@@ -25,7 +25,7 @@ describe("svg path state atoms", () => {
         appSettings.pathEditor.pathName = "";
         appSettings.pathEditor.storedPaths = [];
         appSettings.pathEditor.showViewBoxFrame = false;
-        appSettings.pathEditor.viewBox = { x: 0, y: 0, width: 24, height: 24 };
+        appSettings.pathEditor.viewBox = [0, 0, 24, 24];
         appSettings.pathEditor.decimals = 3;
         appSettings.pathEditor.minifyOutput = false;
     });
@@ -109,18 +109,18 @@ describe("svg path state atoms", () => {
     it("stores and opens named paths", () => {
         const store = createStore();
         store.set(svgPathInputAtom, "M 0 0 L 33 44");
-        store.set(doSetPathViewBoxAtom, { x: 1, y: 2, width: 30, height: 40 });
+        store.set(doSetPathViewBoxAtom, [1, 2, 30, 40]);
         store.set(doSaveNamedPathAtom, "example");
 
         expect(appSettings.pathEditor.storedPaths.length).toBe(1);
         expect(appSettings.pathEditor.pathName).toBe("example");
-        expect(appSettings.pathEditor.storedPaths[0]?.viewBox).toEqual({ x: 1, y: 2, width: 30, height: 40 });
+        expect(appSettings.pathEditor.storedPaths[0]?.viewBox).toEqual([1, 2, 30, 40]);
 
         store.set(svgPathInputAtom, "M 0 0 L 1 1");
-        store.set(doSetViewBoxAtom, { x: 9, y: 9, width: 12, height: 12 });
+        store.set(doSetViewBoxAtom, [9, 9, 12, 12]);
         store.set(doOpenNamedPathAtom, "example");
         expect(store.get(svgPathInputAtom)).toContain("33 44");
-        expect(appSettings.pathEditor.viewBox).toEqual({ x: 1, y: 2, width: 30, height: 40 });
+        expect(appSettings.pathEditor.viewBox).toEqual([1, 2, 30, 40]);
         expect(store.get(canvasViewBoxAtom)).toEqual([9, 9, 12, 12]);
     });
 });

@@ -4,11 +4,12 @@ import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "./2-2-editor-actions";
 import { doSetPathViewBoxAtom, pathViewBoxAtom } from "./2-6-path-viewbox";
 import { appSettings } from "@/store/0-ui-settings";
+import { type ViewBox } from "@/store/9-ui-settings-types-and-defaults";
 
 export type StoredPath = {
     name: string;
     path: string;
-    viewBox: { x: number; y: number; width: number; height: number; };
+    viewBox: ViewBox;
     createdAt: number;
     updatedAt: number;
 };
@@ -19,7 +20,7 @@ export const doSaveNamedPathAtom = atom(
         const path = get(rawPathAtom).trim();
         const name = nameRaw.trim();
         if (!path || !name) return;
-        const viewBox = get(pathViewBoxAtom);
+        const viewBox = [...get(pathViewBoxAtom)] as ViewBox;
         const now = Date.now();
         const existing = appSettings.pathEditor.storedPaths;
         const match = existing.find((it) => it.name === name);
