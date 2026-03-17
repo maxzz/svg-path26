@@ -24,8 +24,8 @@ export function TransformPanel() {
 
     return (
         <SectionPanel sectionKey="transform" label="Path Operations" contentClassName="px-0 pt-1 pb-4">
-            <div className="space-y-2 pl-3 pr-2 text-xs">
-                <div className="flex gap-2">
+            <div className="space-y-1.5 pl-2.5 pr-2 text-[11px]">
+                <div className="flex gap-1.5">
                     <OperationNumberField
                         label={uniformScale ? "Uniform scale" : "Scale X"}
                         value={scaleX}
@@ -40,7 +40,7 @@ export function TransformPanel() {
                         overlay={
                             <button
                                 type="button"
-                                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-800"
+                                className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-800"
                                 title="Lock/Unlock x and y scales"
                                 onMouseDown={(event) => event.preventDefault()}
                                 onClick={() => {
@@ -51,7 +51,7 @@ export function TransformPanel() {
                                     }
                                 }}
                             >
-                                {uniformScale ? <Link2 className="size-4" /> : <Unlink2 className="size-4" />}
+                                {uniformScale ? <Link2 className="size-3.5" /> : <Unlink2 className="size-3.5" />}
                             </button>
                         }
                         onEnter={() => applyScale()}
@@ -77,7 +77,7 @@ export function TransformPanel() {
                     </ActionButton>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-1.5">
                     <OperationAtomField label="Translate X" valueAtom={translateXAtom} wrapperClassName="basis-[33%]" step={1} onEnter={() => applyTranslate()} />
                     <OperationAtomField label="Translate Y" valueAtom={translateYAtom} wrapperClassName="basis-[33%]" step={1} onEnter={() => applyTranslate()} />
                     <ActionButton className="flex-1" title="Translate all commands" onClick={() => applyTranslate()}>
@@ -85,7 +85,7 @@ export function TransformPanel() {
                     </ActionButton>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-1.5">
                     <OperationNumberField
                         label="Number of decimals"
                         value={decimals}
@@ -146,10 +146,10 @@ function OperationNumberField({
 } & Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange">) {
     return (
         <label className={classNames("relative overflow-hidden rounded-md", wrapperClassName)}>
-            <span className="pointer-events-none absolute left-2 top-1 text-[11px] text-slate-600">{label}</span>
+            <span className="pointer-events-none absolute left-1.5 top-0.5 text-[10px] leading-none text-slate-600">{label}</span>
             {overlay}
             <input
-                className={classNames("h-14 w-full rounded-md border border-slate-400/70 bg-slate-100/90 px-2 pt-5 text-[15px] text-slate-800 shadow-sm outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none", className)}
+                className={classNames("h-10 w-full rounded-md border border-slate-400/70 bg-slate-100/90 px-1.5 pt-4 text-[13px] text-slate-800 shadow-sm outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none", className)}
                 type="number"
                 {...rest}
                 value={value}
@@ -168,7 +168,7 @@ function ActionButton({ className, ...rest }: ComponentProps<typeof Button>) {
     return (
         <Button
             variant="outline"
-            className={classNames("h-14 rounded-md border-slate-500/60 bg-slate-300/55 text-base text-slate-900 shadow-sm hover:bg-slate-300/70", className)}
+            className={classNames("h-10 rounded-md border-slate-500/60 bg-slate-300/55 px-2 text-[13px] text-slate-900 shadow-sm hover:bg-slate-300/70", className)}
             {...rest}
         />
     );

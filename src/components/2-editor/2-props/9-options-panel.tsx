@@ -28,12 +28,12 @@ export function OptionsPanel() {
 
     return (
         <SectionPanel sectionKey="options" label="Options" contentClassName="px-0 pt-1 pb-4">
-            <div className="space-y-3 pl-3 text-xs">
-                <div className="space-y-2">
-                    <span className="text-muted-foreground">viewport</span>
+            <div className="space-y-2.5 pl-2.5 pr-2 text-[11px]">
+                <div className="space-y-1.5">
+                    <span className="text-[11px] text-muted-foreground">viewport</span>
 
-                    <div className="flex items-start gap-2">
-                        <div className="grid flex-1 grid-cols-4 gap-2">
+                    <div className="flex items-start gap-1.5">
+                        <div className="grid flex-1 grid-cols-4 gap-1.5">
                             <CompactViewBoxField label="x" valueAtom={viewPortXAtom} title="viewport x" />
                             <CompactViewBoxField label="y" valueAtom={viewPortYAtom} title="viewport y" />
                             <CompactViewBoxField label="width" valueAtom={viewPortWidthAtom} title="viewport width" min={1e-3} />
@@ -43,34 +43,34 @@ export function OptionsPanel() {
                         <Button
                             variant="outline"
                             size="icon"
-                            className="mt-px size-10 shrink-0 rounded-md border-slate-400/70 bg-slate-200/60 text-slate-700 shadow-sm hover:bg-slate-200"
+                            className="mt-px size-9 shrink-0 rounded-md border-slate-400/70 bg-slate-200/60 text-slate-700 shadow-sm hover:bg-slate-200"
                             title={viewPortLocked ? "Unlock viewport" : "Lock viewport"}
                             onClick={() => {
                                 appSettings.pathEditor.viewPortLocked = !viewPortLocked;
                             }}
                         >
-                            {viewPortLocked ? <Lock className="size-4" /> : <LockOpen className="size-4" />}
+                            {viewPortLocked ? <Lock className="size-3.5" /> : <LockOpen className="size-3.5" />}
                         </Button>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2">
-                        <Button variant="outline" className="h-8 px-2" onClick={() => zoomViewBox({ scale: 10 / 9 })}>
+                    <div className="grid grid-cols-3 gap-1.5">
+                        <Button variant="outline" className="h-7 px-2 text-[11px]" onClick={() => zoomViewBox({ scale: 10 / 9 })}>
                             -
                         </Button>
-                        <Button variant="outline" className="h-8 px-2" onClick={() => fitViewBox()}>
+                        <Button variant="outline" className="h-7 px-2 text-[11px]" onClick={() => fitViewBox()}>
                             Zoom to Fit
                         </Button>
-                        <Button variant="outline" className="h-8 px-2" onClick={() => zoomViewBox({ scale: 9 / 10 })}>
+                        <Button variant="outline" className="h-7 px-2 text-[11px]" onClick={() => zoomViewBox({ scale: 9 / 10 })}>
                             +
                         </Button>
                     </div>
                 </div>
 
-                <div className="space-y-2">
-                    <span className="text-muted-foreground">viewBox</span>
+                <div className="space-y-1.5">
+                    <span className="text-[11px] text-muted-foreground">viewBox</span>
 
-                    <div className="flex items-start gap-2">
-                        <div className="grid flex-1 grid-cols-4 gap-2">
+                    <div className="flex items-start gap-1.5">
+                        <div className="grid flex-1 grid-cols-4 gap-1.5">
                             <CompactViewBoxField label="x" valueAtom={pathViewBoxXAtom} title="viewBox x" />
                             <CompactViewBoxField label="y" valueAtom={pathViewBoxYAtom} title="viewBox y" />
                             <CompactViewBoxField label="width" valueAtom={pathViewBoxWidthAtom} title="viewBox width" min={1e-3} />
@@ -80,20 +80,20 @@ export function OptionsPanel() {
                         <Button
                             variant="outline"
                             size="icon"
-                            className="mt-px size-10 shrink-0 rounded-md border-slate-400/70 bg-slate-200/60 text-slate-700 shadow-sm hover:bg-slate-200"
+                            className="mt-px size-9 shrink-0 rounded-md border-slate-400/70 bg-slate-200/60 text-slate-700 shadow-sm hover:bg-slate-200"
                             title={showViewBoxFrame ? "Hide viewBox frame" : "Show viewBox frame"}
                             onClick={() => {
                                 appSettings.pathEditor.showViewBoxFrame = !showViewBoxFrame;
                             }}
                         >
-                            {showViewBoxFrame ? <Lock className="size-4" /> : <LockOpen className="size-4" />}
+                            {showViewBoxFrame ? <Lock className="size-3.5" /> : <LockOpen className="size-3.5" />}
                         </Button>
                     </div>
 
-                    <p className="text-[11px] text-muted-foreground">Lock icon toggles the viewBox frame on canvas.</p>
+                    <p className="text-[10px] text-muted-foreground">Lock icon toggles the viewBox frame on canvas.</p>
                 </div>
 
-                <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-2 items-center">
+                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5">
                     <CheckboxRow
                         label="Snap to grid"
                         checked={snapToGrid}
@@ -130,7 +130,7 @@ export function OptionsPanel() {
                         {showTicks ? (
                             <input
                                 type="number"
-                                className="h-7 w-14 rounded border bg-background px-2 text-xs"
+                                className="h-6 w-12 rounded border bg-background px-2 text-[11px]"
                                 value={tickInterval}
                                 min={1}
                                 step={1}
@@ -176,10 +176,10 @@ function CompactViewBoxField({ valueAtom, label, className, ...rest }: { valueAt
 
     return (
         <label className="relative text-xs select-none">
-            <span className="pointer-events-none absolute left-2 top-1 text-[10px] leading-none text-slate-500">{label}</span>
+            <span className="pointer-events-none absolute left-1.5 top-1 text-[9px] leading-none text-slate-500">{label}</span>
             <input
                 type="number"
-                className={`h-10 w-full rounded-md border border-slate-400/70 bg-slate-100/90 px-2 pt-4 text-[13px] text-slate-800 shadow-sm outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${className ?? ""}`}
+                className={`h-9 w-full rounded-md border border-slate-400/70 bg-slate-100/90 px-1.5 pt-3.5 text-[12px] text-slate-800 shadow-sm outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${className ?? ""}`}
                 value={value}
                 onChange={(event) => setValue(Number(event.target.value))}
                 {...rest}
@@ -190,11 +190,11 @@ function CompactViewBoxField({ valueAtom, label, className, ...rest }: { valueAt
 
 function LabeledNumberField({ label, value, onValueChange, ...rest }: { label: string; value: number; onValueChange: (value: number) => void; } & InputHTMLAttributes<HTMLInputElement>) {
     return (
-        <label className="flex items-center gap-2 justify-self-end whitespace-nowrap">
+        <label className="flex items-center gap-1.5 justify-self-end whitespace-nowrap text-[11px]">
             <span>{label}</span>
             <input
                 type="number"
-                className="h-7 w-14 rounded border bg-background px-2 text-xs"
+                className="h-6 w-12 rounded border bg-background px-2 text-[11px]"
                 value={value}
                 onChange={(event) => onValueChange(Number(event.target.value))}
                 {...rest}
@@ -205,7 +205,7 @@ function LabeledNumberField({ label, value, onValueChange, ...rest }: { label: s
 
 function CheckboxRow({ label, checked, onCheckedChange, className }: { label: string; checked: boolean; onCheckedChange: (checked: boolean) => void; className?: string; }) {
     return (
-        <label className={`flex items-center gap-2 ${className ?? ""}`}>
+        <label className={`flex items-center gap-1.5 text-[11px] ${className ?? ""}`}>
             <input
                 type="checkbox"
                 className="size-3.5 rounded border"
