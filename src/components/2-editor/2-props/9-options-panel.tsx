@@ -32,18 +32,18 @@ export function OptionsPanel() {
                 <div className="space-y-2">
                     <span className="text-muted-foreground">viewport</span>
 
-                    <div className="flex items-end gap-2">
+                    <div className="flex items-start gap-2">
                         <div className="grid flex-1 grid-cols-4 gap-2">
-                            <ValueNumberField label="x" valueAtom={viewPortXAtom} />
-                            <ValueNumberField label="y" valueAtom={viewPortYAtom} />
-                            <ValueNumberField label="width" valueAtom={viewPortWidthAtom} min={1e-3} />
-                            <ValueNumberField label="height" valueAtom={viewPortHeightAtom} min={1e-3} />
+                            <CompactViewBoxField label="x" valueAtom={viewPortXAtom} title="viewport x" />
+                            <CompactViewBoxField label="y" valueAtom={viewPortYAtom} title="viewport y" />
+                            <CompactViewBoxField label="width" valueAtom={viewPortWidthAtom} title="viewport width" min={1e-3} />
+                            <CompactViewBoxField label="height" valueAtom={viewPortHeightAtom} title="viewport height" min={1e-3} />
                         </div>
 
                         <Button
                             variant="outline"
                             size="icon"
-                            className="size-8 shrink-0"
+                            className="mt-px size-10 shrink-0 rounded-md border-slate-400/70 bg-slate-200/60 text-slate-700 shadow-sm hover:bg-slate-200"
                             title={viewPortLocked ? "Unlock viewport" : "Lock viewport"}
                             onClick={() => {
                                 appSettings.pathEditor.viewPortLocked = !viewPortLocked;
@@ -168,23 +168,6 @@ export function OptionsPanel() {
                 </div>
             </div>
         </SectionPanel>
-    );
-}
-
-function ValueNumberField({ valueAtom, label, ...rest }: { valueAtom: PrimitiveAtom<number>; label: string; } & InputHTMLAttributes<HTMLInputElement>) {
-    const [value, setValue] = useAtom(valueAtom);
-
-    return (
-        <label className="space-y-1">
-            <span className="text-muted-foreground">{label}</span>
-            <input
-                type="number"
-                className="h-8 w-full rounded border bg-background px-2 text-xs"
-                value={value}
-                onChange={(event) => setValue(Number(event.target.value))}
-                {...rest}
-            />
-        </label>
     );
 }
 
