@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/shadcn/button";
 import { SectionPanel } from "../../../ui/loacal-ui/1-section-panel";
 import { doApplyScaleAtom, doApplyTranslateAtom, doNormalizePathAtom, doSetAbsoluteAtom, doSetRelativeAtom, scaleXAtom, scaleYAtom, translateXAtom, translateYAtom } from "@/store/0-atoms/2-2-editor-actions";
 
-export function TransformPanel() {
+export function PathOperationsPanel() {
     const { decimals, uniformScale } = useSnapshot(appSettings.pathEditor);
     const [scaleX, setScaleX] = useAtom(scaleXAtom);
     const [scaleY, setScaleY] = useAtom(scaleYAtom);
@@ -21,12 +21,12 @@ export function TransformPanel() {
 
     return (
         <SectionPanel sectionKey="transform" label="Path Operations" contentClassName="px-0 pt-1 pb-4">
-            <div className="space-y-1.5 pl-2.5 pr-2 text-[11px]">
+            <div className="pl-2.5 pr-2 text-[11px] space-y-1.5">
                 <div className="flex gap-1.5">
                     <OperationNumberField
                         label={uniformScale ? "Uniform scale" : "Scale X"}
                         value={scaleX}
-                        wrapperClassName={uniformScale ? "basis-[38%]" : "basis-[24%]"}
+                        wrapperClasses={uniformScale ? "basis-[38%]" : "basis-[24%]"}
                         step={0.1}
                         onValueChange={(nextValue) => {
                             setScaleX(nextValue);
@@ -37,7 +37,7 @@ export function TransformPanel() {
                         overlay={
                             <button
                                 type="button"
-                                className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-800"
+                                className="absolute right-1.5 top-0.5 text-slate-600 hover:text-slate-800"
                                 title="Lock/Unlock x and y scales"
                                 onMouseDown={(event) => event.preventDefault()}
                                 onClick={() => {
@@ -57,7 +57,7 @@ export function TransformPanel() {
                         <OperationNumberField
                             label="Scale Y"
                             value={scaleY}
-                            wrapperClassName="basis-[24%]"
+                            wrapperClasses="basis-[24%]"
                             step={0.1}
                             onValueChange={(nextValue) => {
                                 setScaleY(nextValue);
@@ -75,8 +75,8 @@ export function TransformPanel() {
                 </div>
 
                 <div className="flex gap-1.5">
-                    <OperationAtomField label="Translate X" valueAtom={translateXAtom} wrapperClassName="basis-[33%]" step={1} onEnter={() => applyTranslate()} />
-                    <OperationAtomField label="Translate Y" valueAtom={translateYAtom} wrapperClassName="basis-[33%]" step={1} onEnter={() => applyTranslate()} />
+                    <OperationAtomField label="Translate X" valueAtom={translateXAtom} wrapperClasses="basis-[33%]" step={1} onEnter={() => applyTranslate()} />
+                    <OperationAtomField label="Translate Y" valueAtom={translateYAtom} wrapperClasses="basis-[33%]" step={1} onEnter={() => applyTranslate()} />
                     <ActionButton className="flex-1" title="Translate all commands" onClick={() => applyTranslate()}>
                         Translate
                     </ActionButton>
@@ -86,7 +86,7 @@ export function TransformPanel() {
                     <OperationNumberField
                         label="Number of decimals"
                         value={decimals}
-                        wrapperClassName="basis-[28%]"
+                        wrapperClasses="basis-[28%]"
                         min={0}
                         max={8}
                         step={1}
@@ -94,6 +94,7 @@ export function TransformPanel() {
                             appSettings.pathEditor.decimals = nextValue;
                         }}
                     />
+
                     <ActionButton className="basis-[18%]" title="Round all path numbers" onClick={() => doNormalize()}>
                         Round
                     </ActionButton>
@@ -109,14 +110,14 @@ export function TransformPanel() {
     );
 }
 
-function OperationAtomField({ valueAtom, label, wrapperClassName, onEnter, ...rest }: { valueAtom: PrimitiveAtom<number>; wrapperClassName?: string; label: string; onEnter?: () => void; } & Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange">) {
+function OperationAtomField({ valueAtom, label, wrapperClasses: wrapperClasses, onEnter, ...rest }: { valueAtom: PrimitiveAtom<number>; wrapperClasses?: string; label: string; onEnter?: () => void; } & Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange">) {
     const [value, setValue] = useAtom(valueAtom);
 
     return (
         <OperationNumberField
             label={label}
             value={value}
-            wrapperClassName={wrapperClassName}
+            wrapperClasses={wrapperClasses}
             onValueChange={(nextValue) => setValue(nextValue)}
             onEnter={onEnter}
             {...rest}
@@ -128,7 +129,7 @@ function OperationNumberField({
     value,
     onValueChange,
     label,
-    wrapperClassName,
+    wrapperClasses,
     className,
     overlay,
     onEnter,
@@ -136,18 +137,19 @@ function OperationNumberField({
 }: {
     value: number;
     onValueChange: (value: number) => void;
-    wrapperClassName?: string;
+    wrapperClasses?: string;
     label: string;
     overlay?: ReactNode;
     onEnter?: () => void;
 } & Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange">) {
     return (
-        <label className={classNames("relative overflow-hidden rounded-md", wrapperClassName)}>
-            <span className="pointer-events-none absolute left-1.5 top-0.5 text-[10px] leading-none text-slate-600">{label}</span>
+        <label className={classNames("relative", wrapperClasses)}>
+            <span className="absolute left-1.5 top-0.5 text-[10px] leading-none text-slate-600 pointer-events-none">
+                {label}
+            </span>
             {overlay}
             <input
-                className={classNames("h-10 w-full rounded-md border border-slate-400/70 bg-slate-100/90 px-1.5 pt-4 text-[13px] text-slate-800 shadow-sm outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none", className)}
-                type="number"
+                className={classNames("px-1.5 pt-4 w-full h-10 text-xs rounded border border-slate-400/70 bg-slate-100/90 text-slate-800 shadow outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none", className)}
                 {...rest}
                 value={value}
                 onChange={(event) => onValueChange(Number(event.target.value))}
@@ -156,6 +158,7 @@ function OperationNumberField({
                         onEnter?.();
                     }
                 }}
+                type="number"
             />
         </label>
     );
@@ -165,7 +168,7 @@ function ActionButton({ className, ...rest }: ComponentProps<typeof Button>) {
     return (
         <Button
             variant="outline"
-            className={classNames("h-10 rounded-md border-slate-500/60 bg-slate-300/55 px-2 text-[13px] text-slate-900 shadow-sm hover:bg-slate-300/70", className)}
+            className={classNames("px-2 h-10 text-xs border-slate-500/60 bg-slate-300/55 text-slate-900 shadow-sm hover:bg-slate-300/70 rounded", className)}
             {...rest}
         />
     );
