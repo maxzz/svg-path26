@@ -15,23 +15,21 @@ import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { focusedImageIdAtom, isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 
 export function PathCanvas() {
-    const { canvasPreview: preview } = useSnapshot(appSettings.pathEditor);
+    const { canvasPreview } = useSnapshot(appSettings.pathEditor);
     return (
         <PathCanvasElement>
-                <PathCanvasImages />
-
-                {!preview && <CanvasGrid />}
-
-                <CanvasHelperOverlays />
+            <PathCanvasImages />
+            {!canvasPreview && <CanvasGrid />}
+            <CanvasHelperOverlays />
         </PathCanvasElement>
     );
 }
 
-export function PathCanvasElement({ children }: { children: React.ReactNode }) {
+export function PathCanvasElement({ children }: { children: React.ReactNode; }) {
     const { darkCanvas } = useSnapshot(appSettings);
     const { canvasPreview: preview } = useSnapshot(appSettings.pathEditor);
 
-    const pathValue = useAtomValue(svgPathInputAtom);
+    const svgPathInput = useAtomValue(svgPathInputAtom);
     const parseError = useAtomValue(parseErrorAtom);
     const viewBox = useAtomValue(canvasViewBoxAtom);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
@@ -56,7 +54,7 @@ export function PathCanvasElement({ children }: { children: React.ReactNode }) {
         () => {
             doFitViewBox();
         },
-        [pathValue]);
+        [svgPathInput]);
 
     useEffect(
         () => {

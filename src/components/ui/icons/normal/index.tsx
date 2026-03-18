@@ -27,3 +27,4 @@ export * from "./30-2-theme-sun";
 // export * from "./logos";
 // export * from "./lucid-react";
 export * from "./radix-icons";
+export * from "./heroicons";

@@ -1,6 +1,6 @@
 import { type InputHTMLAttributes } from "react";
 import { useAtom, useSetAtom, type PrimitiveAtom } from "jotai";
-import { Lock, LockOpen } from "lucide-react";
+import { IconLockClosed, IconLockOpen } from "@/components/ui/icons/normal";
 import { useSnapshot } from "valtio";
 import { Button } from "@/components/ui/shadcn/button";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
@@ -8,6 +8,7 @@ import { doNormalizePathAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { doFitViewBoxAtom, doZoomViewBoxAtom, viewPortHeightAtom, viewPortWidthAtom, viewPortXAtom, viewPortYAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 import { pathViewBoxHeightAtom, pathViewBoxWidthAtom, pathViewBoxXAtom, pathViewBoxYAtom } from "@/store/0-atoms/2-6-path-viewbox";
 import { appSettings } from "@/store/0-ui-settings";
+import { classNames } from "@/utils";
 
 export function OptionsPanel() {
     const uiSettings = useSnapshot(appSettings);
@@ -30,67 +31,13 @@ export function OptionsPanel() {
         <SectionPanel sectionKey="options" label="Options" contentClassName="px-0 pt-1 pb-4">
             <div className="pl-2.5 pr-2 text-[11px] space-y-2.5">
                 <div className="space-y-1.5">
-                    <span className="text-[11px] text-muted-foreground">viewport</span>
-
-                    <div className="flex items-start gap-1.5">
-                        <div className="grid flex-1 grid-cols-4 gap-1.5">
-                            <CompactViewBoxField label="x" valueAtom={viewPortXAtom} title="viewport x" />
-                            <CompactViewBoxField label="y" valueAtom={viewPortYAtom} title="viewport y" />
-                            <CompactViewBoxField label="width" valueAtom={viewPortWidthAtom} title="viewport width" min={1e-3} />
-                            <CompactViewBoxField label="height" valueAtom={viewPortHeightAtom} title="viewport height" min={1e-3} />
-                        </div>
-
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            className="mt-px size-9 shrink-0 rounded-md border-slate-400/70 bg-slate-200/60 text-slate-700 shadow-sm hover:bg-slate-200"
-                            title={viewPortLocked ? "Unlock viewport" : "Lock viewport"}
-                            onClick={() => {
-                                appSettings.pathEditor.viewPortLocked = !viewPortLocked;
-                            }}
-                        >
-                            {viewPortLocked ? <Lock className="size-3.5" /> : <LockOpen className="size-3.5" />}
-                        </Button>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-1.5">
-                        <Button variant="outline" className="h-7 px-2 text-[11px]" onClick={() => zoomViewBox({ scale: 10 / 9 })}>
-                            -
-                        </Button>
-                        <Button variant="outline" className="h-7 px-2 text-[11px]" onClick={() => fitViewBox()}>
-                            Zoom to Fit
-                        </Button>
-                        <Button variant="outline" className="h-7 px-2 text-[11px]" onClick={() => zoomViewBox({ scale: 9 / 10 })}>
-                            +
-                        </Button>
-                    </div>
-                </div>
-
-                <div className="space-y-1.5">
                     <span className="text-[11px] text-muted-foreground">viewBox</span>
+                    <ViewBoxControls showFrame={showViewBoxFrame} />
 
-                    <div className="flex items-start gap-1.5">
-                        <div className="grid flex-1 grid-cols-4 gap-1.5">
-                            <CompactViewBoxField label="x" valueAtom={pathViewBoxXAtom} title="viewBox x" />
-                            <CompactViewBoxField label="y" valueAtom={pathViewBoxYAtom} title="viewBox y" />
-                            <CompactViewBoxField label="width" valueAtom={pathViewBoxWidthAtom} title="viewBox width" min={1e-3} />
-                            <CompactViewBoxField label="height" valueAtom={pathViewBoxHeightAtom} title="viewBox height" min={1e-3} />
-                        </div>
+                    <span className="text-[11px] text-muted-foreground">viewport</span>
+                    <ViewportControls locked={viewPortLocked} />
 
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            className="mt-px size-9 shrink-0 rounded-md border-slate-400/70 bg-slate-200/60 text-slate-700 shadow-sm hover:bg-slate-200"
-                            title={showViewBoxFrame ? "Hide viewBox frame" : "Show viewBox frame"}
-                            onClick={() => {
-                                appSettings.pathEditor.showViewBoxFrame = !showViewBoxFrame;
-                            }}
-                        >
-                            {showViewBoxFrame ? <Lock className="size-3.5" /> : <LockOpen className="size-3.5" />}
-                        </Button>
-                    </div>
-
-                    <p className="text-[10px] text-muted-foreground">Lock icon toggles the viewBox frame on canvas.</p>
+                    <ViewportZoomControls onZoom={zoomViewBox} onFit={() => fitViewBox()} />
                 </div>
 
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5">
@@ -171,15 +118,81 @@ export function OptionsPanel() {
     );
 }
 
+function ViewportZoomControls({ onZoom, onFit }: { onZoom: (payload: { scale: number; }) => void; onFit: () => void; }) {
+    return (
+        <div className="grid grid-cols-3 gap-1.5">
+            <Button variant="outline" className="h-7 px-2 text-[11px]" onClick={() => onZoom({ scale: 10 / 9 })}>
+                -
+            </Button>
+            <Button variant="outline" className="h-7 px-2 text-[11px]" onClick={() => onFit()}>
+                Zoom to Fit
+            </Button>
+            <Button variant="outline" className="h-7 px-2 text-[11px]" onClick={() => onZoom({ scale: 9 / 10 })}>
+                +
+            </Button>
+        </div>
+    );
+}
+
+function ViewportControls({ locked }: { locked: boolean; }) {
+    return (
+        <div className="flex items-start gap-1.5">
+            <div className="grid flex-1 grid-cols-4 gap-1">
+                <CompactViewBoxField label="x" valueAtom={viewPortXAtom} title="viewport x" />
+                <CompactViewBoxField label="y" valueAtom={viewPortYAtom} title="viewport y" />
+                <CompactViewBoxField label="width" valueAtom={viewPortWidthAtom} title="viewport width" min={1e-3} />
+                <CompactViewBoxField label="height" valueAtom={viewPortHeightAtom} title="viewport height" min={1e-3} />
+            </div>
+
+            <Button
+                variant="ghost"
+                size="icon"
+                className="shrink-0 mt-px size-8 hover:bg-slate-200 rounded"
+                title={locked ? "Unlock viewport" : "Lock viewport"}
+                onClick={() => {
+                    appSettings.pathEditor.viewPortLocked = !locked;
+                }}
+            >
+                {locked ? <IconLockClosed className="size-3.5" /> : <IconLockOpen className="size-3" />}
+            </Button>
+        </div>
+    );
+}
+
+function ViewBoxControls({ showFrame }: { showFrame: boolean; }) {
+    return (
+        <div className="flex items-start gap-1.5">
+            <div className="grid flex-1 grid-cols-4 gap-1">
+                <CompactViewBoxField label="x" valueAtom={pathViewBoxXAtom} title="viewBox x" />
+                <CompactViewBoxField label="y" valueAtom={pathViewBoxYAtom} title="viewBox y" />
+                <CompactViewBoxField label="width" valueAtom={pathViewBoxWidthAtom} title="viewBox width" min={1e-3} />
+                <CompactViewBoxField label="height" valueAtom={pathViewBoxHeightAtom} title="viewBox height" min={1e-3} />
+            </div>
+
+            <Button
+                variant="ghost"
+                size="icon"
+                className="shrink-0 mt-px size-8 hover:bg-slate-200 rounded"
+                title={showFrame ? "Hide viewBox frame" : "Show viewBox frame"}
+                onClick={() => {
+                    appSettings.pathEditor.showViewBoxFrame = !showFrame;
+                }}
+            >
+                {showFrame ? <IconLockClosed className="size-3.5" /> : <IconLockOpen className="size-3" />}
+            </Button>
+            {/* <p className="text-[10px] text-muted-foreground">Lock icon toggles the viewBox frame on canvas.</p> */}
+        </div>
+    );
+}
+
 function CompactViewBoxField({ valueAtom, label, className, ...rest }: { valueAtom: PrimitiveAtom<number>; label: string; } & InputHTMLAttributes<HTMLInputElement>) {
     const [value, setValue] = useAtom(valueAtom);
-
     return (
         <label className="relative text-xs select-none">
-            <span className="absolute left-1.5 top-1 text-[9px] leading-none text-slate-500 pointer-events-none">{label}</span>
+            <span className="absolute left-[7px] top-1 text-[9px] leading-none text-slate-500 pointer-events-none">{label}</span>
             <input
                 type="number"
-                className={`px-1.5 pt-3.5 w-full h-9 text-[12px] border border-slate-400/70 bg-slate-100/90 text-slate-800 shadow-sm outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none rounded-md ${className ?? ""}`}
+                className={classNames("px-1.5 pt-2.5 w-full h-8 text-[10px] border border-slate-400/70 text-foreground shadow outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none rounded", className)}
                 value={value}
                 onChange={(event) => setValue(Number(event.target.value))}
                 {...rest}
