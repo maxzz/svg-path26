@@ -1,6 +1,6 @@
 import { type InputHTMLAttributes } from "react";
 import { useAtom, useSetAtom, type PrimitiveAtom } from "jotai";
-import { IconLockClosed, IconLockOpen } from "@/components/ui/icons/normal";
+import { IconLockClosed, IconLockOpen, IconZoomIn, IconZoomNormal, IconZoomOut } from "@/components/ui/icons/normal";
 import { useSnapshot } from "valtio";
 import { Button } from "@/components/ui/shadcn/button";
 import { Switch } from "@/components/ui/shadcn/switch";
@@ -124,13 +124,13 @@ function ViewportZoomControls({ onZoom, onFit }: { onZoom: (payload: { scale: nu
     return (
         <div className="grid grid-cols-3 gap-1.5">
             <Button variant="outline" className="h-7 px-2 text-[11px]" onClick={() => onZoom({ scale: 10 / 9 })}>
-                -
+                <IconZoomOut className="size-3.5" />
             </Button>
             <Button variant="outline" className="h-7 px-2 text-[11px]" onClick={() => onFit()}>
-                Zoom to Fit
+                <IconZoomNormal className="size-3.5" />
             </Button>
             <Button variant="outline" className="h-7 px-2 text-[11px]" onClick={() => onZoom({ scale: 9 / 10 })}>
-                +
+                <IconZoomIn className="size-3.5" />
             </Button>
         </div>
     );
