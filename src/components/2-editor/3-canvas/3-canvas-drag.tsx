@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import type { TouchEventHandler } from "react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
-import { canvasSvgElementAtom } from "./5-canvas-viewport-metrics";
+import { canvasSvgElementAtom } from "../../../store/0-atoms/2-1-canvas-viewport";
 import {
     doSetPointLocationWithoutHistoryAtom,
     draggedCanvasPointAtom,
