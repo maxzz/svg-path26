@@ -33,10 +33,10 @@ export function OptionsPanel() {
         <SectionPanel sectionKey="options" label="Options" contentClassName="px-0 pt-1 pb-4">
             <div className="pl-2.5 pr-2 max-w-[320px] text-[11px] space-y-2.5">
                 <div className="space-y-1.5">
-                    <span className="text-[11px] text-muted-foreground">viewBox</span>
+                    <span className="text-[11px] text-muted-foreground select-none">viewBox</span>
                     <ViewBoxControls showFrame={showViewBoxFrame} />
 
-                    <span className="text-[11px] text-muted-foreground">viewport</span>
+                    <span className="text-[11px] text-muted-foreground select-none">viewport</span>
                     <ViewportControls locked={viewPortLocked} />
                 </div>
 
@@ -205,7 +205,7 @@ function CompactViewBoxField({ valueAtom, label, className, ...rest }: { valueAt
 
 function LabeledNumberField({ label, value, onValueChange, ...rest }: { label: string; value: number; onValueChange: (value: number) => void; } & InputHTMLAttributes<HTMLInputElement>) {
     return (
-        <label className="text-[11px] flex items-center justify-self-end whitespace-nowrap gap-1.5">
+        <label className="text-xs flex items-center justify-self-end whitespace-nowrap gap-1.5 select-none">
             <span>{label}</span>
             <input
                 type="number"
@@ -220,7 +220,7 @@ function LabeledNumberField({ label, value, onValueChange, ...rest }: { label: s
 
 function CheckboxRow({ label, checked, onCheckedChange, className }: { label: string; checked: boolean; onCheckedChange: (checked: boolean) => void; className?: string; }) {
     return (
-        <label className={`flex items-center gap-0.5 text-[11px] ${className ?? ""}`}>
+        <label className={classNames("text-xs flex items-center gap-0.5 select-none", className)}>
             <Switch className="scale-75" checked={checked} onCheckedChange={(value) => onCheckedChange(Boolean(value))} />
             <span>{label}</span>
         </label>
