@@ -2,11 +2,11 @@ import { useEffect } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
-import { CanvasGrid } from "./1-canvas-grid";
-import { CanvasHelperOverlays } from "./2-0-canvas-helper-overlays";
+import { CanvasGrid } from "./2-canvas-grid";
+import { CanvasHelperOverlays } from "./1-canvas-overlays";
 import { canvasDragStateAtom, eventToSvgPoint, useCanvasDragAndDrop } from "./3-canvas-drag";
-import { PathCanvasImages } from "./4-canvas-image-edit-overlays";
-import { canvasSvgElementAtom, useSyncCanvasViewportSize } from "./5-canvas-viewport-metrics";
+import { PathCanvasImages } from "./4-canvas-overlays-image";
+import { canvasSvgElementAtom, useSyncCanvasViewportSize } from "../../../store/0-atoms/2-1-canvas-viewport";
 import { appSettings } from "@/store/0-ui-settings";
 import { hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
@@ -15,6 +15,19 @@ import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { focusedImageIdAtom, isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 
 export function PathCanvas() {
+    const { canvasPreview: preview } = useSnapshot(appSettings.pathEditor);
+    return (
+        <PathCanvasElement>
+                <PathCanvasImages />
+
+                {!preview && <CanvasGrid />}
+
+                <CanvasHelperOverlays />
+        </PathCanvasElement>
+    );
+}
+
+export function PathCanvasElement({ children }: { children: React.ReactNode }) {
     const { darkCanvas } = useSnapshot(appSettings);
     const { canvasPreview: preview } = useSnapshot(appSettings.pathEditor);
 
@@ -29,9 +42,9 @@ export function PathCanvas() {
     const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
     const setHoveredCanvasPoint = useSetAtom(hoveredCanvasPointAtom);
     const setCanvasSvgElement = useSetAtom(canvasSvgElementAtom);
-    const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
-    const fitViewBox = useSetAtom(doFitViewBoxAtom);
-    const adjustViewBoxToAspect = useSetAtom(doAdjustViewBoxToAspectAtom);
+    const doZoomViewBox = useSetAtom(doZoomViewBoxAtom);
+    const doFitViewBox = useSetAtom(doFitViewBoxAtom);
+    const doAdjustViewBoxToAspect = useSetAtom(doAdjustViewBoxToAspectAtom);
     const viewportSize = useAtomValue(canvasViewportSizeAtom);
 
     const dragState = useAtomValue(canvasDragStateAtom);
@@ -41,15 +54,15 @@ export function PathCanvas() {
 
     useEffect(
         () => {
-            fitViewBox();
+            doFitViewBox();
         },
-        [fitViewBox, pathValue]);
+        [pathValue]);
 
     useEffect(
         () => {
-            adjustViewBoxToAspect();
+            doAdjustViewBoxToAspect();
         },
-        [adjustViewBoxToAspect, viewportSize]);
+        [viewportSize]);
 
     return (
         <div className={classNames("absolute w-full h-full overflow-hidden", preview ? "bg-white" : (darkCanvas ? "bg-zinc-900" : "bg-white"))}>
@@ -63,7 +76,7 @@ export function PathCanvas() {
                     const center = eventToSvgPoint(svgElement, event.clientX, event.clientY, viewBox);
                     if (!center) return;
                     const scale = Math.pow(1.005, event.deltaY);
-                    zoomViewBox({ scale, center });
+                    doZoomViewBox({ scale, center });
                 }}
                 onPointerDown={(event) => {
                     if (event.pointerType === "touch") return;
@@ -83,11 +96,7 @@ export function PathCanvas() {
                     }
                 }}
             >
-                <PathCanvasImages />
-
-                {!preview && <CanvasGrid />}
-
-                <CanvasHelperOverlays />
+                {children}
             </svg>
 
             {parseError && (
