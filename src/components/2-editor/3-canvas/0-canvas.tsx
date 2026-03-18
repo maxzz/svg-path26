@@ -1,4 +1,4 @@
-import { Children, isValidElement, useEffect, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
@@ -23,7 +23,6 @@ export function PathCanvas() {
             <PathCanvasImages />
             {!canvasPreview && <CanvasGrid />}
             <CanvasHelperOverlays />
-            <ViewportZoomControls />
         </PathCanvasElement>
     );
 }
@@ -52,10 +51,6 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
     const { onTouchEnd, onTouchMove, onTouchStart, startCanvasDrag } = useCanvasDragAndDrop(viewBox);
 
     useSyncCanvasViewportSize();
-
-    const childList = Children.toArray(children);
-    const overlayChildren = childList.filter((child) => isValidElement(child) && child.type === ViewportZoomControls);
-    const svgChildren = childList.filter((child) => !(isValidElement(child) && child.type === ViewportZoomControls));
 
     useEffect(
         () => {
@@ -101,14 +96,10 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
                     }
                 }}
             >
-                {svgChildren}
+                {children}
             </svg>
 
-            {overlayChildren.length ? (
-                <div className="absolute bottom-3 right-3 z-10">
-                    {overlayChildren}
-                </div>
-            ) : null}
+            <ViewportZoomControls />
 
             {parseError && (
                 <div className="absolute inset-x-4 bottom-4 px-3 py-2 text-xs text-destructive-foreground bg-destructive/90 rounded-md pointer-events-none">
@@ -124,7 +115,7 @@ function ViewportZoomControls() {
     const doZoomViewBox = useSetAtom(doZoomViewBoxAtom);
 
     return (
-        <div className="flex items-center gap-0.5">
+        <div className="absolute bottom-3 right-3 z-10 flex items-center gap-0.5">
             <Button variant="outline" size="icon" className="size-7 rounded-full" title="Zoom out" onClick={() => doZoomViewBox({ scale: 10 / 9 })}>
                 <IconZoomOut className="size-3.5" />
             </Button>
