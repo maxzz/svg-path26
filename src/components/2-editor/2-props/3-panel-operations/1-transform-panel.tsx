@@ -7,7 +7,7 @@ import { appSettings } from "@/store/0-ui-settings";
 import { Button } from "@/components/ui/shadcn/button";
 import { SectionPanel } from "../../../ui/loacal-ui/1-section-panel";
 import { doApplyScaleAtom, doApplyTranslateAtom, doNormalizePathAtom, doSetAbsoluteAtom, doSetRelativeAtom, scaleXAtom, scaleYAtom, translateXAtom, translateYAtom } from "@/store/0-atoms/2-2-editor-actions";
-import { inputClasses, labelClasses } from "../8-shared-classes/0-classes";
+import { buttonPanelClasses, compactInputClasses, compactLabelClasses } from "../8-shared-classes/0-classes";
 
 export function PathOperationsPanel() {
     const { decimals, uniformScale } = useSnapshot(appSettings.pathEditor);
@@ -145,12 +145,12 @@ function OperationNumberField({
 } & Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange">) {
     return (
         <label className={classNames("relative", wrapperClasses)}>
-            <span className={labelClasses}>
+            <span className={compactLabelClasses}>
                 {label}
             </span>
             {overlay}
             <input
-                className={classNames(inputClasses, className)}
+                className={classNames(compactInputClasses, className)}
                 {...rest}
                 value={value}
                 onChange={(event) => onValueChange(Number(event.target.value))}
@@ -167,10 +167,6 @@ function OperationNumberField({
 
 function ActionButton({ className, ...rest }: ComponentProps<typeof Button>) {
     return (
-        <Button
-            variant="outline"
-            className={classNames("px-2 h-10 text-xs border-slate-500/60 bg-slate-300/55 text-slate-900 shadow-sm hover:bg-slate-300/70 rounded", className)}
-            {...rest}
-        />
+        <Button className={classNames(buttonPanelClasses, className)} {...rest}/>
     );
 }

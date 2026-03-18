@@ -9,7 +9,7 @@ import { doFitViewBoxAtom, doZoomViewBoxAtom, viewPortHeightAtom, viewPortWidthA
 import { pathViewBoxHeightAtom, pathViewBoxWidthAtom, pathViewBoxXAtom, pathViewBoxYAtom } from "@/store/0-atoms/2-6-path-viewbox";
 import { appSettings } from "@/store/0-ui-settings";
 import { classNames } from "@/utils";
-import { inputClasses, labelClasses } from "../8-shared-classes/0-classes";
+import { compactInputClasses, compactLabelClasses } from "../8-shared-classes/0-classes";
 
 export function OptionsPanel() {
     const uiSettings = useSnapshot(appSettings);
@@ -190,10 +190,10 @@ function CompactViewBoxField({ valueAtom, label, className, ...rest }: { valueAt
     const [value, setValue] = useAtom(valueAtom);
     return (
         <label className="relative text-xs select-none">
-            <span className={labelClasses}>{label}</span>
+            <span className={compactLabelClasses}>{label}</span>
             <input
                 type="number"
-                className={classNames(inputClasses, className)}
+                className={classNames(compactInputClasses, className)}
                 value={value}
                 onChange={(event) => setValue(Number(event.target.value))}
                 {...rest}
