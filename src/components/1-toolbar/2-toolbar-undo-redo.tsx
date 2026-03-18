@@ -1,5 +1,5 @@
 import { useAtomValue, useSetAtom } from "jotai";
-import { IconRadix_ChevronLeft, IconRadix_ChevronRight } from "@/components/ui/icons/normal";
+import { IconRedo, IconUndo } from "@/components/ui/icons/normal";
 import { Button } from "@/components/ui/shadcn/button";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "@/store/0-atoms/1-2-history";
 
@@ -11,25 +11,25 @@ export function ToolbarUndoRedo() {
 
     return (<>
         <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
-            className="size-7"
+            className="size-7 disabled:opacity-20"
             onClick={() => doUndo()}
             disabled={!canUndo}
             title="Undo"
         >
-            <IconRadix_ChevronLeft className="size-4" />
+            <IconUndo className="size-4" />
         </Button>
         
         <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
-            className="size-7"
+            className="size-7 disabled:opacity-20"
             onClick={() => doRedo()}
             disabled={!canRedo}
             title="Redo"
         >
-            <IconRadix_ChevronRight className="size-4" />
+            <IconRedo className="size-4" />
         </Button>
     </>);
 }
