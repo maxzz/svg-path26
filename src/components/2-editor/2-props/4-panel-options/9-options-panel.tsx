@@ -25,8 +25,6 @@ export function OptionsPanel() {
         showViewBoxFrame,
     } = useSnapshot(appSettings.pathEditor);
 
-    const fitViewBox = useSetAtom(doFitViewBoxAtom);
-    const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
     const doNormalize = useSetAtom(doNormalizePathAtom);
 
     return (
@@ -113,23 +111,25 @@ export function OptionsPanel() {
                         }}
                     />
 
-                    <ViewportZoomControls onZoom={zoomViewBox} onFit={() => fitViewBox()} />
+                    <ViewportZoomControls />
                 </div>
             </div>
         </SectionPanel>
     );
 }
 
-function ViewportZoomControls({ onZoom, onFit }: { onZoom: (payload: { scale: number; }) => void; onFit: () => void; }) {
+function ViewportZoomControls() {
+    const doFitViewBox = useSetAtom(doFitViewBoxAtom);
+    const doZoomViewBox = useSetAtom(doZoomViewBoxAtom);
     return (
-        <div className="grid grid-cols-3 gap-1.5">
-            <Button variant="outline" className="h-7 px-2 text-[11px]" onClick={() => onZoom({ scale: 10 / 9 })}>
+        <div className="flex items-center gap-0.5">
+            <Button variant="outline" size="icon" className="size-7 rounded-full" title="Zoom out" onClick={() => doZoomViewBox({ scale: 10 / 9 })}>
                 <IconZoomOut className="size-3.5" />
             </Button>
-            <Button variant="outline" className="h-7 px-2 text-[11px]" onClick={() => onFit()}>
+            <Button variant="outline" size="icon" className="size-7 rounded-full" title="Fit" onClick={() => doFitViewBox()}>
                 <IconZoomNormal className="size-3.5" />
             </Button>
-            <Button variant="outline" className="h-7 px-2 text-[11px]" onClick={() => onZoom({ scale: 9 / 10 })}>
+            <Button variant="outline" size="icon" className="size-7 rounded-full" title="Zoom in" onClick={() => doZoomViewBox({ scale: 9 / 10 })}>
                 <IconZoomIn className="size-3.5" />
             </Button>
         </div>
