@@ -31,15 +31,13 @@ export function OptionsPanel() {
 
     return (
         <SectionPanel sectionKey="options" label="Options" contentClassName="px-0 pt-1 pb-4">
-            <div className="pl-2.5 pr-2 text-[11px] space-y-2.5">
+            <div className="pl-2.5 pr-2 max-w-[320px] text-[11px] space-y-2.5">
                 <div className="space-y-1.5">
                     <span className="text-[11px] text-muted-foreground">viewBox</span>
                     <ViewBoxControls showFrame={showViewBoxFrame} />
 
                     <span className="text-[11px] text-muted-foreground">viewport</span>
                     <ViewportControls locked={viewPortLocked} />
-
-                    <ViewportZoomControls onZoom={zoomViewBox} onFit={() => fitViewBox()} />
                 </div>
 
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5">
@@ -114,6 +112,8 @@ export function OptionsPanel() {
                             doNormalize();
                         }}
                     />
+
+                    <ViewportZoomControls onZoom={zoomViewBox} onFit={() => fitViewBox()} />
                 </div>
             </div>
         </SectionPanel>
@@ -220,9 +220,9 @@ function LabeledNumberField({ label, value, onValueChange, ...rest }: { label: s
 
 function CheckboxRow({ label, checked, onCheckedChange, className }: { label: string; checked: boolean; onCheckedChange: (checked: boolean) => void; className?: string; }) {
     return (
-        <label className={`flex items-center justify-between gap-2 text-[11px] ${className ?? ""}`}>
+        <label className={`flex items-center gap-0.5 text-[11px] ${className ?? ""}`}>
+            <Switch className="scale-75" checked={checked} onCheckedChange={(value) => onCheckedChange(Boolean(value))} />
             <span>{label}</span>
-            <Switch checked={checked} onCheckedChange={(value) => onCheckedChange(Boolean(value))} />
         </label>
     );
 }

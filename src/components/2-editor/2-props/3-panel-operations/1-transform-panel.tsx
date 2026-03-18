@@ -22,7 +22,7 @@ export function PathOperationsPanel() {
 
     return (
         <SectionPanel sectionKey="transform" label="Path Operations" contentClassName="px-0 pt-1 pb-4">
-            <div className="pl-2.5 pr-2 text-[11px] space-y-1.5">
+            <div className="pl-2.5 pr-2 max-w-[320px] text-[11px] space-y-1.5">
                 <div className="flex gap-1.5">
                     <OperationNumberField
                         label={uniformScale ? "Uniform scale" : "Scale X"}
