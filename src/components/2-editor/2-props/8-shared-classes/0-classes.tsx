@@ -1,0 +1,2 @@
+export const labelClasses = "absolute left-[7px] top-1 text-[9px] leading-none text-slate-600 pointer-events-none";
+export const inputClasses = "px-1.5 pt-2.5 w-full h-8 text-[10px] border border-border text-foreground shadow outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none rounded";

@@ -7,6 +7,7 @@ import { appSettings } from "@/store/0-ui-settings";
 import { Button } from "@/components/ui/shadcn/button";
 import { SectionPanel } from "../../../ui/loacal-ui/1-section-panel";
 import { doApplyScaleAtom, doApplyTranslateAtom, doNormalizePathAtom, doSetAbsoluteAtom, doSetRelativeAtom, scaleXAtom, scaleYAtom, translateXAtom, translateYAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { inputClasses, labelClasses } from "../8-shared-classes/0-classes";
 
 export function PathOperationsPanel() {
     const { decimals, uniformScale } = useSnapshot(appSettings.pathEditor);
@@ -144,12 +145,12 @@ function OperationNumberField({
 } & Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange">) {
     return (
         <label className={classNames("relative", wrapperClasses)}>
-            <span className="absolute left-1.5 top-0.5 text-[10px] leading-none text-slate-600 pointer-events-none">
+            <span className={labelClasses}>
                 {label}
             </span>
             {overlay}
             <input
-                className={classNames("px-1.5 pt-4 w-full h-10 text-xs rounded border border-slate-400/70 bg-slate-100/90 text-slate-800 shadow outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none", className)}
+                className={classNames(inputClasses, className)}
                 {...rest}
                 value={value}
                 onChange={(event) => onValueChange(Number(event.target.value))}

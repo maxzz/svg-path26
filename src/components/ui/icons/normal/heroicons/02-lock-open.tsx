@@ -1,4 +1,4 @@
-import { type HTMLAttributes } from "react";
+import { type HTMLAttributes } from "react"; // https://heroicons.com lock-open
 import { classNames } from "@/utils";
 
 export function IconLockOpen({ className, title, ...rest }: HTMLAttributes<SVGSVGElement>) {

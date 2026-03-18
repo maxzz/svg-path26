@@ -9,6 +9,7 @@ import { doFitViewBoxAtom, doZoomViewBoxAtom, viewPortHeightAtom, viewPortWidthA
 import { pathViewBoxHeightAtom, pathViewBoxWidthAtom, pathViewBoxXAtom, pathViewBoxYAtom } from "@/store/0-atoms/2-6-path-viewbox";
 import { appSettings } from "@/store/0-ui-settings";
 import { classNames } from "@/utils";
+import { inputClasses, labelClasses } from "../8-shared-classes/0-classes";
 
 export function OptionsPanel() {
     const uiSettings = useSnapshot(appSettings);
@@ -189,10 +190,10 @@ function CompactViewBoxField({ valueAtom, label, className, ...rest }: { valueAt
     const [value, setValue] = useAtom(valueAtom);
     return (
         <label className="relative text-xs select-none">
-            <span className="absolute left-[7px] top-1 text-[9px] leading-none text-slate-500 pointer-events-none">{label}</span>
+            <span className={labelClasses}>{label}</span>
             <input
                 type="number"
-                className={classNames("px-1.5 pt-2.5 w-full h-8 text-[10px] border border-slate-400/70 text-foreground shadow outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none rounded", className)}
+                className={classNames(inputClasses, className)}
                 value={value}
                 onChange={(event) => setValue(Number(event.target.value))}
                 {...rest}
