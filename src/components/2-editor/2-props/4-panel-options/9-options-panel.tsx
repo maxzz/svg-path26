@@ -3,6 +3,7 @@ import { useAtom, useSetAtom, type PrimitiveAtom } from "jotai";
 import { IconLockClosed, IconLockOpen } from "@/components/ui/icons/normal";
 import { useSnapshot } from "valtio";
 import { Button } from "@/components/ui/shadcn/button";
+import { Switch } from "@/components/ui/shadcn/switch";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
 import { doNormalizePathAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { doFitViewBoxAtom, doZoomViewBoxAtom, viewPortHeightAtom, viewPortWidthAtom, viewPortXAtom, viewPortYAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
@@ -219,14 +220,9 @@ function LabeledNumberField({ label, value, onValueChange, ...rest }: { label: s
 
 function CheckboxRow({ label, checked, onCheckedChange, className }: { label: string; checked: boolean; onCheckedChange: (checked: boolean) => void; className?: string; }) {
     return (
-        <label className={`flex items-center gap-1.5 text-[11px] ${className ?? ""}`}>
-            <input
-                type="checkbox"
-                className="size-3.5 rounded border"
-                checked={checked}
-                onChange={(event) => onCheckedChange(event.target.checked)}
-            />
+        <label className={`flex items-center justify-between gap-2 text-[11px] ${className ?? ""}`}>
             <span>{label}</span>
+            <Switch checked={checked} onCheckedChange={(value) => onCheckedChange(Boolean(value))} />
         </label>
     );
 }
