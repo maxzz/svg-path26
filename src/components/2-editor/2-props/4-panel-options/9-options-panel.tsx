@@ -1,12 +1,12 @@
 import { type InputHTMLAttributes } from "react";
 import { useAtom, useSetAtom, type PrimitiveAtom } from "jotai";
-import { IconLockClosed, IconLockOpen, IconZoomIn, IconZoomNormal, IconZoomOut } from "@/components/ui/icons/normal";
+import { IconLockClosed, IconLockOpen } from "@/components/ui/icons/normal";
 import { useSnapshot } from "valtio";
 import { Button } from "@/components/ui/shadcn/button";
 import { Switch } from "@/components/ui/shadcn/switch";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
 import { doNormalizePathAtom } from "@/store/0-atoms/2-2-editor-actions";
-import { doFitViewBoxAtom, doZoomViewBoxAtom, viewPortHeightAtom, viewPortWidthAtom, viewPortXAtom, viewPortYAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
+import { viewPortHeightAtom, viewPortWidthAtom, viewPortXAtom, viewPortYAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 import { pathViewBoxHeightAtom, pathViewBoxWidthAtom, pathViewBoxXAtom, pathViewBoxYAtom } from "@/store/0-atoms/2-6-path-viewbox";
 import { appSettings } from "@/store/0-ui-settings";
 import { classNames } from "@/utils";
@@ -110,29 +110,9 @@ export function OptionsPanel() {
                             doNormalize();
                         }}
                     />
-
-                    <ViewportZoomControls />
                 </div>
             </div>
         </SectionPanel>
-    );
-}
-
-function ViewportZoomControls() {
-    const doFitViewBox = useSetAtom(doFitViewBoxAtom);
-    const doZoomViewBox = useSetAtom(doZoomViewBoxAtom);
-    return (
-        <div className="flex items-center gap-0.5">
-            <Button variant="outline" size="icon" className="size-7 rounded-full" title="Zoom out" onClick={() => doZoomViewBox({ scale: 10 / 9 })}>
-                <IconZoomOut className="size-3.5" />
-            </Button>
-            <Button variant="outline" size="icon" className="size-7 rounded-full" title="Fit" onClick={() => doFitViewBox()}>
-                <IconZoomNormal className="size-3.5" />
-            </Button>
-            <Button variant="outline" size="icon" className="size-7 rounded-full" title="Zoom in" onClick={() => doZoomViewBox({ scale: 9 / 10 })}>
-                <IconZoomIn className="size-3.5" />
-            </Button>
-        </div>
     );
 }
 
