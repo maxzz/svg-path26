@@ -113,16 +113,17 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
 function ViewportZoomControls() {
     const doFitViewBox = useSetAtom(doFitViewBoxAtom);
     const doZoomViewBox = useSetAtom(doZoomViewBoxAtom);
-
+    const { darkCanvas } = useSnapshot(appSettings);
+    const buttonClasses = classNames("size-7 rounded-full", darkCanvas ? "text-slate-500 bg-slate-100/10! border-slate-100/10!" : "text-slate-500 bg-slate-500/10! border-slate-500/10!");
     return (
         <div className="absolute bottom-3 right-3 z-10 flex items-center gap-0.5">
-            <Button variant="outline" size="icon" className="size-7 rounded-full" title="Zoom out" onClick={() => doZoomViewBox({ scale: 10 / 9 })}>
+            <Button variant="outline" size="icon" className={buttonClasses} title="Zoom out" onClick={() => doZoomViewBox({ scale: 10 / 9 })}>
                 <IconZoomOut className="size-3.5" />
             </Button>
-            <Button variant="outline" size="icon" className="size-7 rounded-full" title="Fit" onClick={() => doFitViewBox()}>
+            <Button variant="outline" size="icon" className={buttonClasses} title="Fit" onClick={() => doFitViewBox()}>
                 <IconZoomNormal className="size-3.5" />
             </Button>
-            <Button variant="outline" size="icon" className="size-7 rounded-full" title="Zoom in" onClick={() => doZoomViewBox({ scale: 9 / 10 })}>
+            <Button variant="outline" size="icon" className={buttonClasses} title="Zoom in" onClick={() => doZoomViewBox({ scale: 9 / 10 })}>
                 <IconZoomIn className="size-3.5" />
             </Button>
         </div>
