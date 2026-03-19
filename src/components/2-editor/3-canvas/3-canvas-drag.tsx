@@ -1,20 +1,14 @@
-import { useEffect, useRef } from "react";
-import type { PointerEvent as ReactPointerEvent, TouchEventHandler } from "react";
+import { useEffect, useRef, type PointerEvent as ReactPointerEvent, type TouchEventHandler } from "react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
-import { canvasSvgElementAtom } from "../../../store/0-atoms/2-1-canvas-viewport";
-import {
-    doSetPointLocationWithoutHistoryAtom,
-    draggedCanvasPointAtom,
-    isCanvasDraggingAtom,
-} from "@/store/0-atoms/2-2-editor-actions";
-import { doPanViewBoxAtom, doZoomViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
+import { appSettings } from "@/store/0-ui-settings";
+import { type Point, type SvgCanvasPoint, type ViewBox } from "@/svg-core/9-types-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
+import { canvasSvgElementAtom } from "../../../store/0-atoms/2-1-canvas-viewport";
+import { doSetPointLocationWithoutHistoryAtom, draggedCanvasPointAtom, isCanvasDraggingAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { doPanViewBoxAtom, doZoomViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 import { doCommitCurrentPathToHistoryAtom } from "@/store/0-atoms/1-2-history";
 import { doUpdateImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-4-images";
-import { appSettings } from "@/store/0-ui-settings";
-import type { ViewBox } from "@/store/9-ui-settings-types-and-defaults";
-import type { Point, SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
 
 export type DragState =
     | { mode: "point"; pointerId: number; point: SvgCanvasPoint; startPath: string; }

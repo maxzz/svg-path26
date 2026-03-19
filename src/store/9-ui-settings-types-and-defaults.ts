@@ -1,6 +1,5 @@
-import type { ThemeMode } from "@/utils";
-
-export type ViewBox = readonly [number, number, number, number];
+import { type ViewBox } from "@/svg-core/9-types-svg-model";
+import { type ThemeMode } from "@/utils";
 
 export interface StoredPathSetting {
     name: string;

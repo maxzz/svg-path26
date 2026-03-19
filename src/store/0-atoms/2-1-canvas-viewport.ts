@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
+import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { strokeWidthAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { canvasViewBoxAtom, canvasViewportSizeAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
-import type { ViewBox } from "@/store/9-ui-settings-types-and-defaults";
 
 export { canvasViewportSizeAtom };
 

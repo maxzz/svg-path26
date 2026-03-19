@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/shadcn/input";
+import { type ViewBox, type SvgCanvasPoint, type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
-import type { SvgCanvasPoint, SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 
 export function isCommandCellLinkedToPoint(
     row: SvgSegmentSummary,
@@ -175,7 +175,7 @@ export function commandValueTooltip(command: string, valueIndex: number): string
 export function computeExportViewBox(
     path: string,
     strokePadding: number,
-    fallback: import("@/store/9-ui-settings-types-and-defaults").ViewBox,
+    fallback: ViewBox,
 ) {
     try {
         const model = new SvgPathModel(path);
@@ -188,7 +188,7 @@ export function computeExportViewBox(
             bounds.ymin - pad,
             width + 2 * pad,
             height + 2 * pad,
-        ] as import("@/store/9-ui-settings-types-and-defaults").ViewBox;
+        ] as ViewBox;
     } catch {
         return fallback;
     }

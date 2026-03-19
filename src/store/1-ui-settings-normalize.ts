@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { type ExportSettings, type PathEditorSettings, type UiSettings, type ViewBox, DEFAULT_EXPORT_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SETTINGS, DEFAULT_VIEWBOX_SETTINGS } from "./9-ui-settings-types-and-defaults";
+import { type ViewBox } from "@/svg-core/9-types-svg-model";
+import { type ExportSettings, type PathEditorSettings, type UiSettings, DEFAULT_EXPORT_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SETTINGS, DEFAULT_VIEWBOX_SETTINGS } from "./9-ui-settings-types-and-defaults";
 
 export function normalizeStoredSettings(value: unknown): UiSettings {
     const defaultSettings = DEFAULT_SETTINGS;
