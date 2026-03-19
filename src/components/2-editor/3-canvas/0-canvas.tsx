@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/shadcn/button";
 import { IconZoomIn, IconZoomNormal, IconZoomOut } from "@/components/ui/icons/normal";
 import { CanvasGrid } from "./2-canvas-grid";
 import { CanvasHelperOverlays } from "./1-canvas-overlays";
-import { canvasDragStateAtom, eventToSvgPoint, useCanvasDragAndDrop } from "./3-canvas-drag";
+import { eventToSvgPoint, useCanvasDragAndDrop } from "./3-canvas-drag";
 import { PathCanvasImages } from "./4-canvas-overlays-image";
 import { canvasSvgElementAtom, useSyncCanvasViewportSize } from "../../../store/0-atoms/2-1-canvas-viewport";
 import { appSettings } from "@/store/0-ui-settings";
@@ -44,7 +44,6 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
     const doAdjustViewBoxToAspect = useSetAtom(doAdjustViewBoxToAspectAtom);
     const viewportSize = useAtomValue(canvasViewportSizeAtom);
 
-    const dragState = useAtomValue(canvasDragStateAtom);
     const { onTouchEnd, onTouchMove, onTouchStart, startCanvasDrag } = useCanvasDragAndDrop(viewBox);
 
     useSyncCanvasViewportSize();
@@ -86,7 +85,6 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
                 onClick={
                     (event) => {
                         if (event.target === event.currentTarget) {
-                            if (dragState?.mode === "canvas" && dragState.moved) return;
                             doClearCanvasFocus();
                         }
                     }

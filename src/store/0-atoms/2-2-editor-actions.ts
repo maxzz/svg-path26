@@ -7,6 +7,7 @@ import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doSetPathWithoutHistoryAtom, doUndoPathAtom } from "./1-2-history";
 import { commandRowsAtom, standaloneSegmentPathsAtom, svgModelAtom } from "./2-0-svg-model";
 import { doDeleteImageAtom, focusedImageIdAtom } from "./2-4-images";
+import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
 import { appSettings } from "@/store/0-ui-settings";
 
 export const strokeWidthAtom = createAtomAppSetting("strokeWidth");
@@ -46,7 +47,9 @@ export const isCanvasDraggingAtom = atom(false);
 
 export const doClearCanvasFocusAtom = atom(
     null,
-    (_get, set) => {
+    (get, set) => {
+        const dragState = get(canvasDragStateAtom);
+        if (dragState?.mode === "canvas" && dragState.moved) return;
         set(selectedCommandIndexAtom, null);
         set(hoveredCommandIndexAtom, null);
         set(hoveredCanvasPointAtom, null);
