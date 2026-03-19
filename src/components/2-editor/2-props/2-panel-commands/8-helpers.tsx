@@ -188,4 +188,3 @@ export function computeExportViewBox(path: string, strokePadding: number, fallba
         return fallback;
     }
 }
-

@@ -3,7 +3,7 @@ import { useSnapshot } from "valtio";
 import { canvasViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 import { focusedImageIdAtom, imagesAtom, isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { appSettings } from "@/store/0-ui-settings";
-import { buildImageHandles, eventToSvgPoint, startImageDragAtom } from "./3-canvas-drag";
+import { buildImageHandles, eventToSvgPoint, doStartImageDragAtom } from "./3-canvas-drag";
 import { canvasUnitsPerPixelAtom } from "../../../store/0-atoms/2-1-canvas-viewport";
 
 export function PathCanvasImages() {
@@ -32,7 +32,7 @@ export function PathCanvasImageEditOverlays() {
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
     const [focusedImageId, setFocusedImageId] = useAtom(focusedImageIdAtom);
     const viewBox = useAtomValue(canvasViewBoxAtom);
-    const startImageDrag = useSetAtom(startImageDragAtom);
+    const startImageDrag = useSetAtom(doStartImageDragAtom);
 
     if (preview || !imageEditMode) return null;
 

@@ -23,7 +23,7 @@ type TouchGestureState =
 
 export const canvasDragStateAtom = atom<DragState | null>(null);
 
-export const startCanvasDragAtom = atom(
+export const doStartCanvasDragAtom = atom(
     null,
     (_get, set, args: { pointerId: number; clientX: number; clientY: number; }) => {
         set(draggedCanvasPointAtom, null);
@@ -38,7 +38,7 @@ export const startCanvasDragAtom = atom(
     }
 );
 
-export const startPointDragAtom = atom(
+export const doStartPointDragAtom = atom(
     null,
     (_get, set, args: { point: SvgCanvasPoint; pointerId: number; startPath: string; }) => {
         set(draggedCanvasPointAtom, args.point);
@@ -52,7 +52,7 @@ export const startPointDragAtom = atom(
     }
 );
 
-export const startImageDragAtom = atom(
+export const doStartImageDragAtom = atom(
     null,
     (_get, set, args: { pointerId: number; imageId: string; handle: ImageHandle; start: Point; initial: EditorImage; }) => {
         set(draggedCanvasPointAtom, null);
@@ -68,7 +68,7 @@ export const startImageDragAtom = atom(
     }
 );
 
-export const stopCanvasDragAtom = atom(
+export const doStopCanvasDragAtom = atom(
     null,
     (_get, set) => {
         set(canvasDragStateAtom, null);
@@ -77,29 +77,22 @@ export const stopCanvasDragAtom = atom(
     }
 );
 
-export function useCanvasDragAndDrop(
-    viewBox: ViewBox,
-) {
+export function useCanvasDragAndDrop(viewBox: ViewBox) {
     const svgElement = useAtomValue(canvasSvgElementAtom);
     const dragState = useAtomValue(canvasDragStateAtom);
-    const {
-        canvasPreview: preview,
-        snapToGrid,
-        pointPrecision,
-        viewPortLocked,
-    } = useSnapshot(appSettings.pathEditor);
+    const { canvasPreview: preview, snapToGrid, pointPrecision, viewPortLocked } = useSnapshot(appSettings.pathEditor);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
 
     const setDragState = useSetAtom(canvasDragStateAtom);
-    const stopCanvasDrag = useSetAtom(stopCanvasDragAtom);
+    const stopCanvasDrag = useSetAtom(doStopCanvasDragAtom);
     const commitCurrentPathToHistory = useSetAtom(doCommitCurrentPathToHistoryAtom);
     const setPathValue = useSetAtom(svgPathInputAtom);
     const setPointLocationWithoutHistory = useSetAtom(doSetPointLocationWithoutHistoryAtom);
     const panViewBox = useSetAtom(doPanViewBoxAtom);
     const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
     const updateImage = useSetAtom(doUpdateImageAtom);
-    const beginCanvasDrag = useSetAtom(startCanvasDragAtom);
-    const startImageDrag = useSetAtom(startImageDragAtom);
+    const beginCanvasDrag = useSetAtom(doStartCanvasDragAtom);
+    const startImageDrag = useSetAtom(doStartImageDragAtom);
 
     const touchGestureRef = useRef<TouchGestureState | null>(null);
     const [, , vw, vh] = viewBox;
@@ -329,15 +322,12 @@ export function useCanvasDragAndDrop(
     };
 }
 
-export function eventToSvgPoint(
-    svg: SVGSVGElement | null,
-    clientX: number,
-    clientY: number,
-    viewBox: ViewBox,
-): Point | null {
+export function eventToSvgPoint(svg: SVGSVGElement | null, clientX: number, clientY: number, viewBox: ViewBox): Point | null {
     if (!svg) return null;
+
     const rect = svg.getBoundingClientRect();
     if (!rect.width || !rect.height) return null;
+
     const [x, y, width, height] = viewBox;
     return {
         x: x + ((clientX - rect.left) / rect.width) * width,
