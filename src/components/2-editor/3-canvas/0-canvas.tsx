@@ -6,13 +6,13 @@ import { Button } from "@/components/ui/shadcn/button";
 import { IconZoomIn, IconZoomNormal, IconZoomOut } from "@/components/ui/icons/normal";
 import { CanvasGrid } from "./2-canvas-grid";
 import { CanvasHelperOverlays } from "./1-canvas-overlays";
-import { eventToSvgPoint, useCanvasDragAndDrop } from "./3-canvas-drag";
+import { useCanvasDragAndDrop } from "./3-canvas-drag";
 import { PathCanvasImages } from "./4-canvas-overlays-image";
 import { canvasSvgElementAtom, useSyncCanvasViewportSize } from "../../../store/0-atoms/2-1-canvas-viewport";
 import { appSettings } from "@/store/0-ui-settings";
 import { doClearCanvasFocusAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
-import { canvasViewBoxAtom, canvasViewportSizeAtom, doAdjustViewBoxToAspectAtom, doFitViewBoxAtom, doZoomViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
+import { canvasViewBoxAtom, canvasViewportSizeAtom, doAdjustViewBoxToAspectAtom, doFitViewBoxAtom, doWheelZoomViewBoxAtom, doZoomViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 
@@ -39,7 +39,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
 
     const doClearCanvasFocus = useSetAtom(doClearCanvasFocusAtom);
     const setCanvasSvgElement = useSetAtom(canvasSvgElementAtom);
-    const doZoomViewBox = useSetAtom(doZoomViewBoxAtom);
+    const doWheelZoomViewBox = useSetAtom(doWheelZoomViewBoxAtom);
     const doFitViewBox = useSetAtom(doFitViewBoxAtom);
     const doAdjustViewBoxToAspect = useSetAtom(doAdjustViewBoxToAspectAtom);
     const viewportSize = useAtomValue(canvasViewportSizeAtom);
@@ -66,14 +66,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
                 ref={(node) => setCanvasSvgElement(node)}
                 viewBox={viewBox.join(" ")}
                 className="size-full touch-none"
-                onWheel={(event) => {
-                    event.preventDefault();
-                    if (!svgElement) return;
-                    const center = eventToSvgPoint(svgElement, event.clientX, event.clientY, viewBox);
-                    if (!center) return;
-                    const scale = Math.pow(1.005, event.deltaY);
-                    doZoomViewBox({ scale, center });
-                }}
+                onWheel={doWheelZoomViewBox}
                 onPointerDown={(event) => {
                     if (event.pointerType === "touch") return;
                     if (event.button !== 0 || imageEditMode || preview) return;

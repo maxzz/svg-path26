@@ -1,8 +1,11 @@
 import { atom } from "jotai";
+import type { WheelEvent as ReactWheelEvent } from "react";
 import { type Point } from "@/svg-core/9-types-svg-model";
 import { svgModelAtom } from "@/store/0-atoms/2-0-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
 import { type ViewBox } from "@/store/9-ui-settings-types-and-defaults";
+import { canvasSvgElementAtom } from "./2-1-canvas-viewport";
+import { eventToSvgPoint } from "@/components/2-editor/3-canvas/3-canvas-drag";
 
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 16;
@@ -77,6 +80,20 @@ export const doZoomViewBoxAtom = atom(
         set(viewPortHeightAtom, Math.max(1e-3, nextHeight));
 
         appSettings.pathEditor.zoom = clampZoom(appSettings.pathEditor.zoom / scale);
+    }
+);
+
+export const doWheelZoomViewBoxAtom = atom(
+    null,
+    (get, set, event: ReactWheelEvent<SVGSVGElement>) => {
+        event.preventDefault();
+        const svgElement = get(canvasSvgElementAtom);
+        if (!svgElement) return;
+        const viewBox = get(canvasViewBoxAtom);
+        const center = eventToSvgPoint(svgElement, event.clientX, event.clientY, viewBox);
+        if (!center) return;
+        const scale = Math.pow(1.005, event.deltaY);
+        set(doZoomViewBoxAtom, { scale, center });
     }
 );
 
