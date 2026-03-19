@@ -1,4 +1,4 @@
-import { useEffect, useRef, type PointerEvent as ReactPointerEvent, type TouchEvent, type TouchEventHandler } from "react";
+import { useEffect, useRef, type PointerEvent as ReactPointerEvent, type TouchEvent } from "react";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
@@ -342,26 +342,6 @@ export function eventToSvgPoint(svg: SVGSVGElement | null, clientX: number, clie
         x: x + ((clientX - rect.left) / rect.width) * width,
         y: y + ((clientY - rect.top) / rect.height) * height,
     };
-}
-
-export function buildImageHandles(image: EditorImage): Array<{ type: ImageHandle; x: number; y: number; }> {
-    const left = image.x1;
-    const right = image.x2;
-    const top = image.y1;
-    const bottom = image.y2;
-    const cx = (left + right) / 2;
-    const cy = (top + bottom) / 2;
-
-    return [
-        { type: "left", x: left, y: cy },
-        { type: "right", x: right, y: cy },
-        { type: "top", x: cx, y: top },
-        { type: "bottom", x: cx, y: bottom },
-        { type: "topLeft", x: left, y: top },
-        { type: "topRight", x: right, y: top },
-        { type: "bottomLeft", x: left, y: bottom },
-        { type: "bottomRight", x: right, y: bottom },
-    ];
 }
 
 function distanceBetween(a: Point, b: Point): number {
