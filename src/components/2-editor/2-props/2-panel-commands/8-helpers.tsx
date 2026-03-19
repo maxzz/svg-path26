@@ -1,4 +1,3 @@
-import { Input } from "@/components/ui/shadcn/input";
 import { type ViewBox, type SvgCanvasPoint, type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
 
@@ -172,11 +171,7 @@ export function commandValueTooltip(command: string, valueIndex: number): string
     return `${commandCellNames(command)[valueIndex] ?? `value ${valueIndex + 1}`}`;
 }
 
-export function computeExportViewBox(
-    path: string,
-    strokePadding: number,
-    fallback: ViewBox,
-) {
+export function computeExportViewBox(path: string, strokePadding: number, fallback: ViewBox) {
     try {
         const model = new SvgPathModel(path);
         const bounds = model.getBounds();
@@ -194,16 +189,3 @@ export function computeExportViewBox(
     }
 }
 
-export function NumberField({ label, value, onChange, min }: { label: string; value: number; onChange: (value: number) => void; min?: number; }) {
-    return (
-        <label className="space-y-1">
-            <span className="text-muted-foreground">{label}</span>
-            <Input
-                type="number"
-                value={value}
-                min={min}
-                onChange={(event) => onChange(Number(event.target.value))}
-            />
-        </label>
-    );
-}
