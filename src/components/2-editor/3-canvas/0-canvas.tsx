@@ -68,13 +68,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
-                onClick={
-                    (event) => {
-                        if (event.target === event.currentTarget) {
-                            doClearCanvasFocus();
-                        }
-                    }
-                }
+                onClick={doClearCanvasFocus}
             >
                 {children}
             </svg>

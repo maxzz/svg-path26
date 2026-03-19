@@ -1,3 +1,4 @@
+import { type MouseEvent } from "react";
 import { atom } from "jotai";
 import { rawPathAtom } from "./1-0-raw-path";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
@@ -47,7 +48,9 @@ export const isCanvasDraggingAtom = atom(false);
 
 export const doClearCanvasFocusAtom = atom(
     null,
-    (get, set) => {
+    (get, set, event: MouseEvent<SVGSVGElement>) => {
+        if (event.target !== event.currentTarget) return;
+        
         const dragState = get(canvasDragStateAtom);
         if (dragState?.mode === "canvas" && dragState.moved) return;
         set(selectedCommandIndexAtom, null);
