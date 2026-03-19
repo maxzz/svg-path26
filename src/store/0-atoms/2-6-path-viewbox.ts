@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import { createAtomAppSetting } from "./8-create-atom-app-settings";
-import { type ViewBox } from "@/store/9-ui-settings-types-and-defaults";
+import { type ViewBox } from "@/svg-core/9-types-svg-model";
 
 const storedPathViewBoxAtom = createAtomAppSetting("viewBox");
 

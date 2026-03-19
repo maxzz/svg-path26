@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { computeExportViewBox } from "./2-panel-commands/8-helpers";
-import { type ViewBox } from "@/store/9-ui-settings-types-and-defaults";
+import { type ViewBox } from "@/svg-core/9-types-svg-model";
 
 describe("computeExportViewBox", () => {
     it("computes bounds with stroke padding and falls back on invalid input", () => {
