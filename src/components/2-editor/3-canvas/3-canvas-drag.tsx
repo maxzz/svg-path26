@@ -78,21 +78,22 @@ export const doStopCanvasDragAtom = atom(
 );
 
 export function useCanvasDragAndDrop(viewBox: ViewBox) {
+    const { canvasPreview: preview, snapToGrid, pointPrecision, viewPortLocked } = useSnapshot(appSettings.pathEditor);
+    
     const svgElement = useAtomValue(canvasSvgElementAtom);
     const dragState = useAtomValue(canvasDragStateAtom);
-    const { canvasPreview: preview, snapToGrid, pointPrecision, viewPortLocked } = useSnapshot(appSettings.pathEditor);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
 
     const setDragState = useSetAtom(canvasDragStateAtom);
-    const stopCanvasDrag = useSetAtom(doStopCanvasDragAtom);
-    const commitCurrentPathToHistory = useSetAtom(doCommitCurrentPathToHistoryAtom);
+    const doStopCanvasDrag = useSetAtom(doStopCanvasDragAtom);
+    const doCommitCurrentPathToHistory = useSetAtom(doCommitCurrentPathToHistoryAtom);
     const setPathValue = useSetAtom(svgPathInputAtom);
     const setPointLocationWithoutHistory = useSetAtom(doSetPointLocationWithoutHistoryAtom);
-    const panViewBox = useSetAtom(doPanViewBoxAtom);
-    const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
-    const updateImage = useSetAtom(doUpdateImageAtom);
-    const beginCanvasDrag = useSetAtom(doStartCanvasDragAtom);
-    const startImageDrag = useSetAtom(doStartImageDragAtom);
+    const doPanViewBox = useSetAtom(doPanViewBoxAtom);
+    const doZoomViewBox = useSetAtom(doZoomViewBoxAtom);
+    const doUpdateImage = useSetAtom(doUpdateImageAtom);
+    const doBeginCanvasDrag = useSetAtom(doStartCanvasDragAtom);
+    const doStartImageDrag = useSetAtom(doStartImageDragAtom);
 
     const touchGestureRef = useRef<TouchGestureState | null>(null);
     const [, , vw, vh] = viewBox;
@@ -126,7 +127,7 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
                 const dyPx = event.clientY - dragState.lastClientY;
                 const dx = -(dxPx / rect.width) * vw;
                 const dy = -(dyPx / rect.height) * vh;
-                panViewBox({ dx, dy });
+                doPanViewBox({ dx, dy });
                 setDragState({
                     ...dragState,
                     moved: dragState.moved || Math.abs(dxPx) > 1 || Math.abs(dyPx) > 1,
@@ -139,7 +140,7 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
             const dx = next.x - dragState.start.x;
             const dy = next.y - dragState.start.y;
             const patch = patchImageByHandle(dragState.initial, dragState.handle, dx, dy);
-            updateImage({
+            doUpdateImage({
                 id: dragState.imageId,
                 patch,
             });
@@ -148,9 +149,9 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
         const onPointerUp = (event: PointerEvent) => {
             if (event.pointerId !== dragState.pointerId) return;
             if (dragState.mode === "point") {
-                commitCurrentPathToHistory(dragState.startPath);
+                doCommitCurrentPathToHistory(dragState.startPath);
             }
-            stopCanvasDrag();
+            doStopCanvasDrag();
         };
 
         const controller = new AbortController();
@@ -158,7 +159,7 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
         window.addEventListener("pointerup", onPointerUp, { signal: controller.signal });
         window.addEventListener("pointercancel", onPointerUp, { signal: controller.signal });
         return () => controller.abort();
-    }, [commitCurrentPathToHistory, dragState, panViewBox, pointPrecision, setDragState, setPointLocationWithoutHistory, snapToGrid, stopCanvasDrag, svgElement, updateImage, vh, viewBox, viewPortLocked, vw]);
+    }, [doCommitCurrentPathToHistory, dragState, doPanViewBox, pointPrecision, setDragState, setPointLocationWithoutHistory, snapToGrid, doStopCanvasDrag, svgElement, doUpdateImage, vh, viewBox, viewPortLocked, vw]);
 
     useEffect(() => {
         if (!dragState) return;
@@ -170,7 +171,7 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
             if (dragState.mode === "point") {
                 setPathValue(dragState.startPath);
             } else if (dragState.mode === "image") {
-                updateImage({
+                doUpdateImage({
                     id: dragState.imageId,
                     patch: {
                         x1: dragState.initial.x1,
@@ -183,13 +184,13 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
                 });
             }
 
-            stopCanvasDrag();
+            doStopCanvasDrag();
         };
 
         const controller = new AbortController();
         window.addEventListener("keydown", onKeyDown, { signal: controller.signal });
         return () => controller.abort();
-    }, [dragState, setPathValue, stopCanvasDrag, updateImage]);
+    }, [dragState, setPathValue, doStopCanvasDrag, doUpdateImage]);
 
     const onTouchStart: TouchEventHandler<SVGSVGElement> = (event) => {
         if (imageEditMode || preview) return;
@@ -233,8 +234,8 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
             const previous = touchGestureRef.current;
             if (previous.mode === "pinch" && previous.lastDistance > 0 && distance > 0) {
                 const scale = previous.lastDistance / distance;
-                zoomViewBox({ scale, center });
-                panViewBox({
+                doZoomViewBox({ scale, center });
+                doPanViewBox({
                     dx: previous.lastCenter.x - center.x,
                     dy: previous.lastCenter.y - center.y,
                 });
@@ -257,7 +258,7 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
                 const dyPx = touch.clientY - previous.lastClientY;
                 const dx = -(dxPx / rect.width) * vw;
                 const dy = -(dyPx / rect.height) * vh;
-                panViewBox({ dx, dy });
+                doPanViewBox({ dx, dy });
             }
             touchGestureRef.current = {
                 mode: "pan",
@@ -305,7 +306,7 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
     const startCanvasDrag = (event: ReactPointerEvent<SVGSVGElement>) => {
         if (event.pointerType === "touch") return;
         if (event.button !== 0 || imageEditMode || preview) return;
-        beginCanvasDrag({
+        doBeginCanvasDrag({
             pointerId: event.pointerId,
             clientX: event.clientX,
             clientY: event.clientY,
@@ -318,7 +319,7 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
         onTouchMove,
         onTouchEnd,
         startCanvasDrag,
-        startImageDrag,
+        startImageDrag: doStartImageDrag,
     };
 }
 
