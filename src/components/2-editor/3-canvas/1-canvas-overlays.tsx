@@ -17,21 +17,20 @@ export function CanvasHelperOverlays() {
     const { canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.pathEditor);
 
     const imageEditMode = useAtomValue(isImageEditModeAtom);
-    const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
 
     return (<>
         <CanvasMainPathOverlay />
 
-        {!canvasPreview && showViewBoxFrame && <CanvasViewBoxFrame unitsPerPixel={unitsPerPixel} />}
+        {!canvasPreview && showViewBoxFrame && <CanvasViewBoxFrame />}
 
         {!canvasPreview && (<>
             <CanvasHoveredSegmentOverlay />
             <CanvasSelectedSegmentOverlay />
 
             {!imageEditMode && showHelpers && (<>
-                <CanvasControlLines unitsPerPixel={unitsPerPixel} />
-                <CanvasControlPoints unitsPerPixel={unitsPerPixel} />
-                <CanvasTargetPoints unitsPerPixel={unitsPerPixel} />
+                <CanvasControlLines />
+                <CanvasControlPoints />
+                <CanvasTargetPoints />
             </>)}
         </>)}
 
@@ -70,9 +69,10 @@ function getCanvasPathClasses(canvasPreview: boolean, fillPreview: boolean, dark
 
 // Viewbox Frame Overlay
 
-function CanvasViewBoxFrame({ unitsPerPixel }: { unitsPerPixel: number; }) {
+function CanvasViewBoxFrame() {
     const { darkCanvas } = useSnapshot(appSettings);
     const viewBox = useAtomValue(pathViewBoxAtom);
+    const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
 
     return (
         <rect
@@ -127,7 +127,7 @@ function CanvasSelectedSegmentOverlay() {
 
 // Control Lines Overlay
 
-function CanvasControlLines({ unitsPerPixel }: { unitsPerPixel: number; }) {
+function CanvasControlLines() {
     const { darkCanvas } = useSnapshot(appSettings);
     const controlLines = useAtomValue(controlLinesAtom);
     const strokeWidth = useAtomValue(canvasStrokeWidthAtom);
@@ -154,10 +154,12 @@ function getControlLinesClasses(darkCanvas: boolean): string {
 
 // Control Points Overlay
 
-function CanvasControlPoints({ unitsPerPixel }: { unitsPerPixel: number; }) {
+function CanvasControlPoints() {
     const pathValue = useAtomValue(svgPathInputAtom);
     const controlPoints = useAtomValue(controlPointsAtom);
+    const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
     const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
+
     const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
     const setHoveredCanvasPoint = useSetAtom(hoveredCanvasPointAtom);
     const setFocusPointCommand = useSetAtom(doFocusPointCommandAtom);
@@ -195,10 +197,12 @@ function getControlPointClasses(selected: boolean, movable: boolean): string {
 
 // Target Points Overlay
 
-function CanvasTargetPoints({ unitsPerPixel }: { unitsPerPixel: number; }) {
+function CanvasTargetPoints() {
     const pathValue = useAtomValue(svgPathInputAtom);
     const targetPoints = useAtomValue(targetPointsAtom);
+    const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
     const [selectedCommandIndex, setSelectedCommandIndex] = useAtom(selectedCommandIndexAtom);
+    
     const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
     const setHoveredCanvasPoint = useSetAtom(hoveredCanvasPointAtom);
     const setFocusPointCommand = useSetAtom(doFocusPointCommandAtom);
