@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import type { TouchEventHandler } from "react";
+import type { PointerEvent as ReactPointerEvent, TouchEventHandler } from "react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { canvasSvgElementAtom } from "../../../store/0-atoms/2-1-canvas-viewport";
@@ -103,7 +103,7 @@ export function useCanvasDragAndDrop(
     const panViewBox = useSetAtom(doPanViewBoxAtom);
     const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
     const updateImage = useSetAtom(doUpdateImageAtom);
-    const startCanvasDrag = useSetAtom(startCanvasDragAtom);
+    const beginCanvasDrag = useSetAtom(startCanvasDragAtom);
     const startImageDrag = useSetAtom(startImageDragAtom);
 
     const touchGestureRef = useRef<TouchGestureState | null>(null);
@@ -312,6 +312,16 @@ export function useCanvasDragAndDrop(
             return;
         }
         touchGestureRef.current = null;
+    };
+
+    const startCanvasDrag = (event: ReactPointerEvent<SVGSVGElement>) => {
+        if (event.pointerType === "touch") return;
+        if (event.button !== 0 || imageEditMode || preview) return;
+        beginCanvasDrag({
+            pointerId: event.pointerId,
+            clientX: event.clientX,
+            clientY: event.clientY,
+        });
     };
 
     return {

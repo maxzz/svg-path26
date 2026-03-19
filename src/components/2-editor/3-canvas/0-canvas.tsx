@@ -14,7 +14,6 @@ import { doClearCanvasFocusAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
 import { canvasViewBoxAtom, canvasViewportSizeAtom, doAdjustViewBoxToAspectAtom, doFitViewBoxAtom, doWheelZoomViewBoxAtom, doZoomViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 
 export function PathCanvas() {
     const { canvasPreview } = useSnapshot(appSettings.pathEditor);
@@ -34,8 +33,6 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
     const svgPathInput = useAtomValue(svgPathInputAtom);
     const parseError = useAtomValue(parseErrorAtom);
     const viewBox = useAtomValue(canvasViewBoxAtom);
-    const imageEditMode = useAtomValue(isImageEditModeAtom);
-    const svgElement = useAtomValue(canvasSvgElementAtom);
 
     const doClearCanvasFocus = useSetAtom(doClearCanvasFocusAtom);
     const setCanvasSvgElement = useSetAtom(canvasSvgElementAtom);
@@ -67,11 +64,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
                 viewBox={viewBox.join(" ")}
                 className="size-full touch-none"
                 onWheel={doWheelZoomViewBox}
-                onPointerDown={(event) => {
-                    if (event.pointerType === "touch") return;
-                    if (event.button !== 0 || imageEditMode || preview) return;
-                    startCanvasDrag({ pointerId: event.pointerId, clientX: event.clientX, clientY: event.clientY });
-                }}
+                onPointerDown={startCanvasDrag}
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
