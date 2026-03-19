@@ -105,6 +105,7 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
                 if (!dragState) return;
                 if (event.pointerId !== dragState.pointerId) return;
                 if (!svgElement) return;
+
                 const next = eventToSvgPoint(svgElement, event.clientX, event.clientY, viewBox);
                 if (!next) return;
 
@@ -150,6 +151,7 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
             function onPointerUp(event: PointerEvent) {
                 if (!dragState) return;
                 if (event.pointerId !== dragState.pointerId) return;
+
                 if (dragState.mode === "point") {
                     doCommitCurrentPathToHistory(dragState.startPath);
                 }
@@ -162,7 +164,7 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
             window.addEventListener("pointercancel", onPointerUp, { signal: controller.signal });
             return () => controller.abort();
         },
-        [doCommitCurrentPathToHistory, dragState, doPanViewBox, pointPrecision, setDragState, setPointLocationWithoutHistory, snapToGrid, doStopCanvasDrag, svgElement, doUpdateImage, vh, viewBox, viewPortLocked, vw]);
+        [dragState, pointPrecision, snapToGrid, svgElement, vh, viewBox, viewPortLocked, vw]);
 
     useEffect(
         () => {
@@ -195,12 +197,13 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
             window.addEventListener("keydown", onKeyDown, { signal: controller.signal });
             return () => controller.abort();
         },
-        [dragState, setPathValue, doStopCanvasDrag, doUpdateImage]);
+        [dragState]);
 
     function onTouchStart(event: TouchEvent<SVGSVGElement>) {
         if (imageEditMode || canvasPreview) return;
         if (event.target !== event.currentTarget) return;
         if (!svgElement) return;
+
         if (event.touches.length === 1) {
             const touch = event.touches[0];
             touchGestureRef.current = {
@@ -276,11 +279,12 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
             touchGestureRef.current = null;
             return;
         }
+
         if (event.touches.length === 0) {
             touchGestureRef.current = null;
             return;
         }
-        if (event.touches.length === 1) {
+        else if (event.touches.length === 1) {
             const touch = event.touches[0];
             touchGestureRef.current = {
                 mode: "pan",
@@ -289,7 +293,7 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
             };
             return;
         }
-        if (event.touches.length === 2) {
+        else if (event.touches.length === 2) {
             const p1 = eventToSvgPoint(svgElement, event.touches[0].clientX, event.touches[0].clientY, viewBox);
             const p2 = eventToSvgPoint(svgElement, event.touches[1].clientX, event.touches[1].clientY, viewBox);
             if (!p1 || !p2) {
@@ -303,6 +307,7 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
             };
             return;
         }
+
         touchGestureRef.current = null;
     }
 
