@@ -13,6 +13,7 @@ import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { doCommitCurrentPathToHistoryAtom } from "@/store/0-atoms/1-2-history";
 import { doUpdateImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-4-images";
 import { appSettings } from "@/store/0-ui-settings";
+import type { ViewBox } from "@/store/9-ui-settings-types-and-defaults";
 import type { Point, SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
 
 export type DragState =
@@ -83,7 +84,7 @@ export const stopCanvasDragAtom = atom(
 );
 
 export function useCanvasDragAndDrop(
-    viewBox: [number, number, number, number],
+    viewBox: ViewBox,
 ) {
     const svgElement = useAtomValue(canvasSvgElementAtom);
     const dragState = useAtomValue(canvasDragStateAtom);
@@ -338,7 +339,7 @@ export function eventToSvgPoint(
     svg: SVGSVGElement | null,
     clientX: number,
     clientY: number,
-    viewBox: [number, number, number, number],
+    viewBox: ViewBox,
 ): Point | null {
     if (!svg) return null;
     const rect = svg.getBoundingClientRect();

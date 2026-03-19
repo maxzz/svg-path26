@@ -2,8 +2,7 @@ import { useEffect } from "react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { strokeWidthAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { canvasViewBoxAtom, canvasViewportSizeAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
-
-export type SvgViewBox = [number, number, number, number];
+import type { ViewBox } from "@/store/9-ui-settings-types-and-defaults";
 
 export { canvasViewportSizeAtom };
 
@@ -55,7 +54,7 @@ export function useSyncCanvasViewportSize() {
         [setViewportSize, svgElement]);
 }
 
-function getSvgUnitsPerPixel(viewBox: SvgViewBox, size: SvgViewportSize | null): number {
+function getSvgUnitsPerPixel(viewBox: ViewBox, size: SvgViewportSize | null): number {
     const [, , width, height] = viewBox;
 
     if (!size || size.width <= 0 || size.height <= 0) {

@@ -1,6 +1,6 @@
 import type { ThemeMode } from "@/utils";
 
-export type ViewBox = [number, number, number, number];
+export type ViewBox = readonly [number, number, number, number];
 
 export interface StoredPathSetting {
     name: string;
