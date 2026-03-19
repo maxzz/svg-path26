@@ -10,11 +10,11 @@ import { canvasDragStateAtom, eventToSvgPoint, useCanvasDragAndDrop } from "./3-
 import { PathCanvasImages } from "./4-canvas-overlays-image";
 import { canvasSvgElementAtom, useSyncCanvasViewportSize } from "../../../store/0-atoms/2-1-canvas-viewport";
 import { appSettings } from "@/store/0-ui-settings";
-import { hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { doClearCanvasFocusAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
 import { canvasViewBoxAtom, canvasViewportSizeAtom, doAdjustViewBoxToAspectAtom, doFitViewBoxAtom, doZoomViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { focusedImageIdAtom, isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
+import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 
 export function PathCanvas() {
     const { canvasPreview } = useSnapshot(appSettings.pathEditor);
@@ -37,10 +37,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
     const imageEditMode = useAtomValue(isImageEditModeAtom);
     const svgElement = useAtomValue(canvasSvgElementAtom);
 
-    const setFocusedImageId = useSetAtom(focusedImageIdAtom);
-    const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
-    const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
-    const setHoveredCanvasPoint = useSetAtom(hoveredCanvasPointAtom);
+    const doClearCanvasFocus = useSetAtom(doClearCanvasFocusAtom);
     const setCanvasSvgElement = useSetAtom(canvasSvgElementAtom);
     const doZoomViewBox = useSetAtom(doZoomViewBoxAtom);
     const doFitViewBox = useSetAtom(doFitViewBoxAtom);
@@ -86,15 +83,14 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
-                onClick={(event) => {
-                    if (event.target === event.currentTarget) {
-                        if (dragState?.mode === "canvas" && dragState.moved) return;
-                        setSelectedCommandIndex(null);
-                        setHoveredCommandIndex(null);
-                        setHoveredCanvasPoint(null);
-                        setFocusedImageId(null);
+                onClick={
+                    (event) => {
+                        if (event.target === event.currentTarget) {
+                            if (dragState?.mode === "canvas" && dragState.moved) return;
+                            doClearCanvasFocus();
+                        }
                     }
-                }}
+                }
             >
                 {children}
             </svg>
@@ -116,7 +112,7 @@ function ViewportZoomControls() {
     const { darkCanvas } = useSnapshot(appSettings);
     const buttonClasses = classNames("size-7 rounded-full", darkCanvas ? "text-slate-500 bg-slate-100/10! border-slate-100/10!" : "text-slate-500 bg-slate-500/10! border-slate-500/10!");
     return (
-        <div className="absolute bottom-3 right-3 z-10 flex items-center gap-0.5">
+        <div className="absolute bottom-3 right-3 flex items-center gap-0.5 z-10">
             <Button variant="outline" size="icon" className={buttonClasses} title="Zoom out" onClick={() => doZoomViewBox({ scale: 10 / 9 })}>
                 <IconZoomOut className="size-3.5" />
             </Button>

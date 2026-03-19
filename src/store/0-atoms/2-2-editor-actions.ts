@@ -44,6 +44,16 @@ export const hoveredCanvasPointAtom = atom<SvgCanvasPoint | null>(null);
 export const draggedCanvasPointAtom = atom<SvgCanvasPoint | null>(null);
 export const isCanvasDraggingAtom = atom(false);
 
+export const doClearCanvasFocusAtom = atom(
+    null,
+    (_get, set) => {
+        set(selectedCommandIndexAtom, null);
+        set(hoveredCommandIndexAtom, null);
+        set(hoveredCanvasPointAtom, null);
+        set(focusedImageIdAtom, null);
+    }
+);
+
 const COMMAND_SHORTCUT_PATTERN = /^[mlvhcsqtaz]$/i;
 
 // Selected standalone segment path
