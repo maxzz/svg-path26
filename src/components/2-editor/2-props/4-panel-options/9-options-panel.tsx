@@ -56,18 +56,15 @@ export function OptionsPanel() {
                             checked={showTicks}
                             onCheckedChange={(checked) => appSettings.canvas.showTicks = checked}
                         />
-                        {showTicks
-                            ? (
-                                <input
-                                    className="h-6 w-12 rounded border bg-background px-2 text-[11px]"
-                                    type="number"
-                                    value={tickInterval}
-                                    min={1}
-                                    step={1}
-                                    onChange={(event) => appSettings.pathEditor.tickInterval = Math.max(1, Number(event.target.value) || 1)}
-                                />
-                            ) : null
-                        }
+                        <input
+                            className="h-6 w-12 rounded border bg-background px-2 text-[11px] disabled:opacity-20"
+                            disabled={!showTicks}
+                            type="number"
+                            value={tickInterval}
+                            min={1}
+                            step={1}
+                            onChange={(event) => appSettings.pathEditor.tickInterval = Math.max(1, Number(event.target.value) || 1)}
+                        />
                     </div>
 
                     <CheckboxRow
