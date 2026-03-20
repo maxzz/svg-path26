@@ -34,9 +34,7 @@ export function OptionsPanel() {
                     <CheckboxRow
                         label="Snap to grid"
                         checked={snapToGrid}
-                        onCheckedChange={(checked) => {
-                            appSettings.canvas.snapToGrid = checked;
-                        }}
+                        onCheckedChange={(checked) => appSettings.canvas.snapToGrid = checked}
                     />
                     <LabeledNumberField
                         label="Precision"
@@ -44,63 +42,50 @@ export function OptionsPanel() {
                         min={0}
                         max={8}
                         step={1}
-                        onValueChange={(value) => {
-                            appSettings.pathEditor.pointPrecision = value;
-                        }}
+                        onValueChange={(value) => appSettings.pathEditor.pointPrecision = value}
                     />
 
                     <CheckboxRow
                         label="Show grid"
                         checked={uiSettings.showGrid}
-                        onCheckedChange={(checked) => {
-                            appSettings.canvas.showGrid = checked;
-                        }}
+                        onCheckedChange={(checked) => appSettings.canvas.showGrid = checked}
                     />
                     <div className="flex items-center gap-2 justify-self-end">
                         <CheckboxRow
                             label="Ticks"
                             checked={showTicks}
-                            onCheckedChange={(checked) => {
-                                appSettings.canvas.showTicks = checked;
-                            }}
+                            onCheckedChange={(checked) => appSettings.canvas.showTicks = checked}
                         />
-                        {showTicks ? (
-                            <input
-                                type="number"
-                                className="h-6 w-12 rounded border bg-background px-2 text-[11px]"
-                                value={tickInterval}
-                                min={1}
-                                step={1}
-                                onChange={(event) => {
-                                    appSettings.pathEditor.tickInterval = Math.max(1, Number(event.target.value) || 1);
-                                }}
-                            />
-                        ) : null}
+                        {showTicks
+                            ? (
+                                <input
+                                    className="h-6 w-12 rounded border bg-background px-2 text-[11px]"
+                                    type="number"
+                                    value={tickInterval}
+                                    min={1}
+                                    step={1}
+                                    onChange={(event) => appSettings.pathEditor.tickInterval = Math.max(1, Number(event.target.value) || 1)}
+                                />
+                            ) : null
+                        }
                     </div>
 
                     <CheckboxRow
                         label="Show point controls"
                         checked={uiSettings.showHelpers}
-                        onCheckedChange={(checked) => {
-                            appSettings.canvas.showHelpers = checked;
-                        }}
+                        onCheckedChange={(checked) => appSettings.canvas.showHelpers = checked}
                     />
                     <CheckboxRow
                         label="Fill path"
                         checked={fillPreview}
-                        onCheckedChange={(checked) => {
-                            appSettings.canvas.fillPreview = checked;
-                        }}
+                        onCheckedChange={(checked) => appSettings.canvas.fillPreview = checked}
                     />
 
                     <CheckboxRow
                         label="Minify output"
                         checked={minifyOutput}
                         className="col-span-2"
-                        onCheckedChange={(checked) => {
-                            appSettings.pathEditor.minifyOutput = checked;
-                            doNormalize();
-                        }}
+                        onCheckedChange={(checked) => { appSettings.pathEditor.minifyOutput = checked; doNormalize(); }}
                     />
                 </div>
             </div>
@@ -123,9 +108,7 @@ function ViewportControls({ locked }: { locked: boolean; }) {
                 size="icon"
                 className="shrink-0 mt-px size-8 hover:bg-slate-200 rounded"
                 title={locked ? "Unlock viewport" : "Lock viewport"}
-                onClick={() => {
-                    appSettings.pathEditor.viewPortLocked = !locked;
-                }}
+                onClick={() => appSettings.pathEditor.viewPortLocked = !locked}
             >
                 {locked ? <IconLockClosed className="size-3.5" /> : <IconLockOpen className="size-3" />}
             </Button>
@@ -148,9 +131,7 @@ function ViewBoxControls({ showFrame }: { showFrame: boolean; }) {
                 size="icon"
                 className="shrink-0 mt-px size-8 hover:bg-slate-200 rounded"
                 title={showFrame ? "Hide viewBox frame" : "Show viewBox frame"}
-                onClick={() => {
-                    appSettings.canvas.showViewBoxFrame = !showFrame;
-                }}
+                onClick={() => appSettings.canvas.showViewBoxFrame = !showFrame}
             >
                 {showFrame ? <IconLockClosed className="size-3.5" /> : <IconLockOpen className="size-3" />}
             </Button>
