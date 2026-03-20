@@ -16,6 +16,7 @@ import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } fr
 import { doOpenNamedPathAtom, doSaveNamedPathAtom } from "./2-3-stored-paths-actions";
 import { doSetPathViewBoxAtom } from "./2-6-path-viewbox";
 import { appSettings } from "@/store/0-ui-settings";
+import { normalizeStoredSettings } from "@/store/1-ui-settings-normalize";
 
 describe("svg path state atoms", () => {
     beforeEach(() => {
@@ -24,7 +25,14 @@ describe("svg path state atoms", () => {
         appSettings.pathEditor.viewPortLocked = false;
         appSettings.pathEditor.pathName = "";
         appSettings.pathEditor.storedPaths = [];
-        appSettings.pathEditor.showViewBoxFrame = false;
+        appSettings.canvas.showViewBoxFrame = false;
+        appSettings.canvas.canvasPreview = false;
+        appSettings.canvas.fillPreview = false;
+        appSettings.canvas.showGrid = true;
+        appSettings.canvas.showHelpers = true;
+        appSettings.canvas.darkCanvas = false;
+        appSettings.canvas.snapToGrid = true;
+        appSettings.canvas.showTicks = false;
         appSettings.pathEditor.viewBox = [0, 0, 24, 24];
         appSettings.pathEditor.decimals = 3;
         appSettings.pathEditor.minifyOutput = false;
@@ -122,5 +130,32 @@ describe("svg path state atoms", () => {
         expect(store.get(svgPathInputAtom)).toContain("33 44");
         expect(appSettings.pathEditor.viewBox).toEqual([1, 2, 30, 40]);
         expect(store.get(canvasViewBoxAtom)).toEqual([9, 9, 12, 12]);
+    });
+
+    it("migrates legacy canvas settings into the nested canvas branch", () => {
+        const settings = normalizeStoredSettings({
+            theme: "dark",
+            showGrid: false,
+            showHelpers: false,
+            darkCanvas: true,
+            pathEditor: {
+                snapToGrid: false,
+                showTicks: true,
+                fillPreview: true,
+                canvasPreview: true,
+                showViewBoxFrame: true,
+            },
+        });
+
+        expect(settings.canvas).toMatchObject({
+            showGrid: false,
+            showHelpers: false,
+            darkCanvas: true,
+            snapToGrid: false,
+            showTicks: true,
+            fillPreview: true,
+            canvasPreview: true,
+            showViewBoxFrame: true,
+        });
     });
 });

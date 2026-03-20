@@ -13,17 +13,9 @@ import { classNames } from "@/utils";
 import { compactInputClasses, compactLabelClasses } from "../8-shared-classes/0-classes";
 
 export function OptionsPanel() {
-    const uiSettings = useSnapshot(appSettings);
-    const {
-        minifyOutput,
-        pointPrecision,
-        showTicks,
-        snapToGrid,
-        tickInterval,
-        fillPreview,
-        viewPortLocked,
-        showViewBoxFrame,
-    } = useSnapshot(appSettings.pathEditor);
+    const uiSettings = useSnapshot(appSettings.canvas);
+    const { showTicks, snapToGrid, fillPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);
+    const { minifyOutput, pointPrecision, tickInterval, viewPortLocked } = useSnapshot(appSettings.pathEditor);
 
     const doNormalize = useSetAtom(doNormalizePathAtom);
 
@@ -43,7 +35,7 @@ export function OptionsPanel() {
                         label="Snap to grid"
                         checked={snapToGrid}
                         onCheckedChange={(checked) => {
-                            appSettings.pathEditor.snapToGrid = checked;
+                            appSettings.canvas.snapToGrid = checked;
                         }}
                     />
                     <LabeledNumberField
@@ -61,7 +53,7 @@ export function OptionsPanel() {
                         label="Show grid"
                         checked={uiSettings.showGrid}
                         onCheckedChange={(checked) => {
-                            appSettings.showGrid = checked;
+                            appSettings.canvas.showGrid = checked;
                         }}
                     />
                     <div className="flex items-center gap-2 justify-self-end">
@@ -69,7 +61,7 @@ export function OptionsPanel() {
                             label="Ticks"
                             checked={showTicks}
                             onCheckedChange={(checked) => {
-                                appSettings.pathEditor.showTicks = checked;
+                                appSettings.canvas.showTicks = checked;
                             }}
                         />
                         {showTicks ? (
@@ -90,14 +82,14 @@ export function OptionsPanel() {
                         label="Show point controls"
                         checked={uiSettings.showHelpers}
                         onCheckedChange={(checked) => {
-                            appSettings.showHelpers = checked;
+                            appSettings.canvas.showHelpers = checked;
                         }}
                     />
                     <CheckboxRow
                         label="Fill path"
                         checked={fillPreview}
                         onCheckedChange={(checked) => {
-                            appSettings.pathEditor.fillPreview = checked;
+                            appSettings.canvas.fillPreview = checked;
                         }}
                     />
 
@@ -157,7 +149,7 @@ function ViewBoxControls({ showFrame }: { showFrame: boolean; }) {
                 className="shrink-0 mt-px size-8 hover:bg-slate-200 rounded"
                 title={showFrame ? "Hide viewBox frame" : "Show viewBox frame"}
                 onClick={() => {
-                    appSettings.pathEditor.showViewBoxFrame = !showFrame;
+                    appSettings.canvas.showViewBoxFrame = !showFrame;
                 }}
             >
                 {showFrame ? <IconLockClosed className="size-3.5" /> : <IconLockOpen className="size-3" />}

@@ -28,9 +28,9 @@ import {
 import { appSettings } from "@/store/0-ui-settings";
 
 export function CanvasActionsMenu() {
-    const uiSettings = useSnapshot(appSettings);
-    const pathValue = useAtomValue(svgPathInputAtom);
+    const { showGrid, showHelpers, darkCanvas } = useSnapshot(appSettings.canvas);
     const { minifyOutput } = useSnapshot(appSettings.pathEditor);
+    const pathValue = useAtomValue(svgPathInputAtom);
     const [isImageEditMode, setIsImageEditMode] = useAtom(isImageEditModeAtom);
 
     const doNormalize = useSetAtom(doNormalizePathAtom);
@@ -55,13 +55,13 @@ export function CanvasActionsMenu() {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuCheckboxItem checked={uiSettings.showGrid} onCheckedChange={(checked) => { appSettings.showGrid = Boolean(checked); }}>
+                <DropdownMenuCheckboxItem checked={showGrid} onCheckedChange={(checked) => { appSettings.canvas.showGrid = Boolean(checked); }}>
                     Grid
                 </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem checked={uiSettings.showHelpers} onCheckedChange={(checked) => { appSettings.showHelpers = Boolean(checked); }}>
+                <DropdownMenuCheckboxItem checked={showHelpers} onCheckedChange={(checked) => { appSettings.canvas.showHelpers = Boolean(checked); }}>
                     Helpers
                 </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem checked={uiSettings.darkCanvas} onCheckedChange={(checked) => { appSettings.darkCanvas = Boolean(checked); }}>
+                <DropdownMenuCheckboxItem checked={darkCanvas} onCheckedChange={(checked) => { appSettings.canvas.darkCanvas = Boolean(checked); }}>
                     Dark Canvas
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem checked={isImageEditMode} onCheckedChange={(checked) => setIsImageEditMode(Boolean(checked))}>

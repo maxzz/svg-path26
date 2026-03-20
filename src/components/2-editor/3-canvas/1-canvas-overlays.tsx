@@ -13,8 +13,7 @@ import { doStartPointDragAtom } from "./3-canvas-drag";
 import { PathCanvasImageEditOverlays } from "./4-canvas-overlays-image";
 
 export function CanvasHelperOverlays() {
-    const { showHelpers } = useSnapshot(appSettings);
-    const { canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.pathEditor);
+    const { showHelpers, canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);
 
     const imageEditMode = useAtomValue(isImageEditModeAtom);
 
@@ -41,8 +40,7 @@ export function CanvasHelperOverlays() {
 // Main Path Overlay
 
 function CanvasMainPathOverlay() {
-    const { darkCanvas } = useSnapshot(appSettings);
-    const { canvasPreview, fillPreview } = useSnapshot(appSettings.pathEditor);
+    const { darkCanvas, canvasPreview, fillPreview } = useSnapshot(appSettings.canvas);
 
     const pathValue = useAtomValue(svgPathInputAtom);
     const parseError = useAtomValue(parseErrorAtom);
@@ -70,7 +68,7 @@ function getCanvasPathClasses(canvasPreview: boolean, fillPreview: boolean, dark
 // Viewbox Frame Overlay
 
 function CanvasViewBoxFrame() {
-    const { darkCanvas } = useSnapshot(appSettings);
+    const { darkCanvas } = useSnapshot(appSettings.canvas);
     const viewBox = useAtomValue(pathViewBoxAtom);
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
 
@@ -128,7 +126,7 @@ function CanvasSelectedSegmentOverlay() {
 // Control Lines Overlay
 
 function CanvasControlLines() {
-    const { darkCanvas } = useSnapshot(appSettings);
+    const { darkCanvas } = useSnapshot(appSettings.canvas);
     const controlLines = useAtomValue(controlLinesAtom);
     const strokeWidth = useAtomValue(canvasStrokeWidthAtom);
     const controlLinesClasses = getControlLinesClasses(darkCanvas);

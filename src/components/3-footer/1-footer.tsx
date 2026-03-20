@@ -5,12 +5,12 @@ import { commandCountAtom } from "@/store/0-atoms/2-0-svg-model";
 
 export function Footer() {
     const commandCount = useAtomValue(commandCountAtom);
-    const settings = useSnapshot(appSettings);
+    const { showGrid, darkCanvas } = useSnapshot(appSettings.canvas);
 
     return (
         <footer className="flex items-center justify-between border-t px-4 py-2 text-xs text-muted-foreground">
             <span>Commands: {commandCount}</span>
-            <span>{settings.showGrid ? "Grid on" : "Grid off"} / {settings.darkCanvas ? "Dark canvas" : "Light canvas"}</span>
+            <span>{showGrid ? "Grid on" : "Grid off"} / {darkCanvas ? "Dark canvas" : "Light canvas"}</span>
         </footer>
     );
 }

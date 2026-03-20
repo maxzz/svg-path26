@@ -1,30 +1,31 @@
 import { z } from "zod";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
-import { type ExportSettings, type PathEditorSettings, type UiSettings, DEFAULT_EXPORT_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SETTINGS, DEFAULT_VIEWBOX_SETTINGS } from "./9-ui-settings-types-and-defaults";
+import { type CanvasSettings, type ExportSettings, type PathEditorSettings, type UiSettings, DEFAULT_CANVAS_SETTINGS, DEFAULT_EXPORT_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SETTINGS, DEFAULT_VIEWBOX_SETTINGS } from "./9-ui-settings-types-and-defaults";
 
 type MutableViewBox = Writeable<ViewBox>;
 
 export function normalizeStoredSettings(value: unknown): UiSettings {
     const defaultSettings = DEFAULT_SETTINGS;
+    const defaultCanvasSettings = DEFAULT_CANVAS_SETTINGS;
     const defaultPathEditorSettings = DEFAULT_PATH_EDITOR_SETTINGS;
     const defaultExportSettings = DEFAULT_EXPORT_SETTINGS;
 
     const fallbackSettings = cloneUiSettings({
         ...defaultSettings,
+        canvas: defaultCanvasSettings,
         pathEditor: defaultPathEditorSettings,
         export: defaultExportSettings,
     });
 
+    const canvasSettingsSchema = createCanvasSettingsSchema(defaultCanvasSettings);
     const pathEditorSchema = createPathEditorSettingsSchema(defaultPathEditorSettings);
     const exportSettingsSchema = createExportSettingsSchema(defaultExportSettings);
 
     const uiSettingsSchema = z.preprocess(
-        toRecord,
+        (value) => toUiSettingsRecord(value, defaultCanvasSettings),
         z.object({
             theme: themeModeSchema.catch(defaultSettings.theme),
-            showGrid: z.boolean().catch(defaultSettings.showGrid),
-            showHelpers: z.boolean().catch(defaultSettings.showHelpers),
-            darkCanvas: z.boolean().catch(defaultSettings.darkCanvas),
+            canvas: canvasSettingsSchema.catch(defaultCanvasSettings),
             sections: z.record(z.string(), z.boolean()).catch(defaultSettings.sections),
             editorPanelSizes: z.array(z.number()).catch(defaultSettings.editorPanelSizes),
             pathEditor: pathEditorSchema.catch(toPathEditorSchemaDefaults(defaultPathEditorSettings)),
@@ -49,6 +50,7 @@ export function normalizeStoredSettings(value: unknown): UiSettings {
 function cloneUiSettings(settings: UiSettings): UiSettings {
     return {
         ...settings,
+        canvas: { ...settings.canvas },
         sections: { ...settings.sections },
         editorPanelSizes: [...settings.editorPanelSizes],
         export: { ...settings.export },
@@ -63,6 +65,22 @@ function cloneUiSettings(settings: UiSettings): UiSettings {
     };
 }
 
+function createCanvasSettingsSchema(defaultSettings: CanvasSettings) {
+    return z.preprocess(
+        toRecord,
+        z.object({
+            showGrid: z.boolean().catch(defaultSettings.showGrid),
+            showHelpers: z.boolean().catch(defaultSettings.showHelpers),
+            darkCanvas: z.boolean().catch(defaultSettings.darkCanvas),
+            snapToGrid: z.boolean().catch(defaultSettings.snapToGrid),
+            showTicks: z.boolean().catch(defaultSettings.showTicks),
+            fillPreview: z.boolean().catch(defaultSettings.fillPreview),
+            canvasPreview: z.boolean().catch(defaultSettings.canvasPreview),
+            showViewBoxFrame: z.boolean().catch(defaultSettings.showViewBoxFrame),
+        })
+    );
+}
+
 function createPathEditorSettingsSchema(defaultSettings: PathEditorSettings) {
     const fallbackPathEditorSettings = toPathEditorSchemaDefaults(defaultSettings);
 
@@ -74,20 +92,35 @@ function createPathEditorSettingsSchema(defaultSettings: PathEditorSettings) {
             uniformScale: z.boolean().catch(defaultSettings.uniformScale),
             decimals: z.number().catch(defaultSettings.decimals),
             minifyOutput: z.boolean().catch(defaultSettings.minifyOutput),
-            snapToGrid: z.boolean().catch(defaultSettings.snapToGrid),
             pointPrecision: z.number().catch(defaultSettings.pointPrecision),
-            showTicks: z.boolean().catch(defaultSettings.showTicks),
             tickInterval: z.number().catch(defaultSettings.tickInterval),
-            fillPreview: z.boolean().catch(defaultSettings.fillPreview),
-            canvasPreview: z.boolean().catch(defaultSettings.canvasPreview),
             viewPortLocked: z.boolean().catch(defaultSettings.viewPortLocked),
-            showViewBoxFrame: z.boolean().catch(defaultSettings.showViewBoxFrame),
             viewBox: createStoredViewBoxSchema(defaultSettings.viewBox).catch(toMutableViewBox(defaultSettings.viewBox)),
             pathName: z.string().catch(defaultSettings.pathName),
             rawPath: z.string().catch(defaultSettings.rawPath),
             storedPaths: z.array(storedPathSchema).catch(fallbackPathEditorSettings.storedPaths),
         }).catch(fallbackPathEditorSettings)
     );
+}
+
+function toUiSettingsRecord(value: unknown, defaultCanvasSettings: CanvasSettings): Record<string, unknown> {
+    const record = toRecord(value);
+    const canvasRecord = toRecord(record.canvas);
+    const pathEditorRecord = toRecord(record.pathEditor);
+
+    return {
+        ...record,
+        canvas: {
+            showGrid: canvasRecord.showGrid ?? record.showGrid ?? pathEditorRecord.showGrid ?? defaultCanvasSettings.showGrid,
+            showHelpers: canvasRecord.showHelpers ?? record.showHelpers ?? pathEditorRecord.showHelpers ?? defaultCanvasSettings.showHelpers,
+            darkCanvas: canvasRecord.darkCanvas ?? record.darkCanvas ?? pathEditorRecord.darkCanvas ?? defaultCanvasSettings.darkCanvas,
+            snapToGrid: canvasRecord.snapToGrid ?? record.snapToGrid ?? pathEditorRecord.snapToGrid ?? defaultCanvasSettings.snapToGrid,
+            showTicks: canvasRecord.showTicks ?? record.showTicks ?? pathEditorRecord.showTicks ?? defaultCanvasSettings.showTicks,
+            fillPreview: canvasRecord.fillPreview ?? record.fillPreview ?? pathEditorRecord.fillPreview ?? defaultCanvasSettings.fillPreview,
+            canvasPreview: canvasRecord.canvasPreview ?? record.canvasPreview ?? pathEditorRecord.canvasPreview ?? defaultCanvasSettings.canvasPreview,
+            showViewBoxFrame: canvasRecord.showViewBoxFrame ?? record.showViewBoxFrame ?? pathEditorRecord.showViewBoxFrame ?? defaultCanvasSettings.showViewBoxFrame,
+        },
+    };
 }
 
 function createExportSettingsSchema(defaultSettings: ExportSettings) {

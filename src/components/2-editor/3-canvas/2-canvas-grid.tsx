@@ -7,8 +7,8 @@ import { canvasUnitsPerPixelAtom, canvasViewportSizeAtom } from "../../../store/
 import { canvasViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 
 export function CanvasGrid() {
-    const { showGrid } = useSnapshot(appSettings);
-    const { showTicks, tickInterval } = useSnapshot(appSettings.pathEditor);
+    const { showGrid, showTicks } = useSnapshot(appSettings.canvas);
+    const { tickInterval } = useSnapshot(appSettings.pathEditor);
     const viewBox = useAtomValue(canvasViewBoxAtom);
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
     const viewportSize = useAtomValue(canvasViewportSizeAtom);

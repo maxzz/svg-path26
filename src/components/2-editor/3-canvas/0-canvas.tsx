@@ -16,7 +16,7 @@ import { canvasViewBoxAtom, canvasViewportSizeAtom, doAdjustViewBoxToAspectAtom,
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 
 export function PathCanvas() {
-    const { canvasPreview } = useSnapshot(appSettings.pathEditor);
+    const { canvasPreview } = useSnapshot(appSettings.canvas);
     return (
         <PathCanvasElement>
             <PathCanvasImages />
@@ -27,8 +27,7 @@ export function PathCanvas() {
 }
 
 export function PathCanvasElement({ children }: { children: ReactNode; }) {
-    const { darkCanvas } = useSnapshot(appSettings);
-    const { canvasPreview: preview } = useSnapshot(appSettings.pathEditor);
+    const { darkCanvas, canvasPreview } = useSnapshot(appSettings.canvas);
 
     const svgPathInput = useAtomValue(svgPathInputAtom);
     const parseError = useAtomValue(parseErrorAtom);
@@ -58,7 +57,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
         [viewportSize]);
 
     return (
-        <div className={classNames("absolute w-full h-full overflow-hidden", preview ? "bg-white" : (darkCanvas ? "bg-zinc-900" : "bg-white"))}>
+        <div className={classNames("absolute w-full h-full overflow-hidden", canvasPreview ? "bg-white" : (darkCanvas ? "bg-zinc-900" : "bg-white"))}>
             <svg
                 ref={(node) => setCanvasSvgElement(node)}
                 viewBox={viewBox.join(" ")}
@@ -85,9 +84,9 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
 }
 
 function ViewportZoomControls() {
+    const { darkCanvas } = useSnapshot(appSettings.canvas);
     const doFitViewBox = useSetAtom(doFitViewBoxAtom);
     const doZoomViewBox = useSetAtom(doZoomViewBoxAtom);
-    const { darkCanvas } = useSnapshot(appSettings);
     const buttonClasses = classNames("size-7 rounded-full", darkCanvas ? "text-slate-500 bg-slate-100/10! border-slate-100/10!" : "text-slate-500 bg-slate-500/10! border-slate-500/10!");
     return (
         <div className="absolute bottom-3 right-3 flex items-center gap-0.5 z-10">

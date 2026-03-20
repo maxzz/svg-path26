@@ -11,7 +11,8 @@ import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { appSettings } from "@/store/0-ui-settings";
 
 export function SettingsPopover() {
-    const { viewPortLocked, snapToGrid, showTicks, fillPreview, canvasPreview, tickInterval, pointPrecision, showViewBoxFrame } = useSnapshot(appSettings.pathEditor);
+    const { snapToGrid, showTicks, fillPreview, canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);
+    const { viewPortLocked, tickInterval, pointPrecision } = useSnapshot(appSettings.pathEditor);
     const fitViewBox = useSetAtom(doFitViewBoxAtom);
     const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
 
@@ -71,27 +72,27 @@ export function SettingsPopover() {
                         <ToggleValueRow
                             label="Snap to grid"
                             value={snapToGrid}
-                            onChange={(nextValue) => { appSettings.pathEditor.snapToGrid = nextValue; }}
+                            onChange={(nextValue) => { appSettings.canvas.snapToGrid = nextValue; }}
                         />
                         <ToggleValueRow
                             label="Show ticks"
                             value={showTicks}
-                            onChange={(nextValue) => { appSettings.pathEditor.showTicks = nextValue; }}
+                            onChange={(nextValue) => { appSettings.canvas.showTicks = nextValue; }}
                         />
                         <ToggleValueRow
                             label="Show viewBox frame"
                             value={showViewBoxFrame}
-                            onChange={(nextValue) => { appSettings.pathEditor.showViewBoxFrame = nextValue; }}
+                            onChange={(nextValue) => { appSettings.canvas.showViewBoxFrame = nextValue; }}
                         />
                         <ToggleValueRow
                             label="Fill path"
                             value={fillPreview}
-                            onChange={(nextValue) => { appSettings.pathEditor.fillPreview = nextValue; }}
+                            onChange={(nextValue) => { appSettings.canvas.fillPreview = nextValue; }}
                         />
                         <ToggleValueRow
                             label="Preview mode"
                             value={canvasPreview}
-                            onChange={(nextValue) => { appSettings.pathEditor.canvasPreview = nextValue; }}
+                            onChange={(nextValue) => { appSettings.canvas.canvasPreview = nextValue; }}
                         />
                         <ToggleRow label="Image edit mode" atom={isImageEditModeAtom} />
                     </div>
