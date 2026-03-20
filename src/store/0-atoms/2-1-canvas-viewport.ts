@@ -1,63 +1,176 @@
-import { useEffect } from "react";
-import { atom, useAtomValue, useSetAtom } from "jotai";
-import { type ViewBox } from "@/svg-core/9-types-svg-model";
-import { strokeWidthAtom } from "@/store/0-atoms/2-2-editor-actions";
-import { canvasViewBoxAtom, canvasViewportSizeAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
+import { atom } from "jotai";
+import type { WheelEvent as ReactWheelEvent } from "react";
+import { type Point, type ViewBox } from "@/svg-core/9-types-svg-model";
+import { svgModelAtom } from "@/store/0-atoms/2-0-svg-model";
+import { appSettings } from "@/store/0-ui-settings";
 
-export const canvasSvgElementAtom = atom<SVGSVGElement | null>(null);
+import { canvasSvgElementAtom } from "./2-1-canvas-viewport-derives";
+import { eventToSvgPoint } from "@/components/2-editor/3-canvas/3-canvas-drag";
 
-type SvgViewportSize = {
-    width: number;
-    height: number;
-};
+const MIN_ZOOM = 0.25;
+const MAX_ZOOM = 16;
+const DEFAULT_VIEWPORT_X = 0;
+const DEFAULT_VIEWPORT_Y = 0;
+const DEFAULT_VIEWPORT_WIDTH = 120;
+const DEFAULT_VIEWPORT_HEIGHT = 90;
 
-export const canvasUnitsPerPixelAtom = atom(
-    (get) => getSvgUnitsPerPixel(get(canvasViewBoxAtom), get(canvasViewportSizeAtom))
+export const canvasViewportSizeAtom = atom<{ width: number; height: number; } | null>(null);
+
+export const viewPortXAtom = atom(DEFAULT_VIEWPORT_X);
+export const viewPortYAtom = atom(DEFAULT_VIEWPORT_Y);
+export const viewPortWidthAtom = atom(DEFAULT_VIEWPORT_WIDTH);
+export const viewPortHeightAtom = atom(DEFAULT_VIEWPORT_HEIGHT);
+
+export const canvasViewBoxAtom = atom<ViewBox>(
+    (get) => [
+        get(viewPortXAtom),
+        get(viewPortYAtom),
+        get(viewPortWidthAtom),
+        get(viewPortHeightAtom),
+    ]
 );
 
-export const canvasStrokeWidthAtom = atom(
-    (get) => get(canvasUnitsPerPixelAtom) * get(strokeWidthAtom)
-);
+export const doSetViewPortAtom = atom(
+    null,
+    (_get, set, next: ViewBox) => {
+        if (!Number.isFinite(next[0]) || !Number.isFinite(next[1])) return;
+        if (!Number.isFinite(next[2]) || !Number.isFinite(next[3])) return;
+        if (next[2] <= 0 || next[3] <= 0) return;
 
-export const hoveredSegmentStrokeWidthAtom = atom(
-    (get) => Math.max(get(canvasStrokeWidthAtom) * 1.4, get(canvasUnitsPerPixelAtom) * 0.8)
-);
-
-export const selectedSegmentStrokeWidthAtom = atom(
-    (get) => Math.max(get(canvasStrokeWidthAtom) * 1.6, get(canvasUnitsPerPixelAtom) * 0.95)
-);
-
-export function useSyncCanvasViewportSize() {
-    const svgElement = useAtomValue(canvasSvgElementAtom);
-    const setViewportSize = useSetAtom(canvasViewportSizeAtom);
-
-    useEffect(
-        () => {
-            if (!svgElement) {
-                setViewportSize(null);
-                return;
-            }
-
-            const updateSize = () => {
-                const rect = svgElement.getBoundingClientRect();
-                setViewportSize({ width: rect.width, height: rect.height });
-            };
-
-            updateSize();
-
-            const observer = new ResizeObserver(() => updateSize());
-            observer.observe(svgElement);
-            return () => observer.disconnect();
-        },
-        [setViewportSize, svgElement]);
-}
-
-function getSvgUnitsPerPixel(viewBox: ViewBox, viePortSize: SvgViewportSize | null): number {
-    const [, , width, height] = viewBox;
-
-    if (!viePortSize || viePortSize.width <= 0 || viePortSize.height <= 0) {
-        return Math.max(width, height) / 1000;
+        set(viewPortXAtom, next[0]);
+        set(viewPortYAtom, next[1]);
+        set(viewPortWidthAtom, Math.max(1e-3, next[2]));
+        set(viewPortHeightAtom, Math.max(1e-3, next[3]));
     }
+);
 
-    return Math.max(width / viePortSize.width, height / viePortSize.height);
+// Pan/zoom/fit view box
+
+export const doPanViewPortAtom = atom(
+    null,
+    (get, set, delta: { dx: number; dy: number; }) => {
+        if (appSettings.pathEditor.viewPortLocked) return;
+        set(viewPortXAtom, get(viewPortXAtom) + delta.dx);
+        set(viewPortYAtom, get(viewPortYAtom) + delta.dy);
+    }
+);
+
+export const doZoomViewPortAtom = atom(
+    null,
+    (get, set, viewBoxArgs: { scale: number; center?: Point; }) => {
+        if (appSettings.pathEditor.viewPortLocked) return;
+        
+        const scale = viewBoxArgs.scale;
+        if (!Number.isFinite(scale) || scale <= 0) return;
+
+        const x = get(viewPortXAtom);
+        const y = get(viewPortYAtom);
+        const width = get(viewPortWidthAtom);
+        const height = get(viewPortHeightAtom);
+        const center = viewBoxArgs.center ?? { x: x + width / 2, y: y + height / 2 };
+
+        const nextWidth = width * scale;
+        const nextHeight = height * scale;
+        const nextX = x + (center.x - x) - scale * (center.x - x);
+        const nextY = y + (center.y - y) - scale * (center.y - y);
+
+        set(viewPortXAtom, nextX);
+        set(viewPortYAtom, nextY);
+        set(viewPortWidthAtom, Math.max(1e-3, nextWidth));
+        set(viewPortHeightAtom, Math.max(1e-3, nextHeight));
+
+        appSettings.pathEditor.zoom = clampZoom(appSettings.pathEditor.zoom / scale);
+    }
+);
+
+export const doFitViewPortAtom = atom(
+    null,
+    (get, set) => {
+        if (appSettings.pathEditor.viewPortLocked) return;
+
+        const model = get(svgModelAtom).model;
+        if (!model) {
+            set(viewPortXAtom, DEFAULT_VIEWPORT_X);
+            set(viewPortYAtom, DEFAULT_VIEWPORT_Y);
+            set(viewPortWidthAtom, DEFAULT_VIEWPORT_WIDTH);
+            set(viewPortHeightAtom, DEFAULT_VIEWPORT_HEIGHT);
+            return;
+        }
+
+        const bounds = model.getBounds();
+        const widthRaw = Math.max(10, bounds.xmax - bounds.xmin);
+        const heightRaw = Math.max(10, bounds.ymax - bounds.ymin);
+        const padding = Math.max(widthRaw, heightRaw) * 0.12 + 2;
+
+        let width = widthRaw + padding * 2;
+        let height = heightRaw + padding * 2;
+        const viewport = get(canvasViewportSizeAtom);
+        const aspect = (viewport && viewport.width > 0 && viewport.height > 0)
+            ? viewport.width / viewport.height
+            : 4 / 3;
+        if (width / height > aspect) {
+            height = width / aspect;
+        } else {
+            width = height * aspect;
+        }
+
+        const zoom = clampZoom(appSettings.pathEditor.zoom);
+        width /= zoom;
+        height /= zoom;
+        const centerX = (bounds.xmin + bounds.xmax) / 2;
+        const centerY = (bounds.ymin + bounds.ymax) / 2;
+
+        set(viewPortXAtom, centerX - width / 2);
+        set(viewPortYAtom, centerY - height / 2);
+        set(viewPortWidthAtom, width);
+        set(viewPortHeightAtom, height);
+    }
+);
+
+export const doAdjustViewPortToAspectAtom = atom(
+    null,
+    (get, set) => {
+        const viewport = get(canvasViewportSizeAtom);
+        if (!viewport || viewport.width <= 0 || viewport.height <= 0) return;
+
+        const aspect = viewport.width / viewport.height;
+        const oldWidth = get(viewPortWidthAtom);
+        const oldHeight = get(viewPortHeightAtom);
+        const oldCenterX = get(viewPortXAtom) + oldWidth / 2;
+        const oldCenterY = get(viewPortYAtom) + oldHeight / 2;
+
+        let width = oldWidth;
+        let height = oldHeight;
+        if (width / height > aspect) {
+            height = width / aspect;
+        } else {
+            width = height * aspect;
+        }
+
+        set(viewPortXAtom, oldCenterX - width / 2);
+        set(viewPortYAtom, oldCenterY - height / 2);
+        set(viewPortWidthAtom, width);
+        set(viewPortHeightAtom, height);
+    }
+);
+
+export const doWheelZoomViewPortAtom = atom(
+    null,
+    (get, set, event: ReactWheelEvent<SVGSVGElement>) => {
+        event.preventDefault();
+        const svgElement = get(canvasSvgElementAtom);
+        if (!svgElement) return;
+        const viewBox = get(canvasViewBoxAtom);
+        const center = eventToSvgPoint(svgElement, event.clientX, event.clientY, viewBox);
+        if (!center) return;
+        const scale = Math.pow(1.005, event.deltaY);
+        set(doZoomViewPortAtom, { scale, center });
+    }
+);
+
+function clampZoom(value: number): number {
+    if (!Number.isFinite(value) || value <= 0) {
+        return 1;
+    }
+    return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value));
 }

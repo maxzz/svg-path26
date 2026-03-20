@@ -4,7 +4,7 @@ import {
     doSetPointLocationWithoutHistoryAtom,
 } from "./2-2-editor-actions";
 import { targetPointsAtom } from "./2-0-svg-model";
-import { canvasViewBoxAtom, doFitViewPortAtom, doPanViewPortAtom, doSetViewPortAtom, doZoomViewPortAtom } from "./2-1-canvas-viewbox";
+import { canvasViewBoxAtom, doFitViewPortAtom, doPanViewPortAtom, doSetViewPortAtom, doZoomViewPortAtom } from "./2-1-canvas-viewport";
 import {
     canRedoAtom,
     canUndoAtom,
