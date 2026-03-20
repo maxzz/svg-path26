@@ -4,7 +4,7 @@ import {
     doSetPointLocationWithoutHistoryAtom,
 } from "./2-2-editor-actions";
 import { targetPointsAtom } from "./2-0-svg-model";
-import { canvasViewBoxAtom, doFitViewBoxAtom, doPanViewBoxAtom, doSetViewBoxAtom, doZoomViewBoxAtom } from "./2-1-canvas-viewbox";
+import { canvasViewBoxAtom, doFitViewPortAtom, doPanViewPortAtom, doSetViewPortAtom, doZoomViewPortAtom } from "./2-1-canvas-viewbox";
 import {
     canRedoAtom,
     canUndoAtom,
@@ -78,24 +78,24 @@ describe("svg path state atoms", () => {
     it("fits, pans and zooms viewport with lock handling", () => {
         const store = createStore();
         store.set(svgPathInputAtom, "M 0 0 L 50 25");
-        store.set(doFitViewBoxAtom);
+        store.set(doFitViewPortAtom);
 
         const initial = store.get(canvasViewBoxAtom);
         expect(initial[2]).toBeGreaterThan(0);
         expect(initial[3]).toBeGreaterThan(0);
 
-        store.set(doPanViewBoxAtom, { dx: 10, dy: -5 });
+        store.set(doPanViewPortAtom, { dx: 10, dy: -5 });
         const panned = store.get(canvasViewBoxAtom);
         expect(panned[0]).not.toBe(initial[0]);
         expect(panned[1]).not.toBe(initial[1]);
 
-        store.set(doZoomViewBoxAtom, { scale: 0.9 });
+        store.set(doZoomViewPortAtom, { scale: 0.9 });
         const zoomed = store.get(canvasViewBoxAtom);
         expect(zoomed[2]).toBeLessThan(panned[2]);
 
         appSettings.pathEditor.viewPortLocked = true;
         const lockedBefore = store.get(canvasViewBoxAtom);
-        store.set(doPanViewBoxAtom, { dx: 5, dy: 5 });
+        store.set(doPanViewPortAtom, { dx: 5, dy: 5 });
         expect(store.get(canvasViewBoxAtom)).toEqual(lockedBefore);
     });
 
@@ -103,10 +103,10 @@ describe("svg path state atoms", () => {
         const store = createStore();
         appSettings.pathEditor.zoom = 2;
         store.set(svgPathInputAtom, "M 0 0 L 50 25");
-        store.set(doFitViewBoxAtom);
+        store.set(doFitViewPortAtom);
 
         const before = store.get(canvasViewBoxAtom);
-        store.set(doZoomViewBoxAtom, { scale: 0.9 });
+        store.set(doZoomViewPortAtom, { scale: 0.9 });
         const after = store.get(canvasViewBoxAtom);
 
         expect(after[2]).toBeCloseTo(before[2] * 0.9);
@@ -125,7 +125,7 @@ describe("svg path state atoms", () => {
         expect(appSettings.pathEditor.storedPaths[0]?.viewBox).toEqual([1, 2, 30, 40]);
 
         store.set(svgPathInputAtom, "M 0 0 L 1 1");
-        store.set(doSetViewBoxAtom, [9, 9, 12, 12]);
+        store.set(doSetViewPortAtom, [9, 9, 12, 12]);
         store.set(doOpenNamedPathAtom, "example");
         expect(store.get(svgPathInputAtom)).toContain("33 44");
         expect(appSettings.pathEditor.viewBox).toEqual([1, 2, 30, 40]);

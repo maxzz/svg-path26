@@ -30,7 +30,7 @@ export const canvasViewBoxAtom = atom<ViewBox>(
     ]
 );
 
-export const doSetViewBoxAtom = atom(
+export const doSetViewPortAtom = atom(
     null,
     (_get, set, next: ViewBox) => {
         if (!Number.isFinite(next[0]) || !Number.isFinite(next[1])) return;
@@ -46,7 +46,7 @@ export const doSetViewBoxAtom = atom(
 
 // Pan/zoom/fit view box
 
-export const doPanViewBoxAtom = atom(
+export const doPanViewPortAtom = atom(
     null,
     (get, set, delta: { dx: number; dy: number; }) => {
         if (appSettings.pathEditor.viewPortLocked) return;
@@ -55,7 +55,7 @@ export const doPanViewBoxAtom = atom(
     }
 );
 
-export const doZoomViewBoxAtom = atom(
+export const doZoomViewPortAtom = atom(
     null,
     (get, set, viewBoxArgs: { scale: number; center?: Point; }) => {
         if (appSettings.pathEditor.viewPortLocked) return;
@@ -83,7 +83,7 @@ export const doZoomViewBoxAtom = atom(
     }
 );
 
-export const doFitViewBoxAtom = atom(
+export const doFitViewPortAtom = atom(
     null,
     (get, set) => {
         if (appSettings.pathEditor.viewPortLocked) return;
@@ -127,7 +127,7 @@ export const doFitViewBoxAtom = atom(
     }
 );
 
-export const doAdjustViewBoxToAspectAtom = atom(
+export const doAdjustViewPortToAspectAtom = atom(
     null,
     (get, set) => {
         const viewport = get(canvasViewportSizeAtom);
@@ -154,7 +154,7 @@ export const doAdjustViewBoxToAspectAtom = atom(
     }
 );
 
-export const doWheelZoomViewBoxAtom = atom(
+export const doWheelZoomViewPortAtom = atom(
     null,
     (get, set, event: ReactWheelEvent<SVGSVGElement>) => {
         event.preventDefault();
@@ -164,7 +164,7 @@ export const doWheelZoomViewBoxAtom = atom(
         const center = eventToSvgPoint(svgElement, event.clientX, event.clientY, viewBox);
         if (!center) return;
         const scale = Math.pow(1.005, event.deltaY);
-        set(doZoomViewBoxAtom, { scale, center });
+        set(doZoomViewPortAtom, { scale, center });
     }
 );
 

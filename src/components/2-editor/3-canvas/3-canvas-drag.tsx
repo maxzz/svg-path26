@@ -6,7 +6,7 @@ import { type Point, type SvgCanvasPoint, type ViewBox } from "@/svg-core/9-type
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { canvasSvgElementAtom } from "../../../store/0-atoms/2-1-canvas-viewport";
 import { doSetPointLocationWithoutHistoryAtom, draggedCanvasPointAtom, isCanvasDraggingAtom } from "@/store/0-atoms/2-2-editor-actions";
-import { doPanViewBoxAtom, doZoomViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
+import { doPanViewPortAtom, doZoomViewPortAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 import { doCommitCurrentPathToHistoryAtom } from "@/store/0-atoms/1-2-history";
 import { doUpdateImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-4-images";
 
@@ -89,8 +89,8 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
     const doCommitCurrentPathToHistory = useSetAtom(doCommitCurrentPathToHistoryAtom);
     const setPathValue = useSetAtom(svgPathInputAtom);
     const setPointLocationWithoutHistory = useSetAtom(doSetPointLocationWithoutHistoryAtom);
-    const doPanViewBox = useSetAtom(doPanViewBoxAtom);
-    const doZoomViewBox = useSetAtom(doZoomViewBoxAtom);
+    const doPanViewPort = useSetAtom(doPanViewPortAtom);
+    const doZoomViewPort = useSetAtom(doZoomViewPortAtom);
     const doUpdateImage = useSetAtom(doUpdateImageAtom);
     const doBeginCanvasDrag = useSetAtom(doStartCanvasDragAtom);
     const doStartImageDrag = useSetAtom(doStartImageDragAtom);
@@ -130,7 +130,7 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
                     const dyPx = event.clientY - dragState.lastClientY;
                     const dx = -(dxPx / rect.width) * vw;
                     const dy = -(dyPx / rect.height) * vh;
-                    doPanViewBox({ dx, dy });
+                    doPanViewPort({ dx, dy });
                     setDragState({
                         ...dragState,
                         moved: dragState.moved || Math.abs(dxPx) > 1 || Math.abs(dyPx) > 1,
@@ -243,8 +243,8 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
             const previous = touchGestureRef.current;
             if (previous.mode === "pinch" && previous.lastDistance > 0 && distance > 0) {
                 const scale = previous.lastDistance / distance;
-                doZoomViewBox({ scale, center });
-                doPanViewBox({
+                doZoomViewPort({ scale, center });
+                doPanViewPort({
                     dx: previous.lastCenter.x - center.x,
                     dy: previous.lastCenter.y - center.y,
                 });
@@ -265,7 +265,7 @@ export function useCanvasDragAndDrop(viewBox: ViewBox) {
                 const dyPx = touch.clientY - previous.lastClientY;
                 const dx = -(dxPx / rect.width) * vw;
                 const dy = -(dyPx / rect.height) * vh;
-                doPanViewBox({ dx, dy });
+                doPanViewPort({ dx, dy });
             }
             touchGestureRef.current = {
                 mode: "pan",

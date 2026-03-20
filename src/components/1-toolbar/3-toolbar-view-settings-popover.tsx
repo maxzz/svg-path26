@@ -6,15 +6,15 @@ import { Button } from "@/components/ui/shadcn/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
 import { Switch } from "@/components/ui/shadcn/switch";
 import { strokeWidthAtom } from "@/store/0-atoms/2-2-editor-actions";
-import { doFitViewBoxAtom, doZoomViewBoxAtom, viewPortHeightAtom, viewPortWidthAtom, viewPortXAtom, viewPortYAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
+import { doFitViewPortAtom, doZoomViewPortAtom, viewPortHeightAtom, viewPortWidthAtom, viewPortXAtom, viewPortYAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { appSettings } from "@/store/0-ui-settings";
 
 export function SettingsPopover() {
     const { snapToGrid, showTicks, fillPreview, canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);
     const { viewPortLocked, tickInterval, pointPrecision } = useSnapshot(appSettings.pathEditor);
-    const fitViewBox = useSetAtom(doFitViewBoxAtom);
-    const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
+    const fitViewPort = useSetAtom(doFitViewPortAtom);
+    const zoomViewPort = useSetAtom(doZoomViewPortAtom);
 
     return (
         <Popover>
@@ -57,13 +57,13 @@ export function SettingsPopover() {
                     </div>
 
                     <div className="grid grid-cols-3 gap-1">
-                        <Button variant="outline" className="h-7 px-2" onClick={() => zoomViewBox({ scale: 9 / 10 })}>
+                        <Button variant="outline" className="h-7 px-2" onClick={() => zoomViewPort({ scale: 9 / 10 })}>
                             Zoom In
                         </Button>
-                        <Button variant="outline" className="h-7 px-2" onClick={() => fitViewBox()}>
+                        <Button variant="outline" className="h-7 px-2" onClick={() => fitViewPort()}>
                             Fit
                         </Button>
-                        <Button variant="outline" className="h-7 px-2" onClick={() => zoomViewBox({ scale: 10 / 9 })}>
+                        <Button variant="outline" className="h-7 px-2" onClick={() => zoomViewPort({ scale: 10 / 9 })}>
                             Zoom Out
                         </Button>
                     </div>
@@ -139,7 +139,7 @@ function SettingsRangeField({ valueAtom, label, valueClassName, formatValue, ...
 
 function ZoomSettingsField() {
     const { zoom } = useSnapshot(appSettings.pathEditor);
-    const zoomViewBox = useSetAtom(doZoomViewBoxAtom);
+    const zoomViewPort = useSetAtom(doZoomViewPortAtom);
 
     return (
         <label className="flex items-center gap-2 text-xs">
@@ -153,7 +153,7 @@ function ZoomSettingsField() {
                 onChange={(event) => {
                     const nextZoom = Number(event.target.value);
                     if (!Number.isFinite(nextZoom) || nextZoom <= 0 || nextZoom === zoom) return;
-                    zoomViewBox({ scale: zoom / nextZoom });
+                    zoomViewPort({ scale: zoom / nextZoom });
                 }}
             />
             <span className="w-12 text-right tabular-nums">{zoom.toFixed(1)}x</span>

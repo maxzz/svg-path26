@@ -12,7 +12,7 @@ import { canvasSvgElementAtom, useSyncCanvasViewportSize } from "../../../store/
 import { appSettings } from "@/store/0-ui-settings";
 import { doClearCanvasFocusAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
-import { canvasViewBoxAtom, canvasViewportSizeAtom, doAdjustViewBoxToAspectAtom, doFitViewBoxAtom, doWheelZoomViewBoxAtom, doZoomViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
+import { canvasViewBoxAtom, canvasViewportSizeAtom, doAdjustViewPortToAspectAtom, doFitViewPortAtom, doWheelZoomViewPortAtom, doZoomViewPortAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 
 export function PathCanvas() {
@@ -35,9 +35,9 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
 
     const doClearCanvasFocus = useSetAtom(doClearCanvasFocusAtom);
     const setCanvasSvgElement = useSetAtom(canvasSvgElementAtom);
-    const doWheelZoomViewBox = useSetAtom(doWheelZoomViewBoxAtom);
-    const doFitViewBox = useSetAtom(doFitViewBoxAtom);
-    const doAdjustViewBoxToAspect = useSetAtom(doAdjustViewBoxToAspectAtom);
+    const doWheelZoomViewPort = useSetAtom(doWheelZoomViewPortAtom);
+    const doFitViewPort = useSetAtom(doFitViewPortAtom);
+    const doAdjustViewPortToAspect = useSetAtom(doAdjustViewPortToAspectAtom);
     const viewportSize = useAtomValue(canvasViewportSizeAtom);
 
     const { onTouchEnd, onTouchMove, onTouchStart, startCanvasDrag } = useCanvasDragAndDrop(viewBox);
@@ -46,13 +46,13 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
 
     useEffect(
         () => {
-            doFitViewBox();
+            doFitViewPort();
         },
         [svgPathInput]);
 
     useEffect(
         () => {
-            doAdjustViewBoxToAspect();
+            doAdjustViewPortToAspect();
         },
         [viewportSize]);
 
@@ -62,7 +62,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
                 ref={(node) => setCanvasSvgElement(node)}
                 viewBox={viewBox.join(" ")}
                 className="size-full touch-none"
-                onWheel={doWheelZoomViewBox}
+                onWheel={doWheelZoomViewPort}
                 onPointerDown={startCanvasDrag}
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
@@ -85,18 +85,18 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
 
 function ViewportZoomControls() {
     const { darkCanvas } = useSnapshot(appSettings.canvas);
-    const doFitViewBox = useSetAtom(doFitViewBoxAtom);
-    const doZoomViewBox = useSetAtom(doZoomViewBoxAtom);
+    const doFitViewPort = useSetAtom(doFitViewPortAtom);
+    const doZoomViewPort = useSetAtom(doZoomViewPortAtom);
     const buttonClasses = classNames("size-7 rounded-full", darkCanvas ? "text-slate-500 bg-slate-100/10! border-slate-100/10!" : "text-slate-500 bg-slate-500/10! border-slate-500/10!");
     return (
         <div className="absolute bottom-3 right-3 flex items-center gap-0.5 z-10">
-            <Button variant="outline" size="icon" className={buttonClasses} title="Zoom out" onClick={() => doZoomViewBox({ scale: 10 / 9 })}>
+            <Button variant="outline" size="icon" className={buttonClasses} title="Zoom out" onClick={() => doZoomViewPort({ scale: 10 / 9 })}>
                 <IconZoomOut className="size-3.5" />
             </Button>
-            <Button variant="outline" size="icon" className={buttonClasses} title="Fit" onClick={() => doFitViewBox()}>
+            <Button variant="outline" size="icon" className={buttonClasses} title="Fit" onClick={() => doFitViewPort()}>
                 <IconZoomNormal className="size-3.5" />
             </Button>
-            <Button variant="outline" size="icon" className={buttonClasses} title="Zoom in" onClick={() => doZoomViewBox({ scale: 9 / 10 })}>
+            <Button variant="outline" size="icon" className={buttonClasses} title="Zoom in" onClick={() => doZoomViewPort({ scale: 9 / 10 })}>
                 <IconZoomIn className="size-3.5" />
             </Button>
         </div>
