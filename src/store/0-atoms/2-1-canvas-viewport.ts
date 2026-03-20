@@ -3,7 +3,6 @@ import type { WheelEvent as ReactWheelEvent } from "react";
 import { type Point, type ViewBox } from "@/svg-core/9-types-svg-model";
 import { svgModelAtom } from "@/store/0-atoms/2-0-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
-
 import { canvasSvgElementAtom } from "./2-1-canvas-viewport-derives";
 import { eventToSvgPoint } from "@/components/2-editor/3-canvas/3-canvas-drag";
 
@@ -13,6 +12,11 @@ const DEFAULT_VIEWPORT_X = 0;
 const DEFAULT_VIEWPORT_Y = 0;
 const DEFAULT_VIEWPORT_WIDTH = 120;
 const DEFAULT_VIEWPORT_HEIGHT = 90;
+
+export type SvgViewportSize = {
+    width: number;
+    height: number;
+};
 
 export const canvasViewportSizeAtom = atom<{ width: number; height: number; } | null>(null);
 
