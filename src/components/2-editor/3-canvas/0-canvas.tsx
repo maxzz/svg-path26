@@ -8,7 +8,7 @@ import { CanvasGrid } from "./2-canvas-grid";
 import { CanvasHelperOverlays } from "./1-canvas-overlays";
 import { useCanvasDragAndDrop } from "./3-canvas-drag";
 import { PathCanvasImages } from "./4-canvas-overlays-image";
-import { canvasSvgElementAtom, useSyncCanvasViewportSize } from "../../../store/0-atoms/2-1-canvas-viewport-derives";
+import { canvasRootSvgElementAtom, useSyncCanvasViewportSize } from "../../../store/0-atoms/2-1-canvas-viewport-derives";
 import { appSettings } from "@/store/0-ui-settings";
 import { doClearCanvasFocusAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
@@ -34,7 +34,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
     const viewPort = useAtomValue(canvasViewPortAtom);
 
     const doClearCanvasFocus = useSetAtom(doClearCanvasFocusAtom);
-    const setCanvasSvgElement = useSetAtom(canvasSvgElementAtom);
+    const setCanvasRootSvgElement = useSetAtom(canvasRootSvgElementAtom);
     const doWheelZoomViewPort = useSetAtom(doWheelZoomViewPortAtom);
     const doFitViewPort = useSetAtom(doFitViewPortAtom);
     const doAdjustViewPortToAspect = useSetAtom(doAdjustViewPortToAspectAtom);
@@ -59,7 +59,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
     return (
         <div className={classNames("absolute w-full h-full overflow-hidden", canvasPreview ? "bg-white" : (darkCanvas ? "bg-zinc-900" : "bg-white"))}>
             <svg
-                ref={(node) => setCanvasSvgElement(node)}
+                ref={(node) => setCanvasRootSvgElement(node)}
                 viewBox={viewPort.join(" ")}
                 className="size-full touch-none"
                 onWheel={doWheelZoomViewPort}

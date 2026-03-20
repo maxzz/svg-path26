@@ -4,7 +4,7 @@ import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { strokeWidthAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { type SvgViewportSize, canvasViewPortAtom, canvasViewportSizeAtom } from "@/store/0-atoms/2-1-canvas-viewport";
 
-export const canvasSvgElementAtom = atom<SVGSVGElement | null>(null);
+export const canvasRootSvgElementAtom = atom<SVGSVGElement | null>(null);
 
 export const canvasUnitsPerPixelAtom = atom(
     (get) => getSvgUnitsPerPixel(get(canvasViewPortAtom), get(canvasViewportSizeAtom))
@@ -23,28 +23,28 @@ export const selectedSegmentStrokeWidthAtom = atom(
 );
 
 export function useSyncCanvasViewportSize() {
-    const svgElement = useAtomValue(canvasSvgElementAtom);
+    const rootSvgElement = useAtomValue(canvasRootSvgElementAtom);
     const setViewportSize = useSetAtom(canvasViewportSizeAtom);
 
     useEffect(
         () => {
-            if (!svgElement) {
+            if (!rootSvgElement) {
                 setViewportSize(null);
                 return;
             }
 
             const updateSize = () => {
-                const rect = svgElement.getBoundingClientRect();
+                const rect = rootSvgElement.getBoundingClientRect();
                 setViewportSize({ width: rect.width, height: rect.height });
             };
 
             updateSize();
 
             const observer = new ResizeObserver(() => updateSize());
-            observer.observe(svgElement);
+            observer.observe(rootSvgElement);
             return () => observer.disconnect();
         },
-        [setViewportSize, svgElement]);
+        [setViewportSize, rootSvgElement]);
 }
 
 function getSvgUnitsPerPixel(viewBox: ViewBox, viePortSize: SvgViewportSize | null): number {

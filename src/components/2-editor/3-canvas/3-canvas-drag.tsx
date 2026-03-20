@@ -4,7 +4,7 @@ import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
 import { type Point, type SvgCanvasPoint, type ViewBox } from "@/svg-core/9-types-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { canvasSvgElementAtom } from "../../../store/0-atoms/2-1-canvas-viewport-derives";
+import { canvasRootSvgElementAtom } from "../../../store/0-atoms/2-1-canvas-viewport-derives";
 import { doSetPointLocationWithoutHistoryAtom, draggedCanvasPointAtom, isCanvasDraggingAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { doPanViewPortAtom, doZoomViewPortAtom } from "@/store/0-atoms/2-1-canvas-viewport";
 import { doCommitCurrentPathToHistoryAtom } from "@/store/0-atoms/1-2-history";
@@ -81,7 +81,7 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
     const { canvasPreview, snapToGrid } = useSnapshot(appSettings.canvas);
     const { pointPrecision, viewPortLocked } = useSnapshot(appSettings.pathEditor);
 
-    const svgElement = useAtomValue(canvasSvgElementAtom);
+    const rootSvgElement = useAtomValue(canvasRootSvgElementAtom);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
     const [dragState, setDragState] = useAtom(canvasDragStateAtom);
 
@@ -105,9 +105,9 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
             function onPointerMove(event: PointerEvent) {
                 if (!dragState) return;
                 if (event.pointerId !== dragState.pointerId) return;
-                if (!svgElement) return;
+                if (!rootSvgElement) return;
 
-                const next = eventToSvgPoint(svgElement, event.clientX, event.clientY, viewPort);
+                const next = eventToSvgPoint(rootSvgElement, event.clientX, event.clientY, viewPort);
                 if (!next) return;
 
                 if (dragState.mode === "point") {
@@ -124,7 +124,7 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
 
                 if (dragState.mode === "canvas") {
                     if (viewPortLocked) return;
-                    const rect = svgElement.getBoundingClientRect();
+                    const rect = rootSvgElement.getBoundingClientRect();
                     if (!rect.width || !rect.height) return;
                     const dxPx = event.clientX - dragState.lastClientX;
                     const dyPx = event.clientY - dragState.lastClientY;
@@ -165,7 +165,7 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
             window.addEventListener("pointercancel", onPointerUp, { signal: controller.signal });
             return () => controller.abort();
         },
-        [dragState, pointPrecision, snapToGrid, svgElement, vh, viewPort, viewPortLocked, vw]);
+        [dragState, pointPrecision, snapToGrid, rootSvgElement, vh, viewPort, viewPortLocked, vw]);
 
     useEffect(
         () => {
@@ -203,7 +203,7 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
     function onTouchStart(event: TouchEvent<SVGSVGElement>) {
         if (imageEditMode || canvasPreview) return;
         if (event.target !== event.currentTarget) return;
-        if (!svgElement) return;
+        if (!rootSvgElement) return;
 
         if (event.touches.length === 1) {
             const touch = event.touches[0];
@@ -217,8 +217,8 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
         if (event.touches.length === 2) {
             const first = event.touches[0];
             const second = event.touches[1];
-            const p1 = eventToSvgPoint(svgElement, first.clientX, first.clientY, viewPort);
-            const p2 = eventToSvgPoint(svgElement, second.clientX, second.clientY, viewPort);
+            const p1 = eventToSvgPoint(rootSvgElement, first.clientX, first.clientY, viewPort);
+            const p2 = eventToSvgPoint(rootSvgElement, second.clientX, second.clientY, viewPort);
             if (!p1 || !p2) return;
             touchGestureRef.current = {
                 mode: "pinch",
@@ -230,13 +230,13 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
 
     function onTouchMove(event: TouchEvent<SVGSVGElement>) {
         if (imageEditMode || canvasPreview) return;
-        if (!svgElement || !touchGestureRef.current) return;
+        if (!rootSvgElement || !touchGestureRef.current) return;
         if (event.touches.length === 0) return;
         event.preventDefault();
 
         if (event.touches.length === 2) {
-            const p1 = eventToSvgPoint(svgElement, event.touches[0].clientX, event.touches[0].clientY, viewPort);
-            const p2 = eventToSvgPoint(svgElement, event.touches[1].clientX, event.touches[1].clientY, viewPort);
+            const p1 = eventToSvgPoint(rootSvgElement, event.touches[0].clientX, event.touches[0].clientY, viewPort);
+            const p2 = eventToSvgPoint(rootSvgElement, event.touches[1].clientX, event.touches[1].clientY, viewPort);
             if (!p1 || !p2) return;
             const center = midpoint(p1, p2);
             const distance = distanceBetween(p1, p2);
@@ -258,8 +258,8 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
         else if (event.touches.length === 1) {
             const touch = event.touches[0];
             const previous = touchGestureRef.current;
-            if (previous.mode === "pan" && svgElement) {
-                const rect = svgElement.getBoundingClientRect();
+            if (previous.mode === "pan" && rootSvgElement) {
+                const rect = rootSvgElement.getBoundingClientRect();
                 if (!rect.width || !rect.height) return;
                 const dxPx = touch.clientX - previous.lastClientX;
                 const dyPx = touch.clientY - previous.lastClientY;
@@ -276,7 +276,7 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
     }
 
     function onTouchEnd(event: TouchEvent<SVGSVGElement>) {
-        if (!svgElement) {
+        if (!rootSvgElement) {
             touchGestureRef.current = null;
             return;
         }
@@ -295,8 +295,8 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
             return;
         }
         else if (event.touches.length === 2) {
-            const p1 = eventToSvgPoint(svgElement, event.touches[0].clientX, event.touches[0].clientY, viewPort);
-            const p2 = eventToSvgPoint(svgElement, event.touches[1].clientX, event.touches[1].clientY, viewPort);
+            const p1 = eventToSvgPoint(rootSvgElement, event.touches[0].clientX, event.touches[0].clientY, viewPort);
+            const p2 = eventToSvgPoint(rootSvgElement, event.touches[1].clientX, event.touches[1].clientY, viewPort);
             if (!p1 || !p2) {
                 touchGestureRef.current = null;
                 return;
