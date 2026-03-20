@@ -21,7 +21,7 @@ export const viewPortYAtom = atom(DEFAULT_VIEWPORT_Y);
 export const viewPortWidthAtom = atom(DEFAULT_VIEWPORT_WIDTH);
 export const viewPortHeightAtom = atom(DEFAULT_VIEWPORT_HEIGHT);
 
-export const canvasViewBoxAtom = atom<ViewBox>(
+export const canvasViewPortAtom = atom<ViewBox>(
     (get) => [
         get(viewPortXAtom),
         get(viewPortYAtom),
@@ -33,14 +33,16 @@ export const canvasViewBoxAtom = atom<ViewBox>(
 export const doSetViewPortAtom = atom(
     null,
     (_get, set, next: ViewBox) => {
-        if (!Number.isFinite(next[0]) || !Number.isFinite(next[1])) return;
-        if (!Number.isFinite(next[2]) || !Number.isFinite(next[3])) return;
-        if (next[2] <= 0 || next[3] <= 0) return;
+        const [x, y, width, height] = next;
 
-        set(viewPortXAtom, next[0]);
-        set(viewPortYAtom, next[1]);
-        set(viewPortWidthAtom, Math.max(1e-3, next[2]));
-        set(viewPortHeightAtom, Math.max(1e-3, next[3]));
+        if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+        if (!Number.isFinite(width) || !Number.isFinite(height)) return;
+        if (width <= 0 || height <= 0) return;
+
+        set(viewPortXAtom, x);
+        set(viewPortYAtom, y);
+        set(viewPortWidthAtom, Math.max(1e-3, width));
+        set(viewPortHeightAtom, Math.max(1e-3, height));
     }
 );
 
@@ -160,9 +162,11 @@ export const doWheelZoomViewPortAtom = atom(
         event.preventDefault();
         const svgElement = get(canvasSvgElementAtom);
         if (!svgElement) return;
-        const viewBox = get(canvasViewBoxAtom);
-        const center = eventToSvgPoint(svgElement, event.clientX, event.clientY, viewBox);
+
+        const viewPort = get(canvasViewPortAtom);
+        const center = eventToSvgPoint(svgElement, event.clientX, event.clientY, viewPort);
         if (!center) return;
+        
         const scale = Math.pow(1.005, event.deltaY);
         set(doZoomViewPortAtom, { scale, center });
     }

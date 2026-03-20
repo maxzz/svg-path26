@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
-import { canvasViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewport";
+import { canvasViewPortAtom } from "@/store/0-atoms/2-1-canvas-viewport";
 import { type EditorImage, focusedImageIdAtom, imagesAtom, isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { type ImageHandle, eventToSvgPoint, doStartImageDragAtom } from "./3-canvas-drag";
 import { canvasUnitsPerPixelAtom } from "../../../store/0-atoms/2-1-canvas-viewport-derives";
@@ -33,7 +33,7 @@ export function PathCanvasImageEditOverlays() {
     const images = useAtomValue(imagesAtom);
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
     const [focusedImageId, setFocusedImageId] = useAtom(focusedImageIdAtom);
-    const viewBox = useAtomValue(canvasViewBoxAtom);
+    const viewPort = useAtomValue(canvasViewPortAtom);
 
     const startImageDrag = useSetAtom(doStartImageDragAtom);
 
@@ -45,7 +45,7 @@ export function PathCanvasImageEditOverlays() {
                 key={`edit:${image.id}`}
                 onPointerDown={(event) => {
                     event.stopPropagation();
-                    const start = eventToSvgPoint(event.currentTarget.ownerSVGElement, event.clientX, event.clientY, viewBox);
+                    const start = eventToSvgPoint(event.currentTarget.ownerSVGElement, event.clientX, event.clientY, viewPort);
                     if (!start) return;
 
                     startImageDrag({ pointerId: event.pointerId, imageId: image.id, handle: "move", start, initial: image });
@@ -71,7 +71,7 @@ export function PathCanvasImageEditOverlays() {
                             r={unitsPerPixel * 3}
                             onPointerDown={(event) => {
                                 event.stopPropagation();
-                                const start = eventToSvgPoint(event.currentTarget.ownerSVGElement, event.clientX, event.clientY, viewBox);
+                                const start = eventToSvgPoint(event.currentTarget.ownerSVGElement, event.clientX, event.clientY, viewPort);
                                 if (!start) return;
                                 startImageDrag({ pointerId: event.pointerId, imageId: image.id, handle: handle.type, start, initial: image });
                                 setFocusedImageId(image.id);

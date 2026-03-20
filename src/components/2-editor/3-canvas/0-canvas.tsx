@@ -12,7 +12,7 @@ import { canvasSvgElementAtom, useSyncCanvasViewportSize } from "../../../store/
 import { appSettings } from "@/store/0-ui-settings";
 import { doClearCanvasFocusAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
-import { canvasViewBoxAtom, canvasViewportSizeAtom, doAdjustViewPortToAspectAtom, doFitViewPortAtom, doWheelZoomViewPortAtom, doZoomViewPortAtom } from "@/store/0-atoms/2-1-canvas-viewport";
+import { canvasViewPortAtom, canvasViewportSizeAtom, doAdjustViewPortToAspectAtom, doFitViewPortAtom, doWheelZoomViewPortAtom, doZoomViewPortAtom } from "@/store/0-atoms/2-1-canvas-viewport";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 
 export function PathCanvas() {
@@ -31,7 +31,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
 
     const svgPathInput = useAtomValue(svgPathInputAtom);
     const parseError = useAtomValue(parseErrorAtom);
-    const viewBox = useAtomValue(canvasViewBoxAtom);
+    const viewPort = useAtomValue(canvasViewPortAtom);
 
     const doClearCanvasFocus = useSetAtom(doClearCanvasFocusAtom);
     const setCanvasSvgElement = useSetAtom(canvasSvgElementAtom);
@@ -40,7 +40,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
     const doAdjustViewPortToAspect = useSetAtom(doAdjustViewPortToAspectAtom);
     const viewportSize = useAtomValue(canvasViewportSizeAtom);
 
-    const { onTouchEnd, onTouchMove, onTouchStart, startCanvasDrag } = useCanvasDragAndDrop(viewBox);
+    const { onTouchEnd, onTouchMove, onTouchStart, startCanvasDrag } = useCanvasDragAndDrop(viewPort);
 
     useSyncCanvasViewportSize();
 
@@ -60,7 +60,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
         <div className={classNames("absolute w-full h-full overflow-hidden", canvasPreview ? "bg-white" : (darkCanvas ? "bg-zinc-900" : "bg-white"))}>
             <svg
                 ref={(node) => setCanvasSvgElement(node)}
-                viewBox={viewBox.join(" ")}
+                viewBox={viewPort.join(" ")}
                 className="size-full touch-none"
                 onWheel={doWheelZoomViewPort}
                 onPointerDown={startCanvasDrag}

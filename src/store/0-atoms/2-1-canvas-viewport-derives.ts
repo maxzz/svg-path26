@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { strokeWidthAtom } from "@/store/0-atoms/2-2-editor-actions";
-import { canvasViewBoxAtom, canvasViewportSizeAtom } from "@/store/0-atoms/2-1-canvas-viewport";
+import { canvasViewPortAtom, canvasViewportSizeAtom } from "@/store/0-atoms/2-1-canvas-viewport";
 
 export const canvasSvgElementAtom = atom<SVGSVGElement | null>(null);
 
@@ -12,7 +12,7 @@ type SvgViewportSize = {
 };
 
 export const canvasUnitsPerPixelAtom = atom(
-    (get) => getSvgUnitsPerPixel(get(canvasViewBoxAtom), get(canvasViewportSizeAtom))
+    (get) => getSvgUnitsPerPixel(get(canvasViewPortAtom), get(canvasViewportSizeAtom))
 );
 
 export const canvasStrokeWidthAtom = atom(
