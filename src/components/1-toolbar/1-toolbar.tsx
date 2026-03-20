@@ -1,6 +1,6 @@
 import { CanvasActionsMenu } from "../2-editor/2-props/0-all-panels/8-props-top-menu";
 import { ToolbarUndoRedo } from "./2-toolbar-undo-redo";
-import { SettingsPopover } from "./3-toolbar-view-settings-popover";
+import { SettingsPopover } from "./3-toolbar-popover";
 import { ButtonThemeToggle } from "./4-btn-theme-toggle";
 
 export function Toolbar() {

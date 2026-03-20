@@ -6,15 +6,13 @@ import { Button } from "@/components/ui/shadcn/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
 import { Switch } from "@/components/ui/shadcn/switch";
 import { strokeWidthAtom } from "@/store/0-atoms/2-2-editor-actions";
-import { doFitViewPortAtom, doZoomViewPortAtom, viewPortHeightAtom, viewPortWidthAtom, viewPortXAtom, viewPortYAtom } from "@/store/0-atoms/2-1-canvas-viewport";
+import { doZoomViewPortAtom, viewPortHeightAtom, viewPortWidthAtom, viewPortXAtom, viewPortYAtom } from "@/store/0-atoms/2-1-canvas-viewport";
 import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { appSettings } from "@/store/0-ui-settings";
 
 export function SettingsPopover() {
     const { snapToGrid, showTicks, fillPreview, canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);
     const { viewPortLocked, tickInterval, pointPrecision } = useSnapshot(appSettings.pathEditor);
-    const fitViewPort = useSetAtom(doFitViewPortAtom);
-    const zoomViewPort = useSetAtom(doZoomViewPortAtom);
 
     return (
         <Popover>
@@ -54,18 +52,6 @@ export function SettingsPopover() {
                     <div className="flex items-center justify-between text-xs">
                         <span>Lock viewport</span>
                         <Switch checked={viewPortLocked} onCheckedChange={(checked) => { appSettings.pathEditor.viewPortLocked = Boolean(checked); }} />
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-1">
-                        <Button variant="outline" className="h-7 px-2" onClick={() => zoomViewPort({ scale: 9 / 10 })}>
-                            Zoom In
-                        </Button>
-                        <Button variant="outline" className="h-7 px-2" onClick={() => fitViewPort()}>
-                            Fit
-                        </Button>
-                        <Button variant="outline" className="h-7 px-2" onClick={() => zoomViewPort({ scale: 10 / 9 })}>
-                            Zoom Out
-                        </Button>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 rounded-md border p-2">
