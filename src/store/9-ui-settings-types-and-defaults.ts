@@ -44,12 +44,12 @@ export interface ExportSettings {
 }
 
 export interface UiSettings {
-    theme: ThemeMode;
-    canvas: CanvasSettings;
-    sections: Record<string, boolean>;
-    editorPanelSizes: number[];
-    pathEditor: PathEditorSettings;
-    export: ExportSettings;
+    theme: ThemeMode;                     // Theme mode (light or dark)
+    canvas: CanvasSettings;               // Canvas settings
+    sections: Record<string, boolean>;    // Props panel sections collapsed state
+    editorPanelSizes: number[];           // Props and Canvas editor panel sizes
+    pathEditor: PathEditorSettings;       // Path editor settings
+    export: ExportSettings;               // Export settings
 }
 
 export const DEFAULT_VIEWBOX_SETTINGS: ViewBox = [0, 0, 24, 24];
