@@ -18,12 +18,14 @@ export type SvgViewportSize = {
     height: number;
 };
 
-export const canvasViewportSizeAtom = atom<{ width: number; height: number; } | null>(null);
+export const rootSvgElementSizeAtom = atom<SvgViewportSize | null>(null);
 
 export const viewPortXAtom = atom(DEFAULT_VIEWPORT_X);
 export const viewPortYAtom = atom(DEFAULT_VIEWPORT_Y);
 export const viewPortWidthAtom = atom(DEFAULT_VIEWPORT_WIDTH);
 export const viewPortHeightAtom = atom(DEFAULT_VIEWPORT_HEIGHT);
+
+// Get/Set the current view box of the canvas
 
 export const canvasViewPortAtom = atom<ViewBox>(
     (get) => [
@@ -110,9 +112,9 @@ export const doFitViewPortAtom = atom(
 
         let width = widthRaw + padding * 2;
         let height = heightRaw + padding * 2;
-        const viewport = get(canvasViewportSizeAtom);
-        const aspect = (viewport && viewport.width > 0 && viewport.height > 0)
-            ? viewport.width / viewport.height
+        const rootSvgElementSize = get(rootSvgElementSizeAtom);
+        const aspect = (rootSvgElementSize && rootSvgElementSize.width > 0 && rootSvgElementSize.height > 0)
+            ? rootSvgElementSize.width / rootSvgElementSize.height
             : 4 / 3;
         if (width / height > aspect) {
             height = width / aspect;
@@ -136,10 +138,10 @@ export const doFitViewPortAtom = atom(
 export const doAdjustViewPortToAspectAtom = atom(
     null,
     (get, set) => {
-        const viewport = get(canvasViewportSizeAtom);
-        if (!viewport || viewport.width <= 0 || viewport.height <= 0) return;
+        const rootSvgElementSize = get(rootSvgElementSizeAtom);
+        if (!rootSvgElementSize || rootSvgElementSize.width <= 0 || rootSvgElementSize.height <= 0) return;
 
-        const aspect = viewport.width / viewport.height;
+        const aspect = rootSvgElementSize.width / rootSvgElementSize.height;
         const oldWidth = get(viewPortWidthAtom);
         const oldHeight = get(viewPortHeightAtom);
         const oldCenterX = get(viewPortXAtom) + oldWidth / 2;

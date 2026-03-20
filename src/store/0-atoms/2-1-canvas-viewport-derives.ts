@@ -2,12 +2,12 @@ import { useEffect } from "react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { strokeWidthAtom } from "@/store/0-atoms/2-2-editor-actions";
-import { type SvgViewportSize, canvasViewPortAtom, canvasViewportSizeAtom } from "@/store/0-atoms/2-1-canvas-viewport";
+import { type SvgViewportSize, canvasViewPortAtom, rootSvgElementSizeAtom } from "@/store/0-atoms/2-1-canvas-viewport";
 
 export const canvasRootSvgElementAtom = atom<SVGSVGElement | null>(null);
 
 export const canvasUnitsPerPixelAtom = atom(
-    (get) => getSvgUnitsPerPixel(get(canvasViewPortAtom), get(canvasViewportSizeAtom))
+    (get) => getSvgUnitsPerPixel(get(canvasViewPortAtom), get(rootSvgElementSizeAtom))
 );
 
 export const canvasStrokeWidthAtom = atom(
@@ -24,18 +24,18 @@ export const selectedSegmentStrokeWidthAtom = atom(
 
 export function useSyncCanvasViewportSize() {
     const rootSvgElement = useAtomValue(canvasRootSvgElementAtom);
-    const setViewportSize = useSetAtom(canvasViewportSizeAtom);
+    const setRootSvgElementSize = useSetAtom(rootSvgElementSizeAtom);
 
     useEffect(
         () => {
             if (!rootSvgElement) {
-                setViewportSize(null);
+                setRootSvgElementSize(null);
                 return;
             }
 
             const updateSize = () => {
                 const rect = rootSvgElement.getBoundingClientRect();
-                setViewportSize({ width: rect.width, height: rect.height });
+                setRootSvgElementSize({ width: rect.width, height: rect.height });
             };
 
             updateSize();
@@ -44,7 +44,7 @@ export function useSyncCanvasViewportSize() {
             observer.observe(rootSvgElement);
             return () => observer.disconnect();
         },
-        [setViewportSize, rootSvgElement]);
+        [rootSvgElement]);
 }
 
 function getSvgUnitsPerPixel(viewBox: ViewBox, viePortSize: SvgViewportSize | null): number {

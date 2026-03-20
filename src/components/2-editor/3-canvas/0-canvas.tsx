@@ -12,7 +12,7 @@ import { canvasRootSvgElementAtom, useSyncCanvasViewportSize } from "../../../st
 import { appSettings } from "@/store/0-ui-settings";
 import { doClearCanvasFocusAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
-import { canvasViewPortAtom, canvasViewportSizeAtom, doAdjustViewPortToAspectAtom, doFitViewPortAtom, doWheelZoomViewPortAtom, doZoomViewPortAtom } from "@/store/0-atoms/2-1-canvas-viewport";
+import { canvasViewPortAtom, rootSvgElementSizeAtom, doAdjustViewPortToAspectAtom, doFitViewPortAtom, doWheelZoomViewPortAtom, doZoomViewPortAtom } from "@/store/0-atoms/2-1-canvas-viewport";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 
 export function PathCanvas() {
@@ -38,7 +38,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
     const doWheelZoomViewPort = useSetAtom(doWheelZoomViewPortAtom);
     const doFitViewPort = useSetAtom(doFitViewPortAtom);
     const doAdjustViewPortToAspect = useSetAtom(doAdjustViewPortToAspectAtom);
-    const viewportSize = useAtomValue(canvasViewportSizeAtom);
+    const rootSvgElementSize = useAtomValue(rootSvgElementSizeAtom);
 
     const { onTouchEnd, onTouchMove, onTouchStart, startCanvasDrag } = useCanvasDragAndDrop(viewPort);
 
@@ -54,7 +54,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
         () => {
             doAdjustViewPortToAspect();
         },
-        [viewportSize]);
+        [rootSvgElementSize]);
 
     return (
         <div className={classNames("absolute w-full h-full overflow-hidden", canvasPreview ? "bg-white" : (darkCanvas ? "bg-zinc-900" : "bg-white"))}>
