@@ -23,39 +23,26 @@ export function OptionsPanel() {
         <SectionPanel sectionKey="options" label="Options" contentClassName="px-0 pt-1 pb-4">
             <div className="pl-2.5 pr-2 max-w-[320px] text-[11px] space-y-2.5">
                 <div className="space-y-1.5">
-                    <span className="text-[11px] text-muted-foreground select-none">viewBox</span>
+                    <span className="text-[11px] text-muted-foreground select-none">
+                        viewBox
+                    </span>
                     <ViewBoxControls showFrame={showViewBoxFrame} />
 
-                    <span className="text-[11px] text-muted-foreground select-none">viewport</span>
+                    <span className="text-[11px] text-muted-foreground select-none">
+                        viewPort
+                    </span>
                     <ViewportControls locked={viewPortLocked} />
                 </div>
 
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5">
-                    <CheckboxRow
-                        label="Snap to grid"
-                        checked={snapToGrid}
-                        onCheckedChange={(checked) => appSettings.canvas.snapToGrid = checked}
-                    />
-                    <NumberRow
-                        label="Precision"
-                        value={pointPrecision}
-                        min={0}
-                        max={8}
-                        step={1}
-                        onValueChange={(value) => appSettings.pathEditor.pointPrecision = value}
-                    />
+                    <CheckboxRow label="Snap to grid" className="col-start-1" checked={snapToGrid} onCheckedChange={(checked) => appSettings.canvas.snapToGrid = checked} />
 
-                    <CheckboxRow
-                        label="Show grid"
-                        checked={uiSettings.showGrid}
-                        onCheckedChange={(checked) => appSettings.canvas.showGrid = checked}
-                    />
-                    <div className="flex items-center gap-2 justify-self-end">
-                        <CheckboxRow
-                            label="Ticks"
-                            checked={showTicks}
-                            onCheckedChange={(checked) => appSettings.canvas.showTicks = checked}
-                        />
+                    <NumberRow label="Precision" className="col-start-2" value={pointPrecision} min={0} max={8} step={1} onValueChange={(value) => appSettings.pathEditor.pointPrecision = value} />
+
+                    <CheckboxRow label="Show grid" className="col-start-2" checked={uiSettings.showGrid} onCheckedChange={(checked) => appSettings.canvas.showGrid = checked} />
+
+                    <div className="col-start-1 flex items-center gap-2">
+                        <CheckboxRow label="Ticks" checked={showTicks} onCheckedChange={(checked) => appSettings.canvas.showTicks = checked} />
                         <input
                             className="h-6 w-12 rounded border bg-background px-2 text-[11px] disabled:opacity-20"
                             disabled={!showTicks}
@@ -67,23 +54,9 @@ export function OptionsPanel() {
                         />
                     </div>
 
-                    <CheckboxRow
-                        label="Show point controls"
-                        checked={uiSettings.showHelpers}
-                        onCheckedChange={(checked) => appSettings.canvas.showHelpers = checked}
-                    />
-                    <CheckboxRow
-                        label="Fill path"
-                        checked={fillPreview}
-                        onCheckedChange={(checked) => appSettings.canvas.fillPreview = checked}
-                    />
-
-                    <CheckboxRow
-                        label="Minify output"
-                        checked={minifyOutput}
-                        className="col-span-2"
-                        onCheckedChange={(checked) => { appSettings.pathEditor.minifyOutput = checked; doNormalize(); }}
-                    />
+                    <CheckboxRow label="Show point controls" className="col-start-2" checked={uiSettings.showHelpers} onCheckedChange={(checked) => appSettings.canvas.showHelpers = checked} />
+                    <CheckboxRow label="Fill path" className="col-start-2" checked={fillPreview} onCheckedChange={(checked) => appSettings.canvas.fillPreview = checked} />
+                    <CheckboxRow label="Minify output" checked={minifyOutput} className="col-start-2" onCheckedChange={(checked) => { appSettings.pathEditor.minifyOutput = checked; doNormalize(); }} />
                 </div>
             </div>
         </SectionPanel>
