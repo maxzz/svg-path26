@@ -1,6 +1,6 @@
 export type Point = { x: number; y: number; };
+export type SizeWH = { width: number; height: number; };
 export type Bounds = { xmin: number; ymin: number; xmax: number; ymax: number; };
-
 export type ViewBox = readonly [x: number, y: number, width: number, height: number];
 
 export type SvgSegmentSummary = {

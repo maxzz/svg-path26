@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import type { WheelEvent as ReactWheelEvent } from "react";
-import { type Point, type ViewBox } from "@/svg-core/9-types-svg-model";
+import { type Point, type SizeWH, type ViewBox } from "@/svg-core/9-types-svg-model";
 import { svgModelAtom } from "@/store/0-atoms/2-0-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
 import { canvasRootSvgElementAtom } from "./2-1-canvas-viewport-derives";
@@ -13,12 +13,7 @@ const DEFAULT_VIEWPORT_Y = 0;
 const DEFAULT_VIEWPORT_WIDTH = 120;
 const DEFAULT_VIEWPORT_HEIGHT = 90;
 
-export type SvgViewportSize = {
-    width: number;
-    height: number;
-};
-
-export const rootSvgElementSizeAtom = atom<SvgViewportSize | null>(null);
+export const rootSvgElementSizeAtom = atom<SizeWH | null>(null);
 
 export const viewPortXAtom = atom(DEFAULT_VIEWPORT_X);
 export const viewPortYAtom = atom(DEFAULT_VIEWPORT_Y);
@@ -67,7 +62,7 @@ export const doZoomViewPortAtom = atom(
     null,
     (get, set, viewBoxArgs: { scale: number; center?: Point; }) => {
         if (appSettings.pathEditor.viewPortLocked) return;
-        
+
         const scale = viewBoxArgs.scale;
         if (!Number.isFinite(scale) || scale <= 0) return;
 
@@ -172,7 +167,7 @@ export const doWheelZoomViewPortAtom = atom(
         const viewPort = get(canvasViewPortAtom);
         const center = eventToSvgPoint(rootSvgElement, event.clientX, event.clientY, viewPort);
         if (!center) return;
-        
+
         const scale = Math.pow(1.005, event.deltaY);
         set(doZoomViewPortAtom, { scale, center });
     }
