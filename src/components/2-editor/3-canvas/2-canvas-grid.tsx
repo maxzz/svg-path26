@@ -3,8 +3,8 @@ import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
-import { canvasUnitsPerPixelAtom, canvasViewportSizeAtom } from "../../../store/0-atoms/2-1-canvas-viewport";
-import { canvasViewBoxAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
+import { canvasUnitsPerPixelAtom } from "../../../store/0-atoms/2-1-canvas-viewport";
+import { canvasViewBoxAtom, canvasViewportSizeAtom } from "@/store/0-atoms/2-1-canvas-viewbox";
 
 export function CanvasGrid() {
     const { showGrid, showTicks } = useSnapshot(appSettings.canvas);

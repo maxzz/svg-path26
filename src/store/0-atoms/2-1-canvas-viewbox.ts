@@ -83,20 +83,6 @@ export const doZoomViewBoxAtom = atom(
     }
 );
 
-export const doWheelZoomViewBoxAtom = atom(
-    null,
-    (get, set, event: ReactWheelEvent<SVGSVGElement>) => {
-        event.preventDefault();
-        const svgElement = get(canvasSvgElementAtom);
-        if (!svgElement) return;
-        const viewBox = get(canvasViewBoxAtom);
-        const center = eventToSvgPoint(svgElement, event.clientX, event.clientY, viewBox);
-        if (!center) return;
-        const scale = Math.pow(1.005, event.deltaY);
-        set(doZoomViewBoxAtom, { scale, center });
-    }
-);
-
 export const doFitViewBoxAtom = atom(
     null,
     (get, set) => {
@@ -165,6 +151,20 @@ export const doAdjustViewBoxToAspectAtom = atom(
         set(viewPortYAtom, oldCenterY - height / 2);
         set(viewPortWidthAtom, width);
         set(viewPortHeightAtom, height);
+    }
+);
+
+export const doWheelZoomViewBoxAtom = atom(
+    null,
+    (get, set, event: ReactWheelEvent<SVGSVGElement>) => {
+        event.preventDefault();
+        const svgElement = get(canvasSvgElementAtom);
+        if (!svgElement) return;
+        const viewBox = get(canvasViewBoxAtom);
+        const center = eventToSvgPoint(svgElement, event.clientX, event.clientY, viewBox);
+        if (!center) return;
+        const scale = Math.pow(1.005, event.deltaY);
+        set(doZoomViewBoxAtom, { scale, center });
     }
 );
 
