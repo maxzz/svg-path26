@@ -3,32 +3,15 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { IconRadix_DotsHorizontal } from "@/components/ui/icons/normal";
 import { Button } from "@/components/ui/shadcn/button";
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/shadcn/dropdown-menu";
-import {
-    doClearPathAtom,
-    doNormalizePathAtom,
-    doSetAbsoluteAtom,
-    doSetRelativeAtom,
-} from "@/store/0-atoms/2-2-editor-actions";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/shadcn/dropdown-menu";
+import { doClearPathAtom, doNormalizePathAtom, doSetAbsoluteAtom, doSetRelativeAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { addImageDialogOpenAtom, exportSvgDialogOpenAtom, openPathDialogOpenAtom, savePathDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-actions-menu";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { isImageEditModeAtom, pendingImageAtom } from "@/store/0-atoms/2-4-images";
-import {
-    addImageDialogOpenAtom,
-    exportSvgDialogOpenAtom,
-    openPathDialogOpenAtom,
-    savePathDialogOpenAtom,
-} from "@/store/0-atoms/2-5-canvas-actions-menu";
 import { appSettings } from "@/store/0-ui-settings";
 
 export function CanvasActionsMenu() {
-    const { showGrid, showHelpers, darkCanvas } = useSnapshot(appSettings.canvas);
+    const { darkCanvas } = useSnapshot(appSettings.canvas);
     const { minifyOutput } = useSnapshot(appSettings.pathEditor);
     const pathValue = useAtomValue(svgPathInputAtom);
     const [isImageEditMode, setIsImageEditMode] = useAtom(isImageEditModeAtom);
@@ -55,12 +38,6 @@ export function CanvasActionsMenu() {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuCheckboxItem checked={showGrid} onCheckedChange={(checked) => { appSettings.canvas.showGrid = Boolean(checked); }}>
-                    Grid
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem checked={showHelpers} onCheckedChange={(checked) => { appSettings.canvas.showHelpers = Boolean(checked); }}>
-                    Helpers
-                </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem checked={darkCanvas} onCheckedChange={(checked) => { appSettings.canvas.darkCanvas = Boolean(checked); }}>
                     Dark Canvas
                 </DropdownMenuCheckboxItem>
