@@ -1,15 +1,19 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
-import { Menubar, MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarTrigger } from "@/components/ui/shadcn/menubar";
+import { Menubar } from "@/components/ui/shadcn/menubar";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "@/store/0-atoms/1-2-history";
 import { doClearPathAtom, doNormalizePathAtom, doSetAbsoluteAtom, doSetRelativeAtom } from "@/store/0-atoms/2-2-editor-actions";
-import { aboutDialogOpenAtom, addImageDialogOpenAtom, exportSvgDialogOpenAtom, openPathDialogOpenAtom, savePathDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-actions-menu";
+import { aboutDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-actions-menu";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { isImageEditModeAtom, pendingImageAtom } from "@/store/0-atoms/2-4-images";
+import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { appSettings } from "@/store/0-ui-settings";
 import { toggleTheme } from "@/utils";
 import { doHandleTopMenuKeyDownAtom } from "./1-top-menu-shortcuts";
+import { FileMenu } from "./2-file-menu";
+import { EditMenu } from "./3-edit-menu";
+import { ViewMenu } from "./4-view-menu";
+import { HelpMenu } from "./5-help-menu";
 
 export function TopMenu() {
     const { darkCanvas } = useSnapshot(appSettings.canvas);
@@ -27,19 +31,10 @@ export function TopMenu() {
     const doSetAbsolute = useSetAtom(doSetAbsoluteAtom);
     const doClear = useSetAtom(doClearPathAtom);
 
-    const setOpenExportDialog = useSetAtom(exportSvgDialogOpenAtom);
-    const setSaveDialogOpen = useSetAtom(savePathDialogOpenAtom);
-    const setOpenDialogOpen = useSetAtom(openPathDialogOpenAtom);
     const setAboutDialogOpen = useSetAtom(aboutDialogOpenAtom);
 
-    const fileRef = useRef<HTMLInputElement | null>(null);
     const hasPath = Boolean(pathValue.trim());
     const handleTopMenuKeyDown = useSetAtom(doHandleTopMenuKeyDownAtom);
-
-    const openSaveDialog = () => setSaveDialogOpen(true);
-    const openStoredPaths = () => setOpenDialogOpen(true);
-    const openExportDialog = () => hasPath && setOpenExportDialog(true);
-    const uploadImage = () => fileRef.current?.click();
 
     async function copyPath() {
         if (!hasPath) return;
@@ -66,146 +61,31 @@ export function TopMenu() {
     }, [handleTopMenuKeyDown]);
 
     return (<>
-        <ImageUploadInput fileRef={fileRef} />
-
         <Menubar className="h-auto border-none bg-transparent p-0 shadow-none">
-            <MenubarMenu>
-                <MenubarTrigger className="px-3 text-xs font-medium">File</MenubarTrigger>
-                <MenubarContent>
-                    <MenubarItem onClick={openStoredPaths}>
-                        Open Saved Path...
-                        <MenubarShortcut>Ctrl+O</MenubarShortcut>
-                    </MenubarItem>
-                    <MenubarItem disabled={!hasPath} onClick={openSaveDialog}>
-                        Save Path...
-                        <MenubarShortcut>Ctrl+S</MenubarShortcut>
-                    </MenubarItem>
-                    <MenubarItem disabled={!hasPath} onClick={openExportDialog}>
-                        Export SVG...
-                        <MenubarShortcut>Ctrl+E</MenubarShortcut>
-                    </MenubarItem>
-                    <MenubarItem onClick={uploadImage}>
-                        Upload Image...
-                    </MenubarItem>
-                </MenubarContent>
-            </MenubarMenu>
-
-            <MenubarMenu>
-                <MenubarTrigger className="px-3 text-xs font-medium">Edit</MenubarTrigger>
-                <MenubarContent>
-                    <MenubarItem disabled={!canUndo} onClick={() => doUndo()}>
-                        Undo
-                        <MenubarShortcut>Ctrl+Z</MenubarShortcut>
-                    </MenubarItem>
-                    <MenubarItem disabled={!canRedo} onClick={() => doRedo()}>
-                        Redo
-                        <MenubarShortcut>Ctrl+Shift+Z</MenubarShortcut>
-                    </MenubarItem>
-
-                    <MenubarSeparator />
-
-                    <MenubarItem disabled={!hasPath} onClick={() => doNormalize()}>
-                        Normalize
-                        <MenubarShortcut>Alt+N</MenubarShortcut>
-                    </MenubarItem>
-                    <MenubarItem disabled={!hasPath} onClick={() => doSetAbsolute()}>
-                        Convert to Absolute
-                        <MenubarShortcut>Alt+A</MenubarShortcut>
-                    </MenubarItem>
-                    <MenubarItem disabled={!hasPath} onClick={() => doSetRelative()}>
-                        Convert to Relative
-                        <MenubarShortcut>Alt+R</MenubarShortcut>
-                    </MenubarItem>
-                    <MenubarCheckboxItem checked={minifyOutput} disabled={!hasPath} onCheckedChange={() => toggleMinify()}>
-                        Minify Path
-                        <MenubarShortcut>Alt+M</MenubarShortcut>
-                    </MenubarCheckboxItem>
-
-                    <MenubarSeparator />
-
-                    <MenubarItem disabled={!hasPath} onClick={() => void copyPath()}>
-                        Copy Path
-                        <MenubarShortcut>Alt+C</MenubarShortcut>
-                    </MenubarItem>
-                    <MenubarItem disabled={!hasPath} onClick={() => doClear()}>
-                        Clear Path
-                        <MenubarShortcut>Alt+X</MenubarShortcut>
-                    </MenubarItem>
-                </MenubarContent>
-            </MenubarMenu>
-
-            <MenubarMenu>
-                <MenubarTrigger className="px-3 text-xs font-medium">View</MenubarTrigger>
-                <MenubarContent>
-                    <MenubarCheckboxItem checked={darkCanvas} onCheckedChange={() => toggleDarkCanvas()}>
-                        Dark Canvas
-                        <MenubarShortcut>Alt+D</MenubarShortcut>
-                    </MenubarCheckboxItem>
-                    <MenubarCheckboxItem checked={isImageEditMode} onCheckedChange={() => toggleImageEditMode()}>
-                        Image Edit Mode
-                        <MenubarShortcut>Alt+I</MenubarShortcut>
-                    </MenubarCheckboxItem>
-
-                    <MenubarSeparator />
-
-                    <MenubarItem onClick={() => toggleTheme(theme)}>
-                        Toggle Theme
-                        <MenubarShortcut>Alt+T</MenubarShortcut>
-                    </MenubarItem>
-                </MenubarContent>
-            </MenubarMenu>
-
-            <MenubarMenu>
-                <MenubarTrigger className="px-3 text-xs font-medium">Help</MenubarTrigger>
-                <MenubarContent>
-                    <MenubarItem onClick={() => setAboutDialogOpen(true)}>
-                        About
-                    </MenubarItem>
-                </MenubarContent>
-            </MenubarMenu>
+            <FileMenu />
+            <EditMenu
+                canUndo={canUndo}
+                canRedo={canRedo}
+                hasPath={hasPath}
+                minifyOutput={minifyOutput}
+                onUndo={() => doUndo()}
+                onRedo={() => doRedo()}
+                onNormalize={() => doNormalize()}
+                onSetAbsolute={() => doSetAbsolute()}
+                onSetRelative={() => doSetRelative()}
+                onToggleMinify={() => toggleMinify()}
+                onCopyPath={() => void copyPath()}
+                onClearPath={() => doClear()}
+            />
+            <ViewMenu
+                darkCanvas={darkCanvas}
+                isImageEditMode={isImageEditMode}
+                onToggleDarkCanvas={() => toggleDarkCanvas()}
+                onToggleImageEditMode={() => toggleImageEditMode()}
+                onToggleTheme={() => toggleTheme(theme)}
+            />
+            <HelpMenu onOpenAbout={() => setAboutDialogOpen(true)} />
         </Menubar>
 
     </>);
-}
-
-function ImageUploadInput({ fileRef }: { fileRef: React.RefObject<HTMLInputElement | null>; }) {
-    const setPendingImage = useSetAtom(pendingImageAtom);
-    const setOpenImageDialog = useSetAtom(addImageDialogOpenAtom);
-
-    const handleFileInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-        if (!file.type.startsWith("image/")) return;
-        const data = await fileToDataUrl(file);
-        setPendingImage({
-            data,
-            x1: 0,
-            y1: 0,
-            x2: 20,
-            y2: 20,
-            preserveAspectRatio: true,
-            opacity: 1,
-        });
-        setOpenImageDialog(true);
-        event.target.value = "";
-    };
-
-    return (
-        <input
-            ref={fileRef}
-            type="file"
-            className="hidden"
-            accept="image/*"
-            onChange={handleFileInputChange}
-        />
-    );
-}
-
-function fileToDataUrl(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result ?? ""));
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(file);
-    });
 }
