@@ -5,3 +5,5 @@ export * from "./03-redo";
 export * from "./04-zoom-in";
 export * from "./04-zoom-normal";
 export * from "./04-zoom-out";
+export * from "./05-eye-hide";
+export * from "./05-eye-show";

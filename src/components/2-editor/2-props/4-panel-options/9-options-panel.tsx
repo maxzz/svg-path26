@@ -1,16 +1,16 @@
 import { type InputHTMLAttributes } from "react";
 import { useAtom, useSetAtom, type PrimitiveAtom } from "jotai";
-import { IconLockClosed, IconLockOpen } from "@/components/ui/icons/normal";
+import { IconEyeHide, IconEyeShow, IconLockClosed, IconLockOpen } from "@/components/ui/icons/normal";
 import { useSnapshot } from "valtio";
 import { Button } from "@/components/ui/shadcn/button";
 import { Switch } from "@/components/ui/shadcn/switch";
+import { compactInputClasses, compactLabelClasses } from "../8-shared-classes/0-classes";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
 import { doNormalizePathAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { viewPortHeightAtom, viewPortWidthAtom, viewPortXAtom, viewPortYAtom } from "@/store/0-atoms/2-1-canvas-viewport";
 import { pathViewBoxHeightAtom, pathViewBoxWidthAtom, pathViewBoxXAtom, pathViewBoxYAtom } from "@/store/0-atoms/2-6-path-viewbox";
 import { appSettings } from "@/store/0-ui-settings";
 import { classNames } from "@/utils";
-import { compactInputClasses, compactLabelClasses } from "../8-shared-classes/0-classes";
 
 export function OptionsPanel() {
     const { showTicks, snapToGrid, fillPreview, showGrid, showHelpers } = useSnapshot(appSettings.canvas);
@@ -34,14 +34,12 @@ export function OptionsPanel() {
                 </div>
 
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5">
+                    <CheckboxRow label="Show grid" className="col-start-1" checked={showGrid} onCheckedChange={(checked) => appSettings.canvas.showGrid = checked} />
+                    <NumberRow label="Precision" className="col-start-2" value={pointPrecision} min={0} max={8} step={1} onValueChange={(value) => appSettings.pathEditor.pointPrecision = value} />
                     <CheckboxRow label="Snap to grid" className="col-start-1" checked={snapToGrid} onCheckedChange={(checked) => appSettings.canvas.snapToGrid = checked} />
 
-                    <NumberRow label="Precision" className="col-start-2" value={pointPrecision} min={0} max={8} step={1} onValueChange={(value) => appSettings.pathEditor.pointPrecision = value} />
-
-                    <CheckboxRow label="Show grid" className="col-start-2" checked={showGrid} onCheckedChange={(checked) => appSettings.canvas.showGrid = checked} />
-
                     <div className="col-start-1 flex items-center gap-2">
-                        <CheckboxRow label="Ticks" checked={showTicks} onCheckedChange={(checked) => appSettings.canvas.showTicks = checked} />
+                        <CheckboxRow label="Show ticks" checked={showTicks} onCheckedChange={(checked) => appSettings.canvas.showTicks = checked} />
                         <input
                             className="h-6 w-12 rounded border bg-background px-2 text-[11px] disabled:opacity-20"
                             disabled={!showTicks}
@@ -53,9 +51,9 @@ export function OptionsPanel() {
                         />
                     </div>
 
-                    <CheckboxRow label="Show point controls" className="col-start-2" checked={showHelpers} onCheckedChange={(checked) => appSettings.canvas.showHelpers = checked} />
-                    <CheckboxRow label="Fill path" className="col-start-2" checked={fillPreview} onCheckedChange={(checked) => appSettings.canvas.fillPreview = checked} />
-                    <CheckboxRow label="Minify output" checked={minifyOutput} className="col-start-2" onCheckedChange={(checked) => { appSettings.pathEditor.minifyOutput = checked; doNormalizePath(); }} />
+                    <CheckboxRow label="Show point controls" className="col-start-1" checked={showHelpers} onCheckedChange={(checked) => appSettings.canvas.showHelpers = checked} />
+                    <CheckboxRow label="Fill path" className="col-start-1" checked={fillPreview} onCheckedChange={(checked) => appSettings.canvas.fillPreview = checked} />
+                    <CheckboxRow label="Minify output" checked={minifyOutput} className="col-start-1" onCheckedChange={(checked) => { appSettings.pathEditor.minifyOutput = checked; doNormalizePath(); }} />
                 </div>
             </div>
         </SectionPanel>
@@ -124,7 +122,7 @@ function ViewBoxControls() {
                 title={showViewBoxFrame ? "Hide viewBox frame" : "Show viewBox frame"}
                 onClick={() => appSettings.canvas.showViewBoxFrame = !showViewBoxFrame}
             >
-                {showViewBoxFrame ? <IconLockClosed className="size-3.5" /> : <IconLockOpen className="size-3" />}
+                {showViewBoxFrame ? <IconEyeShow className="size-3.5" /> : <IconEyeHide className="size-3" />}
             </Button>
             {/* <p className="text-[10px] text-muted-foreground">Lock icon toggles the viewBox frame on canvas.</p> */}
         </div>
@@ -154,5 +152,3 @@ function ViewportControls() {
         </div>
     );
 }
-
-//TODO: change viewBox icon. It's not lock and should be show/hide
