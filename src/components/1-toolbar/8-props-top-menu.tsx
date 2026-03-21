@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { Menubar, MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarTrigger } from "@/components/ui/shadcn/menubar";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "@/store/0-atoms/1-2-history";
@@ -33,6 +33,7 @@ export function TopMenu() {
 
     const fileRef = useRef<HTMLInputElement | null>(null);
     const hasPath = Boolean(pathValue.trim());
+    const handleTopMenuKeyDown = useSetAtom(doHandleTopMenuKeyDownAtom);
 
     const openSaveDialog = () => setSaveDialogOpen(true);
     const openStoredPaths = () => setOpenDialogOpen(true);
@@ -59,89 +60,11 @@ export function TopMenu() {
 
     useEffect(
         () => {
-            function handleKeyDown(event: KeyboardEvent) {
-                const target = event.target;
-                if (isEditableTarget(target)) return;
-
-                const key = event.key.toLowerCase();
-                const withPrimary = event.ctrlKey || event.metaKey;
-                const withAltOnly = event.altKey && !withPrimary && !event.shiftKey;
-
-                if (withPrimary && !event.shiftKey && key === "o") {
-                    event.preventDefault();
-                    openStoredPaths();
-                    return;
-                }
-                if (withPrimary && !event.shiftKey && key === "s") {
-                    event.preventDefault();
-                    openSaveDialog();
-                    return;
-                }
-                if (withPrimary && !event.shiftKey && key === "e") {
-                    if (!hasPath) return;
-                    event.preventDefault();
-                    openExportDialog();
-                    return;
-                }
-                if (!withAltOnly) return;
-
-                if (key === "n") {
-                    if (!hasPath) return;
-                    event.preventDefault();
-                    doNormalize();
-                    return;
-                }
-                if (key === "a") {
-                    if (!hasPath) return;
-                    event.preventDefault();
-                    doSetAbsolute();
-                    return;
-                }
-                if (key === "r") {
-                    if (!hasPath) return;
-                    event.preventDefault();
-                    doSetRelative();
-                    return;
-                }
-                if (key === "m") {
-                    if (!hasPath) return;
-                    event.preventDefault();
-                    toggleMinify();
-                    return;
-                }
-                if (key === "d") {
-                    event.preventDefault();
-                    toggleDarkCanvas();
-                    return;
-                }
-                if (key === "i") {
-                    event.preventDefault();
-                    toggleImageEditMode();
-                    return;
-                }
-                if (key === "t") {
-                    event.preventDefault();
-                    toggleTheme(theme);
-                    return;
-                }
-                if (key === "c") {
-                    if (!hasPath) return;
-                    event.preventDefault();
-                    void copyPath();
-                    return;
-                }
-                if (key === "x") {
-                    if (!hasPath) return;
-                    event.preventDefault();
-                    doClear();
-                }
-            }
-
             const controller = new AbortController();
-            window.addEventListener("keydown", handleKeyDown, { signal: controller.signal });
+            window.addEventListener("keydown", handleTopMenuKeyDown, { signal: controller.signal });
             return () => controller.abort();
         },
-        [theme, hasPath, darkCanvas, isImageEditMode, minifyOutput, doNormalize, doSetAbsolute, doSetRelative, doClear, setIsImageEditMode, pathValue, setOpenDialogOpen, setSaveDialogOpen, setOpenExportDialog]
+        [handleTopMenuKeyDown]
     );
 
     return (<>
@@ -296,3 +219,86 @@ function fileToDataUrl(file: File): Promise<string> {
         reader.readAsDataURL(file);
     });
 }
+
+const doHandleTopMenuKeyDownAtom = atom(
+    null,
+    (get, set, event: KeyboardEvent) => {
+        const target = event.target;
+        if (isEditableTarget(target)) return;
+
+        const key = event.key.toLowerCase();
+        const withPrimary = event.ctrlKey || event.metaKey;
+        const withAltOnly = event.altKey && !withPrimary && !event.shiftKey;
+        const hasPath = Boolean(get(svgPathInputAtom).trim());
+
+        if (withPrimary && !event.shiftKey && key === "o") {
+            event.preventDefault();
+            set(openPathDialogOpenAtom, true);
+            return;
+        }
+        if (withPrimary && !event.shiftKey && key === "s") {
+            event.preventDefault();
+            set(savePathDialogOpenAtom, true);
+            return;
+        }
+        if (withPrimary && !event.shiftKey && key === "e") {
+            if (!hasPath) return;
+            event.preventDefault();
+            set(exportSvgDialogOpenAtom, true);
+            return;
+        }
+        if (!withAltOnly) return;
+
+        if (key === "n") {
+            if (!hasPath) return;
+            event.preventDefault();
+            set(doNormalizePathAtom);
+            return;
+        }
+        if (key === "a") {
+            if (!hasPath) return;
+            event.preventDefault();
+            set(doSetAbsoluteAtom);
+            return;
+        }
+        if (key === "r") {
+            if (!hasPath) return;
+            event.preventDefault();
+            set(doSetRelativeAtom);
+            return;
+        }
+        if (key === "m") {
+            if (!hasPath) return;
+            event.preventDefault();
+            appSettings.pathEditor.minifyOutput = !appSettings.pathEditor.minifyOutput;
+            set(doNormalizePathAtom);
+            return;
+        }
+        if (key === "d") {
+            event.preventDefault();
+            appSettings.canvas.darkCanvas = !appSettings.canvas.darkCanvas;
+            return;
+        }
+        if (key === "i") {
+            event.preventDefault();
+            set(isImageEditModeAtom, !get(isImageEditModeAtom));
+            return;
+        }
+        if (key === "t") {
+            event.preventDefault();
+            toggleTheme(appSettings.theme);
+            return;
+        }
+        if (key === "c") {
+            if (!hasPath) return;
+            event.preventDefault();
+            void navigator.clipboard.writeText(get(svgPathInputAtom));
+            return;
+        }
+        if (key === "x") {
+            if (!hasPath) return;
+            event.preventDefault();
+            set(doClearPathAtom);
+        }
+    }
+);
