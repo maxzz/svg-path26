@@ -46,6 +46,7 @@ export function CanvasHelperOverlays() {
 function CanvasSegmentHitAreas() {
     const segmentPaths = useAtomValue(standaloneSegmentPathsAtom);
     const canvasStrokeWidth = useAtomValue(canvasStrokeWidthAtom);
+    const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
     const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
     const setHoveredCanvasPoint = useSetAtom(hoveredCanvasPointAtom);
 
@@ -62,6 +63,12 @@ function CanvasSegmentHitAreas() {
                     strokeWidth={Math.max(canvasStrokeWidth * 10, canvasStrokeWidth * 4)}
                     strokeLinecap="round"
                     strokeLinejoin="round"
+                    onPointerDown={(event) => {
+                        event.stopPropagation();
+                        setSelectedCommandIndex(index);
+                        setHoveredCommandIndex(index);
+                        setHoveredCanvasPoint(null);
+                    }}
                     onMouseEnter={() => {
                         setHoveredCommandIndex(index);
                         setHoveredCanvasPoint(null);
