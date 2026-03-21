@@ -38,6 +38,13 @@ export function CommandsList() {
         },
         [selectedCommandIndex, rows.length]);
 
+    useEffect(
+        () => {
+            if (hoveredCommandIndex === null || hoveredCommandIndex === selectedCommandIndex) return;
+            rowRefs.current[hoveredCommandIndex]?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        },
+        [hoveredCommandIndex, selectedCommandIndex, rows.length]);
+
     function moveVertical(rowIndex: number, valueIndex: number, direction: "up" | "down") {
         const nextRowIndex = direction === "up" ? rowIndex - 1 : rowIndex + 1;
         if (nextRowIndex < 0 || nextRowIndex >= rows.length) return;

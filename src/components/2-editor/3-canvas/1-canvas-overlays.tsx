@@ -6,7 +6,7 @@ import { type SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { canvasStrokeWidthAtom, canvasUnitsPerPixelAtom, hoveredSegmentStrokeWidthAtom, selectedSegmentStrokeWidthAtom } from "../../../store/0-atoms/2-1-canvas-viewport-derives";
 import { doFocusPointCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, hoveredStandaloneSegmentPathAtom, selectedCommandIndexAtom, selectedStandaloneSegmentPathAtom } from "@/store/0-atoms/2-2-editor-actions";
-import { controlPointsAtom, parseErrorAtom, targetPointsAtom } from "@/store/0-atoms/2-0-svg-model";
+import { controlPointsAtom, parseErrorAtom, standaloneSegmentPathsAtom, targetPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { pathViewBoxAtom } from "@/store/0-atoms/2-6-path-viewbox";
 import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { doStartPointDragAtom } from "./3-canvas-drag";
@@ -28,6 +28,7 @@ export function CanvasHelperOverlays() {
         {!canvasPreview && showViewBoxFrame && <CanvasViewBoxFrame />}
 
         {!canvasPreview && (<>
+            <CanvasSegmentHitAreas />
             <CanvasHoveredSegmentOverlay />
             <CanvasSelectedSegmentOverlay />
 
@@ -40,6 +41,38 @@ export function CanvasHelperOverlays() {
 
         <PathCanvasImageEditOverlays />
     </>);
+}
+
+function CanvasSegmentHitAreas() {
+    const segmentPaths = useAtomValue(standaloneSegmentPathsAtom);
+    const canvasStrokeWidth = useAtomValue(canvasStrokeWidthAtom);
+    const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
+    const setHoveredCanvasPoint = useSetAtom(hoveredCanvasPointAtom);
+
+    return segmentPaths.map(
+        (segmentPath, index) => {
+            if (!segmentPath) return null;
+
+            return (
+                <path
+                    key={`segment-hit:${index}`}
+                    d={segmentPath}
+                    fill="none"
+                    stroke="transparent"
+                    strokeWidth={Math.max(canvasStrokeWidth * 10, canvasStrokeWidth * 4)}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    onMouseEnter={() => {
+                        setHoveredCommandIndex(index);
+                        setHoveredCanvasPoint(null);
+                    }}
+                    onMouseLeave={() => {
+                        setHoveredCommandIndex(null);
+                    }}
+                />
+            );
+        }
+    );
 }
 
 // Main Path Overlay
