@@ -1,4 +1,4 @@
-export const compactLabelClasses = "absolute left-[6px] top-1 text-[9px] leading-none text-slate-600 pointer-events-none";
+export const compactLabelClasses = "absolute left-1.5 top-1 text-[9px] leading-none text-foreground/40 pointer-events-none";
 
 export const compactInputClasses = "\
 px-1.5 pt-2.5 w-full h-8 text-[10px] \

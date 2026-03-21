@@ -22,7 +22,7 @@ export function PathOperationsPanel() {
 
     return (
         <SectionPanel sectionKey="transform" label="Path Operations" contentClassName="px-0 pt-1 pb-4">
-            <div className="pl-2.5 pr-2 max-w-[360px] text-[11px] space-y-1.5">
+            <div className="pl-2.5 pr-2 max-w-90 text-[11px] space-y-1.5">
                 <div className="flex gap-1.5">
                     <OperationNumberField
                         label={uniformScale ? "Uniform scale" : "Scale X"}
@@ -38,7 +38,7 @@ export function PathOperationsPanel() {
                         overlay={
                             <button
                                 type="button"
-                                className="absolute right-1.5 top-0.5 text-slate-600 hover:text-slate-800"
+                                className="absolute right-1.5 top-0.5 text-slate-600 hover:text-slate-800 cursor-pointer"
                                 title="Lock/Unlock x and y scales"
                                 onMouseDown={(event) => event.preventDefault()}
                                 onClick={() => {

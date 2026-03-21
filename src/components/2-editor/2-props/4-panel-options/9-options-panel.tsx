@@ -13,11 +13,10 @@ import { classNames } from "@/utils";
 import { compactInputClasses, compactLabelClasses } from "../8-shared-classes/0-classes";
 
 export function OptionsPanel() {
-    const uiSettings = useSnapshot(appSettings.canvas);
-    const { showTicks, snapToGrid, fillPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);
-    const { minifyOutput, pointPrecision, tickInterval, viewPortLocked } = useSnapshot(appSettings.pathEditor);
+    const { showTicks, snapToGrid, fillPreview, showGrid, showHelpers } = useSnapshot(appSettings.canvas);
+    const { minifyOutput, pointPrecision, tickInterval } = useSnapshot(appSettings.pathEditor);
 
-    const doNormalize = useSetAtom(doNormalizePathAtom);
+    const doNormalizePath = useSetAtom(doNormalizePathAtom);
 
     return (
         <SectionPanel sectionKey="options" label="Options" contentClassName="px-0 pt-1 pb-4">
@@ -26,12 +25,12 @@ export function OptionsPanel() {
                     <span className="text-[11px] text-muted-foreground select-none">
                         viewBox
                     </span>
-                    <ViewBoxControls showFrame={showViewBoxFrame} />
+                    <ViewBoxControls />
 
                     <span className="text-[11px] text-muted-foreground select-none">
                         viewPort
                     </span>
-                    <ViewportControls locked={viewPortLocked} />
+                    <ViewportControls />
                 </div>
 
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5">
@@ -39,7 +38,7 @@ export function OptionsPanel() {
 
                     <NumberRow label="Precision" className="col-start-2" value={pointPrecision} min={0} max={8} step={1} onValueChange={(value) => appSettings.pathEditor.pointPrecision = value} />
 
-                    <CheckboxRow label="Show grid" className="col-start-2" checked={uiSettings.showGrid} onCheckedChange={(checked) => appSettings.canvas.showGrid = checked} />
+                    <CheckboxRow label="Show grid" className="col-start-2" checked={showGrid} onCheckedChange={(checked) => appSettings.canvas.showGrid = checked} />
 
                     <div className="col-start-1 flex items-center gap-2">
                         <CheckboxRow label="Ticks" checked={showTicks} onCheckedChange={(checked) => appSettings.canvas.showTicks = checked} />
@@ -54,9 +53,9 @@ export function OptionsPanel() {
                         />
                     </div>
 
-                    <CheckboxRow label="Show point controls" className="col-start-2" checked={uiSettings.showHelpers} onCheckedChange={(checked) => appSettings.canvas.showHelpers = checked} />
+                    <CheckboxRow label="Show point controls" className="col-start-2" checked={showHelpers} onCheckedChange={(checked) => appSettings.canvas.showHelpers = checked} />
                     <CheckboxRow label="Fill path" className="col-start-2" checked={fillPreview} onCheckedChange={(checked) => appSettings.canvas.fillPreview = checked} />
-                    <CheckboxRow label="Minify output" checked={minifyOutput} className="col-start-2" onCheckedChange={(checked) => { appSettings.pathEditor.minifyOutput = checked; doNormalize(); }} />
+                    <CheckboxRow label="Minify output" checked={minifyOutput} className="col-start-2" onCheckedChange={(checked) => { appSettings.pathEditor.minifyOutput = checked; doNormalizePath(); }} />
                 </div>
             </div>
         </SectionPanel>
@@ -93,19 +92,22 @@ function CompactField({ valueAtom, label, className, ...rest }: { valueAtom: Pri
     const [value, setValue] = useAtom(valueAtom);
     return (
         <label className="relative text-xs select-none">
-            <span className={compactLabelClasses}>{label}</span>
+            <span className={compactLabelClasses}>
+                {label}
+            </span>
             <input
-                type="number"
                 className={classNames(compactInputClasses, className)}
                 value={value}
                 onChange={(event) => setValue(Number(event.target.value))}
+                type="number"
                 {...rest}
             />
         </label>
     );
 }
 
-function ViewBoxControls({ showFrame }: { showFrame: boolean; }) {
+function ViewBoxControls() {
+    const { showViewBoxFrame } = useSnapshot(appSettings.canvas);
     return (
         <div className="flex items-start gap-1.5">
             <div className="grid flex-1 grid-cols-4 gap-1">
@@ -119,17 +121,18 @@ function ViewBoxControls({ showFrame }: { showFrame: boolean; }) {
                 variant="ghost"
                 size="icon"
                 className="shrink-0 mt-px size-8 hover:bg-slate-200 rounded"
-                title={showFrame ? "Hide viewBox frame" : "Show viewBox frame"}
-                onClick={() => appSettings.canvas.showViewBoxFrame = !showFrame}
+                title={showViewBoxFrame ? "Hide viewBox frame" : "Show viewBox frame"}
+                onClick={() => appSettings.canvas.showViewBoxFrame = !showViewBoxFrame}
             >
-                {showFrame ? <IconLockClosed className="size-3.5" /> : <IconLockOpen className="size-3" />}
+                {showViewBoxFrame ? <IconLockClosed className="size-3.5" /> : <IconLockOpen className="size-3" />}
             </Button>
             {/* <p className="text-[10px] text-muted-foreground">Lock icon toggles the viewBox frame on canvas.</p> */}
         </div>
     );
 }
 
-function ViewportControls({ locked }: { locked: boolean; }) {
+function ViewportControls() {
+    const { viewPortLocked } = useSnapshot(appSettings.pathEditor);
     return (
         <div className="flex items-start gap-1.5">
             <div className="grid flex-1 grid-cols-4 gap-1">
@@ -143,11 +146,13 @@ function ViewportControls({ locked }: { locked: boolean; }) {
                 variant="ghost"
                 size="icon"
                 className="shrink-0 mt-px size-8 hover:bg-slate-200 rounded"
-                title={locked ? "Unlock viewport" : "Lock viewport"}
-                onClick={() => appSettings.pathEditor.viewPortLocked = !locked}
+                title={viewPortLocked ? "Unlock viewport" : "Lock viewport"}
+                onClick={() => appSettings.pathEditor.viewPortLocked = !viewPortLocked}
             >
-                {locked ? <IconLockClosed className="size-3.5" /> : <IconLockOpen className="size-3" />}
+                {viewPortLocked ? <IconLockClosed className="size-3.5" /> : <IconLockOpen className="size-3" />}
             </Button>
         </div>
     );
 }
+
+//TODO: change viewBox icon. It's not lock and should be show/hide
