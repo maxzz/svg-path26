@@ -57,7 +57,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
         [rootSvgElementSize]);
 
     return (
-        <div className={classNames("absolute w-full h-full overflow-hidden", canvasPreview ? "bg-white" : (darkCanvas ? "bg-zinc-900" : "bg-white"))}>
+        <div className={classNames("absolute w-full h-full overflow-hidden", canvasPreview ? "bg-white" : (darkCanvas ? "bg-[#040d1c]" : "bg-white"))}>
             <svg
                 ref={(node) => setCanvasRootSvgElement(node)}
                 viewBox={viewPort.join(" ")}
