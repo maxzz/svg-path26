@@ -38,104 +38,111 @@ export function TopMenu() {
     const openStoredPaths = () => setOpenDialogOpen(true);
     const openExportDialog = () => hasPath && setOpenExportDialog(true);
     const uploadImage = () => fileRef.current?.click();
-    const copyPath = async () => {
+
+    async function copyPath() {
         if (!hasPath) return;
         await navigator.clipboard.writeText(pathValue);
-    };
-    const toggleDarkCanvas = () => {
+    }
+
+    function toggleDarkCanvas() {
         appSettings.canvas.darkCanvas = !darkCanvas;
-    };
-    const toggleImageEditMode = () => {
+    }
+
+    function toggleImageEditMode() {
         setIsImageEditMode(!isImageEditMode);
-    };
-    const toggleMinify = () => {
+    }
+
+    function toggleMinify() {
         appSettings.pathEditor.minifyOutput = !minifyOutput;
         doNormalize();
-    };
+    }
 
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            const target = event.target;
-            if (isEditableTarget(target)) return;
+    useEffect(
+        () => {
+            function handleKeyDown(event: KeyboardEvent) {
+                const target = event.target;
+                if (isEditableTarget(target)) return;
 
-            const key = event.key.toLowerCase();
-            const withPrimary = event.ctrlKey || event.metaKey;
-            const withAltOnly = event.altKey && !withPrimary && !event.shiftKey;
+                const key = event.key.toLowerCase();
+                const withPrimary = event.ctrlKey || event.metaKey;
+                const withAltOnly = event.altKey && !withPrimary && !event.shiftKey;
 
-            if (withPrimary && !event.shiftKey && key === "o") {
-                event.preventDefault();
-                openStoredPaths();
-                return;
-            }
-            if (withPrimary && !event.shiftKey && key === "s") {
-                event.preventDefault();
-                openSaveDialog();
-                return;
-            }
-            if (withPrimary && !event.shiftKey && key === "e") {
-                if (!hasPath) return;
-                event.preventDefault();
-                openExportDialog();
-                return;
-            }
-            if (!withAltOnly) return;
+                if (withPrimary && !event.shiftKey && key === "o") {
+                    event.preventDefault();
+                    openStoredPaths();
+                    return;
+                }
+                if (withPrimary && !event.shiftKey && key === "s") {
+                    event.preventDefault();
+                    openSaveDialog();
+                    return;
+                }
+                if (withPrimary && !event.shiftKey && key === "e") {
+                    if (!hasPath) return;
+                    event.preventDefault();
+                    openExportDialog();
+                    return;
+                }
+                if (!withAltOnly) return;
 
-            if (key === "n") {
-                if (!hasPath) return;
-                event.preventDefault();
-                doNormalize();
-                return;
+                if (key === "n") {
+                    if (!hasPath) return;
+                    event.preventDefault();
+                    doNormalize();
+                    return;
+                }
+                if (key === "a") {
+                    if (!hasPath) return;
+                    event.preventDefault();
+                    doSetAbsolute();
+                    return;
+                }
+                if (key === "r") {
+                    if (!hasPath) return;
+                    event.preventDefault();
+                    doSetRelative();
+                    return;
+                }
+                if (key === "m") {
+                    if (!hasPath) return;
+                    event.preventDefault();
+                    toggleMinify();
+                    return;
+                }
+                if (key === "d") {
+                    event.preventDefault();
+                    toggleDarkCanvas();
+                    return;
+                }
+                if (key === "i") {
+                    event.preventDefault();
+                    toggleImageEditMode();
+                    return;
+                }
+                if (key === "t") {
+                    event.preventDefault();
+                    toggleTheme(theme);
+                    return;
+                }
+                if (key === "c") {
+                    if (!hasPath) return;
+                    event.preventDefault();
+                    void copyPath();
+                    return;
+                }
+                if (key === "x") {
+                    if (!hasPath) return;
+                    event.preventDefault();
+                    doClear();
+                }
             }
-            if (key === "a") {
-                if (!hasPath) return;
-                event.preventDefault();
-                doSetAbsolute();
-                return;
-            }
-            if (key === "r") {
-                if (!hasPath) return;
-                event.preventDefault();
-                doSetRelative();
-                return;
-            }
-            if (key === "m") {
-                if (!hasPath) return;
-                event.preventDefault();
-                toggleMinify();
-                return;
-            }
-            if (key === "d") {
-                event.preventDefault();
-                toggleDarkCanvas();
-                return;
-            }
-            if (key === "i") {
-                event.preventDefault();
-                toggleImageEditMode();
-                return;
-            }
-            if (key === "t") {
-                event.preventDefault();
-                toggleTheme(theme);
-                return;
-            }
-            if (key === "c") {
-                if (!hasPath) return;
-                event.preventDefault();
-                void copyPath();
-                return;
-            }
-            if (key === "x") {
-                if (!hasPath) return;
-                event.preventDefault();
-                doClear();
-            }
-        };
 
-        const controller = new AbortController();
-        window.addEventListener("keydown", handleKeyDown, { signal: controller.signal });
-        return () => controller.abort();
-    }, [theme, hasPath, darkCanvas, isImageEditMode, minifyOutput, doNormalize, doSetAbsolute, doSetRelative, doClear, setIsImageEditMode, pathValue, setOpenDialogOpen, setSaveDialogOpen, setOpenExportDialog]);
+            const controller = new AbortController();
+            window.addEventListener("keydown", handleKeyDown, { signal: controller.signal });
+            return () => controller.abort();
+        },
+        [theme, hasPath, darkCanvas, isImageEditMode, minifyOutput, doNormalize, doSetAbsolute, doSetRelative, doClear, setIsImageEditMode, pathValue, setOpenDialogOpen, setSaveDialogOpen, setOpenExportDialog]
+    );
 
     return (<>
         <ImageUploadInput fileRef={fileRef} />
