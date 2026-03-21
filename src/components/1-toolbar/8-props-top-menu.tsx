@@ -1,21 +1,26 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
-import { IconRadix_DotsHorizontal } from "@/components/ui/icons/normal";
-import { Button } from "@/components/ui/shadcn/button";
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/shadcn/dropdown-menu";
+import { Menubar, MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarTrigger } from "@/components/ui/shadcn/menubar";
+import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "@/store/0-atoms/1-2-history";
 import { doClearPathAtom, doNormalizePathAtom, doSetAbsoluteAtom, doSetRelativeAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { addImageDialogOpenAtom, exportSvgDialogOpenAtom, openPathDialogOpenAtom, savePathDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-actions-menu";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { isImageEditModeAtom, pendingImageAtom } from "@/store/0-atoms/2-4-images";
 import { appSettings } from "@/store/0-ui-settings";
+import { toggleTheme } from "@/utils";
 
-export function CanvasActionsMenu() {
+export function TopMenu() {
     const { darkCanvas } = useSnapshot(appSettings.canvas);
     const { minifyOutput } = useSnapshot(appSettings.pathEditor);
+    const { theme } = useSnapshot(appSettings);
     const pathValue = useAtomValue(svgPathInputAtom);
     const [isImageEditMode, setIsImageEditMode] = useAtom(isImageEditModeAtom);
+    const canUndo = useAtomValue(canUndoAtom);
+    const canRedo = useAtomValue(canRedoAtom);
 
+    const doUndo = useSetAtom(doUndoPathAtom);
+    const doRedo = useSetAtom(doRedoPathAtom);
     const doNormalize = useSetAtom(doNormalizePathAtom);
     const doSetRelative = useSetAtom(doSetRelativeAtom);
     const doSetAbsolute = useSetAtom(doSetAbsoluteAtom);
@@ -26,67 +31,211 @@ export function CanvasActionsMenu() {
     const setOpenDialogOpen = useSetAtom(openPathDialogOpenAtom);
 
     const fileRef = useRef<HTMLInputElement | null>(null);
+    const hasPath = Boolean(pathValue.trim());
+
+    const openSaveDialog = () => setSaveDialogOpen(true);
+    const openStoredPaths = () => setOpenDialogOpen(true);
+    const openExportDialog = () => hasPath && setOpenExportDialog(true);
+    const uploadImage = () => fileRef.current?.click();
+    const copyPath = async () => {
+        if (!hasPath) return;
+        await navigator.clipboard.writeText(pathValue);
+    };
+    const toggleDarkCanvas = () => {
+        appSettings.canvas.darkCanvas = !darkCanvas;
+    };
+    const toggleImageEditMode = () => {
+        setIsImageEditMode(!isImageEditMode);
+    };
+    const toggleMinify = () => {
+        appSettings.pathEditor.minifyOutput = !minifyOutput;
+        doNormalize();
+    };
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            const target = event.target;
+            if (isEditableTarget(target)) return;
+
+            const key = event.key.toLowerCase();
+            const withPrimary = event.ctrlKey || event.metaKey;
+            const withAltOnly = event.altKey && !withPrimary && !event.shiftKey;
+
+            if (withPrimary && !event.shiftKey && key === "o") {
+                event.preventDefault();
+                openStoredPaths();
+                return;
+            }
+            if (withPrimary && !event.shiftKey && key === "s") {
+                event.preventDefault();
+                openSaveDialog();
+                return;
+            }
+            if (withPrimary && !event.shiftKey && key === "e") {
+                if (!hasPath) return;
+                event.preventDefault();
+                openExportDialog();
+                return;
+            }
+            if (!withAltOnly) return;
+
+            if (key === "n") {
+                if (!hasPath) return;
+                event.preventDefault();
+                doNormalize();
+                return;
+            }
+            if (key === "a") {
+                if (!hasPath) return;
+                event.preventDefault();
+                doSetAbsolute();
+                return;
+            }
+            if (key === "r") {
+                if (!hasPath) return;
+                event.preventDefault();
+                doSetRelative();
+                return;
+            }
+            if (key === "m") {
+                if (!hasPath) return;
+                event.preventDefault();
+                toggleMinify();
+                return;
+            }
+            if (key === "d") {
+                event.preventDefault();
+                toggleDarkCanvas();
+                return;
+            }
+            if (key === "i") {
+                event.preventDefault();
+                toggleImageEditMode();
+                return;
+            }
+            if (key === "t") {
+                event.preventDefault();
+                toggleTheme(theme);
+                return;
+            }
+            if (key === "c") {
+                if (!hasPath) return;
+                event.preventDefault();
+                void copyPath();
+                return;
+            }
+            if (key === "x") {
+                if (!hasPath) return;
+                event.preventDefault();
+                doClear();
+            }
+        };
+
+        const controller = new AbortController();
+        window.addEventListener("keydown", handleKeyDown, { signal: controller.signal });
+        return () => controller.abort();
+    }, [theme, hasPath, darkCanvas, isImageEditMode, minifyOutput, doNormalize, doSetAbsolute, doSetRelative, doClear, setIsImageEditMode, pathValue, setOpenDialogOpen, setSaveDialogOpen, setOpenExportDialog]);
 
     return (<>
         <ImageUploadInput fileRef={fileRef} />
 
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="size-7" title="More actions">
-                    <IconRadix_DotsHorizontal className="size-4" />
-                </Button>
-            </DropdownMenuTrigger>
+        <Menubar className="h-auto border-none bg-transparent p-0 shadow-none">
+            <MenubarMenu>
+                <MenubarTrigger className="px-3 text-xs font-medium">File</MenubarTrigger>
+                <MenubarContent>
+                    <MenubarItem onClick={openStoredPaths}>
+                        Open Saved Path...
+                        <MenubarShortcut>Ctrl+O</MenubarShortcut>
+                    </MenubarItem>
+                    <MenubarItem disabled={!hasPath} onClick={openSaveDialog}>
+                        Save Path...
+                        <MenubarShortcut>Ctrl+S</MenubarShortcut>
+                    </MenubarItem>
+                    <MenubarItem disabled={!hasPath} onClick={openExportDialog}>
+                        Export SVG...
+                        <MenubarShortcut>Ctrl+E</MenubarShortcut>
+                    </MenubarItem>
+                    <MenubarItem onClick={uploadImage}>
+                        Upload Image...
+                    </MenubarItem>
+                </MenubarContent>
+            </MenubarMenu>
 
-            <DropdownMenuContent align="end">
-                <DropdownMenuCheckboxItem checked={darkCanvas} onCheckedChange={(checked) => { appSettings.canvas.darkCanvas = Boolean(checked); }}>
-                    Dark Canvas
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem checked={isImageEditMode} onCheckedChange={(checked) => setIsImageEditMode(Boolean(checked))}>
-                    Image Edit Mode
-                </DropdownMenuCheckboxItem>
+            <MenubarMenu>
+                <MenubarTrigger className="px-3 text-xs font-medium">Edit</MenubarTrigger>
+                <MenubarContent>
+                    <MenubarItem disabled={!canUndo} onClick={() => doUndo()}>
+                        Undo
+                        <MenubarShortcut>Ctrl+Z</MenubarShortcut>
+                    </MenubarItem>
+                    <MenubarItem disabled={!canRedo} onClick={() => doRedo()}>
+                        Redo
+                        <MenubarShortcut>Ctrl+Shift+Z</MenubarShortcut>
+                    </MenubarItem>
 
-                <DropdownMenuSeparator />
+                    <MenubarSeparator />
 
-                <DropdownMenuItem className="pl-8" onSelect={() => doNormalize()}>
-                    Normalize...
-                </DropdownMenuItem>
-                <DropdownMenuItem className="pl-8" onSelect={() => doSetAbsolute()}>
-                    To Abs...
-                </DropdownMenuItem>
-                <DropdownMenuItem className="pl-8" onSelect={() => doSetRelative()}>
-                    To Rel...
-                </DropdownMenuItem>
-                <DropdownMenuCheckboxItem checked={minifyOutput} onCheckedChange={(checked) => { appSettings.pathEditor.minifyOutput = Boolean(checked); doNormalize(); }}>
-                    Minify path
-                </DropdownMenuCheckboxItem>
+                    <MenubarItem disabled={!hasPath} onClick={() => doNormalize()}>
+                        Normalize
+                        <MenubarShortcut>Alt+N</MenubarShortcut>
+                    </MenubarItem>
+                    <MenubarItem disabled={!hasPath} onClick={() => doSetAbsolute()}>
+                        Convert to Absolute
+                        <MenubarShortcut>Alt+A</MenubarShortcut>
+                    </MenubarItem>
+                    <MenubarItem disabled={!hasPath} onClick={() => doSetRelative()}>
+                        Convert to Relative
+                        <MenubarShortcut>Alt+R</MenubarShortcut>
+                    </MenubarItem>
+                    <MenubarCheckboxItem checked={minifyOutput} disabled={!hasPath} onCheckedChange={() => toggleMinify()}>
+                        Minify Path
+                        <MenubarShortcut>Alt+M</MenubarShortcut>
+                    </MenubarCheckboxItem>
 
-                <DropdownMenuSeparator />
+                    <MenubarSeparator />
 
-                <DropdownMenuItem className="pl-8" onSelect={() => setSaveDialogOpen(true)}>
-                    Save Path to browser storage
-                </DropdownMenuItem>
-                <DropdownMenuItem className="pl-8" onSelect={() => setOpenDialogOpen(true)}>
-                    Open saved path
-                </DropdownMenuItem>
-                <DropdownMenuItem className="pl-8" disabled={!pathValue.trim()} onSelect={() => setOpenExportDialog(true)}>
-                    Export SVG
-                </DropdownMenuItem>
-                <DropdownMenuItem className="pl-8" onSelect={() => fileRef.current?.click()}>
-                    Upload Image
-                </DropdownMenuItem>
+                    <MenubarItem disabled={!hasPath} onClick={() => void copyPath()}>
+                        Copy Path
+                        <MenubarShortcut>Alt+C</MenubarShortcut>
+                    </MenubarItem>
+                    <MenubarItem disabled={!hasPath} onClick={() => doClear()}>
+                        Clear Path
+                        <MenubarShortcut>Alt+X</MenubarShortcut>
+                    </MenubarItem>
+                </MenubarContent>
+            </MenubarMenu>
 
-                <DropdownMenuSeparator />
+            <MenubarMenu>
+                <MenubarTrigger className="px-3 text-xs font-medium">View</MenubarTrigger>
+                <MenubarContent>
+                    <MenubarCheckboxItem checked={darkCanvas} onCheckedChange={() => toggleDarkCanvas()}>
+                        Dark Canvas
+                        <MenubarShortcut>Alt+D</MenubarShortcut>
+                    </MenubarCheckboxItem>
+                    <MenubarCheckboxItem checked={isImageEditMode} onCheckedChange={() => toggleImageEditMode()}>
+                        Image Edit Mode
+                        <MenubarShortcut>Alt+I</MenubarShortcut>
+                    </MenubarCheckboxItem>
 
-                <DropdownMenuItem className="pl-8" disabled={!pathValue} onSelect={async () => { !!pathValue && await navigator.clipboard.writeText(pathValue); }}>
-                    Copy
-                </DropdownMenuItem>
-                <DropdownMenuItem className="pl-8" disabled={!pathValue} onSelect={() => doClear()}>
-                    Clear
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+                    <MenubarSeparator />
+
+                    <MenubarItem onClick={() => toggleTheme(theme)}>
+                        Toggle Theme
+                        <MenubarShortcut>Alt+T</MenubarShortcut>
+                    </MenubarItem>
+                </MenubarContent>
+            </MenubarMenu>
+        </Menubar>
 
     </>);
+}
+
+function isEditableTarget(target: EventTarget | null): boolean {
+    if (!(target instanceof HTMLElement)) return false;
+    if (target.isContentEditable) return true;
+
+    const tagName = target.tagName;
+    return tagName === "INPUT" || tagName === "TEXTAREA" || tagName === "SELECT";
 }
 
 function ImageUploadInput({ fileRef }: { fileRef: React.RefObject<HTMLInputElement | null>; }) {
