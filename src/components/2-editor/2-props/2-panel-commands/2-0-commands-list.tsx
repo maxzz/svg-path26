@@ -8,7 +8,7 @@ import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 import { commandRowsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { CommandSelectionMenu } from "./2-2-commands-list-row-menu.tsx";
 import { doToggleSegmentRelativeAtom, draggedCanvasPointAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-2-editor-actions";
-import { type CommandProps, CommandCellInput } from "./2-1-commands-list-cells.tsx";
+import { type CommandProps, CommandArcFlagsInput, CommandCellInput } from "./2-1-commands-list-cells.tsx";
 
 export function CommandsListPanel() {
     return (
@@ -115,6 +115,26 @@ export function CommandsList() {
 
                                 {row.values.map(
                                     (value, valueIndex) => {
+                                        if (row.command.toLowerCase() === "a" && valueIndex === 3) {
+                                            return null;
+                                        }
+
+                                        if (row.command.toLowerCase() === "a" && valueIndex === 4) {
+                                            return (
+                                                <CommandArcFlagsInput
+                                                    key={`${row.index}:arc-flags`}
+                                                    rowIndex={row.index}
+                                                    rowValueCount={row.values.length}
+                                                    command={row.command}
+                                                    largeArcValue={row.values[3] ?? 0}
+                                                    sweepValue={row.values[4] ?? 0}
+                                                    focusField={focusCommandCell}
+                                                    moveVertical={moveVertical}
+                                                    registerFieldRef={registerFieldRef}
+                                                />
+                                            );
+                                        }
+
                                         const isLinkedValue = isCommandValueLinkedToPoint(row, valueIndex, highlightedCanvasPoint);
                                         const inputProps: CommandProps = {
                                             rowIndex: row.index,
