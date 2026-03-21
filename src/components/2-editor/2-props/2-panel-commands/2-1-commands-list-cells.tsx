@@ -252,11 +252,11 @@ function getCommandValueInputClassName(highlighted?: boolean) {
 
 function getCommandFlagGroupClassName(highlighted?: boolean) {
     return cn(
-        "px-1 h-5 min-w-[2.4rem] transition-colors rounded inline-flex items-center justify-center gap-1 border bg-background",
+        "px-0.5 h-5 w-[2.4rem] transition-colors rounded inline-flex items-center justify-center gap-0.5 border",
         highlighted ? "border border-sky-500/60 bg-sky-500/10" : "border bg-background"
     );
 }
 
 function getCommandFlagCheckboxClassName() {
-    return "h-3.5 w-3.5 rounded border-muted-foreground/40 align-middle";
+    return "h-3 w-3 shrink-0 rounded-[0.2rem] border-muted-foreground/50 bg-background align-middle accent-primary";
 }
