@@ -18,7 +18,10 @@ export function FileMenu() {
         <ImageUploadInput fileRef={fileRef} />
 
         <MenubarMenu>
-            <MenubarTrigger className="px-3 text-xs font-medium">File</MenubarTrigger>
+            <MenubarTrigger className="px-2 text-xs">
+                File
+            </MenubarTrigger>
+
             <MenubarContent>
                 <MenubarItem onClick={() => setOpenDialogOpen(true)}>
                     Open Saved Path...

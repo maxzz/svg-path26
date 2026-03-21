@@ -12,7 +12,10 @@ export function ViewMenu() {
 
     return (
         <MenubarMenu>
-            <MenubarTrigger className="px-3 text-xs font-medium">View</MenubarTrigger>
+            <MenubarTrigger className="px-2 text-xs">
+                View
+            </MenubarTrigger>
+
             <MenubarContent>
                 <MenubarCheckboxItem checked={darkCanvas} onCheckedChange={() => { appSettings.canvas.darkCanvas = !darkCanvas; }}>
                     Dark Canvas

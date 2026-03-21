@@ -7,7 +7,10 @@ export function HelpMenu() {
 
     return (
         <MenubarMenu>
-            <MenubarTrigger className="px-3 text-xs font-medium">Help</MenubarTrigger>
+            <MenubarTrigger className="px-2 text-xs">
+                Help
+            </MenubarTrigger>
+
             <MenubarContent>
                 <MenubarItem onClick={() => setAboutDialogOpen(true)}>
                     About

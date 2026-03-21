@@ -33,7 +33,10 @@ export function EditMenu() {
 
     return (
         <MenubarMenu>
-            <MenubarTrigger className="px-3 text-xs font-medium">Edit</MenubarTrigger>
+            <MenubarTrigger className="px-2 text-xs">
+                Edit
+            </MenubarTrigger>
+
             <MenubarContent>
                 <MenubarItem disabled={!canUndo} onClick={() => doUndo()}>
                     Undo
