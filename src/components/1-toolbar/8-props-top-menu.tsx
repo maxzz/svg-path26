@@ -4,7 +4,7 @@ import { useSnapshot } from "valtio";
 import { Menubar, MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarTrigger } from "@/components/ui/shadcn/menubar";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "@/store/0-atoms/1-2-history";
 import { doClearPathAtom, doNormalizePathAtom, doSetAbsoluteAtom, doSetRelativeAtom } from "@/store/0-atoms/2-2-editor-actions";
-import { addImageDialogOpenAtom, exportSvgDialogOpenAtom, openPathDialogOpenAtom, savePathDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-actions-menu";
+import { aboutDialogOpenAtom, addImageDialogOpenAtom, exportSvgDialogOpenAtom, openPathDialogOpenAtom, savePathDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-actions-menu";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { isImageEditModeAtom, pendingImageAtom } from "@/store/0-atoms/2-4-images";
 import { appSettings } from "@/store/0-ui-settings";
@@ -29,6 +29,7 @@ export function TopMenu() {
     const setOpenExportDialog = useSetAtom(exportSvgDialogOpenAtom);
     const setSaveDialogOpen = useSetAtom(savePathDialogOpenAtom);
     const setOpenDialogOpen = useSetAtom(openPathDialogOpenAtom);
+    const setAboutDialogOpen = useSetAtom(aboutDialogOpenAtom);
 
     const fileRef = useRef<HTMLInputElement | null>(null);
     const hasPath = Boolean(pathValue.trim());
@@ -222,6 +223,15 @@ export function TopMenu() {
                     <MenubarItem onClick={() => toggleTheme(theme)}>
                         Toggle Theme
                         <MenubarShortcut>Alt+T</MenubarShortcut>
+                    </MenubarItem>
+                </MenubarContent>
+            </MenubarMenu>
+
+            <MenubarMenu>
+                <MenubarTrigger className="px-3 text-xs font-medium">Help</MenubarTrigger>
+                <MenubarContent>
+                    <MenubarItem onClick={() => setAboutDialogOpen(true)}>
+                        About
                     </MenubarItem>
                 </MenubarContent>
             </MenubarMenu>
