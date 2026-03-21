@@ -1,4 +1,4 @@
-import { TopMenu } from "./8-props-top-menu";
+import { TopMenu } from "./1-top-menu/0-all-menu";
 import { ToolbarUndoRedo } from "./2-toolbar-undo-redo";
 import { SettingsPopover } from "./3-toolbar-popover";
 import { ButtonThemeToggle } from "./4-btn-theme-toggle";
