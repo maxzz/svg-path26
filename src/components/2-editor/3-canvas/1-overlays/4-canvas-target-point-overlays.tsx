@@ -7,7 +7,7 @@ import { doFocusPointCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAto
 import { targetPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
 import { doStartPointDragAtom } from "../3-canvas-drag";
-import { getControlHaloFill, getEditorStroke, getTargetPointFill, getTargetPointStroke } from "./8-canvas-color-palette";
+import { getControlHaloFill, getEditorStroke, getPointInteractionClassName, getTargetPointFill, getTargetPointStroke } from "./8-canvas-color-palette";
 
 export function CanvasTargetPoints() {
     const { darkCanvas } = useSnapshot(appSettings.canvas);
@@ -65,8 +65,4 @@ export function CanvasTargetPoints() {
             );
         }
     );
-}
-
-function getPointInteractionClassName(movable: boolean): string {
-    return movable ? "cursor-pointer transition-all" : "cursor-default";
 }

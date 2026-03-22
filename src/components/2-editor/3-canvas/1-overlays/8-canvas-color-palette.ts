@@ -1,3 +1,5 @@
+import { classNames } from "@/utils";
+
 const DARK_CANVAS_COLORS = {
     segmentActive: "#009cff",
     segmentHover: "#ff4343",
@@ -71,4 +73,19 @@ export function getSegmentActiveStroke(darkCanvas: boolean): string {
 
 export function getSegmentHoverStroke(darkCanvas: boolean): string {
     return getCanvasColors(darkCanvas).segmentHover;
+}
+
+//
+
+export function getCanvasPathClasses(canvasPreview: boolean, fillPreview: boolean, darkCanvas: boolean): string {
+    return classNames(
+        !fillPreview ? "fill-none" : (canvasPreview ? "fill-black/20" : "fill-blue-500/25"),
+        canvasPreview ? "stroke-black" : (darkCanvas ? "stroke-white" : "stroke-blue-700")
+    );
+}
+
+//
+
+export function getPointInteractionClassName(movable: boolean): string {
+    return movable ? "cursor-pointer transition-all" : "cursor-default";
 }

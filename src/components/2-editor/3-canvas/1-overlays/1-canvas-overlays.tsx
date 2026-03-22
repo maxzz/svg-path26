@@ -1,6 +1,5 @@
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
-import { classNames } from "@/utils";
 import { appSettings } from "@/store/0-ui-settings";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { canvasStrokeWidthAtom, canvasUnitsPerPixelAtom } from "../../../../store/0-atoms/2-1-canvas-viewport-derives";
@@ -11,6 +10,7 @@ import { PathCanvasImageEditOverlays } from "../4-canvas-overlays-image";
 import { CanvasHoveredSegmentOverlay, CanvasSegmentHitAreas, CanvasSelectedSegmentOverlay } from "./2-canvas-segment-overlays";
 import { CanvasControlLines, CanvasControlPoints } from "./3-canvas-control-overlays";
 import { CanvasTargetPoints } from "./4-canvas-target-point-overlays";
+import { getCanvasPathClasses } from "./8-canvas-color-palette";
 
 export function CanvasHelperOverlays() {
     const { showHelpers, canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);
@@ -55,14 +55,6 @@ function CanvasMainPathOverlay() {
             strokeLinejoin="round"
             d={parseError || !pathValue ? "M 0 0" : pathValue}
         />
-    );
-}
-
-
-function getCanvasPathClasses(canvasPreview: boolean, fillPreview: boolean, darkCanvas: boolean): string {
-    return classNames(
-        !fillPreview ? "fill-none" : (canvasPreview ? "fill-black/20" : "fill-blue-500/25"),
-        canvasPreview ? "stroke-black" : (darkCanvas ? "stroke-white" : "stroke-blue-700")
     );
 }
 
