@@ -78,10 +78,10 @@ export function CommandsList() {
                             className={cn(
                                 "px-1.5 border rounded flex items-center gap-1 transition-colors",
                                 selectedCommandIndex === row.index
-                                    ? "border-sky-500/50 bg-sky-500/10"
+                                    ? "border-transparent bg-blue-300"
                                     : (hoveredCommandIndex === row.index || isCanvasPointFocused)
-                                        ? "border-sky-500/25 bg-sky-500/5"
-                                        : "border-transparent bg-background hover:bg-muted/40"
+                                        ? "border-transparent bg-slate-400/40"
+                                        : "border-transparent bg-background hover:bg-slate-400/25"
                             )}
                             onClick={() => setSelectedCommandIndex(row.index)}
                             onMouseEnter={() => setHoveredCommandIndex(row.index)}
@@ -97,8 +97,8 @@ export function CommandsList() {
                                         type="button"
                                         className={cn(
                                             "w-5 h-5 shrink-0 text-xs leading-3 text-center font-semibold rounded-l-[0.2rem] cursor-pointer transition-colors",
-                                            row.command === row.command.toLowerCase() ? "bg-muted-foreground/20 text-violet-500" : "bg-muted-foreground/30 text-orange-500",
-                                            highlightCommandCell && "bg-sky-500/15 ring-1 ring-sky-500/50"
+                                            row.command === row.command.toLowerCase() ? "bg-slate-400 text-slate-900" : "bg-slate-500 text-slate-900",
+                                            highlightCommandCell && "ring-1 ring-[#9c00ffa0]"
                                         )}
                                         onClick={(event) => {
                                             event.stopPropagation();

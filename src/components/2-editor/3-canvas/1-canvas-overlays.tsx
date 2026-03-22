@@ -14,8 +14,9 @@ import { PathCanvasImageEditOverlays } from "./4-canvas-overlays-image";
 
 const SEGMENT_ACTIVE = "#009cff";
 const SEGMENT_HOVER = "#ff4343";
-const CONTROL_ACTIVE = "rgba(156, 0, 255, 0.63)";
-const CONTROL_HOVER = "rgba(255, 173, 64, 0.8)";
+const EDITOR_STROKE = "#9c00ff63";
+const CONTROL_ACTIVE = "#9c00ffa0";
+const CONTROL_HOVER = "#ffad40";
 
 export function CanvasHelperOverlays() {
     const { showHelpers, canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);
@@ -200,7 +201,7 @@ function CanvasControlLines() {
 function getControlLineStroke(selected: boolean, hovered: boolean, darkCanvas: boolean): string {
     if (selected) return CONTROL_ACTIVE;
     if (hovered) return CONTROL_HOVER;
-    return darkCanvas ? "rgba(255, 255, 255, 0.33)" : "rgba(71, 85, 105, 0.35)";
+    return darkCanvas ? "rgba(255, 255, 255, 0.33)" : "rgba(100, 116, 139, 0.45)";
 }
 
 // Control Points Overlay
@@ -236,7 +237,7 @@ function CanvasControlPoints() {
                             width={haloSize}
                             height={haloSize}
                             fill={selected ? CONTROL_ACTIVE : CONTROL_HOVER}
-                            stroke={selected ? CONTROL_ACTIVE : CONTROL_HOVER}
+                            stroke={EDITOR_STROKE}
                             strokeWidth={unitsPerPixel * 6}
                             pointerEvents="none"
                         />
@@ -297,7 +298,7 @@ function CanvasTargetPoints() {
                             cy={point.y}
                             r={haloRadius}
                             fill={selected ? CONTROL_ACTIVE : CONTROL_HOVER}
-                            stroke={selected ? CONTROL_ACTIVE : CONTROL_HOVER}
+                            stroke={EDITOR_STROKE}
                             strokeWidth={unitsPerPixel * 6}
                             pointerEvents="none"
                         />
@@ -336,7 +337,7 @@ function getPointInteractionClassName(movable: boolean): string {
 function getPointFill(selected: boolean, hovered: boolean, darkCanvas: boolean): string {
     if (selected) return SEGMENT_ACTIVE;
     if (hovered) return SEGMENT_HOVER;
-    return darkCanvas ? "#ffffff" : "#475569";
+    return darkCanvas ? "#ffffff" : "#ffffff";
 }
 
 //
