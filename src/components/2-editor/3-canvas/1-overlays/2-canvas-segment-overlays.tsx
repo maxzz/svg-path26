@@ -2,9 +2,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { canvasStrokeWidthAtom, hoveredSegmentStrokeWidthAtom, selectedSegmentStrokeWidthAtom } from "../../../../store/0-atoms/2-1-canvas-viewport-derives";
 import { hoveredCanvasPointAtom, hoveredCommandIndexAtom, hoveredStandaloneSegmentPathAtom, selectedCommandIndexAtom, selectedStandaloneSegmentPathAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { standaloneSegmentPathsAtom } from "@/store/0-atoms/2-0-svg-model";
-
-const DARK_SEGMENT_ACTIVE = "#009cff";
-const DARK_SEGMENT_HOVER = "#ff4343";
+import { DARK_SEGMENT_ACTIVE, DARK_SEGMENT_HOVER } from "./0-canvas-color-palette";
 
 export function CanvasSegmentHitAreas() {
     const segmentPaths = useAtomValue(standaloneSegmentPathsAtom);

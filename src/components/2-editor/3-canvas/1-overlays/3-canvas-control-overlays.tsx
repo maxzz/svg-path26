@@ -7,20 +7,7 @@ import { doFocusPointCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAto
 import { controlPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
 import { doStartPointDragAtom } from "../3-canvas-drag";
-
-const DARK_SEGMENT_ACTIVE = "#009cff";
-const DARK_SEGMENT_HOVER = "#ff4343";
-const DARK_EDITOR_STROKE = "#9c00ff63";
-const DARK_CONTROL_ACTIVE = "#9c00ffa0";
-const DARK_CONTROL_HOVER = "#ffad40";
-
-const LIGHT_EDITOR_STROKE = "#7c3aed3d";
-const LIGHT_CONTROL_ACTIVE = "#7c3aed38";
-const LIGHT_CONTROL_HOVER = "#d977063d";
-const LIGHT_HANDLE_ACTIVE = "#7c3aed";
-const LIGHT_HANDLE_HOVER = "#d97706";
-const LIGHT_HANDLE_IDLE = "#64748bad";
-const LIGHT_CONTROL_POINT_IDLE = "#64748b";
+import { getControlHaloFill, getControlLineStroke, getControlPointFill, getEditorStroke } from "./0-canvas-color-palette";
 
 export function CanvasControlLines() {
     const { darkCanvas } = useSnapshot(appSettings.canvas);
@@ -109,33 +96,6 @@ export function CanvasControlPoints() {
     );
 }
 
-function getControlLineStroke(selected: boolean, hovered: boolean, darkCanvas: boolean): string {
-    if (darkCanvas) {
-        if (selected) return DARK_CONTROL_ACTIVE;
-        if (hovered) return DARK_CONTROL_HOVER;
-        return "rgba(255, 255, 255, 0.33)";
-    }
-
-    if (selected) return LIGHT_HANDLE_ACTIVE;
-    if (hovered) return LIGHT_HANDLE_HOVER;
-    return LIGHT_HANDLE_IDLE;
-}
-
 function getPointInteractionClassName(movable: boolean): string {
     return movable ? "cursor-pointer transition-all" : "cursor-default";
-}
-
-function getEditorStroke(darkCanvas: boolean): string {
-    return darkCanvas ? DARK_EDITOR_STROKE : LIGHT_EDITOR_STROKE;
-}
-
-function getControlHaloFill(selected: boolean, darkCanvas: boolean): string {
-    if (darkCanvas) return selected ? DARK_CONTROL_ACTIVE : DARK_CONTROL_HOVER;
-    return selected ? LIGHT_CONTROL_ACTIVE : LIGHT_CONTROL_HOVER;
-}
-
-function getControlPointFill(selected: boolean, hovered: boolean, darkCanvas: boolean): string {
-    if (selected) return DARK_SEGMENT_ACTIVE;
-    if (hovered) return DARK_SEGMENT_HOVER;
-    return darkCanvas ? "#ffffff" : LIGHT_CONTROL_POINT_IDLE;
 }

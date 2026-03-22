@@ -7,18 +7,7 @@ import { doFocusPointCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAto
 import { targetPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
 import { doStartPointDragAtom } from "../3-canvas-drag";
-
-const DARK_SEGMENT_ACTIVE = "#009cff";
-const DARK_SEGMENT_HOVER = "#ff4343";
-const DARK_EDITOR_STROKE = "#9c00ff63";
-const DARK_CONTROL_ACTIVE = "#9c00ffa0";
-const DARK_CONTROL_HOVER = "#ffad40";
-
-const LIGHT_EDITOR_STROKE = "#7c3aed3d";
-const LIGHT_CONTROL_ACTIVE = "#7c3aed38";
-const LIGHT_CONTROL_HOVER = "#d977063d";
-const LIGHT_TARGET_POINT_IDLE = "#334155";
-const LIGHT_TARGET_POINT_STROKE = "#0f172a29";
+import { getControlHaloFill, getEditorStroke, getTargetPointFill, getTargetPointStroke } from "./0-canvas-color-palette";
 
 export function CanvasTargetPoints() {
     const { darkCanvas } = useSnapshot(appSettings.canvas);
@@ -47,7 +36,7 @@ export function CanvasTargetPoints() {
                             cx={point.x}
                             cy={point.y}
                             r={haloRadius}
-                            fill={getTargetHaloFill(selected, darkCanvas)}
+                            fill={getControlHaloFill(selected, darkCanvas)}
                             stroke={getEditorStroke(darkCanvas)}
                             strokeWidth={unitsPerPixel * 6}
                             pointerEvents="none"
@@ -60,7 +49,7 @@ export function CanvasTargetPoints() {
                         cx={point.x}
                         cy={point.y}
                         r={pointRadius}
-                        fill={getPointFill(selected, hovered, darkCanvas)}
+                        fill={getTargetPointFill(selected, hovered, darkCanvas)}
                         stroke={getTargetPointStroke(selected, darkCanvas)}
                         onPointerDown={(event) => {
                             event.stopPropagation();
@@ -80,24 +69,4 @@ export function CanvasTargetPoints() {
 
 function getPointInteractionClassName(movable: boolean): string {
     return movable ? "cursor-pointer transition-all" : "cursor-default";
-}
-
-function getEditorStroke(darkCanvas: boolean): string {
-    return darkCanvas ? DARK_EDITOR_STROKE : LIGHT_EDITOR_STROKE;
-}
-
-function getTargetHaloFill(selected: boolean, darkCanvas: boolean): string {
-    if (darkCanvas) return selected ? DARK_CONTROL_ACTIVE : DARK_CONTROL_HOVER;
-    return selected ? LIGHT_CONTROL_ACTIVE : LIGHT_CONTROL_HOVER;
-}
-
-function getPointFill(selected: boolean, hovered: boolean, darkCanvas: boolean): string {
-    if (selected) return DARK_SEGMENT_ACTIVE;
-    if (hovered) return DARK_SEGMENT_HOVER;
-    return darkCanvas ? "#ffffff" : LIGHT_TARGET_POINT_IDLE;
-}
-
-function getTargetPointStroke(selected: boolean, darkCanvas: boolean): string {
-    if (!selected) return "transparent";
-    return darkCanvas ? "#ffffff38" : LIGHT_TARGET_POINT_STROKE;
 }
