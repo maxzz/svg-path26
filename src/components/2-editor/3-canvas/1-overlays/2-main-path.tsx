@@ -11,7 +11,7 @@ import { getCanvasPathClasses } from "./8-canvas-color-palette";
 export function CanvasMainPathOverlay() {
     const { darkCanvas, canvasPreview, fillPreview } = useSnapshot(appSettings.canvas);
 
-    const pathValue = useAtomValue(svgPathInputAtom);
+    const svgPathInput = useAtomValue(svgPathInputAtom);
     const parseError = useAtomValue(parseErrorAtom);
     const canvasStrokeWidth = useAtomValue(canvasStrokeWidthAtom);
 
@@ -21,7 +21,7 @@ export function CanvasMainPathOverlay() {
             strokeWidth={canvasStrokeWidth}
             strokeLinecap="round"
             strokeLinejoin="round"
-            d={parseError || !pathValue ? "M 0 0" : pathValue}
+            d={parseError || !svgPathInput ? "M 0 0" : svgPathInput}
         />
     );
 }

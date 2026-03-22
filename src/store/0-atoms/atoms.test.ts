@@ -1,5 +1,5 @@
 import { createStore } from "jotai";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
     doSetPointLocationWithoutHistoryAtom,
 } from "./2-2-editor-actions";
@@ -36,6 +36,30 @@ describe("svg path state atoms", () => {
         appSettings.pathEditor.viewBox = [0, 0, 24, 24];
         appSettings.pathEditor.decimals = 3;
         appSettings.pathEditor.minifyOutput = false;
+    });
+
+    it("debounces app settings persistence", async () => {
+        vi.useFakeTimers();
+
+        try {
+            appSettings.canvas.showGrid = false;
+            appSettings.canvas.showHelpers = false;
+
+            expect(localStorage.getItem("svg-path26__v3")).toBeNull();
+
+            await vi.advanceTimersByTimeAsync(149);
+            expect(localStorage.getItem("svg-path26__v3")).toBeNull();
+
+            await vi.advanceTimersByTimeAsync(1);
+
+            const storedSettings = localStorage.getItem("svg-path26__v3");
+            expect(storedSettings).not.toBeNull();
+            expect(storedSettings).toContain('"showGrid":false');
+            expect(storedSettings).toContain('"showHelpers":false');
+        } finally {
+            await vi.runOnlyPendingTimersAsync();
+            vi.useRealTimers();
+        }
     });
 
     it("supports undo/redo flow", () => {
