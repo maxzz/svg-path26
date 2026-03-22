@@ -12,11 +12,11 @@ import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { doStartPointDragAtom } from "./3-canvas-drag";
 import { PathCanvasImageEditOverlays } from "./4-canvas-overlays-image";
 
-const SEGMENT_ACTIVE = "#009cff";
-const SEGMENT_HOVER = "#ff4343";
-const EDITOR_STROKE = "#9c00ff63";
-const CONTROL_ACTIVE = "#9c00ffa0";
-const CONTROL_HOVER = "#ffad40";
+const DARK_SEGMENT_ACTIVE = "#009cff";
+const DARK_SEGMENT_HOVER = "#ff4343";
+const DARK_EDITOR_STROKE = "#9c00ff63";
+const DARK_CONTROL_ACTIVE = "#9c00ffa0";
+const DARK_CONTROL_HOVER = "#ffad40";
 const LIGHT_EDITOR_STROKE = "rgba(124, 58, 237, 0.24)";
 const LIGHT_CONTROL_ACTIVE = "rgba(124, 58, 237, 0.22)";
 const LIGHT_CONTROL_HOVER = "rgba(217, 119, 6, 0.24)";
@@ -24,6 +24,8 @@ const LIGHT_HANDLE_ACTIVE = "#7c3aed";
 const LIGHT_HANDLE_HOVER = "#d97706";
 const LIGHT_HANDLE_IDLE = "rgba(100, 116, 139, 0.68)";
 const LIGHT_CONTROL_POINT_IDLE = "#64748b";
+const LIGHT_TARGET_POINT_IDLE = "#334155";
+const LIGHT_TARGET_POINT_STROKE = "rgba(15, 23, 42, 0.16)";
 
 export function CanvasHelperOverlays() {
     const { showHelpers, canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);
@@ -150,7 +152,7 @@ function CanvasHoveredSegmentOverlay() {
     return (
         <path
             fill="none"
-            stroke={SEGMENT_HOVER}
+            stroke={DARK_SEGMENT_HOVER}
             strokeWidth={hoveredSegmentStrokeWidth}
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -169,7 +171,7 @@ function CanvasSelectedSegmentOverlay() {
     return (
         <path
             fill="none"
-            stroke={SEGMENT_ACTIVE}
+            stroke={DARK_SEGMENT_ACTIVE}
             strokeWidth={selectedSegmentStrokeWidth}
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -207,8 +209,8 @@ function CanvasControlLines() {
 
 function getControlLineStroke(selected: boolean, hovered: boolean, darkCanvas: boolean): string {
     if (darkCanvas) {
-        if (selected) return CONTROL_ACTIVE;
-        if (hovered) return CONTROL_HOVER;
+        if (selected) return DARK_CONTROL_ACTIVE;
+        if (hovered) return DARK_CONTROL_HOVER;
         return "rgba(255, 255, 255, 0.33)";
     }
 
@@ -324,7 +326,7 @@ function CanvasTargetPoints() {
                         cy={point.y}
                         r={pointRadius}
                         fill={getPointFill(selected, hovered, darkCanvas)}
-                        stroke={selected ? "rgba(255, 255, 255, 0.22)" : "transparent"}
+                        stroke={getTargetPointStroke(selected, darkCanvas)}
                         onPointerDown={
                             (event) => {
                                 event.stopPropagation();
@@ -348,24 +350,29 @@ function getPointInteractionClassName(movable: boolean): string {
 }
 
 function getEditorStroke(darkCanvas: boolean): string {
-    return darkCanvas ? EDITOR_STROKE : LIGHT_EDITOR_STROKE;
+    return darkCanvas ? DARK_EDITOR_STROKE : LIGHT_EDITOR_STROKE;
 }
 
 function getControlHaloFill(selected: boolean, darkCanvas: boolean): string {
-    if (darkCanvas) return selected ? CONTROL_ACTIVE : CONTROL_HOVER;
+    if (darkCanvas) return selected ? DARK_CONTROL_ACTIVE : DARK_CONTROL_HOVER;
     return selected ? LIGHT_CONTROL_ACTIVE : LIGHT_CONTROL_HOVER;
 }
 
 function getControlPointFill(selected: boolean, hovered: boolean, darkCanvas: boolean): string {
-    if (selected) return SEGMENT_ACTIVE;
-    if (hovered) return SEGMENT_HOVER;
+    if (selected) return DARK_SEGMENT_ACTIVE;
+    if (hovered) return DARK_SEGMENT_HOVER;
     return darkCanvas ? "#ffffff" : LIGHT_CONTROL_POINT_IDLE;
 }
 
 function getPointFill(selected: boolean, hovered: boolean, darkCanvas: boolean): string {
-    if (selected) return SEGMENT_ACTIVE;
-    if (hovered) return SEGMENT_HOVER;
-    return darkCanvas ? "#ffffff" : "#ffffff";
+    if (selected) return DARK_SEGMENT_ACTIVE;
+    if (hovered) return DARK_SEGMENT_HOVER;
+    return darkCanvas ? "#ffffff" : LIGHT_TARGET_POINT_IDLE;
+}
+
+function getTargetPointStroke(selected: boolean, darkCanvas: boolean): string {
+    if (!selected) return "transparent";
+    return darkCanvas ? "rgba(255, 255, 255, 0.22)" : LIGHT_TARGET_POINT_STROKE;
 }
 
 //
