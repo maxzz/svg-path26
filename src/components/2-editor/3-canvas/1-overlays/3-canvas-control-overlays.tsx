@@ -7,7 +7,7 @@ import { doFocusPointCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAto
 import { controlPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
 import { doStartPointDragAtom } from "../3-canvas-drag";
-import { getControlHaloFill, getControlLineStroke, getControlPointFill, getEditorStroke } from "./0-canvas-color-palette";
+import { getControlHaloFill, getControlLineStroke, getControlPointFill, getEditorStroke } from "./8-canvas-color-palette";
 
 export function CanvasControlLines() {
     const { darkCanvas } = useSnapshot(appSettings.canvas);
