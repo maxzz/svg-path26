@@ -2,7 +2,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { canvasStrokeWidthAtom, hoveredSegmentStrokeWidthAtom, selectedSegmentStrokeWidthAtom } from "../../../../store/0-atoms/2-1-canvas-viewport-derives";
 import { hoveredCanvasPointAtom, hoveredCommandIndexAtom, hoveredStandaloneSegmentPathAtom, selectedCommandIndexAtom, selectedStandaloneSegmentPathAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { standaloneSegmentPathsAtom } from "@/store/0-atoms/2-0-svg-model";
-import { DARK_SEGMENT_ACTIVE, DARK_SEGMENT_HOVER } from "./8-canvas-color-palette";
+import { DARK_CANVAS_COLORS } from "./8-canvas-color-palette";
 
 export function CanvasSegmentHitAreas() {
     const segmentPaths = useAtomValue(standaloneSegmentPathsAtom);
@@ -51,7 +51,7 @@ export function CanvasHoveredSegmentOverlay() {
     return (
         <path
             fill="none"
-            stroke={DARK_SEGMENT_HOVER}
+            stroke={DARK_CANVAS_COLORS.segmentHover}
             strokeWidth={hoveredSegmentStrokeWidth}
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -68,7 +68,7 @@ export function CanvasSelectedSegmentOverlay() {
     return (
         <path
             fill="none"
-            stroke={DARK_SEGMENT_ACTIVE}
+            stroke={DARK_CANVAS_COLORS.segmentActive}
             strokeWidth={selectedSegmentStrokeWidth}
             strokeLinecap="round"
             strokeLinejoin="round"
