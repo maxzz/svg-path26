@@ -7,7 +7,7 @@ import { IconZoomIn, IconZoomNormal, IconZoomOut } from "@/components/ui/icons/n
 import { CanvasGrid } from "./2-canvas-grid";
 import { CanvasHelperOverlays } from "./1-overlays/1-canvas-overlays";
 import { useCanvasDragAndDrop } from "./3-canvas-drag";
-import { PathCanvasImages } from "./4-canvas-overlays-image";
+import { PathCanvasImages } from "./1-overlays/6-images";
 import { useSyncCanvasViewportSize } from "../../../store/0-atoms/2-1-canvas-viewport-derives";
 import { appSettings } from "@/store/0-ui-settings";
 import { doClearCanvasFocusAtom } from "@/store/0-atoms/2-2-editor-actions";

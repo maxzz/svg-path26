@@ -3,8 +3,8 @@ import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
 import { canvasViewPortAtom } from "@/store/0-atoms/2-1-canvas-viewport";
 import { type EditorImage, focusedImageIdAtom, imagesAtom, isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
-import { type ImageHandle, eventToSvgPoint, doStartImageDragAtom } from "./3-canvas-drag";
-import { canvasUnitsPerPixelAtom } from "../../../store/0-atoms/2-1-canvas-viewport-derives";
+import { type ImageHandle, eventToSvgPoint, doStartImageDragAtom } from "../3-canvas-drag";
+import { canvasUnitsPerPixelAtom } from "../../../../store/0-atoms/2-1-canvas-viewport-derives";
 
 export function PathCanvasImages() {
     const images = useAtomValue(imagesAtom);
