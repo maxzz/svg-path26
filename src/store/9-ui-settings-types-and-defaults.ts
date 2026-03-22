@@ -55,7 +55,7 @@ export interface UiSettings {
 export const DEFAULT_VIEWBOX_SETTINGS: ViewBox = [0, 0, 24, 24];
 
 export const DEFAULT_PATH_EDITOR_SETTINGS: PathEditorSettings = {
-    strokeWidth: 3,
+    strokeWidth: 1,                       //TODO: set initial stroke width based on viewPort and viewBox
     zoom: 1,
     uniformScale: true,
     decimals: 3,

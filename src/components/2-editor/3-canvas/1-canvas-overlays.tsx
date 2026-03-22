@@ -17,6 +17,13 @@ const SEGMENT_HOVER = "#ff4343";
 const EDITOR_STROKE = "#9c00ff63";
 const CONTROL_ACTIVE = "#9c00ffa0";
 const CONTROL_HOVER = "#ffad40";
+const LIGHT_EDITOR_STROKE = "rgba(124, 58, 237, 0.24)";
+const LIGHT_CONTROL_ACTIVE = "rgba(124, 58, 237, 0.22)";
+const LIGHT_CONTROL_HOVER = "rgba(217, 119, 6, 0.24)";
+const LIGHT_HANDLE_ACTIVE = "#7c3aed";
+const LIGHT_HANDLE_HOVER = "#d97706";
+const LIGHT_HANDLE_IDLE = "rgba(100, 116, 139, 0.68)";
+const LIGHT_CONTROL_POINT_IDLE = "#64748b";
 
 export function CanvasHelperOverlays() {
     const { showHelpers, canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);
@@ -199,9 +206,15 @@ function CanvasControlLines() {
 }
 
 function getControlLineStroke(selected: boolean, hovered: boolean, darkCanvas: boolean): string {
-    if (selected) return CONTROL_ACTIVE;
-    if (hovered) return CONTROL_HOVER;
-    return darkCanvas ? "rgba(255, 255, 255, 0.33)" : "rgba(100, 116, 139, 0.45)";
+    if (darkCanvas) {
+        if (selected) return CONTROL_ACTIVE;
+        if (hovered) return CONTROL_HOVER;
+        return "rgba(255, 255, 255, 0.33)";
+    }
+
+    if (selected) return LIGHT_HANDLE_ACTIVE;
+    if (hovered) return LIGHT_HANDLE_HOVER;
+    return LIGHT_HANDLE_IDLE;
 }
 
 // Control Points Overlay
@@ -236,8 +249,8 @@ function CanvasControlPoints() {
                             y={point.y - haloOffset}
                             width={haloSize}
                             height={haloSize}
-                            fill={selected ? CONTROL_ACTIVE : CONTROL_HOVER}
-                            stroke={EDITOR_STROKE}
+                            fill={getControlHaloFill(selected, darkCanvas)}
+                            stroke={getEditorStroke(darkCanvas)}
                             strokeWidth={unitsPerPixel * 6}
                             pointerEvents="none"
                         />
@@ -249,7 +262,7 @@ function CanvasControlPoints() {
                         y={point.y - pointOffset}
                         width={pointSize}
                         height={pointSize}
-                        fill={getPointFill(selected, hovered, darkCanvas)}
+                        fill={getControlPointFill(selected, hovered, darkCanvas)}
                         stroke="transparent"
                         strokeWidth={unitsPerPixel * 10}
                         onPointerDown={(event) => {
@@ -297,8 +310,8 @@ function CanvasTargetPoints() {
                             cx={point.x}
                             cy={point.y}
                             r={haloRadius}
-                            fill={selected ? CONTROL_ACTIVE : CONTROL_HOVER}
-                            stroke={EDITOR_STROKE}
+                            fill={getControlHaloFill(selected, darkCanvas)}
+                            stroke={getEditorStroke(darkCanvas)}
                             strokeWidth={unitsPerPixel * 6}
                             pointerEvents="none"
                         />
@@ -332,6 +345,21 @@ function CanvasTargetPoints() {
 
 function getPointInteractionClassName(movable: boolean): string {
     return movable ? "cursor-pointer transition-all" : "cursor-default";
+}
+
+function getEditorStroke(darkCanvas: boolean): string {
+    return darkCanvas ? EDITOR_STROKE : LIGHT_EDITOR_STROKE;
+}
+
+function getControlHaloFill(selected: boolean, darkCanvas: boolean): string {
+    if (darkCanvas) return selected ? CONTROL_ACTIVE : CONTROL_HOVER;
+    return selected ? LIGHT_CONTROL_ACTIVE : LIGHT_CONTROL_HOVER;
+}
+
+function getControlPointFill(selected: boolean, hovered: boolean, darkCanvas: boolean): string {
+    if (selected) return SEGMENT_ACTIVE;
+    if (hovered) return SEGMENT_HOVER;
+    return darkCanvas ? "#ffffff" : LIGHT_CONTROL_POINT_IDLE;
 }
 
 function getPointFill(selected: boolean, hovered: boolean, darkCanvas: boolean): string {
