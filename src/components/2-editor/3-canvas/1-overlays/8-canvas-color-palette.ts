@@ -1,4 +1,4 @@
-export const DARK_CANVAS_COLORS = {
+const DARK_CANVAS_COLORS = {
     segmentActive: "#009cff",
     segmentHover: "#ff4343",
     editorStroke: "#9c00ff63",
@@ -12,7 +12,7 @@ export const DARK_CANVAS_COLORS = {
     targetPointStroke: "#ffffff38",
 } as const;
 
-export const LIGHT_CANVAS_COLORS = {
+const LIGHT_CANVAS_COLORS = {
     segmentActive: "#009cff",
     segmentHover: "#ff4343",
     editorStroke: "#7c3aed3d",
@@ -63,4 +63,12 @@ export function getTargetPointFill(selected: boolean, hovered: boolean, darkCanv
 export function getTargetPointStroke(selected: boolean, darkCanvas: boolean): string {
     if (!selected) return "transparent";
     return getCanvasColors(darkCanvas).targetPointStroke;
+}
+
+export function getSegmentActiveStroke(darkCanvas: boolean): string {
+    return getCanvasColors(darkCanvas).segmentActive;
+}
+
+export function getSegmentHoverStroke(darkCanvas: boolean): string {
+    return getCanvasColors(darkCanvas).segmentHover;
 }
