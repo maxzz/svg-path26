@@ -3,8 +3,8 @@ import { canvasStrokeWidthAtom, hoveredSegmentStrokeWidthAtom, selectedSegmentSt
 import { hoveredCanvasPointAtom, hoveredCommandIndexAtom, hoveredStandaloneSegmentPathAtom, selectedCommandIndexAtom, selectedStandaloneSegmentPathAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { standaloneSegmentPathsAtom } from "@/store/0-atoms/2-0-svg-model";
 
-export const DARK_SEGMENT_ACTIVE = "#009cff";
-export const DARK_SEGMENT_HOVER = "#ff4343";
+const DARK_SEGMENT_ACTIVE = "#009cff";
+const DARK_SEGMENT_HOVER = "#ff4343";
 
 export function CanvasSegmentHitAreas() {
     const segmentPaths = useAtomValue(standaloneSegmentPathsAtom);
