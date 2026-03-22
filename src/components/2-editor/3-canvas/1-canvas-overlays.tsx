@@ -12,21 +12,6 @@ import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { doStartPointDragAtom } from "./3-canvas-drag";
 import { PathCanvasImageEditOverlays } from "./4-canvas-overlays-image";
 
-const DARK_SEGMENT_ACTIVE = "#009cff";
-const DARK_SEGMENT_HOVER = "#ff4343";
-const DARK_EDITOR_STROKE = "#9c00ff63";
-const DARK_CONTROL_ACTIVE = "#9c00ffa0";
-const DARK_CONTROL_HOVER = "#ffad40";
-const LIGHT_EDITOR_STROKE = "rgba(124, 58, 237, 0.24)";
-const LIGHT_CONTROL_ACTIVE = "rgba(124, 58, 237, 0.22)";
-const LIGHT_CONTROL_HOVER = "rgba(217, 119, 6, 0.24)";
-const LIGHT_HANDLE_ACTIVE = "#7c3aed";
-const LIGHT_HANDLE_HOVER = "#d97706";
-const LIGHT_HANDLE_IDLE = "rgba(100, 116, 139, 0.68)";
-const LIGHT_CONTROL_POINT_IDLE = "#64748b";
-const LIGHT_TARGET_POINT_IDLE = "#334155";
-const LIGHT_TARGET_POINT_STROKE = "rgba(15, 23, 42, 0.16)";
-
 export function CanvasHelperOverlays() {
     const { showHelpers, canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);
 
@@ -372,7 +357,24 @@ function getPointFill(selected: boolean, hovered: boolean, darkCanvas: boolean):
 
 function getTargetPointStroke(selected: boolean, darkCanvas: boolean): string {
     if (!selected) return "transparent";
-    return darkCanvas ? "rgba(255, 255, 255, 0.22)" : LIGHT_TARGET_POINT_STROKE;
+    return darkCanvas ? "#ffffff38" : LIGHT_TARGET_POINT_STROKE;
 }
 
+const DARK_SEGMENT_ACTIVE = "#009cff";
+const DARK_SEGMENT_HOVER = "#ff4343";
+const DARK_EDITOR_STROKE = "#9c00ff63";
+const DARK_CONTROL_ACTIVE = "#9c00ffa0";
+const DARK_CONTROL_HOVER = "#ffad40";
+
+const LIGHT_EDITOR_STROKE = "#7c3aed3d";
+const LIGHT_CONTROL_ACTIVE = "#7c3aed38";
+const LIGHT_CONTROL_HOVER = "#d977063d";
+const LIGHT_HANDLE_ACTIVE = "#7c3aed";
+const LIGHT_HANDLE_HOVER = "#d97706";
+const LIGHT_HANDLE_IDLE = "#64748bad";
+const LIGHT_CONTROL_POINT_IDLE = "#64748b";
+const LIGHT_TARGET_POINT_IDLE = "#334155";
+const LIGHT_TARGET_POINT_STROKE = "#0f172a29";
+
 //
+
