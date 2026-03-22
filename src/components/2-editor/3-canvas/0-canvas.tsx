@@ -5,7 +5,7 @@ import { classNames } from "@/utils";
 import { Button } from "@/components/ui/shadcn/button";
 import { IconZoomIn, IconZoomNormal, IconZoomOut } from "@/components/ui/icons/normal";
 import { CanvasGrid } from "./2-canvas-grid";
-import { CanvasHelperOverlays } from "./1-canvas-overlays";
+import { CanvasHelperOverlays } from "./1-overlays/1-canvas-overlays";
 import { useCanvasDragAndDrop } from "./3-canvas-drag";
 import { PathCanvasImages } from "./4-canvas-overlays-image";
 import { useSyncCanvasViewportSize } from "../../../store/0-atoms/2-1-canvas-viewport-derives";

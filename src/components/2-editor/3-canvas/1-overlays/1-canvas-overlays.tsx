@@ -4,13 +4,14 @@ import { classNames } from "@/utils";
 import { appSettings } from "@/store/0-ui-settings";
 import { type SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { canvasStrokeWidthAtom, canvasUnitsPerPixelAtom, hoveredSegmentStrokeWidthAtom, selectedSegmentStrokeWidthAtom } from "../../../store/0-atoms/2-1-canvas-viewport-derives";
-import { doFocusPointCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, hoveredStandaloneSegmentPathAtom, selectedCommandIndexAtom, selectedStandaloneSegmentPathAtom } from "@/store/0-atoms/2-2-editor-actions";
-import { controlPointsAtom, parseErrorAtom, standaloneSegmentPathsAtom, targetPointsAtom } from "@/store/0-atoms/2-0-svg-model";
+import { canvasStrokeWidthAtom, canvasUnitsPerPixelAtom } from "../../../../store/0-atoms/2-1-canvas-viewport-derives";
+import { doFocusPointCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { controlPointsAtom, parseErrorAtom, targetPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { pathViewBoxAtom } from "@/store/0-atoms/2-6-path-viewbox";
 import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
-import { doStartPointDragAtom } from "./3-canvas-drag";
-import { PathCanvasImageEditOverlays } from "./4-canvas-overlays-image";
+import { doStartPointDragAtom } from "../3-canvas-drag";
+import { PathCanvasImageEditOverlays } from "../4-canvas-overlays-image";
+import { CanvasHoveredSegmentOverlay, CanvasSegmentHitAreas, CanvasSelectedSegmentOverlay, DARK_SEGMENT_ACTIVE, DARK_SEGMENT_HOVER } from "./2-canvas-segment-overlays";
 
 export function CanvasHelperOverlays() {
     const { showHelpers, canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);
@@ -36,45 +37,6 @@ export function CanvasHelperOverlays() {
 
         <PathCanvasImageEditOverlays />
     </>);
-}
-
-function CanvasSegmentHitAreas() {
-    const segmentPaths = useAtomValue(standaloneSegmentPathsAtom);
-    const canvasStrokeWidth = useAtomValue(canvasStrokeWidthAtom);
-    const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
-    const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
-    const setHoveredCanvasPoint = useSetAtom(hoveredCanvasPointAtom);
-
-    return segmentPaths.map(
-        (segmentPath, index) => {
-            if (!segmentPath) return null;
-
-            return (
-                <path
-                    key={`segment-hit:${index}`}
-                    d={segmentPath}
-                    fill="none"
-                    stroke="transparent"
-                    strokeWidth={Math.max(canvasStrokeWidth * 10, canvasStrokeWidth * 4)}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    onPointerDown={(event) => {
-                        event.stopPropagation();
-                        setSelectedCommandIndex(index);
-                        setHoveredCommandIndex(index);
-                        setHoveredCanvasPoint(null);
-                    }}
-                    onMouseEnter={() => {
-                        setHoveredCommandIndex(index);
-                        setHoveredCanvasPoint(null);
-                    }}
-                    onMouseLeave={() => {
-                        setHoveredCommandIndex(null);
-                    }}
-                />
-            );
-        }
-    );
 }
 
 // Main Path Overlay
@@ -123,44 +85,6 @@ function CanvasViewBoxFrame() {
             strokeDasharray={`${unitsPerPixel * 6} ${unitsPerPixel * 3}`}
             strokeWidth={Math.max(unitsPerPixel * 1.5, unitsPerPixel)}
             pointerEvents="none"
-        />
-    );
-}
-
-// Hovered Segment Overlay
-
-function CanvasHoveredSegmentOverlay() {
-    const hoveredSegmentPath = useAtomValue(hoveredStandaloneSegmentPathAtom);
-    const hoveredSegmentStrokeWidth = useAtomValue(hoveredSegmentStrokeWidthAtom);
-    if (!hoveredSegmentPath) return null;
-
-    return (
-        <path
-            fill="none"
-            stroke={DARK_SEGMENT_HOVER}
-            strokeWidth={hoveredSegmentStrokeWidth}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d={hoveredSegmentPath}
-        />
-    );
-}
-
-// Selected Segment Overlay
-
-function CanvasSelectedSegmentOverlay() {
-    const selectedSegmentPath = useAtomValue(selectedStandaloneSegmentPathAtom);
-    const selectedSegmentStrokeWidth = useAtomValue(selectedSegmentStrokeWidthAtom);
-    if (!selectedSegmentPath) return null;
-
-    return (
-        <path
-            fill="none"
-            stroke={DARK_SEGMENT_ACTIVE}
-            strokeWidth={selectedSegmentStrokeWidth}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d={selectedSegmentPath}
         />
     );
 }
@@ -360,8 +284,6 @@ function getTargetPointStroke(selected: boolean, darkCanvas: boolean): string {
     return darkCanvas ? "#ffffff38" : LIGHT_TARGET_POINT_STROKE;
 }
 
-const DARK_SEGMENT_ACTIVE = "#009cff";
-const DARK_SEGMENT_HOVER = "#ff4343";
 const DARK_EDITOR_STROKE = "#9c00ff63";
 const DARK_CONTROL_ACTIVE = "#9c00ffa0";
 const DARK_CONTROL_HOVER = "#ffad40";
