@@ -15,7 +15,7 @@ export interface PathEditorSettings {
     uniformScale: boolean;                // Lock scale X and Y together in Path Operations
     decimals: number;                     // Number of decimals to show
     minifyOutput: boolean;                // Minify output or not
-    pointPrecision: number;               // Point precision (number of decimal places to show)
+    dragPrecision: number;                // Drag precision (number of decimal places to keep while dragging points)
     tickInterval: number;                 // Tick interval on axis
     viewPortLocked: boolean;              // View port locked or not
     viewBox: ViewBox;                     // Stored canvas viewBox
@@ -60,7 +60,7 @@ export const DEFAULT_PATH_EDITOR_SETTINGS: PathEditorSettings = {
     uniformScale: true,
     decimals: 3,
     minifyOutput: false,
-    pointPrecision: 3,
+    dragPrecision: 3,
     tickInterval: 5,
     viewPortLocked: false,
     viewBox: [...DEFAULT_VIEWBOX_SETTINGS],

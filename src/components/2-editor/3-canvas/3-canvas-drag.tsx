@@ -79,7 +79,7 @@ export const doStopCanvasDragAtom = atom(
 
 export function useCanvasDragAndDrop(viewPort: ViewBox) {
     const { canvasPreview, snapToGrid } = useSnapshot(appSettings.canvas);
-    const { pointPrecision, viewPortLocked } = useSnapshot(appSettings.pathEditor);
+    const { dragPrecision, viewPortLocked } = useSnapshot(appSettings.pathEditor);
 
     const rootSvgElement = useAtomValue(canvasRootSvgElementAtom);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
@@ -111,7 +111,7 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
                 if (!next) return;
 
                 if (dragState.mode === "point") {
-                    const baseDecimals = snapToGrid ? 0 : Math.max(0, pointPrecision);
+                    const baseDecimals = snapToGrid ? 0 : Math.max(0, dragPrecision);
                     const decimals = event.ctrlKey ? (baseDecimals ? 0 : 3) : baseDecimals;
                     const x = Number.parseFloat(next.x.toFixed(decimals));
                     const y = Number.parseFloat(next.y.toFixed(decimals));
@@ -165,7 +165,7 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
             window.addEventListener("pointercancel", onPointerUp, { signal: controller.signal });
             return () => controller.abort();
         },
-        [dragState, pointPrecision, snapToGrid, rootSvgElement, vh, viewPort, viewPortLocked, vw]);
+        [dragState, dragPrecision, snapToGrid, rootSvgElement, vh, viewPort, viewPortLocked, vw]);
 
     useEffect(
         () => {

@@ -12,7 +12,7 @@ import { appSettings } from "@/store/0-ui-settings";
 
 export function SettingsPopover() {
     const { snapToGrid, showTicks, fillPreview, canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);
-    const { viewPortLocked, tickInterval, pointPrecision } = useSnapshot(appSettings.pathEditor);
+    const { viewPortLocked, tickInterval, dragPrecision } = useSnapshot(appSettings.pathEditor);
 
     return (
         <Popover>
@@ -92,12 +92,12 @@ export function SettingsPopover() {
                             onValueChange={(nextValue) => { appSettings.pathEditor.tickInterval = nextValue; }}
                         />
                         <SettingsValueNumberField
-                            label="Point precision"
-                            value={pointPrecision}
+                            label="Drag precision"
+                            value={dragPrecision}
                             min={0}
                             max={8}
                             step={1}
-                            onValueChange={(nextValue) => { appSettings.pathEditor.pointPrecision = nextValue; }}
+                            onValueChange={(nextValue) => { appSettings.pathEditor.dragPrecision = nextValue; }}
                         />
                     </div>
                 </div>

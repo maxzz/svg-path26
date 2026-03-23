@@ -92,7 +92,7 @@ function createPathEditorSettingsSchema(defaultSettings: PathEditorSettings) {
             uniformScale: z.boolean().catch(defaultSettings.uniformScale),
             decimals: z.number().catch(defaultSettings.decimals),
             minifyOutput: z.boolean().catch(defaultSettings.minifyOutput),
-            pointPrecision: z.number().catch(defaultSettings.pointPrecision),
+            dragPrecision: z.number().catch(defaultSettings.dragPrecision),
             tickInterval: z.number().catch(defaultSettings.tickInterval),
             viewPortLocked: z.boolean().catch(defaultSettings.viewPortLocked),
             viewBox: createStoredViewBoxSchema(defaultSettings.viewBox).catch(toMutableViewBox(defaultSettings.viewBox)),
@@ -119,6 +119,10 @@ function toUiSettingsRecord(value: unknown, defaultCanvasSettings: CanvasSetting
             fillPreview: canvasRecord.fillPreview ?? record.fillPreview ?? pathEditorRecord.fillPreview ?? defaultCanvasSettings.fillPreview,
             canvasPreview: canvasRecord.canvasPreview ?? record.canvasPreview ?? pathEditorRecord.canvasPreview ?? defaultCanvasSettings.canvasPreview,
             showViewBoxFrame: canvasRecord.showViewBoxFrame ?? record.showViewBoxFrame ?? pathEditorRecord.showViewBoxFrame ?? defaultCanvasSettings.showViewBoxFrame,
+        },
+        pathEditor: {
+            ...pathEditorRecord,
+            dragPrecision: pathEditorRecord.dragPrecision ?? pathEditorRecord.pointPrecision,
         },
     };
 }

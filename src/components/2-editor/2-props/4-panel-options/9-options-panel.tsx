@@ -14,7 +14,7 @@ import { classNames } from "@/utils";
 
 export function OptionsPanel() {
     const { showTicks, snapToGrid, fillPreview, showGrid, showHelpers } = useSnapshot(appSettings.canvas);
-    const { minifyOutput, pointPrecision, tickInterval } = useSnapshot(appSettings.pathEditor);
+    const { minifyOutput, dragPrecision, tickInterval } = useSnapshot(appSettings.pathEditor);
 
     const doNormalizePath = useSetAtom(doNormalizePathAtom);
 
@@ -35,7 +35,7 @@ export function OptionsPanel() {
 
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5">
                     <CheckboxRow label="Show grid" className="col-start-1" checked={showGrid} onCheckedChange={(checked) => appSettings.canvas.showGrid = checked} />
-                    <NumberRow label="Precision" className="col-start-2" value={pointPrecision} min={0} max={8} step={1} onValueChange={(value) => appSettings.pathEditor.pointPrecision = value} />
+                    <NumberRow label="Drag precision" className="col-start-2" value={dragPrecision} min={0} max={8} step={1} onValueChange={(value) => appSettings.pathEditor.dragPrecision = value} />
                     <CheckboxRow label="Snap to grid" className="col-start-1" checked={snapToGrid} onCheckedChange={(checked) => appSettings.canvas.snapToGrid = checked} />
 
                     <div className="col-start-1 flex items-center gap-2">
