@@ -40,7 +40,16 @@ export const hoveredCommandIndexAtom = atom<number | null>(null);
 export const hoveredCanvasPointAtom = atom<SvgCanvasPoint | null>(null);
 export const draggedCanvasPointAtom = atom<SvgCanvasPoint | null>(null);
 export const isCanvasDraggingAtom = atom(false);
+const suppressCanvasFocusClearUntilAtom = atom(0);
 export const canvasSegmentHitAreaElementsAtom = atom<Record<number, SVGPathElement | null>>({});
+const CANVAS_FOCUS_CLEAR_SUPPRESSION_MS = 250;
+
+export const doSuppressNextCanvasFocusClearAtom = atom(
+    null,
+    (_get, set) => {
+        set(suppressCanvasFocusClearUntilAtom, Date.now() + CANVAS_FOCUS_CLEAR_SUPPRESSION_MS);
+    }
+);
 
 export const doRegisterCanvasSegmentHitAreaAtom = atom(
     null,
@@ -105,6 +114,10 @@ export function highlightedCanvasPointAtomForSegment(segmentIndex: number) {
 export const doClearCanvasFocusAtom = atom(
     null,
     (get, set, event: MouseEvent<SVGSVGElement>) => {
+        if (get(suppressCanvasFocusClearUntilAtom) >= Date.now()) {
+            set(suppressCanvasFocusClearUntilAtom, 0);
+            return;
+        }
         if (event.shiftKey || event.ctrlKey || event.metaKey) return;
         if (event.target !== event.currentTarget) return;
 

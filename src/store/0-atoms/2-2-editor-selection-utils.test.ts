@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyCommandSelection, getCommandSelectionMode, remapSelectedIndicesAfterDelete } from "./2-2-editor-selection-utils";
+import { applyCommandSelection, getCommandSelectionMode, getMarqueeSelectionMode, remapSelectedIndicesAfterDelete } from "./2-2-editor-selection-utils";
 
 describe("editor selection utils", () => {
     it("applies replace, add, and remove selection modes", () => {
@@ -18,5 +18,12 @@ describe("editor selection utils", () => {
         expect(getCommandSelectionMode({ shiftKey: true, ctrlKey: false, metaKey: false })).toBe("add");
         expect(getCommandSelectionMode({ shiftKey: false, ctrlKey: true, metaKey: false })).toBe("remove");
         expect(getCommandSelectionMode({ shiftKey: false, ctrlKey: false, metaKey: true })).toBe("remove");
+    });
+
+    it("requires shift to start marquee selection", () => {
+        expect(getMarqueeSelectionMode({ shiftKey: false, ctrlKey: false, metaKey: false })).toBeNull();
+        expect(getMarqueeSelectionMode({ shiftKey: true, ctrlKey: false, metaKey: false })).toBe("add");
+        expect(getMarqueeSelectionMode({ shiftKey: true, ctrlKey: true, metaKey: false })).toBe("remove");
+        expect(getMarqueeSelectionMode({ shiftKey: true, ctrlKey: false, metaKey: true })).toBe("remove");
     });
 });

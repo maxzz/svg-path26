@@ -8,6 +8,12 @@ export function getCommandSelectionMode(modifiers: { shiftKey: boolean; ctrlKey:
     return "replace";
 }
 
+export function getMarqueeSelectionMode(modifiers: { shiftKey: boolean; ctrlKey: boolean; metaKey: boolean; }): CommandSelectionMode | null {
+    if (!modifiers.shiftKey) return null;
+    if (modifiers.ctrlKey || modifiers.metaKey) return "remove";
+    return "add";
+}
+
 export function normalizeSelectedCommandIndices(indices: Iterable<number>, rowCount?: number): number[] {
     const next: number[] = [];
     const seen = new Set<number>();

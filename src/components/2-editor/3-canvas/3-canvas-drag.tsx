@@ -6,14 +6,15 @@ import { type Point, type SvgCanvasPoint, type ViewBox } from "@/svg-core/9-type
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { controlPointsAtom, targetPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { canvasRootSvgElementAtom } from "@/store/0-atoms/2-1-canvas-viewport";
-import { canvasSegmentHitAreaElementsAtom, doSetPointLocationWithoutHistoryAtom, draggedCanvasPointAtom, isCanvasDraggingAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-2-editor-actions";
-import { applyCommandSelection, getCommandSelectionMode, getMarqueeSelectionIndices, type CommandSelectionMode } from "@/store/0-atoms/2-2-editor-selection-utils";
+import { canvasSegmentHitAreaElementsAtom, doSetPointLocationWithoutHistoryAtom, doSuppressNextCanvasFocusClearAtom, draggedCanvasPointAtom, isCanvasDraggingAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { applyCommandSelection, getMarqueeSelectionMode, getMarqueeSelectionIndices, type CommandSelectionMode } from "@/store/0-atoms/2-2-editor-selection-utils";
 import { doPanViewPortAtom, doZoomViewPortAtom } from "@/store/0-atoms/2-1-canvas-viewport";
 import { doCommitCurrentPathToHistoryAtom } from "@/store/0-atoms/1-2-history";
 import { doUpdateImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-4-images";
 
 export type DragState =
     | { mode: "point"; pointerId: number; point: SvgCanvasPoint; startPath: string; }
+    | { mode: "canvas"; pointerId: number; lastClientX: number; lastClientY: number; moved: boolean; }
     | { mode: "marquee"; pointerId: number; start: Point; current: Point; startClientX: number; startClientY: number; moved: boolean; selectionMode: CommandSelectionMode; initialSelection: number[]; }
     | { mode: "image"; pointerId: number; imageId: string; handle: ImageHandle; start: Point; initial: EditorImage; };
 
@@ -24,6 +25,21 @@ type TouchGestureState =
     | { mode: "pinch"; lastDistance: number; lastCenter: Point; };
 
 export const canvasDragStateAtom = atom<DragState | null>(null);
+
+export const doStartCanvasDragAtom = atom(
+    null,
+    (_get, set, args: { pointerId: number; clientX: number; clientY: number; }) => {
+        set(draggedCanvasPointAtom, null);
+        set(isCanvasDraggingAtom, true);
+        set(canvasDragStateAtom, {
+            mode: "canvas",
+            pointerId: args.pointerId,
+            lastClientX: args.clientX,
+            lastClientY: args.clientY,
+            moved: false,
+        });
+    }
+);
 
 export const doStartMarqueeDragAtom = atom(
     null,
@@ -92,7 +108,7 @@ export const doStopCanvasDragAtom = atom(
 
 export function useCanvasDragAndDrop(viewPort: ViewBox) {
     const { canvasPreview, snapToGrid } = useSnapshot(appSettings.canvas);
-    const { dragPrecision } = useSnapshot(appSettings.pathEditor);
+    const { dragPrecision, viewPortLocked } = useSnapshot(appSettings.pathEditor);
 
     const rootSvgElement = useAtomValue(canvasRootSvgElementAtom);
     const targetPoints = useAtomValue(targetPointsAtom);
@@ -107,6 +123,8 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
     const setPathValue = useSetAtom(svgPathInputAtom);
     const setPointLocationWithoutHistory = useSetAtom(doSetPointLocationWithoutHistoryAtom);
     const setSelectedCommandIndices = useSetAtom(selectedCommandIndicesAtom);
+    const doSuppressNextCanvasFocusClear = useSetAtom(doSuppressNextCanvasFocusClearAtom);
+    const doBeginCanvasDrag = useSetAtom(doStartCanvasDragAtom);
     const doPanViewPort = useSetAtom(doPanViewPortAtom);
     const doZoomViewPort = useSetAtom(doZoomViewPortAtom);
     const doUpdateImage = useSetAtom(doUpdateImageAtom);
@@ -136,6 +154,24 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
                     setPointLocationWithoutHistory({
                         point: dragState.point,
                         to: { x, y },
+                    });
+                    return;
+                }
+
+                if (dragState.mode === "canvas") {
+                    if (viewPortLocked) return;
+                    const rect = rootSvgElement.getBoundingClientRect();
+                    if (!rect.width || !rect.height) return;
+                    const dxPx = event.clientX - dragState.lastClientX;
+                    const dyPx = event.clientY - dragState.lastClientY;
+                    const dx = -(dxPx / rect.width) * viewPort[2];
+                    const dy = -(dyPx / rect.height) * viewPort[3];
+                    doPanViewPort({ dx, dy });
+                    setDragState({
+                        ...dragState,
+                        moved: dragState.moved || Math.abs(dxPx) > 1 || Math.abs(dyPx) > 1,
+                        lastClientX: event.clientX,
+                        lastClientY: event.clientY,
                     });
                     return;
                 }
@@ -181,8 +217,13 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
 
                 if (dragState.mode === "point") {
                     doCommitCurrentPathToHistory(dragState.startPath);
-                } else if (dragState.mode === "marquee" && !dragState.moved) {
-                    setSelectedCommandIndices(dragState.initialSelection);
+                } else if (dragState.mode === "marquee") {
+                    if (!dragState.moved) {
+                        setSelectedCommandIndices(dragState.initialSelection);
+                    }
+                    doSuppressNextCanvasFocusClear();
+                } else if (dragState.mode === "canvas" && dragState.moved) {
+                    doSuppressNextCanvasFocusClear();
                 }
                 doStopCanvasDrag();
             }
@@ -193,7 +234,7 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
             window.addEventListener("pointercancel", onPointerUp, { signal: controller.signal });
             return () => controller.abort();
         },
-        [controlPoints, dragState, dragPrecision, doCommitCurrentPathToHistory, doStopCanvasDrag, segmentHitAreaElements, setDragState, setPointLocationWithoutHistory, setSelectedCommandIndices, snapToGrid, rootSvgElement, targetPoints, viewPort]);
+        [controlPoints, doCommitCurrentPathToHistory, doPanViewPort, doStopCanvasDrag, doSuppressNextCanvasFocusClear, dragState, dragPrecision, rootSvgElement, segmentHitAreaElements, setDragState, setPointLocationWithoutHistory, setSelectedCommandIndices, snapToGrid, targetPoints, viewPort, viewPortLocked]);
 
     useEffect(
         () => {
@@ -345,16 +386,27 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
     function startCanvasPointerDown(event: ReactPointerEvent<SVGSVGElement>) {
         if (event.pointerType === "touch") return;
         if (event.button !== 0 || imageEditMode || canvasPreview) return;
-        const start = eventToSvgPoint(rootSvgElement, event.clientX, event.clientY, viewPort);
-        if (!start) return;
 
-        doBeginMarqueeDrag({
+        const marqueeSelectionMode = getMarqueeSelectionMode(event);
+        if (marqueeSelectionMode) {
+            const start = eventToSvgPoint(rootSvgElement, event.clientX, event.clientY, viewPort);
+            if (!start) return;
+
+            doBeginMarqueeDrag({
+                pointerId: event.pointerId,
+                start,
+                clientX: event.clientX,
+                clientY: event.clientY,
+                selectionMode: marqueeSelectionMode,
+                initialSelection: selectedCommandIndices,
+            });
+            return;
+        }
+
+        doBeginCanvasDrag({
             pointerId: event.pointerId,
-            start,
             clientX: event.clientX,
             clientY: event.clientY,
-            selectionMode: getCommandSelectionMode(event),
-            initialSelection: selectedCommandIndices,
         });
     }
 
