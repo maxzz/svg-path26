@@ -1,5 +1,5 @@
 import { type MouseEvent } from "react";
-import { atom } from "jotai";
+import { atom, type Atom } from "jotai";
 import { rawPathAtom } from "./1-0-raw-path";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
 import { type Point, type SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
@@ -45,6 +45,50 @@ export const hoveredCommandIndexAtom = atom<number | null>(null);
 export const hoveredCanvasPointAtom = atom<SvgCanvasPoint | null>(null);
 export const draggedCanvasPointAtom = atom<SvgCanvasPoint | null>(null);
 export const isCanvasDraggingAtom = atom(false);
+
+// New selective atoms for command selection and hover states by segment index
+
+const selectedCommandBySegmentAtomCache = new Map<number, Atom<boolean>>();
+const hoveredCommandBySegmentAtomCache = new Map<number, Atom<boolean>>();
+const highlightedCanvasPointBySegmentAtomCache = new Map<number, Atom<SvgCanvasPoint | null>>();
+
+export function commandSelectedAtom(segmentIndex: number) {
+    const cached = selectedCommandBySegmentAtomCache.get(segmentIndex);
+    if (cached) return cached;
+
+    const created = atom((get) => get(selectedCommandIndexAtom) === segmentIndex);
+    selectedCommandBySegmentAtomCache.set(segmentIndex, created);
+    return created;
+}
+
+export function commandHoveredAtom(segmentIndex: number) {
+    const cached = hoveredCommandBySegmentAtomCache.get(segmentIndex);
+    if (cached) return cached;
+
+    const created = atom((get) => get(hoveredCommandIndexAtom) === segmentIndex);
+    hoveredCommandBySegmentAtomCache.set(segmentIndex, created);
+    return created;
+}
+
+export function highlightedCanvasPointAtomForSegment(segmentIndex: number) {
+    const cached = highlightedCanvasPointBySegmentAtomCache.get(segmentIndex);
+    if (cached) return cached;
+
+    const created = atom(
+        (get) => {
+            const dragged = get(draggedCanvasPointAtom);
+            if (dragged?.segmentIndex === segmentIndex) return dragged;
+
+            const hovered = get(hoveredCanvasPointAtom);
+            if (!hovered || hovered.segmentIndex !== segmentIndex) return null;
+            return get(hoveredCommandIndexAtom) === segmentIndex ? hovered : null;
+        }
+    );
+    highlightedCanvasPointBySegmentAtomCache.set(segmentIndex, created);
+    return created;
+}
+
+// Clear canvas focus when clicking on the canvas background
 
 export const doClearCanvasFocusAtom = atom(
     null,
