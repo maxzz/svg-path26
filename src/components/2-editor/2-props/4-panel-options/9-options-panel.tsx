@@ -13,7 +13,7 @@ import { appSettings } from "@/store/0-ui-settings";
 import { classNames } from "@/utils";
 
 export function OptionsPanel() {
-    const { showTicks, snapToGrid, fillPreview, showGrid, showHelpers } = useSnapshot(appSettings.canvas);
+    const { showTicks, snapToGrid, scrollOnHover, fillPreview, showGrid, showHelpers } = useSnapshot(appSettings.canvas);
     const { minifyOutput, dragPrecision, tickInterval } = useSnapshot(appSettings.pathEditor);
 
     const doNormalizePath = useSetAtom(doNormalizePathAtom);
@@ -37,6 +37,7 @@ export function OptionsPanel() {
                     <CheckboxRow label="Show grid" className="col-start-1" checked={showGrid} onCheckedChange={(checked) => appSettings.canvas.showGrid = checked} />
                     <NumberRow label="Drag precision" className="col-start-2" value={dragPrecision} min={0} max={8} step={1} onValueChange={(value) => appSettings.pathEditor.dragPrecision = value} />
                     <CheckboxRow label="Snap to grid" className="col-start-1" checked={snapToGrid} onCheckedChange={(checked) => appSettings.canvas.snapToGrid = checked} />
+                    <CheckboxRow label="Scroll on hover" className="col-start-1" checked={scrollOnHover} onCheckedChange={(checked) => appSettings.canvas.scrollOnHover = checked} />
 
                     <div className="col-start-1 flex items-center gap-2">
                         <CheckboxRow label="Show ticks" checked={showTicks} onCheckedChange={(checked) => appSettings.canvas.showTicks = checked} />

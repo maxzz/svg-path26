@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
+import { useSnapshot } from "valtio";
 import { cn } from "@/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel.tsx";
@@ -8,6 +9,7 @@ import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 import { commandRowsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { CommandSelectionMenu } from "./2-2-commands-list-row-menu.tsx";
 import { commandHoveredAtom, commandSelectedAtom, doToggleSegmentRelativeAtom, highlightedCanvasPointAtomForSegment, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { appSettings } from "@/store/0-ui-settings";
 import { type CommandProps, CommandArcFlagsInput, CommandCellInput } from "./2-1-commands-list-cells.tsx";
 
 export function CommandsListPanel() {
@@ -78,6 +80,7 @@ function CommandsListScrollEffects(props: { rowRefs: React.RefObject<Record<numb
     const { rowRefs, rowsLength } = props;
     const selectedCommandIndex = useAtomValue(selectedCommandIndexAtom);
     const hoveredCommandIndex = useAtomValue(hoveredCommandIndexAtom);
+    const { scrollOnHover } = useSnapshot(appSettings.canvas);
 
     useEffect(
         () => {
@@ -88,10 +91,11 @@ function CommandsListScrollEffects(props: { rowRefs: React.RefObject<Record<numb
 
     useEffect(
         () => {
+            if (!scrollOnHover) return;
             if (hoveredCommandIndex === null || hoveredCommandIndex === selectedCommandIndex) return;
             rowRefs.current[hoveredCommandIndex]?.scrollIntoView({ behavior: "smooth", block: "nearest" });
         },
-        [hoveredCommandIndex, rowRefs, rowsLength, selectedCommandIndex]);
+        [hoveredCommandIndex, rowRefs, rowsLength, scrollOnHover, selectedCommandIndex]);
 
     return null;
 }

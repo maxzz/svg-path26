@@ -11,7 +11,7 @@ import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { appSettings } from "@/store/0-ui-settings";
 
 export function SettingsPopover() {
-    const { snapToGrid, showTicks, fillPreview, canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);
+    const { snapToGrid, scrollOnHover, showTicks, fillPreview, canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);
     const { viewPortLocked, tickInterval, dragPrecision } = useSnapshot(appSettings.pathEditor);
 
     return (
@@ -64,6 +64,11 @@ export function SettingsPopover() {
                             label="Show ticks"
                             value={showTicks}
                             onChange={(nextValue) => { appSettings.canvas.showTicks = nextValue; }}
+                        />
+                        <ToggleValueRow
+                            label="Scroll on hover"
+                            value={scrollOnHover}
+                            onChange={(nextValue) => { appSettings.canvas.scrollOnHover = nextValue; }}
                         />
                         <ToggleValueRow
                             label="Show viewBox frame"

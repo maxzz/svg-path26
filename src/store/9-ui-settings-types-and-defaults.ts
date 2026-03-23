@@ -29,6 +29,7 @@ export interface CanvasSettings {
     showHelpers: boolean;                 // Show helpers or not
     darkCanvas: boolean;                  // Dark canvas or not
     snapToGrid: boolean;                  // Snap to grid or not (when enabled, the path will be snapped to the grid)
+    scrollOnHover: boolean;               // Scroll commands list while hovering canvas points or segments
     showTicks: boolean;                   // Show ticks or not (when enabled, the ticks will be shown on the axis)
     fillPreview: boolean;                 // Fill preview or not (when enabled, the fill will be shown on the canvas)
     canvasPreview: boolean;               // Show stored viewBox frame on canvas
@@ -74,6 +75,7 @@ export const DEFAULT_CANVAS_SETTINGS: CanvasSettings = {
     showHelpers: true,
     darkCanvas: false,
     snapToGrid: true,
+    scrollOnHover: true,
     showTicks: false,
     fillPreview: false,
     canvasPreview: false,
