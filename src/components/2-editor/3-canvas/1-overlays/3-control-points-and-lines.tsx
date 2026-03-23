@@ -3,7 +3,8 @@ import { useSnapshot } from "valtio";
 import { type SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { canvasStrokeWidthAtom, canvasUnitsPerPixelAtom } from "../../../../store/0-atoms/2-1-canvas-viewport-derives";
-import { commandHoveredAtom, commandSelectedAtom, doFocusPointCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { commandHoveredAtom, commandSelectedAtom, doFocusPointCommandAtom, doSelectCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { getCommandSelectionMode } from "@/store/0-atoms/2-2-editor-selection-utils";
 import { controlPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
 import { doStartPointDragAtom } from "../3-canvas-drag";
@@ -67,6 +68,7 @@ function CanvasControlLine(props: {
             y1={point.y}
             x2={relation.x}
             y2={relation.y}
+            pointerEvents="none"
         />
     );
 }
@@ -80,7 +82,7 @@ function CanvasControlPoint(props: {
     const { point, darkCanvas, pathValue, unitsPerPixel } = props;
     const selected = useAtomValue(commandSelectedAtom(point.segmentIndex));
     const hovered = useAtomValue(commandHoveredAtom(point.segmentIndex));
-    const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
+    const doSelectCommand = useSetAtom(doSelectCommandAtom);
     const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
     const setHoveredCanvasPoint = useSetAtom(hoveredCanvasPointAtom);
     const setFocusPointCommand = useSetAtom(doFocusPointCommandAtom);
@@ -115,14 +117,21 @@ function CanvasControlPoint(props: {
                 stroke="transparent"
                 strokeWidth={unitsPerPixel * 10}
                 onPointerDown={(event) => {
-                    if (!point.movable) return;
                     event.stopPropagation();
+                    setHoveredCommandIndex(point.segmentIndex);
+                    setHoveredCanvasPoint(point);
+
+                    const selectionMode = getCommandSelectionMode(event);
+                    doSelectCommand({ index: point.segmentIndex, mode: selectionMode });
+                    if (selectionMode !== "replace") return;
+
                     setFocusPointCommand(point);
-                    setSelectedCommandIndex(point.segmentIndex);
+                    if (!point.movable) return;
                     startPointDrag({ point, pointerId: event.pointerId, startPath: pathValue });
                 }}
                 onMouseEnter={() => { setHoveredCommandIndex(point.segmentIndex); setHoveredCanvasPoint(point); }}
                 onMouseLeave={() => { setHoveredCommandIndex(null); setHoveredCanvasPoint(null); }}
+                data-selection-hit="true"
             />
         </g>
     );

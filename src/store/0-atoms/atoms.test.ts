@@ -1,9 +1,11 @@
 import { createStore } from "jotai";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+    doDeleteSelectedSegmentsAtom,
     doSetPointLocationWithoutHistoryAtom,
+    selectedCommandIndicesAtom,
 } from "./2-2-editor-actions";
-import { targetPointsAtom } from "./2-0-svg-model";
+import { commandRowsAtom, targetPointsAtom } from "./2-0-svg-model";
 import { canvasViewPortAtom, doFitViewPortAtom, doPanViewPortAtom, doSetViewPortAtom, doZoomViewPortAtom } from "./2-1-canvas-viewport";
 import {
     canRedoAtom,
@@ -97,6 +99,20 @@ describe("svg path state atoms", () => {
         store.set(doUndoPathAtom);
 
         expect(store.get(svgPathInputAtom)).toBe(startPath);
+    });
+
+    it("deletes every selected segment while keeping surviving selections aligned", () => {
+        const store = createStore();
+        store.set(svgPathInputAtom, "M 0 0 L 10 10 L 20 20 L 30 30");
+        store.set(selectedCommandIndicesAtom, [0, 2, 3]);
+
+        store.set(doDeleteSelectedSegmentsAtom);
+
+        expect(store.get(commandRowsAtom)).toHaveLength(2);
+        expect(store.get(selectedCommandIndicesAtom)).toEqual([0]);
+        expect(store.get(svgPathInputAtom)).toContain("L 10 10");
+        expect(store.get(svgPathInputAtom)).not.toContain("L 20 20");
+        expect(store.get(svgPathInputAtom)).not.toContain("L 30 30");
     });
 
     it("fits, pans and zooms viewport with lock handling", () => {

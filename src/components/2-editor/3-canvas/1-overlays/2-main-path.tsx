@@ -22,6 +22,7 @@ export function CanvasMainPathOverlay() {
             strokeLinecap="round"
             strokeLinejoin="round"
             d={parseError || !svgPathInput ? "M 0 0" : svgPathInput}
+            pointerEvents="none"
         />
     );
 }

@@ -9,6 +9,7 @@ import { canRedoAtom, canUndoAtom, doRedoPathAtom, doSetPathWithoutHistoryAtom, 
 import { commandRowsAtom, standaloneSegmentPathsAtom, svgModelAtom } from "./2-0-svg-model";
 import { doDeleteImageAtom, focusedImageIdAtom } from "./2-4-images";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
+import { applyCommandSelection, normalizeSelectedCommandIndices, remapSelectedIndicesAfterDelete, type CommandSelectionMode } from "./2-2-editor-selection-utils";
 import { appSettings } from "@/store/0-ui-settings";
 
 export const strokeWidthAtom = createAtomAppSetting("strokeWidth");
@@ -18,26 +19,20 @@ export const scaleYAtom = atom(1);
 export const translateXAtom = atom(0);
 export const translateYAtom = atom(0);
 
-const selectedCommandIndexBaseAtom = atom<number | null>(null);
+const selectedCommandIndicesBaseAtom = atom<number[]>([]);
+export const selectedCommandIndicesAtom = atom(
+    (get) => normalizeSelectedCommandIndices(get(selectedCommandIndicesBaseAtom), get(commandRowsAtom).length),
+    (get, set, nextIndices: number[]) => {
+        set(selectedCommandIndicesBaseAtom, normalizeSelectedCommandIndices(nextIndices, get(commandRowsAtom).length));
+    }
+);
 export const selectedCommandIndexAtom = atom(
     (get) => {
-        const index = get(selectedCommandIndexBaseAtom);
-        const rowCount = get(commandRowsAtom).length;
-        if (index === null) return null;
-        if (index < 0 || index >= rowCount) return null;
-        return index;
+        const selected = get(selectedCommandIndicesAtom);
+        return selected.length ? selected[selected.length - 1] : null;
     },
-    (get, set, nextIndex: number | null) => {
-        if (nextIndex === null) {
-            set(selectedCommandIndexBaseAtom, null);
-            return;
-        }
-        const rowCount = get(commandRowsAtom).length;
-        if (nextIndex < 0 || nextIndex >= rowCount) {
-            set(selectedCommandIndexBaseAtom, null);
-            return;
-        }
-        set(selectedCommandIndexBaseAtom, nextIndex);
+    (_get, set, nextIndex: number | null) => {
+        set(selectedCommandIndicesAtom, nextIndex === null ? [] : [nextIndex]);
     }
 );
 
@@ -45,6 +40,23 @@ export const hoveredCommandIndexAtom = atom<number | null>(null);
 export const hoveredCanvasPointAtom = atom<SvgCanvasPoint | null>(null);
 export const draggedCanvasPointAtom = atom<SvgCanvasPoint | null>(null);
 export const isCanvasDraggingAtom = atom(false);
+export const canvasSegmentHitAreaElementsAtom = atom<Record<number, SVGPathElement | null>>({});
+
+export const doRegisterCanvasSegmentHitAreaAtom = atom(
+    null,
+    (get, set, args: { index: number; element: SVGPathElement | null; }) => {
+        const current = get(canvasSegmentHitAreaElementsAtom);
+        if (current[args.index] === args.element) return;
+
+        const next = { ...current };
+        if (args.element) {
+            next[args.index] = args.element;
+        } else {
+            delete next[args.index];
+        }
+        set(canvasSegmentHitAreaElementsAtom, next);
+    }
+);
 
 // New selective atoms for command selection and hover states by segment index
 
@@ -56,7 +68,7 @@ export function commandSelectedAtom(segmentIndex: number) {
     const cached = selectedCommandBySegmentAtomCache.get(segmentIndex);
     if (cached) return cached;
 
-    const created = atom((get) => get(selectedCommandIndexAtom) === segmentIndex);
+    const created = atom((get) => get(selectedCommandIndicesAtom).includes(segmentIndex));
     selectedCommandBySegmentAtomCache.set(segmentIndex, created);
     return created;
 }
@@ -93,14 +105,39 @@ export function highlightedCanvasPointAtomForSegment(segmentIndex: number) {
 export const doClearCanvasFocusAtom = atom(
     null,
     (get, set, event: MouseEvent<SVGSVGElement>) => {
+        if (event.shiftKey || event.ctrlKey || event.metaKey) return;
         if (event.target !== event.currentTarget) return;
-        
+
         const dragState = get(canvasDragStateAtom);
-        if (dragState?.mode === "canvas" && dragState.moved) return;
-        set(selectedCommandIndexAtom, null);
+        if (dragState && "moved" in dragState && dragState.moved) return;
+        set(selectedCommandIndicesAtom, []);
         set(hoveredCommandIndexAtom, null);
         set(hoveredCanvasPointAtom, null);
         set(focusedImageIdAtom, null);
+    }
+);
+
+export const doSelectCommandAtom = atom(
+    null,
+    (get, set, args: { index: number; mode: CommandSelectionMode; }) => {
+        set(selectedCommandIndicesAtom, applyCommandSelection(
+            get(selectedCommandIndicesAtom),
+            [args.index],
+            args.mode,
+            get(commandRowsAtom).length,
+        ));
+    }
+);
+
+export const doSelectCommandsAtom = atom(
+    null,
+    (get, set, args: { indices: number[]; mode: CommandSelectionMode; }) => {
+        set(selectedCommandIndicesAtom, applyCommandSelection(
+            get(selectedCommandIndicesAtom),
+            args.indices,
+            args.mode,
+            get(commandRowsAtom).length,
+        ));
     }
 );
 
@@ -114,6 +151,12 @@ export const selectedStandaloneSegmentPathAtom = atom(
         if (selected === null) return null;
         return get(standaloneSegmentPathsAtom)[selected] ?? null;
     }
+);
+
+export const selectedStandaloneSegmentPathsAtom = atom(
+    (get) => get(selectedCommandIndicesAtom)
+        .map((index) => get(standaloneSegmentPathsAtom)[index])
+        .filter((segmentPath): segmentPath is string => Boolean(segmentPath))
 );
 
 export const hoveredStandaloneSegmentPathAtom = atom(
@@ -206,15 +249,27 @@ export const doDeleteSegmentAtom = atom(
         set(doApplySvgModelAtom, (model) => {
             model.deleteSegment(segmentIndex);
         });
+        set(selectedCommandIndicesAtom, remapSelectedIndicesAfterDelete(get(selectedCommandIndicesAtom), [segmentIndex]));
+    }
+);
 
-        const selected = get(selectedCommandIndexAtom);
-        if (selected === null) return;
+export const doDeleteSelectedSegmentsAtom = atom(
+    null,
+    (get, set) => {
+        const model = get(svgModelAtom).model;
+        if (!model) return;
 
-        if (selected === segmentIndex) {
-            set(selectedCommandIndexAtom, null);
-        } else if (selected > segmentIndex) {
-            set(selectedCommandIndexAtom, selected - 1);
-        }
+        const selected = get(selectedCommandIndicesAtom);
+        const deletable = selected.filter((segmentIndex) => model.canDelete(segmentIndex));
+        if (!deletable.length) return;
+
+        set(doApplySvgModelAtom, (nextModel) => {
+            [...deletable].sort((a, b) => b - a).forEach((segmentIndex) => {
+                nextModel.deleteSegment(segmentIndex);
+            });
+        });
+
+        set(selectedCommandIndicesAtom, remapSelectedIndicesAfterDelete(selected, deletable));
     }
 );
 
@@ -227,7 +282,7 @@ export const doInsertSegmentAtom = atom(
             const inserted = initial.insertSegment(args.type, null);
             const { decimals, minifyOutput: minify } = appSettings.pathEditor;
             set(svgPathInputAtom, initial.toString(decimals, minify));
-            set(selectedCommandIndexAtom, inserted ?? 0);
+            set(selectedCommandIndicesAtom, [inserted ?? 0]);
             return;
         }
 
@@ -236,7 +291,7 @@ export const doInsertSegmentAtom = atom(
             insertedIndex = model.insertSegment(args.type, args.afterIndex);
         });
         if (insertedIndex !== null) {
-            set(selectedCommandIndexAtom, insertedIndex);
+            set(selectedCommandIndicesAtom, [insertedIndex]);
         }
     }
 );
@@ -257,7 +312,7 @@ export const doHandleEditorKeyDownAtom = atom(
         const inInput = target?.tagName === "INPUT" || target?.tagName === "TEXTAREA";
 
         if (event.key === "Escape" && !inInput) {
-            set(selectedCommandIndexAtom, null);
+            set(selectedCommandIndicesAtom, []);
             set(hoveredCommandIndexAtom, null);
             return;
         }
@@ -278,10 +333,11 @@ export const doHandleEditorKeyDownAtom = atom(
 
         if (inInput) return;
 
-        const selectedCommandIndex = get(selectedCommandIndexAtom);
-        if ((event.key === "Backspace" || event.key === "Delete") && selectedCommandIndex !== null) {
+        const selectedCommandIndices = get(selectedCommandIndicesAtom);
+        const selectedCommandIndex = selectedCommandIndices.length ? selectedCommandIndices[selectedCommandIndices.length - 1] : null;
+        if ((event.key === "Backspace" || event.key === "Delete") && selectedCommandIndices.length) {
             event.preventDefault();
-            set(doDeleteSegmentAtom, selectedCommandIndex);
+            set(doDeleteSelectedSegmentsAtom);
             return;
         }
 
@@ -323,7 +379,7 @@ export const doHandleEditorKeyDownAtom = atom(
 export const doFocusPointCommandAtom = atom(
     null,
     (_get, set, point: SvgCanvasPoint | null) => {
-        set(selectedCommandIndexAtom, point ? point.segmentIndex : null);
+        set(selectedCommandIndicesAtom, point ? [point.segmentIndex] : []);
     }
 );
 
@@ -380,7 +436,7 @@ export const doClearPathAtom = atom(
     null,
     (_get, set) => {
         set(svgPathInputAtom, "");
-        set(selectedCommandIndexAtom, null);
+        set(selectedCommandIndicesAtom, []);
         set(hoveredCommandIndexAtom, null);
         set(hoveredCanvasPointAtom, null);
         set(draggedCanvasPointAtom, null);

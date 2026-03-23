@@ -8,9 +8,11 @@ import { commandSummaryTooltip, isCommandCellLinkedToPoint, isCommandValueLinked
 import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 import { commandRowsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { CommandSelectionMenu } from "./2-2-commands-list-row-menu.tsx";
-import { commandHoveredAtom, commandSelectedAtom, doToggleSegmentRelativeAtom, highlightedCanvasPointAtomForSegment, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { commandHoveredAtom, commandSelectedAtom, doSelectCommandAtom, doToggleSegmentRelativeAtom, highlightedCanvasPointAtomForSegment, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { getCommandSelectionMode } from "@/store/0-atoms/2-2-editor-selection-utils";
 import { appSettings } from "@/store/0-ui-settings";
 import { type CommandProps, CommandArcFlagsInput, CommandCellInput } from "./2-1-commands-list-cells.tsx";
+import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
 
 export function CommandsListPanel() {
     return (
@@ -25,6 +27,7 @@ export function CommandsListPanel() {
 export function CommandsList() {
     const rows = useAtomValue(commandRowsAtom);
     const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
+    const doSelectCommand = useSetAtom(doSelectCommandAtom);
     const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
     const doToggleRelative = useSetAtom(doToggleSegmentRelativeAtom);
     const rowRefs = useRef<Record<number, HTMLDivElement | null>>({});
@@ -63,7 +66,7 @@ export function CommandsList() {
                         key={row.index}
                         row={row}
                         setRowRef={setRowRef}
-                        setSelectedCommandIndex={setSelectedCommandIndex}
+                        doSelectCommand={doSelectCommand}
                         setHoveredCommandIndex={setHoveredCommandIndex}
                         doToggleRelative={doToggleRelative}
                         focusCommandCell={focusCommandCell}
@@ -80,14 +83,16 @@ function CommandsListScrollEffects(props: { rowRefs: React.RefObject<Record<numb
     const { rowRefs, rowsLength } = props;
     const selectedCommandIndex = useAtomValue(selectedCommandIndexAtom);
     const hoveredCommandIndex = useAtomValue(hoveredCommandIndexAtom);
+    const dragState = useAtomValue(canvasDragStateAtom);
     const { scrollOnHover } = useSnapshot(appSettings.canvas);
 
     useEffect(
         () => {
             if (selectedCommandIndex === null) return;
+            if (dragState?.mode === "marquee") return;
             rowRefs.current[selectedCommandIndex]?.scrollIntoView({ behavior: "smooth", block: "nearest", });
         },
-        [rowRefs, rowsLength, selectedCommandIndex]);
+        [dragState, rowRefs, rowsLength, selectedCommandIndex]);
 
     useEffect(
         () => {
@@ -103,14 +108,14 @@ function CommandsListScrollEffects(props: { rowRefs: React.RefObject<Record<numb
 function CommandRow(props: {
     row: SvgSegmentSummary;
     setRowRef: (rowIndex: number, element: HTMLDivElement | null) => void;
-    setSelectedCommandIndex: (index: number) => void;
+    doSelectCommand: (args: { index: number; mode: "replace" | "add" | "remove"; }) => void;
     setHoveredCommandIndex: (index: number | null) => void;
     doToggleRelative: (segmentIndex: number) => void;
     focusCommandCell: (nextRowIndex: number, nextValueIndex: number) => void;
     moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
 }) {
-    const { row, setRowRef, setSelectedCommandIndex, setHoveredCommandIndex, doToggleRelative, focusCommandCell, moveVertical, registerFieldRef } = props;
+    const { row, setRowRef, doSelectCommand, setHoveredCommandIndex, doToggleRelative, focusCommandCell, moveVertical, registerFieldRef } = props;
     const selected = useAtomValue(commandSelectedAtom(row.index));
     const hovered = useAtomValue(commandHoveredAtom(row.index));
     const highlightedCanvasPoint = useAtomValue(highlightedCanvasPointAtomForSegment(row.index));
@@ -128,7 +133,7 @@ function CommandRow(props: {
                         ? "border-transparent bg-slate-400/40"
                         : "border-transparent bg-background hover:bg-slate-400/25"
             )}
-            onClick={() => setSelectedCommandIndex(row.index)}
+            onClick={(event) => doSelectCommand({ index: row.index, mode: getCommandSelectionMode(event) })}
             onMouseEnter={() => setHoveredCommandIndex(row.index)}
             onMouseLeave={() => setHoveredCommandIndex(null)}
         >
@@ -143,7 +148,7 @@ function CommandRow(props: {
                         )}
                         onClick={(event) => {
                             event.stopPropagation();
-                            setSelectedCommandIndex(row.index);
+                            doSelectCommand({ index: row.index, mode: "replace" });
                             doToggleRelative(row.index);
                         }}
                     >

@@ -20,7 +20,7 @@ export function CanvasGrid() {
     const canvasStroke = unitsPerPixel;
 
     return (
-        <g className="svg-ticks select-none">
+        <g className="svg-ticks select-none" pointerEvents="none">
             {/* X axis (vertical lines) */}
             {grid.xGrid.map((v) =>
                 <line

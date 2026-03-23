@@ -16,6 +16,7 @@ export function PathCanvasImages() {
                 href={image.data}
                 preserveAspectRatio={image.preserveAspectRatio ? "xMidYMid meet" : "none"}
                 opacity={image.opacity}
+                pointerEvents="none"
 
                 x={Math.min(image.x1, image.x2)}
                 y={Math.min(image.y1, image.y2)}
