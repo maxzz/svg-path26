@@ -9,7 +9,7 @@ import { CanvasHoveredSegmentOverlay, CanvasSegmentHitAreas, CanvasSelectedSegme
 import { CanvasTargetPoints } from "./5-target-points";
 import { PathCanvasImageEditOverlays } from "./6-images";
 import { CanvasViewBoxFrame } from "./7-viewbox-frame";
-import { CanvasSelectionMarquee } from "./9-selection-marquee";
+import { CanvasSelectionMarquee } from "../../../ui/loacal-ui/3-selection-marquee";
 
 export function CanvasHelperOverlays() {
     const { showHelpers, canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);
