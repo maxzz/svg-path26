@@ -46,4 +46,20 @@ describe("SvgPathModel", () => {
         expect(model.canConvert(1, "L")).toBe(true);
         expect(model.canConvert(1, "T")).toBe(false);
     });
+
+    it("translates selected segment ranges while preserving connected anchors", () => {
+        const model = new SvgPathModel("M 0 0 L 10 10 L 20 20");
+
+        model.translateSegments([1, 2], 5, -5);
+
+        expect(model.toString(3, false)).toBe("M 5 -5 L 15 5 L 25 15");
+    });
+
+    it("translates selected segments without changing relative commands", () => {
+        const model = new SvgPathModel("M 0 0 l 10 10 C 10 0 10 10 20 10");
+
+        model.translateSegments([1, 2], 5, 5);
+
+        expect(model.toString(3, false)).toBe("M 5 5 l 10 10 C 15 5 15 15 25 15");
+    });
 });

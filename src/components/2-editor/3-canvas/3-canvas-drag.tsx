@@ -6,14 +6,17 @@ import { type Point, type SvgCanvasPoint, type ViewBox } from "@/svg-core/9-type
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { controlPointsAtom, targetPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { canvasRootSvgElementAtom } from "@/store/0-atoms/2-1-canvas-viewport";
-import { canvasSegmentHitAreaElementsAtom, doSetPointLocationWithoutHistoryAtom, doSuppressNextCanvasFocusClearAtom, draggedCanvasPointAtom, isCanvasDraggingAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { pathViewBoxAtom } from "@/store/0-atoms/2-6-path-viewbox";
+import { canvasSegmentHitAreaElementsAtom, doSetPointLocationWithoutHistoryAtom, doSuppressNextCanvasFocusClearAtom, doTranslateSelectedSegmentsWithoutHistoryAtom, draggedCanvasPointAtom, isCanvasDraggingAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { applyCommandSelection, getMarqueeSelectionMode, getMarqueeSelectionIndices, type CommandSelectionMode } from "@/store/0-atoms/2-2-editor-selection-utils";
 import { doPanViewPortAtom, doZoomViewPortAtom } from "@/store/0-atoms/2-1-canvas-viewport";
 import { doCommitCurrentPathToHistoryAtom } from "@/store/0-atoms/1-2-history";
 import { doUpdateImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-4-images";
+import { notice } from "@/components/ui/loacal-ui/7-toaster/7-toaster";
 
 export type DragState =
     | { mode: "point"; pointerId: number; point: SvgCanvasPoint; startPath: string; }
+    | { mode: "selection"; pointerId: number; segmentIndices: number[]; startPath: string; startClientX: number; startClientY: number; moved: boolean; viewBox: ViewBox; }
     | { mode: "canvas"; pointerId: number; lastClientX: number; lastClientY: number; moved: boolean; }
     | { mode: "marquee"; pointerId: number; start: Point; current: Point; startClientX: number; startClientY: number; moved: boolean; selectionMode: CommandSelectionMode; initialSelection: number[]; }
     | { mode: "image"; pointerId: number; imageId: string; handle: ImageHandle; start: Point; initial: EditorImage; };
@@ -63,6 +66,33 @@ export const doStartMarqueeDragAtom = atom(
             moved: false,
             selectionMode: args.selectionMode,
             initialSelection: args.initialSelection,
+        });
+    }
+);
+
+export const doStartSelectedSegmentsDragAtom = atom(
+    null,
+    (get, set, args: { pointerId: number; clientX: number; clientY: number; startPath: string; segmentIndices?: number[]; }) => {
+        const selection = args.segmentIndices?.length ? args.segmentIndices : get(selectedCommandIndicesAtom);
+        if (!selection.length) return;
+
+        const pathViewBox = get(pathViewBoxAtom);
+        if (!isValidViewBox(pathViewBox)) {
+            notice.info("Path viewBox is undefined, so the selected items cannot be moved.");
+            return;
+        }
+
+        set(draggedCanvasPointAtom, null);
+        set(isCanvasDraggingAtom, true);
+        set(canvasDragStateAtom, {
+            mode: "selection",
+            pointerId: args.pointerId,
+            segmentIndices: selection,
+            startPath: args.startPath,
+            startClientX: args.clientX,
+            startClientY: args.clientY,
+            moved: false,
+            viewBox: pathViewBox,
         });
     }
 );
@@ -122,6 +152,7 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
     const doCommitCurrentPathToHistory = useSetAtom(doCommitCurrentPathToHistoryAtom);
     const setPathValue = useSetAtom(svgPathInputAtom);
     const setPointLocationWithoutHistory = useSetAtom(doSetPointLocationWithoutHistoryAtom);
+    const doTranslateSelectedSegmentsWithoutHistory = useSetAtom(doTranslateSelectedSegmentsWithoutHistoryAtom);
     const setSelectedCommandIndices = useSetAtom(selectedCommandIndicesAtom);
     const doSuppressNextCanvasFocusClear = useSetAtom(doSuppressNextCanvasFocusClearAtom);
     const doBeginCanvasDrag = useSetAtom(doStartCanvasDragAtom);
@@ -154,6 +185,27 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
                     setPointLocationWithoutHistory({
                         point: dragState.point,
                         to: { x, y },
+                    });
+                    return;
+                }
+
+                if (dragState.mode === "selection") {
+                    const dxPx = event.clientX - dragState.startClientX;
+                    const dyPx = event.clientY - dragState.startClientY;
+                    const delta = clientDeltaToSvgDelta(rootSvgElement, dxPx, dyPx, dragState.viewBox);
+                    if (!delta) return;
+
+                    const moved = dragState.moved || Math.abs(dxPx) > 1 || Math.abs(dyPx) > 1;
+                    if (moved !== dragState.moved) {
+                        setDragState({ ...dragState, moved });
+                    }
+                    if (!moved) return;
+
+                    doTranslateSelectedSegmentsWithoutHistory({
+                        segmentIndices: dragState.segmentIndices,
+                        dx: delta.x,
+                        dy: delta.y,
+                        startPath: dragState.startPath,
                     });
                     return;
                 }
@@ -217,6 +269,8 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
 
                 if (dragState.mode === "point") {
                     doCommitCurrentPathToHistory(dragState.startPath);
+                } else if (dragState.mode === "selection" && dragState.moved) {
+                    doCommitCurrentPathToHistory(dragState.startPath);
                 } else if (dragState.mode === "marquee") {
                     if (!dragState.moved) {
                         setSelectedCommandIndices(dragState.initialSelection);
@@ -234,7 +288,7 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
             window.addEventListener("pointercancel", onPointerUp, { signal: controller.signal });
             return () => controller.abort();
         },
-        [controlPoints, doCommitCurrentPathToHistory, doPanViewPort, doStopCanvasDrag, doSuppressNextCanvasFocusClear, dragState, dragPrecision, rootSvgElement, segmentHitAreaElements, setDragState, setPointLocationWithoutHistory, setSelectedCommandIndices, snapToGrid, targetPoints, viewPort, viewPortLocked]);
+        [controlPoints, doCommitCurrentPathToHistory, doPanViewPort, doStopCanvasDrag, doSuppressNextCanvasFocusClear, doTranslateSelectedSegmentsWithoutHistory, dragState, dragPrecision, rootSvgElement, segmentHitAreaElements, setDragState, setPointLocationWithoutHistory, setSelectedCommandIndices, snapToGrid, targetPoints, viewPort, viewPortLocked]);
 
     useEffect(
         () => {
@@ -245,6 +299,8 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
                 event.preventDefault();
 
                 if (dragState.mode === "point") {
+                    setPathValue(dragState.startPath);
+                } else if (dragState.mode === "selection") {
                     setPathValue(dragState.startPath);
                 } else if (dragState.mode === "marquee") {
                     setSelectedCommandIndices(dragState.initialSelection);
@@ -431,6 +487,26 @@ export function eventToSvgPoint(svg: SVGSVGElement | null, clientX: number, clie
         x: x + ((clientX - rect.left) / rect.width) * width,
         y: y + ((clientY - rect.top) / rect.height) * height,
     };
+}
+
+function clientDeltaToSvgDelta(svg: SVGSVGElement | null, dxPx: number, dyPx: number, viewBox: ViewBox): Point | null {
+    if (!svg) return null;
+
+    const rect = svg.getBoundingClientRect();
+    if (!rect.width || !rect.height) return null;
+
+    return {
+        x: (dxPx / rect.width) * viewBox[2],
+        y: (dyPx / rect.height) * viewBox[3],
+    };
+}
+
+function isValidViewBox(viewBox: unknown): viewBox is ViewBox {
+    return Array.isArray(viewBox)
+        && viewBox.length === 4
+        && viewBox.every((value) => Number.isFinite(value))
+        && viewBox[2] > 0
+        && viewBox[3] > 0;
 }
 
 function distanceBetween(a: Point, b: Point): number {

@@ -410,6 +410,72 @@ export class SvgPathModel {
         });
     }
 
+    translateSegments(segmentIndices: number[], deltaX: number, deltaY: number) {
+        if (!segmentIndices.length) return;
+        if (deltaX === 0 && deltaY === 0) return;
+
+        const absolute = this.computeAbsoluteSegments();
+        const selected = new Set(segmentIndices.filter((index) => index >= 0 && index < absolute.length));
+        if (!selected.size) return;
+
+        const subpathStartSegmentByIndex = new Map<number, number>();
+        let currentSubpathStartIndex = 0;
+        absolute.forEach((segmentData) => {
+            if (segmentData.command === "M") {
+                currentSubpathStartIndex = segmentData.index;
+            }
+            subpathStartSegmentByIndex.set(segmentData.index, currentSubpathStartIndex);
+        });
+
+        const targetTranslated = new Set<number>();
+        absolute.forEach((segmentData) => {
+            if (!selected.has(segmentData.index)) return;
+
+            if (segmentData.command === "Z") {
+                const previousIndex = segmentData.index - 1;
+                if (previousIndex >= 0) {
+                    targetTranslated.add(previousIndex);
+                }
+                targetTranslated.add(subpathStartSegmentByIndex.get(segmentData.index) ?? 0);
+                return;
+            }
+
+            targetTranslated.add(segmentData.index);
+
+            const previousIndex = segmentData.index - 1;
+            if (previousIndex >= 0 && !selected.has(previousIndex)) {
+                targetTranslated.add(previousIndex);
+            }
+        });
+
+        const translatedAbsoluteValues = absolute.map((segmentData) => {
+            const nextValues = [...segmentData.values];
+            if (selected.has(segmentData.index)) {
+                translateAbsoluteSegmentValues(segmentData.command, nextValues, deltaX, deltaY);
+            } else if (targetTranslated.has(segmentData.index)) {
+                translateAbsoluteSegmentTarget(segmentData.command, nextValues, deltaX, deltaY);
+            }
+            return nextValues;
+        });
+
+        let current: Point = { x: 0, y: 0 };
+        let subpathStart: Point = { x: 0, y: 0 };
+
+        this.segments.forEach((segment, index) => {
+            const command = upper(segment.command);
+            const absoluteValues = translatedAbsoluteValues[index] ?? [];
+            segment.values = isRelative(segment.command)
+                ? this.absoluteToRelativeValues(command, absoluteValues, current)
+                : absoluteValues;
+
+            const target = getSegmentTargetFromAbsolute(command, absoluteValues, current, subpathStart);
+            if (command === "M") {
+                subpathStart = clonePoint(target);
+            }
+            current = command === "Z" ? clonePoint(subpathStart) : clonePoint(target);
+        });
+    }
+
     setRelative(makeRelative: boolean) {
         const absolute = this.computeAbsoluteSegments();
         absolute.forEach((entry) => {
@@ -768,4 +834,71 @@ function reflectPoint(origin: Point, center: Point): Point {
 
 function clonePoint(point: Point): Point {
     return { x: point.x, y: point.y };
+}
+
+function translateAbsoluteSegmentValues(command: string, values: number[], deltaX: number, deltaY: number) {
+    switch (command) {
+        case "H":
+            values[0] += deltaX;
+            break;
+        case "V":
+            values[0] += deltaY;
+            break;
+        case "A":
+            values[5] += deltaX;
+            values[6] += deltaY;
+            break;
+        case "Z":
+            break;
+        default:
+            for (let i = 0; i < values.length; i += 2) {
+                values[i] += deltaX;
+                values[i + 1] += deltaY;
+            }
+            break;
+    }
+}
+
+function translateAbsoluteSegmentTarget(command: string, values: number[], deltaX: number, deltaY: number) {
+    switch (command) {
+        case "H":
+            values[0] += deltaX;
+            break;
+        case "V":
+            values[0] += deltaY;
+            break;
+        case "A":
+            values[5] += deltaX;
+            values[6] += deltaY;
+            break;
+        case "Z":
+            break;
+        default: {
+            const xIndex = values.length - 2;
+            const yIndex = values.length - 1;
+            if (xIndex >= 0 && yIndex >= 0) {
+                values[xIndex] += deltaX;
+                values[yIndex] += deltaY;
+            }
+            break;
+        }
+    }
+}
+
+function getSegmentTargetFromAbsolute(command: string, values: number[], current: Point, subpathStart: Point): Point {
+    switch (command) {
+        case "Z":
+            return clonePoint(subpathStart);
+        case "H":
+            return { x: values[0] ?? current.x, y: current.y };
+        case "V":
+            return { x: current.x, y: values[0] ?? current.y };
+        case "A":
+            return { x: values[5] ?? current.x, y: values[6] ?? current.y };
+        default:
+            return {
+                x: values[values.length - 2] ?? current.x,
+                y: values[values.length - 1] ?? current.y,
+            };
+    }
 }

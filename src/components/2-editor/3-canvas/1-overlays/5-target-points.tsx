@@ -7,7 +7,7 @@ import { commandHoveredAtom, commandSelectedAtom, doFocusPointCommandAtom, doSel
 import { getCommandSelectionMode } from "@/store/0-atoms/2-2-editor-selection-utils";
 import { targetPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
-import { doStartPointDragAtom } from "../3-canvas-drag";
+import { doStartPointDragAtom, doStartSelectedSegmentsDragAtom } from "../3-canvas-drag";
 import { getControlHaloFill, getEditorStroke, getPointInteractionClassName, getTargetPointFill, getTargetPointStroke } from "./8-canvas-color-palette";
 
 export function CanvasTargetPoints() {
@@ -43,6 +43,7 @@ function CanvasTargetPoint(props: {
     const setHoveredCanvasPoint = useSetAtom(hoveredCanvasPointAtom);
     const setFocusPointCommand = useSetAtom(doFocusPointCommandAtom);
     const startPointDrag = useSetAtom(doStartPointDragAtom);
+    const startSelectedSegmentsDrag = useSetAtom(doStartSelectedSegmentsDragAtom);
     const haloRadius = unitsPerPixel * 8;
     const pointRadius = unitsPerPixel * (selected ? 5 : 4);
 
@@ -72,6 +73,16 @@ function CanvasTargetPoint(props: {
                     event.stopPropagation();
                     setHoveredCommandIndex(point.segmentIndex);
                     setHoveredCanvasPoint(point);
+
+                    if (selected && !event.shiftKey && !event.ctrlKey && !event.metaKey) {
+                        startSelectedSegmentsDrag({
+                            pointerId: event.pointerId,
+                            clientX: event.clientX,
+                            clientY: event.clientY,
+                            startPath: pathValue,
+                        });
+                        return;
+                    }
 
                     const selectionMode = getCommandSelectionMode(event);
                     doSelectCommand({ index: point.segmentIndex, mode: selectionMode });

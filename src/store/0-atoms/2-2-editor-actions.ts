@@ -236,6 +236,25 @@ export const doSetPointLocationWithoutHistoryAtom = atom(
     }
 );
 
+export const doTranslateSelectedSegmentsWithoutHistoryAtom = atom(
+    null,
+    (get, set, args: { segmentIndices: number[]; dx: number; dy: number; startPath?: string; }) => {
+        const path = (args.startPath ?? get(rawPathAtom)).trim();
+        if (!path) return;
+        if (!args.segmentIndices.length) return;
+        if (args.dx === 0 && args.dy === 0) return;
+
+        try {
+            const model = new SvgPathModel(path);
+            model.translateSegments(args.segmentIndices, args.dx, args.dy);
+            const { decimals, minifyOutput: minify } = appSettings.pathEditor;
+            set(doSetPathWithoutHistoryAtom, model.toString(decimals, minify));
+        } catch {
+            // no-op if path is currently invalid
+        }
+    }
+);
+
 export const doSetCommandValueAtom = atom(
     null,
     (_get, set, args: { commandIndex: number; valueIndex: number; value: number; }) => {

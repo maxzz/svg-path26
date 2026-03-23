@@ -1,17 +1,22 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { canvasStrokeWidthAtom, hoveredSegmentStrokeWidthAtom, selectedSegmentStrokeWidthAtom } from "../../../../store/0-atoms/2-1-canvas-viewport-derives";
-import { doRegisterCanvasSegmentHitAreaAtom, doSelectCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, hoveredStandaloneSegmentPathAtom, selectedStandaloneSegmentPathsAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { doRegisterCanvasSegmentHitAreaAtom, doSelectCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, hoveredStandaloneSegmentPathAtom, selectedCommandIndicesAtom, selectedStandaloneSegmentPathsAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { getCommandSelectionMode } from "@/store/0-atoms/2-2-editor-selection-utils";
 import { standaloneSegmentPathsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
+import { doStartSelectedSegmentsDragAtom } from "../3-canvas-drag";
 import { getSegmentActiveStroke, getSegmentHoverStroke } from "./8-canvas-color-palette";
 
 export function CanvasSegmentHitAreas() {
     const segmentPaths = useAtomValue(standaloneSegmentPathsAtom);
+    const pathValue = useAtomValue(svgPathInputAtom);
+    const selectedCommandIndices = useAtomValue(selectedCommandIndicesAtom);
     const canvasStrokeWidth = useAtomValue(canvasStrokeWidthAtom);
     const doRegisterSegmentHitArea = useSetAtom(doRegisterCanvasSegmentHitAreaAtom);
     const doSelectCommand = useSetAtom(doSelectCommandAtom);
+    const startSelectedSegmentsDrag = useSetAtom(doStartSelectedSegmentsDragAtom);
     const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
     const setHoveredCanvasPoint = useSetAtom(hoveredCanvasPointAtom);
 
@@ -33,6 +38,17 @@ export function CanvasSegmentHitAreas() {
                     strokeLinejoin="round"
                     onPointerDown={(event) => {
                         event.stopPropagation();
+
+                        if (selectedCommandIndices.includes(index) && !event.shiftKey && !event.ctrlKey && !event.metaKey) {
+                            startSelectedSegmentsDrag({
+                                pointerId: event.pointerId,
+                                clientX: event.clientX,
+                                clientY: event.clientY,
+                                startPath: pathValue,
+                            });
+                            return;
+                        }
+
                         doSelectCommand({ index, mode: getCommandSelectionMode(event) });
                         setHoveredCommandIndex(index);
                         setHoveredCanvasPoint(null);
