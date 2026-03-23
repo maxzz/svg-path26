@@ -48,7 +48,7 @@
         "react-resizable-panels": "^4.7.3",
         "sonner": "^2.0.7",
         "tailwind-merge": "^3.5.0",
-        "tailwindcss": "^4.2.1",
+        "tailwindcss": "^4.2.2",
         "valtio": "^2.3.1",
         "zod": "^4.3.6"
     },
