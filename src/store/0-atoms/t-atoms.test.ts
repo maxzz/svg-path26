@@ -1,18 +1,9 @@
 import { createStore } from "jotai";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import {
-    doDeleteSelectedSegmentsAtom,
-    doSetPointLocationWithoutHistoryAtom,
-    selectedCommandIndicesAtom,
-} from "./2-2-editor-actions";
+import { doDeleteSelectedSegmentsAtom, doSetPointLocationWithoutHistoryAtom, selectedCommandIndicesAtom } from "./2-2-editor-actions";
 import { commandRowsAtom, targetPointsAtom } from "./2-0-svg-model";
 import { canvasViewPortAtom, doFitViewPortAtom, doPanViewPortAtom, doSetViewPortAtom, doZoomViewPortAtom } from "./2-1-canvas-viewport";
-import {
-    canRedoAtom,
-    canUndoAtom,
-    doRedoPathAtom,
-    doUndoPathAtom,
-} from "./1-2-history";
+import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "./1-2-history";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } from "./1-2-history";
 import { doOpenNamedPathAtom, doSaveNamedPathAtom } from "./2-3-stored-paths-actions";

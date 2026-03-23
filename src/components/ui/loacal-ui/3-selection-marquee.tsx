@@ -8,7 +8,10 @@ export function CanvasSelectionMarquee() {
     const { darkCanvas } = useSnapshot(appSettings.canvas);
     const dragState = useAtomValue(canvasDragStateAtom);
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
-    if (dragState?.mode !== "marquee" || !dragState.moved) return null;
+
+    if (dragState?.mode !== "marquee" || !dragState.moved) {
+        return null;
+    }
 
     const x = Math.min(dragState.start.x, dragState.current.x);
     const y = Math.min(dragState.start.y, dragState.current.y);
@@ -16,7 +19,7 @@ export function CanvasSelectionMarquee() {
     const height = Math.abs(dragState.current.y - dragState.start.y);
     const strokeWidth = Math.max(unitsPerPixel * 1.5, unitsPerPixel);
     const dash = unitsPerPixel * 6;
-    const fill = darkCanvas ? "rgba(148, 163, 184, 0.12)" : "rgba(59, 130, 246, 0.10)";
+    const fill = darkCanvas ? "#94a3b81f" : "#3b82f61a";
 
     return (
         <g pointerEvents="none">
