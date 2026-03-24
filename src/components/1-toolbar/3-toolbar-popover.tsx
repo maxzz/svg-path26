@@ -4,6 +4,7 @@ import { useSnapshot } from "valtio";
 import { Settings as IconSettings } from "lucide-react";
 import { Button } from "@/components/ui/shadcn/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
+import { Slider } from "@/components/ui/shadcn/slider";
 import { Switch } from "@/components/ui/shadcn/switch";
 import { strokeWidthAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { doZoomViewPortAtom } from "@/store/0-atoms/2-1-canvas-viewport";
@@ -85,24 +86,21 @@ function ZoomSettingsField() {
 
     return (
         <label className="text-xs flex items-center gap-2">
-            <span className="shrink-0 w-12">
-                Zoom
-            </span>
-            <input
-                type="range"
+            <span className="shrink-0 w-12">Zoom</span>
+
+            <Slider
+                className="flex-1"
+                value={[zoom]}
                 min={0.25}
                 max={16}
                 step={0.1}
-                value={zoom}
-                onChange={(event) => {
-                    const nextZoom = Number(event.target.value);
+                onValueChange={([nextZoom]) => {
                     if (!Number.isFinite(nextZoom) || nextZoom <= 0 || nextZoom === zoom) return;
                     zoomViewPort({ scale: zoom / nextZoom });
                 }}
             />
-            <span className="w-12 text-right tabular-nums">
-                {zoom.toFixed(1)}x
-            </span>
+
+            <span className="w-12 text-right tabular-nums">{zoom.toFixed(1)}x</span>
         </label>
     );
 }
