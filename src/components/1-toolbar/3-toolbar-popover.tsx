@@ -40,7 +40,7 @@ export function SettingsPopover() {
 
                     <ZoomSettingsField />
 
-                    <div className="grid grid-cols-2 gap-2 rounded-md border p-2">
+                    <div className="p-2 border rounded-md grid gap-2">
                         <ToggleValueRow
                             label="Show viewBox frame"
                             value={showViewBoxFrame}
@@ -99,21 +99,11 @@ function ZoomSettingsField() {
     );
 }
 
-function ToggleRow({ label, atom }: { label: string; atom: PrimitiveAtom<boolean>; }) {
-    const [value, setValue] = useAtom(atom);
-    return (
-        <label className="flex items-center justify-between gap-2 text-xs">
-            <span>{label}</span>
-            <Switch checked={value} onCheckedChange={(checked) => setValue(Boolean(checked))} />
-        </label>
-    );
-}
-
 function ToggleValueRow({ label, value, onChange }: { label: string; value: boolean; onChange: (value: boolean) => void; }) {
     return (
-        <label className="flex items-center justify-between gap-2 text-xs">
-            <span>{label}</span>
+        <label className="flex items-center gap-2 text-xs">
             <Switch checked={value} onCheckedChange={(checked) => onChange(Boolean(checked))} />
+            <span>{label}</span>
         </label>
     );
 }
