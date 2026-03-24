@@ -7,12 +7,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/
 import { Switch } from "@/components/ui/shadcn/switch";
 import { strokeWidthAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { doZoomViewPortAtom } from "@/store/0-atoms/2-1-canvas-viewport";
-import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { appSettings } from "@/store/0-ui-settings";
 
 export function SettingsPopover() {
-    const { snapToGrid, scrollOnHover, showTicks, fillPreview, canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);
-    const { viewPortLocked, tickInterval, dragPrecision } = useSnapshot(appSettings.pathEditor);
+    const { canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);
 
     return (
         <Popover>
@@ -52,24 +50,6 @@ export function SettingsPopover() {
                             label="Preview mode"
                             value={canvasPreview}
                             onChange={(nextValue) => { appSettings.canvas.canvasPreview = nextValue; }}
-                        />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                        <SettingsValueNumberField
-                            label="Tick interval"
-                            value={tickInterval}
-                            min={1}
-                            step={1}
-                            onValueChange={(nextValue) => { appSettings.pathEditor.tickInterval = nextValue; }}
-                        />
-                        <SettingsValueNumberField
-                            label="Drag precision"
-                            value={dragPrecision}
-                            min={0}
-                            max={8}
-                            step={1}
-                            onValueChange={(nextValue) => { appSettings.pathEditor.dragPrecision = nextValue; }}
                         />
                     </div>
                 </div>
@@ -134,21 +114,6 @@ function ToggleValueRow({ label, value, onChange }: { label: string; value: bool
         <label className="flex items-center justify-between gap-2 text-xs">
             <span>{label}</span>
             <Switch checked={value} onCheckedChange={(checked) => onChange(Boolean(checked))} />
-        </label>
-    );
-}
-
-function SettingsValueNumberField({ label, value, onValueChange, ...rest }: { label: string; value: number; onValueChange: (value: number) => void; } & InputHTMLAttributes<HTMLInputElement>) {
-    return (
-        <label className="space-y-1 text-xs">
-            <span className="text-muted-foreground">{label}</span>
-            <input
-                type="number"
-                className="h-7 w-full rounded border bg-background px-2 text-xs"
-                value={value}
-                onChange={(event) => onValueChange(Number(event.target.value))}
-                {...rest}
-            />
         </label>
     );
 }
