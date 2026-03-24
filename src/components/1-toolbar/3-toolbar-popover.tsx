@@ -49,11 +49,6 @@ export function SettingsPopover() {
                             onChange={(nextValue) => { appSettings.canvas.showViewBoxFrame = nextValue; }}
                         />
                         <ToggleValueRow
-                            label="Fill path"
-                            value={fillPreview}
-                            onChange={(nextValue) => { appSettings.canvas.fillPreview = nextValue; }}
-                        />
-                        <ToggleValueRow
                             label="Preview mode"
                             value={canvasPreview}
                             onChange={(nextValue) => { appSettings.canvas.canvasPreview = nextValue; }}
