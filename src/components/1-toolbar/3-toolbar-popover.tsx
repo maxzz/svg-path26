@@ -69,7 +69,9 @@ function StrokeInput() {
                     setValue(nextValue);
                 }}
             />
-            <span className="w-10 text-right tabular-nums">{displayValue}</span>
+            <span className="w-10 text-right tabular-nums">
+                {displayValue}
+            </span>
         </label>
     );
 }
@@ -83,7 +85,6 @@ function ZoomInput() {
             <span className="shrink-0 w-12">
                 Zoom
             </span>
-
             <Slider
                 className="flex-1"
                 value={[zoom]}
@@ -95,8 +96,9 @@ function ZoomInput() {
                     zoomViewPort({ scale: zoom / nextZoom });
                 }}
             />
-
-            <span className="w-12 text-right tabular-nums">{zoom.toFixed(1)}x</span>
+            <span className="w-12 text-right tabular-nums">
+                {zoom.toFixed(1)}x
+            </span>
         </label>
     );
 }
