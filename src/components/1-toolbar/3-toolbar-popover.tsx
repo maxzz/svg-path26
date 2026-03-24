@@ -59,19 +59,25 @@ export function SettingsPopover() {
     );
 }
 
-function SettingsRangeField({ valueAtom, label, valueClassName, formatValue, ...inputProps }: { valueAtom: PrimitiveAtom<number>; label: string; valueClassName: string; formatValue?: (value: number) => string | number; } & InputHTMLAttributes<HTMLInputElement>) {
+function SettingsRangeField({ valueAtom, label, valueClassName, formatValue, min = 0, max = 100, step = 1 }: { valueAtom: PrimitiveAtom<number>; label: string; valueClassName: string; formatValue?: (value: number) => string | number; min?: number; max?: number; step?: number; }) {
     const [value, setValue] = useAtom(valueAtom);
     const displayValue = formatValue ? formatValue(value) : value;
+
     return (
         <label className="text-xs flex items-center gap-2">
             <span className="shrink-0 w-12">
                 {label}
             </span>
-            <input
-                type="range"
-                {...inputProps}
-                value={value}
-                onChange={(event) => setValue(Number(event.target.value))}
+            <Slider
+                className="flex-1"
+                value={[value]}
+                min={min}
+                max={max}
+                step={step}
+                onValueChange={([nextValue]) => {
+                    if (!Number.isFinite(nextValue)) return;
+                    setValue(nextValue);
+                }}
             />
             <span className={`${valueClassName} text-right tabular-nums`}>
                 {displayValue}
