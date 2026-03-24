@@ -28,9 +28,8 @@ export function SettingsPopover() {
                 </div>
 
                 <div className="grid gap-3">
-                    <SettingsRangeField />
-
-                    <ZoomSettingsField />
+                    <StrokeInput />
+                    <ZoomInput />
 
                     <div className="p-2 border rounded-md grid gap-2">
                         <ToggleValueRow
@@ -50,13 +49,15 @@ export function SettingsPopover() {
     );
 }
 
-function SettingsRangeField() {
+function StrokeInput() {
     const [value, setValue] = useAtom(strokeWidthAtom);
     const displayValue = formatCompactNumber(value);
 
     return (
         <label className="text-xs flex items-center gap-2">
-            <span className="shrink-0 w-12">Stroke</span>
+            <span className="shrink-0 w-12">
+                Stroke
+            </span>
             <Slider
                 className="flex-1"
                 value={[value]}
@@ -73,7 +74,7 @@ function SettingsRangeField() {
     );
 }
 
-function ZoomSettingsField() {
+function ZoomInput() {
     const { zoom } = useSnapshot(appSettings.pathEditor);
     const zoomViewPort = useSetAtom(doZoomViewPortAtom);
 
