@@ -53,7 +53,6 @@ export function SettingsPopover() {
                             value={canvasPreview}
                             onChange={(nextValue) => { appSettings.canvas.canvasPreview = nextValue; }}
                         />
-                        <ToggleRow label="Image edit mode" atom={isImageEditModeAtom} />
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 text-xs">
