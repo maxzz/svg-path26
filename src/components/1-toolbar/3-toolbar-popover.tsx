@@ -20,8 +20,8 @@ export function SettingsPopover() {
                 </Button>
             </PopoverTrigger>
 
-            <PopoverContent className="p-3 max-w-80" align="end">
-                <div className="-mx-3 mb-3 pb-2 border-b">
+            <PopoverContent className="p-3 pt-0 max-w-80  overflow-hidden" align="end">
+                <div className="-mx-3 mb-3 pt-3 pb-2 border-b bg-foreground/10">
                     <h4 className="px-3 text-xs font-semibold leading-none">
                         View options
                     </h4>
