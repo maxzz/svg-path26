@@ -15,13 +15,13 @@ export function SettingsPopover() {
     return (
         <Popover>
             <PopoverTrigger asChild>
-                <Button variant="outline" size="icon" className="size-7" title="View options">
+                <Button className="size-7" variant="outline" size="icon" title="View options">
                     <IconSettings className="size-4 stroke-1" />
                 </Button>
             </PopoverTrigger>
 
-            <PopoverContent align="start" className="w-80 p-3">
-                <div className="-mx-3 mb-3 border-b pb-2">
+            <PopoverContent className="p-3 max-w-80" align="end">
+                <div className="-mx-3 mb-3 pb-2 border-b">
                     <h4 className="px-3 text-xs font-semibold leading-none">
                         View options
                     </h4>
@@ -62,15 +62,19 @@ function SettingsRangeField({ valueAtom, label, valueClassName, formatValue, ...
     const [value, setValue] = useAtom(valueAtom);
     const displayValue = formatValue ? formatValue(value) : value;
     return (
-        <label className="flex items-center gap-2 text-xs">
-            <span className="w-12 shrink-0">{label}</span>
+        <label className="text-xs flex items-center gap-2">
+            <span className="shrink-0 w-12">
+                {label}
+            </span>
             <input
                 type="range"
                 {...inputProps}
                 value={value}
                 onChange={(event) => setValue(Number(event.target.value))}
             />
-            <span className={`${valueClassName} text-right tabular-nums`}>{displayValue}</span>
+            <span className={`${valueClassName} text-right tabular-nums`}>
+                {displayValue}
+            </span>
         </label>
     );
 }
@@ -80,8 +84,10 @@ function ZoomSettingsField() {
     const zoomViewPort = useSetAtom(doZoomViewPortAtom);
 
     return (
-        <label className="flex items-center gap-2 text-xs">
-            <span className="w-12 shrink-0">Zoom</span>
+        <label className="text-xs flex items-center gap-2">
+            <span className="shrink-0 w-12">
+                Zoom
+            </span>
             <input
                 type="range"
                 min={0.25}
@@ -94,14 +100,16 @@ function ZoomSettingsField() {
                     zoomViewPort({ scale: zoom / nextZoom });
                 }}
             />
-            <span className="w-12 text-right tabular-nums">{zoom.toFixed(1)}x</span>
+            <span className="w-12 text-right tabular-nums">
+                {zoom.toFixed(1)}x
+            </span>
         </label>
     );
 }
 
 function ToggleValueRow({ label, value, onChange }: { label: string; value: boolean; onChange: (value: boolean) => void; }) {
     return (
-        <label className="flex items-center gap-2 text-xs">
+        <label className="text-xs flex items-center gap-2">
             <Switch checked={value} onCheckedChange={(checked) => onChange(Boolean(checked))} />
             <span>{label}</span>
         </label>
