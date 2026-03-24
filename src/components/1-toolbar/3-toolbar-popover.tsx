@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/shadcn/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
 import { Switch } from "@/components/ui/shadcn/switch";
 import { strokeWidthAtom } from "@/store/0-atoms/2-2-editor-actions";
-import { doZoomViewPortAtom, viewPortHeightAtom, viewPortWidthAtom, viewPortXAtom, viewPortYAtom } from "@/store/0-atoms/2-1-canvas-viewport";
+import { doZoomViewPortAtom } from "@/store/0-atoms/2-1-canvas-viewport";
 import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { appSettings } from "@/store/0-ui-settings";
 
@@ -41,18 +41,6 @@ export function SettingsPopover() {
                     />
 
                     <ZoomSettingsField />
-
-                    <div className="grid grid-cols-4 gap-2 rounded-md border p-2">
-                        <SettingsNumberField label="x" valueAtom={viewPortXAtom} />
-                        <SettingsNumberField label="y" valueAtom={viewPortYAtom} />
-                        <SettingsNumberField label="w" valueAtom={viewPortWidthAtom} min={1e-3} />
-                        <SettingsNumberField label="h" valueAtom={viewPortHeightAtom} min={1e-3} />
-                    </div>
-
-                    <div className="flex items-center justify-between text-xs">
-                        <span>Lock viewport</span>
-                        <Switch checked={viewPortLocked} onCheckedChange={(checked) => { appSettings.pathEditor.viewPortLocked = Boolean(checked); }} />
-                    </div>
 
                     <div className="grid grid-cols-2 gap-2 rounded-md border p-2">
                         <ToggleValueRow
@@ -148,22 +136,6 @@ function ZoomSettingsField() {
                 }}
             />
             <span className="w-12 text-right tabular-nums">{zoom.toFixed(1)}x</span>
-        </label>
-    );
-}
-
-function SettingsNumberField({ valueAtom, label, ...rest }: { valueAtom: PrimitiveAtom<number>; label: string; } & InputHTMLAttributes<HTMLInputElement>) {
-    const [value, setValue] = useAtom(valueAtom);
-    return (
-        <label className="space-y-1 text-xs">
-            <span className="text-muted-foreground">{label}</span>
-            <input
-                type="number"
-                className="h-7 w-full rounded border bg-background px-2 text-xs"
-                value={value}
-                onChange={(event) => setValue(Number(event.target.value))}
-                {...rest}
-            />
         </label>
     );
 }
