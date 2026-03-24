@@ -44,16 +44,6 @@ export function SettingsPopover() {
 
                     <div className="grid grid-cols-2 gap-2 rounded-md border p-2">
                         <ToggleValueRow
-                            label="Snap to grid"
-                            value={snapToGrid}
-                            onChange={(nextValue) => { appSettings.canvas.snapToGrid = nextValue; }}
-                        />
-                        <ToggleValueRow
-                            label="Show ticks"
-                            value={showTicks}
-                            onChange={(nextValue) => { appSettings.canvas.showTicks = nextValue; }}
-                        />
-                        <ToggleValueRow
                             label="Scroll on hover"
                             value={scrollOnHover}
                             onChange={(nextValue) => { appSettings.canvas.scrollOnHover = nextValue; }}
