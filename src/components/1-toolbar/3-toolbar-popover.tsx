@@ -1,5 +1,4 @@
-import { type InputHTMLAttributes } from "react";
-import { useAtom, useSetAtom, type PrimitiveAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { Settings as IconSettings } from "lucide-react";
 import { Button } from "@/components/ui/shadcn/button";
@@ -29,15 +28,7 @@ export function SettingsPopover() {
                 </div>
 
                 <div className="grid gap-3">
-                    <SettingsRangeField
-                        label="Stroke"
-                        valueAtom={strokeWidthAtom}
-                        min={0.1}
-                        max={12}
-                        step={0.1}
-                        valueClassName="w-10"
-                        formatValue={formatCompactNumber}
-                    />
+                    <SettingsRangeField />
 
                     <ZoomSettingsField />
 
@@ -59,29 +50,25 @@ export function SettingsPopover() {
     );
 }
 
-function SettingsRangeField({ valueAtom, label, valueClassName, formatValue, min = 0, max = 100, step = 1 }: { valueAtom: PrimitiveAtom<number>; label: string; valueClassName: string; formatValue?: (value: number) => string | number; min?: number; max?: number; step?: number; }) {
-    const [value, setValue] = useAtom(valueAtom);
-    const displayValue = formatValue ? formatValue(value) : value;
+function SettingsRangeField() {
+    const [value, setValue] = useAtom(strokeWidthAtom);
+    const displayValue = formatCompactNumber(value);
 
     return (
         <label className="text-xs flex items-center gap-2">
-            <span className="shrink-0 w-12">
-                {label}
-            </span>
+            <span className="shrink-0 w-12">Stroke</span>
             <Slider
                 className="flex-1"
                 value={[value]}
-                min={min}
-                max={max}
-                step={step}
+                min={0.1}
+                max={12}
+                step={0.1}
                 onValueChange={([nextValue]) => {
                     if (!Number.isFinite(nextValue)) return;
                     setValue(nextValue);
                 }}
             />
-            <span className={`${valueClassName} text-right tabular-nums`}>
-                {displayValue}
-            </span>
+            <span className="w-10 text-right tabular-nums">{displayValue}</span>
         </label>
     );
 }
@@ -92,7 +79,9 @@ function ZoomSettingsField() {
 
     return (
         <label className="text-xs flex items-center gap-2">
-            <span className="shrink-0 w-12">Zoom</span>
+            <span className="shrink-0 w-12">
+                Zoom
+            </span>
 
             <Slider
                 className="flex-1"
