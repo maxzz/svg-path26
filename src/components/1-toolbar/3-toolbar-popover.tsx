@@ -20,7 +20,7 @@ export function SettingsPopover() {
                 </Button>
             </PopoverTrigger>
 
-            <PopoverContent className="p-3 pt-0 max-w-80  overflow-hidden" align="end">
+            <PopoverContent className="p-3 pt-0 w-auto max-w-80 overflow-hidden" align="end">
                 <div className="-mx-3 mb-3 pt-3 pb-2 border-b bg-foreground/10">
                     <h4 className="px-3 text-xs font-semibold leading-none">
                         View options
@@ -54,7 +54,7 @@ function StrokeInput() {
     const displayValue = formatCompactNumber(value);
 
     return (
-        <label className="text-xs flex items-center gap-2">
+        <label className="text-xs flex items-center gap-1">
             <span className="shrink-0 w-12">
                 Stroke
             </span>
@@ -69,7 +69,7 @@ function StrokeInput() {
                     setValue(nextValue);
                 }}
             />
-            <span className="w-10 text-right tabular-nums">
+            <span className="w-8 text-right tabular-nums">
                 {displayValue}
             </span>
         </label>
@@ -81,7 +81,7 @@ function ZoomInput() {
     const zoomViewPort = useSetAtom(doZoomViewPortAtom);
 
     return (
-        <label className="text-xs flex items-center gap-2">
+        <label className="text-xs flex items-center gap-1">
             <span className="shrink-0 w-12">
                 Zoom
             </span>
@@ -96,7 +96,7 @@ function ZoomInput() {
                     zoomViewPort({ scale: zoom / nextZoom });
                 }}
             />
-            <span className="w-12 text-right tabular-nums">
+            <span className="w-8 text-right tabular-nums">
                 {zoom.toFixed(1)}x
             </span>
         </label>

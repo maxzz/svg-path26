@@ -1,14 +1,15 @@
 # svg-path26
 
-React + TypeScript + Vite project with a layout style aligned to `trace-viewer-25`.
+This SVG path viewer allows you to visualize and edit SVG path data interactively.
 
-## Migration target
+![](./src/assets/previews/2026.03.30-143919.png)
 
-- Angular-style setup removed in favor of React component structure.
-- App shell moved to `src/components/0-all` with numbered module layout.
-- State management split by concern:
-  - **Jotai** for editor/path data atoms.
-  - **Valtio** for UI settings with snapshot-based rendering.
+## References
+
+- [SVG path exploration - svg-path first implementation - tm](https://github.com/maxzz/svg-path)
+- [SVG Path Editor](https://yqnn.github.io/svg-path-editor)
+- [SVG Path Visualizer](https://svg-path-visualizer.netlify.app)
+- [MDN - SVG Path Data](https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths)
 
 ## Run
 
