@@ -22,15 +22,19 @@ export function OpenPathDialog() {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="max-w-2xl">
                 <DialogHeader>
-                    <DialogTitle>Open saved path</DialogTitle>
+                    <DialogTitle>
+                        Open saved path
+                    </DialogTitle>
                     <DialogDescription>
                         Choose a path from browser storage.
                     </DialogDescription>
                 </DialogHeader>
+
                 <div className="max-h-80 space-y-2 overflow-auto">
                     {sortedStored.length === 0 && (
                         <p className="text-xs text-muted-foreground">No saved paths yet.</p>
                     )}
+
                     {sortedStored.map((entry) => {
                         const preview = getPathPreview(entry.path);
                         return (
@@ -38,12 +42,14 @@ export function OpenPathDialog() {
                                 <svg viewBox={preview.viewBox} className="h-10 w-16 rounded bg-muted/20">
                                     <path d={entry.path} fill="none" stroke="currentColor" strokeWidth={preview.strokeWidth} />
                                 </svg>
+
                                 <div className="min-w-0 flex-1">
                                     <p className="truncate text-xs font-medium">{entry.name}</p>
                                     <p className="text-[10px] text-muted-foreground">
                                         Updated {new Date(entry.updatedAt).toLocaleString()}
                                     </p>
                                 </div>
+
                                 <Button
                                     variant="outline"
                                     className="h-7 px-2"
@@ -54,6 +60,7 @@ export function OpenPathDialog() {
                                 >
                                     Open
                                 </Button>
+
                                 <Button
                                     variant="outline"
                                     className="h-7 px-2 text-destructive"
@@ -70,13 +77,14 @@ export function OpenPathDialog() {
     );
 }
 
-function getPathPreview(path: string): { viewBox: string; strokeWidth: number } {
+function getPathPreview(path: string): { viewBox: string; strokeWidth: number; } {
     try {
         const model = new SvgPathModel(path);
         const bounds = model.getBounds();
         const width = Math.max(2, bounds.xmax - bounds.xmin);
         const height = Math.max(2, bounds.ymax - bounds.ymin);
         const pad = Math.max(width, height) * 0.2 + 0.5;
+        
         return {
             viewBox: `${bounds.xmin - pad} ${bounds.ymin - pad} ${width + pad * 2} ${height + pad * 2}`,
             strokeWidth: Math.max(width, height) / 35,
