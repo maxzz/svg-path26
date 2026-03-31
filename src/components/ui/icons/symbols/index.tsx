@@ -1,5 +1,5 @@
 import { DefAllOtherTypes } from "./all-other";
-import { UISymbolDefsInject } from "./symbols-indect";
+import { UISymbolDefsInject } from "./symbols-inject";
 
 export * from "./all-other";
 

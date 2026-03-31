@@ -7,3 +7,4 @@ export * from "./04-zoom-normal";
 export * from "./04-zoom-out";
 export * from "./05-eye-hide";
 export * from "./05-eye-show";
+export * from "./06-tash";
