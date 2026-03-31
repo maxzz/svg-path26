@@ -1,8 +1,8 @@
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
-import { canvasUnitsPerPixelAtom } from "../../../../store/0-atoms/2-1-canvas-viewport-derives";
-import { pathViewBoxAtom } from "@/store/0-atoms/2-6-path-viewbox";
+import { canvasUnitsPerPixelAtom } from "../../../../store/0-atoms/2-3-canvas-viewport-derives";
+import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
 
 // Viewbox Frame Overlay
 

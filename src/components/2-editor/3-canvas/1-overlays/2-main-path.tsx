@@ -2,7 +2,7 @@ import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { canvasStrokeWidthAtom } from "../../../../store/0-atoms/2-1-canvas-viewport-derives";
+import { canvasStrokeWidthAtom } from "../../../../store/0-atoms/2-3-canvas-viewport-derives";
 import { parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
 import { getCanvasPathClasses } from "./8-canvas-color-palette";
 

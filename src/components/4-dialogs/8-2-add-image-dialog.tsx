@@ -2,8 +2,8 @@ import { useAtom, useSetAtom } from "jotai";
 import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
 import { Switch } from "@/components/ui/shadcn/switch";
-import { doAddImageAtom, isImageEditModeAtom, pendingImageAtom } from "@/store/0-atoms/2-4-images";
-import { addImageDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-dialogs-menu";
+import { doAddImageAtom, isImageEditModeAtom, pendingImageAtom } from "@/store/0-atoms/2-8-images";
+import { addImageDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 import { NumberField } from "@/components/ui/loacal-ui/2-number-field";
 
 export function AddImageDialog() {

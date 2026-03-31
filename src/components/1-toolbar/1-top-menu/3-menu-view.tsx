@@ -1,7 +1,7 @@
 import { useAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarTrigger } from "@/components/ui/shadcn/menubar";
-import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
+import { isImageEditModeAtom } from "@/store/0-atoms/2-8-images";
 import { appSettings } from "@/store/0-ui-settings";
 import { toggleTheme } from "@/utils";
 

@@ -3,7 +3,7 @@ import { useSnapshot } from "valtio";
 import { MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarTrigger } from "@/components/ui/shadcn/menubar";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "@/store/0-atoms/1-2-history";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { doClearPathAtom, doNormalizePathAtom, doSetAbsoluteAtom, doSetRelativeAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { doClearPathAtom, doNormalizePathAtom, doSetAbsoluteAtom, doSetRelativeAtom } from "@/store/0-atoms/2-4-editor-actions";
 import { appSettings } from "@/store/0-ui-settings";
 
 export function EditMenu() {

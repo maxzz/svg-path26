@@ -1,7 +1,7 @@
 import { useAtom } from "jotai";
 import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
-import { aboutDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-dialogs-menu";
+import { aboutDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 
 export function AboutDialog() {
     const [open, setOpen] = useAtom(aboutDialogOpenAtom);

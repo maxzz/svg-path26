@@ -7,9 +7,9 @@ import { createAtomAppSetting } from "./8-create-atom-app-settings";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doSetPathWithoutHistoryAtom, doUndoPathAtom } from "./1-2-history";
 import { commandRowsAtom, standaloneSegmentPathsAtom, svgModelAtom } from "./2-0-svg-model";
-import { doDeleteImageAtom, focusedImageIdAtom } from "./2-4-images";
+import { doDeleteImageAtom, focusedImageIdAtom } from "./2-8-images";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
-import { applyCommandSelection, normalizeSelectedCommandIndices, remapSelectedIndicesAfterDelete, type CommandSelectionMode } from "./2-2-editor-selection-utils";
+import { applyCommandSelection, normalizeSelectedCommandIndices, remapSelectedIndicesAfterDelete, type CommandSelectionMode } from "./2-5-editor-selection-utils";
 import { appSettings } from "@/store/0-ui-settings";
 
 export const strokeWidthAtom = createAtomAppSetting("strokeWidth");

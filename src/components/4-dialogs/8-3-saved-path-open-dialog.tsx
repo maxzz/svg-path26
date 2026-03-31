@@ -4,8 +4,8 @@ import { useSnapshot } from "valtio";
 import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
 import { appSettings } from "@/store/0-ui-settings";
-import { doDeleteNamedPathAtom, doOpenNamedPathAtom } from "@/store/0-atoms/2-3-stored-paths-actions";
-import { openPathDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-dialogs-menu";
+import { doDeleteNamedPathAtom, doOpenNamedPathAtom } from "@/store/0-atoms/2-6-stored-paths-actions";
+import { openPathDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
 
 export function OpenPathDialog() {

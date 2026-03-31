@@ -8,8 +8,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/shadcn/input";
 import { ScrollArea } from "@/components/ui/shadcn/scroll-area";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { doSaveNamedPathAtom } from "@/store/0-atoms/2-3-stored-paths-actions";
-import { savePathDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-dialogs-menu";
+import { doSaveNamedPathAtom } from "@/store/0-atoms/2-6-stored-paths-actions";
+import { savePathDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 import { doAsyncExecuteConfirmDialogAtom } from "@/components/4-dialogs/confirmation/2-7-confirmation-dialog";
 import { getConfirmOverwriteSavedPathMessages } from "@/components/4-dialogs/confirmation/8-confirmation-ui-messages";
 import { SvgPathModel } from "@/svg-core/2-svg-model";

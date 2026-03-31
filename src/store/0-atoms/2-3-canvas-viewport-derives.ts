@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { type SizeWH, type ViewBox } from "@/svg-core/9-types-svg-model";
-import { canvasRootSvgElementAtom, canvasViewPortAtom, rootSvgElementSizeAtom } from "@/store/0-atoms/2-1-canvas-viewport";
-import { strokeWidthAtom } from "@/store/0-atoms/2-2-editor-actions";
+import { canvasRootSvgElementAtom, canvasViewPortAtom, rootSvgElementSizeAtom } from "@/store/0-atoms/2-3-canvas-viewport";
+import { strokeWidthAtom } from "@/store/0-atoms/2-4-editor-actions";
 
 export const canvasUnitsPerPixelAtom = atom(
     (get) => getSvgUnitsPerPixel(get(canvasViewPortAtom), get(rootSvgElementSizeAtom))

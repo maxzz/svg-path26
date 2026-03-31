@@ -1,7 +1,7 @@
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
-import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
+import { isImageEditModeAtom } from "@/store/0-atoms/2-8-images";
 
 import { CanvasMainPathOverlay } from "./2-main-path";
 import { CanvasControlLines, CanvasControlPoints } from "./3-control-points-and-lines";

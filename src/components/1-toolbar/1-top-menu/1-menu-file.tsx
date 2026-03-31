@@ -1,9 +1,9 @@
 import { useRef } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { MenubarContent, MenubarItem, MenubarMenu, MenubarShortcut, MenubarTrigger } from "@/components/ui/shadcn/menubar";
-import { addImageDialogOpenAtom, exportSvgDialogOpenAtom, openPathDialogOpenAtom, savePathDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-dialogs-menu";
+import { addImageDialogOpenAtom, exportSvgDialogOpenAtom, openPathDialogOpenAtom, savePathDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { pendingImageAtom } from "@/store/0-atoms/2-4-images";
+import { pendingImageAtom } from "@/store/0-atoms/2-8-images";
 
 export function FileMenu() {
     const pathValue = useAtomValue(svgPathInputAtom);

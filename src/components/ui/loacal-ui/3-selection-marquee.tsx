@@ -1,7 +1,7 @@
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
-import { canvasUnitsPerPixelAtom } from "../../../store/0-atoms/2-1-canvas-viewport-derives";
+import { canvasUnitsPerPixelAtom } from "../../../store/0-atoms/2-3-canvas-viewport-derives";
 import { canvasDragStateAtom } from "../../2-editor/3-canvas/3-canvas-drag";
 
 export function CanvasSelectionMarquee() {
