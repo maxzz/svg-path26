@@ -36,35 +36,46 @@ export function OpenPathDialog() {
                     )}
 
                     {sortedStored.map(
-                        (entry) => {
-                            const preview = getPathPreview(entry.path);
-                            return (
-                                <div key={entry.name} className="flex items-center gap-3 rounded border p-2">
-                                    <svg viewBox={preview.viewBox} className="h-10 w-16 rounded bg-muted/20">
-                                        <path d={entry.path} fill="none" stroke="currentColor" strokeWidth={preview.strokeWidth} />
-                                    </svg>
-
-                                    <div className="min-w-0 flex-1">
-                                        <p className="truncate text-xs font-medium">{entry.name}</p>
-                                        <p className="text-[10px] text-muted-foreground">
-                                            Updated {new Date(entry.updatedAt).toLocaleString()}
-                                        </p>
-                                    </div>
-
-                                    <Button className="h-7 px-2" variant="outline" onClick={() => {doOpenNamedPath(entry.name); setOpen(false);}}>
-                                        Open
-                                    </Button>
-
-                                    <Button className="h-7 px-2 text-destructive" variant="outline" onClick={() => doDeleteNamedPath(entry.name)}>
-                                        Delete
-                                    </Button>
-                                </div>
-                            );
-                        }
+                        (entry) => (
+                            <Row key={entry.name} entry={entry} onOpen={() => { doOpenNamedPath(entry.name); setOpen(false); }} onDelete={() => doDeleteNamedPath(entry.name)} />
+                        )
                     )}
                 </div>
             </DialogContent>
         </Dialog>
+    );
+}
+
+type StoredPathEntry = {
+    name: string;
+    path: string;
+    updatedAt: number;
+};
+
+function Row({ entry, onOpen, onDelete }: { entry: StoredPathEntry; onOpen: () => void; onDelete: () => void; }) {
+    const preview = getPathPreview(entry.path);
+
+    return (
+        <div className="flex items-center gap-3 rounded border p-2">
+            <svg viewBox={preview.viewBox} className="h-10 w-16 rounded bg-muted/20">
+                <path d={entry.path} fill="none" stroke="currentColor" strokeWidth={preview.strokeWidth} />
+            </svg>
+
+            <div className="min-w-0 flex-1">
+                <p className="truncate text-xs font-medium">{entry.name}</p>
+                <p className="text-[10px] text-muted-foreground">
+                    Updated {new Date(entry.updatedAt).toLocaleString()}
+                </p>
+            </div>
+
+            <Button className="h-7 px-2" variant="outline" onClick={onOpen}>
+                Open
+            </Button>
+
+            <Button className="h-7 px-2 text-destructive" variant="outline" onClick={onDelete}>
+                Delete
+            </Button>
+        </div>
     );
 }
 
