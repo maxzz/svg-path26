@@ -1,4 +1,3 @@
-import { AlertTriangle } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
@@ -10,7 +9,8 @@ import { appSettings } from "@/store/0-ui-settings";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { doSaveNamedPathAtom } from "@/store/0-atoms/2-3-stored-paths-actions";
 import { savePathDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-actions-menu";
-import { doAsyncExecuteConfirmDialogAtom } from "@/store/0-atoms/2-7-confirmation-dialog";
+import { doAsyncExecuteConfirmDialogAtom } from "@/components/4-dialogs/confirmation/2-7-confirmation-dialog";
+import { getConfirmOverwriteSavedPathMessages } from "@/components/4-dialogs/confirmation/8-confirmation-ui-messages";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
 import { cn } from "@/utils";
 
@@ -42,19 +42,7 @@ export function SavePathDialog() {
         if (!pathValue.trim() || !trimmedSaveName) return;
 
         if (existingMatch) {
-            const ok = await doAsyncExecuteConfirmDialog({
-                title: "Overwrite saved path?",
-                icon: <AlertTriangle className="size-4" />,
-                message: (
-                    <>
-                        A saved path named <span className="font-medium text-foreground">{existingMatch.name}</span> already exists.
-                        Save will replace its stored path data and update timestamp.
-                    </>
-                ),
-                buttonOk: "Overwrite",
-                buttonCancel: "Cancel",
-                isDafaultOk: false,
-            });
+            const ok = await doAsyncExecuteConfirmDialog(getConfirmOverwriteSavedPathMessages(existingMatch.name));
             if (!ok) return;
 
             doSaveNamedPath(trimmedSaveName);
