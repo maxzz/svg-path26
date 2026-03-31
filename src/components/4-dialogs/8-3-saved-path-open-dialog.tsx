@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { appSettings } from "@/store/0-ui-settings";
 import { doDeleteNamedPathAtom, doOpenNamedPathAtom } from "@/store/0-atoms/2-6-stored-paths-actions";
 import { openPathDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
-import { SvgPathModel } from "@/svg-core/2-svg-model";
+import { SavedPathPreview } from "@/components/4-dialogs/8-0-saved-path-preview";
 
 export function OpenPathDialog() {
     const { storedPaths } = useSnapshot(appSettings.pathEditor);
@@ -53,13 +53,9 @@ type StoredPathEntry = {
 };
 
 function Row({ entry, onOpen, onDelete }: { entry: StoredPathEntry; onOpen: () => void; onDelete: () => void; }) {
-    const preview = getPathPreview(entry.path);
-
     return (
         <div className="flex items-center gap-3 rounded border p-2">
-            <svg viewBox={preview.viewBox} className="h-10 w-16 rounded bg-muted/20">
-                <path d={entry.path} fill="none" stroke="currentColor" strokeWidth={preview.strokeWidth} />
-            </svg>
+            <SavedPathPreview path={entry.path} className="h-10 w-16 rounded bg-muted/20" />
 
             <div className="min-w-0 flex-1">
                 <p className="truncate text-xs font-medium">{entry.name}</p>
@@ -77,21 +73,4 @@ function Row({ entry, onOpen, onDelete }: { entry: StoredPathEntry; onOpen: () =
             </Button>
         </div>
     );
-}
-
-function getPathPreview(path: string): { viewBox: string; strokeWidth: number; } {
-    try {
-        const model = new SvgPathModel(path);
-        const bounds = model.getBounds();
-        const width = Math.max(2, bounds.xmax - bounds.xmin);
-        const height = Math.max(2, bounds.ymax - bounds.ymin);
-        const pad = Math.max(width, height) * 0.2 + 0.5;
-
-        return {
-            viewBox: `${bounds.xmin - pad} ${bounds.ymin - pad} ${width + pad * 2} ${height + pad * 2}`,
-            strokeWidth: Math.max(width, height) / 35,
-        };
-    } catch {
-        return { viewBox: "0 0 10 10", strokeWidth: 0.5 };
-    }
 }
