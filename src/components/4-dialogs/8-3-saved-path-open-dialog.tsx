@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
 import { appSettings } from "@/store/0-ui-settings";
 import { doDeleteNamedPathAtom, doOpenNamedPathAtom } from "@/store/0-atoms/2-3-stored-paths-actions";
-import { openPathDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-actions-menu";
+import { openPathDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-dialogs-menu";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
 
 export function OpenPathDialog() {

@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import { doClearPathAtom, doNormalizePathAtom, doSetAbsoluteAtom, doSetRelativeAtom } from "@/store/0-atoms/2-2-editor-actions";
-import { aboutDialogOpenAtom, exportSvgDialogOpenAtom, openPathDialogOpenAtom, savePathDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-actions-menu";
+import { aboutDialogOpenAtom, exportSvgDialogOpenAtom, openPathDialogOpenAtom, savePathDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-dialogs-menu";
 import { isImageEditModeAtom } from "@/store/0-atoms/2-4-images";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { appSettings } from "@/store/0-ui-settings";

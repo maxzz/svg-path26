@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
 import { Switch } from "@/components/ui/shadcn/switch";
 import { doAddImageAtom, isImageEditModeAtom, pendingImageAtom } from "@/store/0-atoms/2-4-images";
-import { addImageDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-actions-menu";
+import { addImageDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-dialogs-menu";
 import { NumberField } from "@/components/ui/loacal-ui/2-number-field";
 
 export function AddImageDialog() {
