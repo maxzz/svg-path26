@@ -1,4 +1,4 @@
-import { useEffect, useState, type ClipboardEvent } from "react";
+import { useEffect, useRef, useState, type ClipboardEvent } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { type SvgInputNode } from "@/svg-core/3-svg-input";
 import { cn } from "@/utils";
@@ -18,6 +18,7 @@ interface SvgTreeViewProps {
 export function SvgTreeView(props: SvgTreeViewProps) {
     const { root, selectedNodeId, onSelectNode, onPasteText, showConnectorLines = true, parseError, className } = props;
     const [expandedNodeIds, setExpandedNodeIds] = useState<Set<string>>(() => root ? new Set([root.id]) : new Set());
+    const pasteTargetRef = useRef<HTMLTextAreaElement | null>(null);
 
     useEffect(
         () => {
@@ -26,46 +27,65 @@ export function SvgTreeView(props: SvgTreeViewProps) {
         [root],
     );
 
+    const queuePasteTargetFocus = () => {
+        window.setTimeout(() => {
+            pasteTargetRef.current?.focus({ preventScroll: true });
+        }, 0);
+    };
+
     return (
         <div
-            role="tree"
-            aria-label="SVG structure"
-            tabIndex={0}
-            onPaste={(event) => handlePaste(event, onPasteText)}
             className={cn(
-                "overflow-auto rounded border bg-muted/20 font-mono text-[11px] outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                "relative rounded border bg-muted/20 font-mono text-[11px] outline-none focus-within:ring-1 focus-within:ring-ring",
                 className,
             )}
         >
-            {root ? (
-                <ul role="group" className="py-1">
-                    <SvgTreeBranch
-                        node={root}
-                        depth={0}
-                        isLast
-                        ancestryHasNext={[]}
-                        expandedNodeIds={expandedNodeIds}
-                        selectedNodeId={selectedNodeId}
-                        showConnectorLines={showConnectorLines}
-                        onSelectNode={onSelectNode}
-                        onToggleNode={(nodeId) => {
-                            setExpandedNodeIds((current) => {
-                                const next = new Set(current);
-                                if (next.has(nodeId)) {
-                                    next.delete(nodeId);
-                                } else {
-                                    next.add(nodeId);
-                                }
-                                return next;
-                            });
-                        }}
-                    />
-                </ul>
-            ) : (
-                <div className="px-3 py-3 text-[11px] leading-5 text-muted-foreground">
-                    Paste SVG markup, a path element, or path data here.
-                </div>
-            )}
+            <textarea
+                ref={pasteTargetRef}
+                aria-hidden="true"
+                tabIndex={-1}
+                className="pointer-events-none absolute left-0 top-0 h-px w-px opacity-0"
+                onPaste={(event) => handlePaste(event, onPasteText)}
+            />
+
+            <div
+                role="tree"
+                aria-label="SVG structure"
+                tabIndex={0}
+                onFocus={queuePasteTargetFocus}
+                onClickCapture={queuePasteTargetFocus}
+                className="overflow-auto"
+            >
+                {root ? (
+                    <ul role="group" className="py-1">
+                        <SvgTreeBranch
+                            node={root}
+                            depth={0}
+                            isLast
+                            ancestryHasNext={[]}
+                            expandedNodeIds={expandedNodeIds}
+                            selectedNodeId={selectedNodeId}
+                            showConnectorLines={showConnectorLines}
+                            onSelectNode={onSelectNode}
+                            onToggleNode={(nodeId) => {
+                                setExpandedNodeIds((current) => {
+                                    const next = new Set(current);
+                                    if (next.has(nodeId)) {
+                                        next.delete(nodeId);
+                                    } else {
+                                        next.add(nodeId);
+                                    }
+                                    return next;
+                                });
+                            }}
+                        />
+                    </ul>
+                ) : (
+                    <div className="px-3 py-3 text-[11px] leading-5 text-muted-foreground">
+                        Paste SVG markup, a path element, or path data here.
+                    </div>
+                )}
+            </div>
 
             {parseError ? (
                 <div className="border-t border-destructive/20 bg-destructive/5 px-3 py-2 text-[11px] text-destructive">
@@ -196,7 +216,7 @@ function TreeConnectors(props: { depth: number; isLast: boolean; ancestryHasNext
     );
 }
 
-function handlePaste(event: ClipboardEvent<HTMLDivElement>, onPasteText?: (text: string) => void) {
+function handlePaste(event: ClipboardEvent<HTMLTextAreaElement>, onPasteText?: (text: string) => void) {
     if (!onPasteText) return;
 
     const text = event.clipboardData.getData("text");
