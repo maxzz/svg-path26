@@ -1,59 +1,70 @@
-import { AlertTriangle } from "lucide-react";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
-import { confirmationDialogAtom, doCloseConfirmationDialogAtom } from "@/store/0-atoms/2-7-confirmation-dialog";
+import { type ConfirmationData, isOpenConfirmDialogAtom } from "@/store/0-atoms/2-7-confirmation-dialog";
 import { classNames } from "@/utils";
 
 const DESCRIPTION_ID = "confirmation-dialog-message";
 
 export function ConfirmationDialog() {
-    const dialog = useAtomValue(confirmationDialogAtom);
-    const closeDialog = useSetAtom(doCloseConfirmationDialogAtom);
+    const [confirmData, setConfirmData] = useAtom(isOpenConfirmDialogAtom);
+    if (!confirmData) {
+        return null;
+    }
+
+    const currentConfirmData = confirmData;
+
+    function onDlgClose(ok: boolean) {
+        setConfirmData(undefined);
+        currentConfirmData.resolve(ok);
+    }
 
     return (
-        <Dialog open={Boolean(dialog)} onOpenChange={(open) => { if (!open) closeDialog({ confirmed: false }); }}>
+        <Dialog open={!!currentConfirmData} onOpenChange={() => onDlgClose(false)}>
             <DialogContent className="max-w-sm gap-0 p-0" modal showCloseButton={false} aria-describedby={DESCRIPTION_ID}>
-                {dialog ? (
-                    <>
-                        <DialogHeader className="gap-0 border-b px-4 py-3 text-left">
-                            <DialogTitle className="text-sm">
-                                {dialog.title}
-                            </DialogTitle>
-                            <DialogDescription className="sr-only">
-                                Confirmation required before continuing.
-                            </DialogDescription>
-                        </DialogHeader>
+                <DialogHeader className="gap-0 border-b px-4 py-3 text-left">
+                    <DialogTitle className="text-sm">
+                        {currentConfirmData.ui.title}
+                    </DialogTitle>
+                    <DialogDescription className="sr-only">
+                        Confirmation required before continuing.
+                    </DialogDescription>
+                </DialogHeader>
 
-                        <div className="px-4 py-3">
-                            <div id={DESCRIPTION_ID} className="flex items-start gap-2 text-xs leading-5 text-foreground/90">
-                                <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-600" />
-                                <div className="min-w-0">
-                                    {dialog.message}
-                                </div>
-                            </div>
-
-                            <DialogFooter className={classNames("pt-4", dialog.cancelLabel ? "justify-end" : "justify-center")}>
-                                {dialog.cancelLabel ? (
-                                    <Button
-                                        variant={dialog.confirmVariant === "default" ? "outline" : "default"}
-                                        onClick={() => closeDialog({ confirmed: false })}
-                                    >
-                                        {dialog.cancelLabel}
-                                    </Button>
-                                ) : null}
-
-                                <Button
-                                    variant={dialog.confirmVariant}
-                                    onClick={() => closeDialog({ confirmed: true })}
-                                >
-                                    {dialog.confirmLabel}
-                                </Button>
-                            </DialogFooter>
-                        </div>
-                    </>
-                ) : null}
+                <Body confirmDialogOpen={currentConfirmData} onDlgClose={onDlgClose} />
             </DialogContent>
         </Dialog>
+    );
+}
+
+function Body({ confirmDialogOpen, onDlgClose }: { confirmDialogOpen: ConfirmationData; onDlgClose: (ok: boolean) => void; }) {
+    const { ui: { icon, message, buttonOk, buttonCancel, isDafaultOk } } = confirmDialogOpen;
+
+    return (
+        <div className="px-4 py-3">
+            <div id={DESCRIPTION_ID} className="flex items-start gap-2 text-xs leading-5 text-foreground/90">
+                {icon ? (
+                    <div className="mt-0.5 shrink-0 text-amber-600">
+                        {icon}
+                    </div>
+                ) : null}
+
+                <div className="min-w-0">
+                    {message}
+                </div>
+            </div>
+
+            <DialogFooter className={classNames("pt-4 flex-row", buttonCancel ? "justify-end" : "justify-center")}>
+                <Button variant={isDafaultOk ? "default" : "outline"} onClick={() => onDlgClose(true)}>
+                    {buttonOk}
+                </Button>
+
+                {buttonCancel ? (
+                    <Button variant={isDafaultOk ? "outline" : "default"} onClick={() => onDlgClose(false)}>
+                        {buttonCancel}
+                    </Button>
+                ) : null}
+            </DialogFooter>
+        </div>
     );
 }

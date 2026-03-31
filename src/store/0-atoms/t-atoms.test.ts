@@ -7,7 +7,7 @@ import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "./1-2-
 import { doApplySvgInputTextAtom, doSelectSvgInputNodeAtom, svgInputDocumentAtom, svgInputSelectedNodeIdAtom } from "./1-3-svg-input";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } from "./1-2-history";
-import { confirmationDialogAtom, doCloseConfirmationDialogAtom, doOpenConfirmationDialogAtom } from "./2-7-confirmation-dialog";
+import { doAsyncExecuteConfirmDialogAtom, isOpenConfirmDialogAtom } from "./2-7-confirmation-dialog";
 import { doOpenNamedPathAtom, doSaveNamedPathAtom } from "./2-3-stored-paths-actions";
 import { doSetPathViewBoxAtom } from "./2-6-path-viewbox";
 import { appSettings } from "@/store/0-ui-settings";
@@ -198,33 +198,39 @@ describe("svg path state atoms", () => {
         }
     });
 
-    it("opens and resolves the confirmation dialog callbacks", () => {
+    it("opens and resolves the confirmation dialog promise", async () => {
         const store = createStore();
-        const onConfirm = vi.fn();
-        const onCancel = vi.fn();
 
-        store.set(doOpenConfirmationDialogAtom, {
+        const confirmPromise = store.set(doAsyncExecuteConfirmDialogAtom, {
             title: "Overwrite saved path?",
+            icon: "!",
             message: "Replace existing path?",
-            onConfirm,
-            onCancel,
-        });
+            buttonOk: "Overwrite",
+            buttonCancel: "Cancel",
+            isDafaultOk: false,
+        }) as Promise<boolean>;
 
-        expect(store.get(confirmationDialogAtom)?.title).toBe("Overwrite saved path?");
+        const confirmDialog = store.get(isOpenConfirmDialogAtom);
+        expect(confirmDialog?.ui.title).toBe("Overwrite saved path?");
+        confirmDialog?.resolve(true);
+        store.set(isOpenConfirmDialogAtom, undefined);
 
-        store.set(doCloseConfirmationDialogAtom, { confirmed: true });
-        expect(store.get(confirmationDialogAtom)).toBeNull();
-        expect(onConfirm).toHaveBeenCalledTimes(1);
-        expect(onCancel).not.toHaveBeenCalled();
+        await expect(confirmPromise).resolves.toBe(true);
 
-        store.set(doOpenConfirmationDialogAtom, {
+        const cancelPromise = store.set(doAsyncExecuteConfirmDialogAtom, {
             title: "Overwrite saved path?",
+            icon: "!",
             message: "Replace existing path?",
-            onConfirm,
-            onCancel,
-        });
-        store.set(doCloseConfirmationDialogAtom, { confirmed: false });
-        expect(onCancel).toHaveBeenCalledTimes(1);
+            buttonOk: "Overwrite",
+            buttonCancel: "Cancel",
+            isDafaultOk: false,
+        }) as Promise<boolean>;
+
+        const cancelDialog = store.get(isOpenConfirmDialogAtom);
+        cancelDialog?.resolve(false);
+        store.set(isOpenConfirmDialogAtom, undefined);
+
+        await expect(cancelPromise).resolves.toBe(false);
     });
 
     it("loads standalone path data through the SVG input atom", () => {

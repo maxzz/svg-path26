@@ -1,3 +1,4 @@
+import { AlertTriangle } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
@@ -9,7 +10,7 @@ import { appSettings } from "@/store/0-ui-settings";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { doSaveNamedPathAtom } from "@/store/0-atoms/2-3-stored-paths-actions";
 import { savePathDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-actions-menu";
-import { doOpenConfirmationDialogAtom } from "@/store/0-atoms/2-7-confirmation-dialog";
+import { doAsyncExecuteConfirmDialogAtom } from "@/store/0-atoms/2-7-confirmation-dialog";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
 import { cn } from "@/utils";
 
@@ -18,7 +19,7 @@ export function SavePathDialog() {
     const { pathName, storedPaths } = useSnapshot(appSettings.pathEditor);
     const [open, setOpen] = useAtom(savePathDialogOpenAtom);
     const doSaveNamedPath = useSetAtom(doSaveNamedPathAtom);
-    const openConfirmationDialog = useSetAtom(doOpenConfirmationDialogAtom);
+    const doAsyncExecuteConfirmDialog = useSetAtom(doAsyncExecuteConfirmDialogAtom);
 
     const [saveNameDraft, setSaveNameDraft] = useState(pathName || "My path");
 
@@ -37,26 +38,27 @@ export function SavePathDialog() {
         [pathName],
     );
 
-    function handleSaveClick() {
+    async function handleSaveClick() {
         if (!pathValue.trim() || !trimmedSaveName) return;
 
         if (existingMatch) {
-            openConfirmationDialog({
+            const ok = await doAsyncExecuteConfirmDialog({
                 title: "Overwrite saved path?",
+                icon: <AlertTriangle className="size-4" />,
                 message: (
                     <>
                         A saved path named <span className="font-medium text-foreground">{existingMatch.name}</span> already exists.
                         Save will replace its stored path data and update timestamp.
                     </>
                 ),
-                confirmLabel: "Overwrite",
-                cancelLabel: "Cancel",
-                confirmVariant: "destructive",
-                onConfirm: () => {
-                    doSaveNamedPath(trimmedSaveName);
-                    setOpen(false);
-                },
+                buttonOk: "Overwrite",
+                buttonCancel: "Cancel",
+                isDafaultOk: false,
             });
+            if (!ok) return;
+
+            doSaveNamedPath(trimmedSaveName);
+            setOpen(false);
             return;
         }
 
