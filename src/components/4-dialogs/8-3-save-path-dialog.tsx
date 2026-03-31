@@ -10,6 +10,7 @@ import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { doSaveNamedPathAtom } from "@/store/0-atoms/2-3-stored-paths-actions";
 import { savePathDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-actions-menu";
 import { doOpenConfirmationDialogAtom } from "@/store/0-atoms/2-7-confirmation-dialog";
+import { SvgPathModel } from "@/svg-core/2-svg-model";
 import { cn } from "@/utils";
 
 export function SavePathDialog() {
@@ -101,27 +102,34 @@ export function SavePathDialog() {
                                     </p>
                                 ) : sortedStoredPaths.map((entry) => {
                                     const selected = entry.name === trimmedSaveName;
+                                    const preview = getPathPreview(entry.path);
                                     return (
                                         <button
                                             key={entry.name}
                                             type="button"
                                             className={cn(
-                                                "flex w-full items-center justify-between gap-3 rounded-md border px-2 py-1.5 text-left transition-colors",
+                                                "flex w-full items-center gap-3 rounded-md border px-2 py-1.5 text-left transition-colors",
                                                 selected
                                                     ? "border-transparent bg-blue-300 text-slate-950"
                                                     : "bg-background hover:bg-accent/60",
                                             )}
                                             onClick={() => setSaveNameDraft(entry.name)}
                                         >
-                                            <span className="min-w-0 flex-1 truncate text-xs font-medium">
-                                                {entry.name}
-                                            </span>
-                                            <span className={cn(
-                                                "shrink-0 text-[10px]",
-                                                selected ? "text-slate-700" : "text-muted-foreground",
-                                            )}>
-                                                {new Date(entry.updatedAt).toLocaleDateString()}
-                                            </span>
+                                            <svg viewBox={preview.viewBox} className={cn("h-10 w-16 shrink-0 rounded bg-muted/20", selected && "bg-white/50")}>
+                                                <path d={entry.path} fill="none" stroke="currentColor" strokeWidth={preview.strokeWidth} />
+                                            </svg>
+
+                                            <div className="min-w-0 flex-1">
+                                                <p className="truncate text-xs font-medium">
+                                                    {entry.name}
+                                                </p>
+                                                <p className={cn(
+                                                    "text-[10px]",
+                                                    selected ? "text-slate-700" : "text-muted-foreground",
+                                                )}>
+                                                    Updated {new Date(entry.updatedAt).toLocaleString()}
+                                                </p>
+                                            </div>
                                         </button>
                                     );
                                 })}
@@ -146,4 +154,20 @@ export function SavePathDialog() {
             </DialogContent>
         </Dialog>
     );
+}
+
+function getPathPreview(path: string): { viewBox: string; strokeWidth: number } {
+    try {
+        const model = new SvgPathModel(path);
+        const bounds = model.getBounds();
+        const width = Math.max(2, bounds.xmax - bounds.xmin);
+        const height = Math.max(2, bounds.ymax - bounds.ymin);
+        const pad = Math.max(width, height) * 0.2 + 0.5;
+        return {
+            viewBox: `${bounds.xmin - pad} ${bounds.ymin - pad} ${width + pad * 2} ${height + pad * 2}`,
+            strokeWidth: Math.max(width, height) / 35,
+        };
+    } catch {
+        return { viewBox: "0 0 10 10", strokeWidth: 0.5 };
+    }
 }
