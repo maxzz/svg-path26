@@ -37,7 +37,7 @@ export function SavePathDialog() {
         [pathName],
     );
 
-    const handleSaveClick = () => {
+    function handleSaveClick() {
         if (!pathValue.trim() || !trimmedSaveName) return;
 
         if (existingMatch) {
@@ -62,15 +62,20 @@ export function SavePathDialog() {
 
         doSaveNamedPath(trimmedSaveName);
         setOpen(false);
-    };
+    }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Save path</DialogTitle>
-                    <DialogDescription>Save current path in browser storage.</DialogDescription>
+                    <DialogTitle>
+                        Save path
+                    </DialogTitle>
+                    <DialogDescription>
+                        Save current path in browser storage.
+                    </DialogDescription>
                 </DialogHeader>
+
                 <div className="space-y-3">
                     <div className="space-y-2">
                         <label className="text-xs">Name</label>
@@ -88,7 +93,9 @@ export function SavePathDialog() {
 
                     <div className="space-y-2">
                         <div className="flex items-center justify-between gap-2">
-                            <label className="text-xs">Existing saved paths</label>
+                            <label className="text-xs">
+                                Existing saved paths
+                            </label>
                             <span className="text-[10px] text-muted-foreground">
                                 Click a name to reuse it
                             </span>
@@ -100,39 +107,39 @@ export function SavePathDialog() {
                                     <p className="px-1 py-2 text-xs text-muted-foreground">
                                         No saved paths yet.
                                     </p>
-                                ) : sortedStoredPaths.map((entry) => {
-                                    const selected = entry.name === trimmedSaveName;
-                                    const preview = getPathPreview(entry.path);
-                                    return (
-                                        <button
-                                            key={entry.name}
-                                            type="button"
-                                            className={cn(
-                                                "flex w-full items-center gap-3 rounded-md border px-2 py-1.5 text-left transition-colors",
-                                                selected
-                                                    ? "border-transparent bg-blue-300 text-slate-950"
-                                                    : "bg-background hover:bg-accent/60",
-                                            )}
-                                            onClick={() => setSaveNameDraft(entry.name)}
-                                        >
-                                            <svg viewBox={preview.viewBox} className={cn("h-10 w-16 shrink-0 rounded bg-muted/20", selected && "bg-white/50")}>
-                                                <path d={entry.path} fill="none" stroke="currentColor" strokeWidth={preview.strokeWidth} />
-                                            </svg>
+                                ) : sortedStoredPaths.map(
+                                    (entry) => {
+                                        const selected = entry.name === trimmedSaveName;
+                                        const preview = getPathPreview(entry.path);
+                                        return (
+                                            <button
+                                                key={entry.name}
+                                                type="button"
+                                                className={cn(
+                                                    "flex w-full items-center gap-3 rounded-md border px-2 py-1.5 text-left transition-colors",
+                                                    selected
+                                                        ? "border-transparent bg-blue-300 text-slate-950"
+                                                        : "bg-background hover:bg-accent/60",
+                                                )}
+                                                onClick={() => setSaveNameDraft(entry.name)}
+                                            >
+                                                <svg viewBox={preview.viewBox} className={cn("h-10 w-16 shrink-0 rounded bg-muted/20", selected && "bg-white/50")}>
+                                                    <path d={entry.path} fill="none" stroke="currentColor" strokeWidth={preview.strokeWidth} />
+                                                </svg>
 
-                                            <div className="min-w-0 flex-1">
-                                                <p className="truncate text-xs font-medium">
-                                                    {entry.name}
-                                                </p>
-                                                <p className={cn(
-                                                    "text-[10px]",
-                                                    selected ? "text-slate-700" : "text-muted-foreground",
-                                                )}>
-                                                    Updated {new Date(entry.updatedAt).toLocaleString()}
-                                                </p>
-                                            </div>
-                                        </button>
-                                    );
-                                })}
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="truncate text-xs font-medium">
+                                                        {entry.name}
+                                                    </p>
+
+                                                    <p className={cn("text-[10px]", selected ? "text-slate-700" : "text-muted-foreground")}>
+                                                        Updated {new Date(entry.updatedAt).toLocaleString()}
+                                                    </p>
+                                                </div>
+                                            </button>
+                                        );
+                                    }
+                                )}
                             </div>
                         </ScrollArea>
                     </div>
@@ -156,7 +163,7 @@ export function SavePathDialog() {
     );
 }
 
-function getPathPreview(path: string): { viewBox: string; strokeWidth: number } {
+function getPathPreview(path: string): { viewBox: string; strokeWidth: number; } {
     try {
         const model = new SvgPathModel(path);
         const bounds = model.getBounds();

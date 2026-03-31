@@ -35,42 +35,33 @@ export function OpenPathDialog() {
                         <p className="text-xs text-muted-foreground">No saved paths yet.</p>
                     )}
 
-                    {sortedStored.map((entry) => {
-                        const preview = getPathPreview(entry.path);
-                        return (
-                            <div key={entry.name} className="flex items-center gap-3 rounded border p-2">
-                                <svg viewBox={preview.viewBox} className="h-10 w-16 rounded bg-muted/20">
-                                    <path d={entry.path} fill="none" stroke="currentColor" strokeWidth={preview.strokeWidth} />
-                                </svg>
+                    {sortedStored.map(
+                        (entry) => {
+                            const preview = getPathPreview(entry.path);
+                            return (
+                                <div key={entry.name} className="flex items-center gap-3 rounded border p-2">
+                                    <svg viewBox={preview.viewBox} className="h-10 w-16 rounded bg-muted/20">
+                                        <path d={entry.path} fill="none" stroke="currentColor" strokeWidth={preview.strokeWidth} />
+                                    </svg>
 
-                                <div className="min-w-0 flex-1">
-                                    <p className="truncate text-xs font-medium">{entry.name}</p>
-                                    <p className="text-[10px] text-muted-foreground">
-                                        Updated {new Date(entry.updatedAt).toLocaleString()}
-                                    </p>
+                                    <div className="min-w-0 flex-1">
+                                        <p className="truncate text-xs font-medium">{entry.name}</p>
+                                        <p className="text-[10px] text-muted-foreground">
+                                            Updated {new Date(entry.updatedAt).toLocaleString()}
+                                        </p>
+                                    </div>
+
+                                    <Button className="h-7 px-2" variant="outline" onClick={() => {doOpenNamedPath(entry.name); setOpen(false);}}>
+                                        Open
+                                    </Button>
+
+                                    <Button className="h-7 px-2 text-destructive" variant="outline" onClick={() => doDeleteNamedPath(entry.name)}>
+                                        Delete
+                                    </Button>
                                 </div>
-
-                                <Button
-                                    variant="outline"
-                                    className="h-7 px-2"
-                                    onClick={() => {
-                                        doOpenNamedPath(entry.name);
-                                        setOpen(false);
-                                    }}
-                                >
-                                    Open
-                                </Button>
-
-                                <Button
-                                    variant="outline"
-                                    className="h-7 px-2 text-destructive"
-                                    onClick={() => doDeleteNamedPath(entry.name)}
-                                >
-                                    Delete
-                                </Button>
-                            </div>
-                        );
-                    })}
+                            );
+                        }
+                    )}
                 </div>
             </DialogContent>
         </Dialog>
@@ -84,7 +75,7 @@ function getPathPreview(path: string): { viewBox: string; strokeWidth: number; }
         const width = Math.max(2, bounds.xmax - bounds.xmin);
         const height = Math.max(2, bounds.ymax - bounds.ymin);
         const pad = Math.max(width, height) * 0.2 + 0.5;
-        
+
         return {
             viewBox: `${bounds.xmin - pad} ${bounds.ymin - pad} ${width + pad * 2} ${height + pad * 2}`,
             strokeWidth: Math.max(width, height) / 35,
