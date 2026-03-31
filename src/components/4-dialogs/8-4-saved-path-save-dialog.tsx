@@ -12,7 +12,7 @@ import { doSaveNamedPathAtom } from "@/store/0-atoms/2-6-stored-paths-actions";
 import { savePathDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 import { doAsyncExecuteConfirmDialogAtom } from "@/components/4-dialogs/confirmation/2-7-confirmation-dialog";
 import { getConfirmOverwriteSavedPathMessages } from "@/components/4-dialogs/confirmation/8-confirmation-ui-messages";
-import { SavedPathPreview } from "@/components/4-dialogs/8-0-saved-path-preview";
+import { PathPreview } from "@/components/ui/loacal-ui/8-path-preview";
 
 export function SavePathDialog() {
     const pathValue = useAtomValue(svgPathInputAtom);
@@ -92,21 +92,23 @@ export function SavePathDialog() {
                         </div>
 
                         <ScrollArea className="h-44 rounded-md border" fixedWidth parentContentWidth>
-                            <div className="space-y-1 p-2">
-                                {sortedStoredPaths.length === 0 ? (
-                                    <p className="px-1 py-2 text-xs text-muted-foreground">
-                                        No saved paths yet.
-                                    </p>
-                                ) : sortedStoredPaths.map(
-                                    (entry) => (
-                                        <Row key={entry.name} entry={entry} selected={entry.name === trimmedSaveName} setSaveNameDraft={setSaveNameDraft} />
+                            <div className="p-2 space-y-1">
+                                {sortedStoredPaths.length === 0
+                                    ? (
+                                        <p className="px-1 py-2 text-xs text-muted-foreground">
+                                            No saved paths yet.
+                                        </p>
+                                    ) : sortedStoredPaths.map(
+                                        (entry) => (
+                                            <Row key={entry.name} entry={entry} selected={entry.name === trimmedSaveName} setSaveNameDraft={setSaveNameDraft} />
+                                        )
                                     )
-                                )}
+                                }
                             </div>
                         </ScrollArea>
                     </div>
                 </div>
-                
+
                 <DialogFooter>
                     <Button variant="outline" onClick={() => setOpen(false)}>
                         Cancel
@@ -129,22 +131,19 @@ type StoredPathEntry = {
 function Row({ entry, selected, setSaveNameDraft }: { entry: StoredPathEntry; selected: boolean; setSaveNameDraft: Dispatch<SetStateAction<string>>; }) {
     return (
         <button
-            type="button"
             className={classNames(
-                "flex w-full items-center gap-3 rounded-md border px-2 py-1.5 text-left transition-colors",
+                "px-2 py-1.5 w-full text-left border transition-colors rounded-md flex items-center gap-3",
                 selected
-                    ? "border-transparent bg-blue-300 text-slate-950"
+                    ? "text-slate-950 bg-blue-300 border-transparent"
                     : "bg-background hover:bg-accent/60",
             )}
             onClick={() => setSaveNameDraft(entry.name)}
+            type="button"
         >
-            <SavedPathPreview
-                path={entry.path}
-                className={classNames("h-10 w-16 shrink-0 rounded bg-muted/20", selected && "bg-white/50")}
-            />
+            <PathPreview className={classNames("shrink-0 w-16 h-10 rounded bg-muted/20", selected && "bg-white/50")} path={entry.path} />
 
-            <div className="min-w-0 flex-1">
-                <p className="truncate text-xs font-medium">
+            <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium truncate">
                     {entry.name}
                 </p>
 

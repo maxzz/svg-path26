@@ -1,22 +1,16 @@
+import { type SVGProps } from "react";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
 
-export function SavedPathPreview({
-    path,
-    className,
-}: {
-    path: string;
-    className?: string;
-}) {
+export function PathPreview({ path, ...rest }: { path: string; } & Omit<SVGProps<SVGSVGElement>, "children">) {
     const preview = getPathPreview(path);
-
     return (
-        <svg viewBox={preview.viewBox} className={className}>
+        <svg viewBox={preview.viewBox} {...rest}>
             <path d={path} fill="none" stroke="currentColor" strokeWidth={preview.strokeWidth} />
         </svg>
     );
 }
 
-function getPathPreview(path: string): { viewBox: string; strokeWidth: number } {
+function getPathPreview(path: string): { viewBox: string; strokeWidth: number; } {
     try {
         const model = new SvgPathModel(path);
         const bounds = model.getBounds();

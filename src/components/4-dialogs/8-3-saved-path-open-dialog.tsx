@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { appSettings } from "@/store/0-ui-settings";
 import { doDeleteNamedPathAtom, doOpenNamedPathAtom } from "@/store/0-atoms/2-6-stored-paths-actions";
 import { openPathDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
-import { SavedPathPreview } from "@/components/4-dialogs/8-0-saved-path-preview";
+import { PathPreview } from "@/components/ui/loacal-ui/8-path-preview";
 
 export function OpenPathDialog() {
     const { storedPaths } = useSnapshot(appSettings.pathEditor);
@@ -20,7 +20,7 @@ export function OpenPathDialog() {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="w-auto! max-w-xl!">
                 <DialogHeader>
                     <DialogTitle>
                         Open saved path
@@ -30,16 +30,17 @@ export function OpenPathDialog() {
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="max-h-80 space-y-2 overflow-auto">
-                    {sortedStored.length === 0 && (
-                        <p className="text-xs text-muted-foreground">No saved paths yet.</p>
-                    )}
-
-                    {sortedStored.map(
-                        (entry) => (
-                            <Row key={entry.name} entry={entry} onOpen={() => { doOpenNamedPath(entry.name); setOpen(false); }} onDelete={() => doDeleteNamedPath(entry.name)} />
-                        )
-                    )}
+                <div className="max-h-96 space-y-2 overflow-auto">
+                    {!sortedStored.length
+                        ? (
+                            <p className="text-xs text-muted-foreground">
+                                No saved paths yet.
+                            </p>
+                        ) : sortedStored.map(
+                            (entry) => (
+                                <Row key={entry.name} entry={entry} onOpen={() => { doOpenNamedPath(entry.name); setOpen(false); }} onDelete={() => doDeleteNamedPath(entry.name)} />
+                            )
+                        )}
                 </div>
             </DialogContent>
         </Dialog>
@@ -55,7 +56,7 @@ type StoredPathEntry = {
 function Row({ entry, onOpen, onDelete }: { entry: StoredPathEntry; onOpen: () => void; onDelete: () => void; }) {
     return (
         <div className="flex items-center gap-3 rounded border p-2">
-            <SavedPathPreview path={entry.path} className="h-10 w-16 rounded bg-muted/20" />
+            <PathPreview path={entry.path} className="h-10 w-16 rounded bg-muted/20" />
 
             <div className="min-w-0 flex-1">
                 <p className="truncate text-xs font-medium">{entry.name}</p>
