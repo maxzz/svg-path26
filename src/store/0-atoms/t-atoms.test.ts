@@ -7,6 +7,7 @@ import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "./1-2-
 import { doApplySvgInputTextAtom, doSelectSvgInputNodeAtom, svgInputDocumentAtom, svgInputSelectedNodeIdAtom } from "./1-3-svg-input";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } from "./1-2-history";
+import { confirmationDialogAtom, doCloseConfirmationDialogAtom, doOpenConfirmationDialogAtom } from "./2-7-confirmation-dialog";
 import { doOpenNamedPathAtom, doSaveNamedPathAtom } from "./2-3-stored-paths-actions";
 import { doSetPathViewBoxAtom } from "./2-6-path-viewbox";
 import { appSettings } from "@/store/0-ui-settings";
@@ -165,6 +166,65 @@ describe("svg path state atoms", () => {
         expect(store.get(svgPathInputAtom)).toContain("33 44");
         expect(appSettings.pathEditor.viewBox).toEqual([1, 2, 30, 40]);
         expect(store.get(canvasViewPortAtom)).toEqual([9, 9, 12, 12]);
+    });
+
+    it("rewrites an existing saved path while keeping its original creation timestamp", () => {
+        vi.useFakeTimers();
+
+        try {
+            const store = createStore();
+
+            vi.setSystemTime(new Date("2026-03-30T10:00:00Z"));
+            store.set(svgPathInputAtom, "M 0 0 L 10 10");
+            store.set(doSetPathViewBoxAtom, [0, 0, 10, 10]);
+            store.set(doSaveNamedPathAtom, "example");
+
+            const created = appSettings.pathEditor.storedPaths[0];
+            expect(created?.createdAt).toBeDefined();
+
+            vi.setSystemTime(new Date("2026-03-30T11:00:00Z"));
+            store.set(svgPathInputAtom, "M 0 0 L 20 20");
+            store.set(doSetPathViewBoxAtom, [1, 2, 20, 20]);
+            store.set(doSaveNamedPathAtom, "example");
+
+            const updated = appSettings.pathEditor.storedPaths[0];
+            expect(appSettings.pathEditor.storedPaths).toHaveLength(1);
+            expect(updated?.path).toBe("M 0 0 L 20 20");
+            expect(updated?.viewBox).toEqual([1, 2, 20, 20]);
+            expect(updated?.createdAt).toBe(created?.createdAt);
+            expect(updated?.updatedAt).toBeGreaterThan(created?.updatedAt ?? 0);
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
+    it("opens and resolves the confirmation dialog callbacks", () => {
+        const store = createStore();
+        const onConfirm = vi.fn();
+        const onCancel = vi.fn();
+
+        store.set(doOpenConfirmationDialogAtom, {
+            title: "Overwrite saved path?",
+            message: "Replace existing path?",
+            onConfirm,
+            onCancel,
+        });
+
+        expect(store.get(confirmationDialogAtom)?.title).toBe("Overwrite saved path?");
+
+        store.set(doCloseConfirmationDialogAtom, { confirmed: true });
+        expect(store.get(confirmationDialogAtom)).toBeNull();
+        expect(onConfirm).toHaveBeenCalledTimes(1);
+        expect(onCancel).not.toHaveBeenCalled();
+
+        store.set(doOpenConfirmationDialogAtom, {
+            title: "Overwrite saved path?",
+            message: "Replace existing path?",
+            onConfirm,
+            onCancel,
+        });
+        store.set(doCloseConfirmationDialogAtom, { confirmed: false });
+        expect(onCancel).toHaveBeenCalledTimes(1);
     });
 
     it("loads standalone path data through the SVG input atom", () => {
