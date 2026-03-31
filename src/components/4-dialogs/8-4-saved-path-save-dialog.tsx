@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
@@ -98,37 +98,9 @@ export function SavePathDialog() {
                                         No saved paths yet.
                                     </p>
                                 ) : sortedStoredPaths.map(
-                                    (entry) => {
-                                        const selected = entry.name === trimmedSaveName;
-                                        const preview = getPathPreview(entry.path);
-                                        return (
-                                            <button
-                                                key={entry.name}
-                                                type="button"
-                                                className={classNames(
-                                                    "flex w-full items-center gap-3 rounded-md border px-2 py-1.5 text-left transition-colors",
-                                                    selected
-                                                        ? "border-transparent bg-blue-300 text-slate-950"
-                                                        : "bg-background hover:bg-accent/60",
-                                                )}
-                                                onClick={() => setSaveNameDraft(entry.name)}
-                                            >
-                                                <svg viewBox={preview.viewBox} className={classNames("h-10 w-16 shrink-0 rounded bg-muted/20", selected && "bg-white/50")}>
-                                                    <path d={entry.path} fill="none" stroke="currentColor" strokeWidth={preview.strokeWidth} />
-                                                </svg>
-
-                                                <div className="min-w-0 flex-1">
-                                                    <p className="truncate text-xs font-medium">
-                                                        {entry.name}
-                                                    </p>
-
-                                                    <p className={classNames("text-[10px]", selected ? "text-slate-700" : "text-muted-foreground")}>
-                                                        Updated {new Date(entry.updatedAt).toLocaleString()}
-                                                    </p>
-                                                </div>
-                                            </button>
-                                        );
-                                    }
+                                    (entry) => (
+                                        <Row key={entry.name} entry={entry} selected={entry.name === trimmedSaveName} setSaveNameDraft={setSaveNameDraft} />
+                                    )
                                 )}
                             </div>
                         </ScrollArea>
@@ -145,6 +117,43 @@ export function SavePathDialog() {
                 </DialogFooter>
             </DialogContent>
         </Dialog>
+    );
+}
+
+type StoredPathEntry = {
+    name: string;
+    path: string;
+    updatedAt: number;
+};
+
+function Row({ entry, selected, setSaveNameDraft }: { entry: StoredPathEntry; selected: boolean; setSaveNameDraft: Dispatch<SetStateAction<string>>; }) {
+    const preview = getPathPreview(entry.path);
+
+    return (
+        <button
+            type="button"
+            className={classNames(
+                "flex w-full items-center gap-3 rounded-md border px-2 py-1.5 text-left transition-colors",
+                selected
+                    ? "border-transparent bg-blue-300 text-slate-950"
+                    : "bg-background hover:bg-accent/60",
+            )}
+            onClick={() => setSaveNameDraft(entry.name)}
+        >
+            <svg viewBox={preview.viewBox} className={classNames("h-10 w-16 shrink-0 rounded bg-muted/20", selected && "bg-white/50")}>
+                <path d={entry.path} fill="none" stroke="currentColor" strokeWidth={preview.strokeWidth} />
+            </svg>
+
+            <div className="min-w-0 flex-1">
+                <p className="truncate text-xs font-medium">
+                    {entry.name}
+                </p>
+
+                <p className={classNames("text-[10px]", selected ? "text-slate-700" : "text-muted-foreground")}>
+                    Updated {new Date(entry.updatedAt).toLocaleString()}
+                </p>
+            </div>
+        </button>
     );
 }
 
