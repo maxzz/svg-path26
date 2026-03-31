@@ -9,6 +9,16 @@
 					"label": "package.json"
 				}
 			]
+		},
+		{
+			"path": "src/assets/docs/TODOs.txt",
+			"bookmarks": [
+				{
+					"line": 0,
+					"column": 0,
+					"label": "TODOs"
+				}
+			]
 		}
 	]
 }

@@ -14,7 +14,7 @@ import { classNames } from "@/utils";
 
 export function OptionsPanel() {
     const { showTicks, snapToGrid, scrollOnHover, fillPreview, showGrid, showHelpers } = useSnapshot(appSettings.canvas);
-    const { minifyOutput, dragPrecision, tickInterval } = useSnapshot(appSettings.pathEditor);
+    const { minifyOutput, dragPrecision, tickInterval, showSvgTreeConnectorLines } = useSnapshot(appSettings.pathEditor);
 
     const doNormalizePath = useSetAtom(doNormalizePathAtom);
 
@@ -54,6 +54,7 @@ export function OptionsPanel() {
 
                     <CheckboxRow label="Show point controls" className="col-start-1" checked={showHelpers} onCheckedChange={(checked) => appSettings.canvas.showHelpers = checked} />
                     <CheckboxRow label="Fill path" className="col-start-1" checked={fillPreview} onCheckedChange={(checked) => appSettings.canvas.fillPreview = checked} />
+                    <CheckboxRow label="Show SVG tree lines" className="col-start-1" checked={showSvgTreeConnectorLines} onCheckedChange={(checked) => appSettings.pathEditor.showSvgTreeConnectorLines = checked} />
                     <CheckboxRow label="Minify output" checked={minifyOutput} className="col-start-1" onCheckedChange={(checked) => { appSettings.pathEditor.minifyOutput = checked; doNormalizePath(); }} />
                 </div>
             </div>
