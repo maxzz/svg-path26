@@ -4,16 +4,19 @@ import { doDeleteSelectedSegmentsAtom, doSetPointLocationWithoutHistoryAtom, sel
 import { commandRowsAtom, targetPointsAtom } from "./2-0-svg-model";
 import { canvasViewPortAtom, doFitViewPortAtom, doPanViewPortAtom, doSetViewPortAtom, doZoomViewPortAtom } from "./2-1-canvas-viewport";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "./1-2-history";
+import { doApplySvgInputTextAtom, doSelectSvgInputNodeAtom, svgInputDocumentAtom, svgInputSelectedNodeIdAtom } from "./1-3-svg-input";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } from "./1-2-history";
 import { doOpenNamedPathAtom, doSaveNamedPathAtom } from "./2-3-stored-paths-actions";
 import { doSetPathViewBoxAtom } from "./2-6-path-viewbox";
 import { appSettings } from "@/store/0-ui-settings";
 import { normalizeStoredSettings } from "@/store/1-ui-settings-normalize";
+import { DEFAULT_PATH_EDITOR_SETTINGS } from "@/store/9-ui-settings-types-and-defaults";
 
 describe("svg path state atoms", () => {
     beforeEach(() => {
         localStorage.clear();
+        appSettings.pathEditor.rawPath = DEFAULT_PATH_EDITOR_SETTINGS.rawPath;
         appSettings.pathEditor.zoom = 1;
         appSettings.pathEditor.viewPortLocked = false;
         appSettings.pathEditor.pathName = "";
@@ -29,6 +32,7 @@ describe("svg path state atoms", () => {
         appSettings.pathEditor.viewBox = [0, 0, 24, 24];
         appSettings.pathEditor.decimals = 3;
         appSettings.pathEditor.minifyOutput = false;
+        appSettings.pathEditor.showSvgTreeConnectorLines = true;
     });
 
     it("debounces app settings persistence", async () => {
@@ -163,6 +167,38 @@ describe("svg path state atoms", () => {
         expect(store.get(canvasViewPortAtom)).toEqual([9, 9, 12, 12]);
     });
 
+    it("loads standalone path data through the SVG input atom", () => {
+        const store = createStore();
+
+        store.set(doApplySvgInputTextAtom, `d="M 1 1 L 2 2"`);
+
+        expect(store.get(svgInputDocumentAtom)?.root.tagName).toBe("path");
+        expect(store.get(svgInputSelectedNodeIdAtom)).toBe("0");
+        expect(store.get(svgPathInputAtom)).toBe("M 1 1 L 2 2");
+    });
+
+    it("updates the path editor when a path node is selected from SVG input", () => {
+        const store = createStore();
+        store.set(svgPathInputAtom, "M 0 0 L 9 9");
+
+        store.set(doApplySvgInputTextAtom, `
+            <svg viewBox="0 0 10 10">
+                <g>
+                    <path d="M 1 1 L 2 2" />
+                </g>
+            </svg>
+        `);
+
+        expect(store.get(svgInputDocumentAtom)?.root.tagName).toBe("svg");
+        expect(store.get(svgInputSelectedNodeIdAtom)).toBe("0");
+        expect(store.get(svgPathInputAtom)).toBe("M 0 0 L 9 9");
+
+        store.set(doSelectSvgInputNodeAtom, "0.0.0");
+
+        expect(store.get(svgInputSelectedNodeIdAtom)).toBe("0.0.0");
+        expect(store.get(svgPathInputAtom)).toBe("M 1 1 L 2 2");
+    });
+
     it("migrates legacy canvas settings into the nested canvas branch", () => {
         const settings = normalizeStoredSettings({
             theme: "dark",
@@ -188,5 +224,16 @@ describe("svg path state atoms", () => {
             canvasPreview: true,
             showViewBoxFrame: true,
         });
+    });
+
+    it("merges new section defaults and SVG tree settings into stored settings", () => {
+        const settings = normalizeStoredSettings({
+            sections: { options: false },
+            pathEditor: {},
+        });
+
+        expect(settings.sections["svg-input"]).toBe(true);
+        expect(settings.sections.options).toBe(false);
+        expect(settings.pathEditor.showSvgTreeConnectorLines).toBe(true);
     });
 });

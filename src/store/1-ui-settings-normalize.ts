@@ -40,7 +40,13 @@ export function normalizeStoredSettings(value: unknown): UiSettings {
             return fallbackSettings;
         }
 
-        return cloneUiSettings(parseResult.data);
+        return cloneUiSettings({
+            ...parseResult.data,
+            sections: {
+                ...defaultSettings.sections,
+                ...parseResult.data.sections,
+            },
+        });
     } catch (error) {
         console.error("Unexpected error while normalizing UI settings. Using defaults.", error);
         return fallbackSettings;
@@ -93,6 +99,7 @@ function createPathEditorSettingsSchema(defaultSettings: PathEditorSettings) {
             uniformScale: z.boolean().catch(defaultSettings.uniformScale),
             decimals: z.number().catch(defaultSettings.decimals),
             minifyOutput: z.boolean().catch(defaultSettings.minifyOutput),
+            showSvgTreeConnectorLines: z.boolean().catch(defaultSettings.showSvgTreeConnectorLines),
             dragPrecision: z.number().catch(defaultSettings.dragPrecision),
             tickInterval: z.number().catch(defaultSettings.tickInterval),
             viewPortLocked: z.boolean().catch(defaultSettings.viewPortLocked),

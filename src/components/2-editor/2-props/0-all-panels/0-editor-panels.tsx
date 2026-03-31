@@ -1,13 +1,17 @@
 import { useEffect } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useSnapshot } from "valtio";
 import { PathOperationsPanel } from "../3-panel-operations/1-transform-panel";
 import { CommandsListPanel } from "../2-panel-commands/2-0-commands-list";
 import { ImagesPanel } from "../5-panel-images/3-images-panel";
 import { OptionsPanel } from "../4-panel-options/9-options-panel";
 import { doHandleEditorKeyDownAtom } from "@/store/0-atoms/2-2-editor-actions";
 import { commandCountAtom, parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
+import { doApplySvgInputTextAtom, doSelectSvgInputNodeAtom, svgInputDocumentAtom, svgInputErrorAtom, svgInputSelectedNodeIdAtom } from "@/store/0-atoms/1-3-svg-input";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
+import { SvgTreeView } from "@/components/ui/loacal-ui/2-svg-tree-view";
+import { appSettings } from "@/store/0-ui-settings";
 
 export function EditorPanels() {
     const handleEditorKeyDown = useSetAtom(doHandleEditorKeyDownAtom);
@@ -25,6 +29,7 @@ export function EditorPanels() {
     return (
         <aside className="h-full border-r flex flex-col justify-between">
             <div className="grow flex-1 overflow-auto [scrollbar-gutter:stable]">
+                <SvgInputSection />
                 <PathInputSection />
                 <CommandsListPanel />
                 <ImagesPanel />
@@ -34,6 +39,29 @@ export function EditorPanels() {
 
             <PathInputSectionStatus />
         </aside>
+    );
+}
+
+function SvgInputSection() {
+    const document = useAtomValue(svgInputDocumentAtom);
+    const selectedNodeId = useAtomValue(svgInputSelectedNodeIdAtom);
+    const parseError = useAtomValue(svgInputErrorAtom);
+    const applySvgInputText = useSetAtom(doApplySvgInputTextAtom);
+    const selectSvgNode = useSetAtom(doSelectSvgInputNodeAtom);
+    const { showSvgTreeConnectorLines } = useSnapshot(appSettings.pathEditor);
+
+    return (
+        <SectionPanel sectionKey="svg-input" label="SVG Input" contentClassName="px-1 py-1">
+            <SvgTreeView
+                root={document?.root ?? null}
+                selectedNodeId={selectedNodeId}
+                onSelectNode={selectSvgNode}
+                onPasteText={applySvgInputText}
+                showConnectorLines={showSvgTreeConnectorLines}
+                parseError={parseError}
+                className="max-h-72 min-h-24"
+            />
+        </SectionPanel>
     );
 }
 

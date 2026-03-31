@@ -15,6 +15,7 @@ export interface PathEditorSettings {
     uniformScale: boolean;                // Lock scale X and Y together in Path Operations
     decimals: number;                     // Number of decimals to show
     minifyOutput: boolean;                // Minify output or not
+    showSvgTreeConnectorLines: boolean;   // Show connector lines in the SVG input tree
     dragPrecision: number;                // Drag precision (number of decimal places to keep while dragging points)
     tickInterval: number;                 // Tick interval on axis
     viewPortLocked: boolean;              // View port locked or not
@@ -61,6 +62,7 @@ export const DEFAULT_PATH_EDITOR_SETTINGS: PathEditorSettings = {
     uniformScale: true,
     decimals: 3,
     minifyOutput: false,
+    showSvgTreeConnectorLines: true,
     dragPrecision: 3,
     tickInterval: 5,
     viewPortLocked: false,
@@ -93,7 +95,7 @@ export const DEFAULT_EXPORT_SETTINGS: ExportSettings = {
 export const DEFAULT_SETTINGS: UiSettings = {
     theme: "light",
     canvas: DEFAULT_CANVAS_SETTINGS,
-    sections: { transform: true, options: true },
+    sections: { "svg-input": true, transform: true, options: true },
     editorPanelSizes: [33, 67],
     pathEditor: DEFAULT_PATH_EDITOR_SETTINGS,
     export: DEFAULT_EXPORT_SETTINGS,
