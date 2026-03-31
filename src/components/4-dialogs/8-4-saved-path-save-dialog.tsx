@@ -1,18 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
+import { appSettings } from "@/store/0-ui-settings";
+import { classNames } from "@/utils";
 import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
 import { Input } from "@/components/ui/shadcn/input";
 import { ScrollArea } from "@/components/ui/shadcn/scroll-area";
-import { appSettings } from "@/store/0-ui-settings";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { doSaveNamedPathAtom } from "@/store/0-atoms/2-3-stored-paths-actions";
 import { savePathDialogOpenAtom } from "@/store/0-atoms/2-5-canvas-actions-menu";
 import { doAsyncExecuteConfirmDialogAtom } from "@/components/4-dialogs/confirmation/2-7-confirmation-dialog";
 import { getConfirmOverwriteSavedPathMessages } from "@/components/4-dialogs/confirmation/8-confirmation-ui-messages";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
-import { cn } from "@/utils";
 
 export function SavePathDialog() {
     const pathValue = useAtomValue(svgPathInputAtom);
@@ -105,7 +105,7 @@ export function SavePathDialog() {
                                             <button
                                                 key={entry.name}
                                                 type="button"
-                                                className={cn(
+                                                className={classNames(
                                                     "flex w-full items-center gap-3 rounded-md border px-2 py-1.5 text-left transition-colors",
                                                     selected
                                                         ? "border-transparent bg-blue-300 text-slate-950"
@@ -113,7 +113,7 @@ export function SavePathDialog() {
                                                 )}
                                                 onClick={() => setSaveNameDraft(entry.name)}
                                             >
-                                                <svg viewBox={preview.viewBox} className={cn("h-10 w-16 shrink-0 rounded bg-muted/20", selected && "bg-white/50")}>
+                                                <svg viewBox={preview.viewBox} className={classNames("h-10 w-16 shrink-0 rounded bg-muted/20", selected && "bg-white/50")}>
                                                     <path d={entry.path} fill="none" stroke="currentColor" strokeWidth={preview.strokeWidth} />
                                                 </svg>
 
@@ -122,7 +122,7 @@ export function SavePathDialog() {
                                                         {entry.name}
                                                     </p>
 
-                                                    <p className={cn("text-[10px]", selected ? "text-slate-700" : "text-muted-foreground")}>
+                                                    <p className={classNames("text-[10px]", selected ? "text-slate-700" : "text-muted-foreground")}>
                                                         Updated {new Date(entry.updatedAt).toLocaleString()}
                                                     </p>
                                                 </div>
@@ -134,17 +134,12 @@ export function SavePathDialog() {
                         </ScrollArea>
                     </div>
                 </div>
+                
                 <DialogFooter>
-                    <Button
-                        variant="outline"
-                        onClick={() => setOpen(false)}
-                    >
+                    <Button variant="outline" onClick={() => setOpen(false)}>
                         Cancel
                     </Button>
-                    <Button
-                        disabled={!pathValue.trim() || !trimmedSaveName}
-                        onClick={handleSaveClick}
-                    >
+                    <Button disabled={!pathValue.trim() || !trimmedSaveName} onClick={handleSaveClick}>
                         Save
                     </Button>
                 </DialogFooter>

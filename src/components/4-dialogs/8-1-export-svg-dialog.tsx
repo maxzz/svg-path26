@@ -35,6 +35,7 @@ export function ExportSvgDialog() {
         const svgData = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${exportViewBoxDraft[0]} ${exportViewBoxDraft[1]} ${width} ${height}"><path d="${pathValue}"${strokePart}${fillPart} /></svg>`;
         const blob = new Blob([svgData], { type: "image/svg+xml" });
         const url = URL.createObjectURL(blob);
+
         const a = document.createElement("a");
         a.href = url;
         a.download = `${(pathName || "svg-path").replace(/\s+/g, "-")}.svg`;
@@ -42,6 +43,7 @@ export function ExportSvgDialog() {
         a.click();
         a.remove();
         setTimeout(() => URL.revokeObjectURL(url), 200);
+
         setOpenExportDialog(false);
     };
 
