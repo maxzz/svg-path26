@@ -46,7 +46,7 @@ export function CanvasGrid() {
                 {grid.xGrid.map(
                     (v) => (
                         <Fragment key={v}>
-                            {v % tickInterval === 0 &&
+                            {v !== 0 && v % tickInterval === 0 &&
                                 <text className="fill-[#744]"
                                     y={-5 * canvasStroke}
                                     x={v - 5 * canvasStroke}
@@ -66,8 +66,8 @@ export function CanvasGrid() {
                             {v % tickInterval === 0 &&
                                 <text className="fill-[#744]"
                                     x={5 * canvasStroke}
-                                    y={v}
-                                    dominantBaseline="middle"
+                                    y={v === 0 ? -5 * canvasStroke : v}
+                                    dominantBaseline={v === 0 ? undefined : "middle"}
                                     textAnchor="start"
                                     style={{ fontSize: canvasStroke * 10 + 'px', stroke: "white", strokeWidth: canvasStroke * .2 }}
                                 >
