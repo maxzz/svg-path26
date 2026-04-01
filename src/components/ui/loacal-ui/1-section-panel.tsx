@@ -10,9 +10,10 @@ interface SectionPanelProps {
     children: ReactNode;
     triggerClassName?: string;
     contentClassName?: string;
+    overlay?: ReactNode;
 }
 
-export function SectionPanel({ sectionKey, label, children, triggerClassName, contentClassName }: SectionPanelProps) {
+export function SectionPanel({ sectionKey, label, children, triggerClassName, contentClassName, overlay }: SectionPanelProps) {
     const { sections } = useSnapshot(appSettings);
     const open = sections[sectionKey] ?? false;
 
@@ -26,9 +27,20 @@ export function SectionPanel({ sectionKey, label, children, triggerClassName, co
             }}
         >
             <AccordionItem value={sectionKey} className="border-none">
-                <AccordionTrigger className={classNames("px-3 py-1.5 text-base font-ui bg-muted border-b hover:no-underline select-none", triggerClassName)}>
-                    {label}
-                </AccordionTrigger>
+                <div className="relative">
+                    <AccordionTrigger className={classNames("px-3 py-1.5 text-base font-ui bg-muted border-b hover:no-underline select-none", triggerClassName)}>
+                        {label}
+                    </AccordionTrigger>
+
+                    {overlay && (
+                        <div className="pointer-events-none absolute inset-y-0 right-7 z-10 flex items-center">
+                            <div className="pointer-events-auto flex items-center gap-1">
+                                {overlay}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
                 <AccordionContent className={classNames("px-3 py-0", contentClassName)}>
                     {children}
                 </AccordionContent>

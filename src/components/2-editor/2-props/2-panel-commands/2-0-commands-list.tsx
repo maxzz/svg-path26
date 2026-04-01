@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
+import { ArrowLeftRight } from "lucide-react";
 import { cn } from "@/utils";
+import { Button } from "@/components/ui/shadcn/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel.tsx";
 import { commandSummaryTooltip, isCommandCellLinkedToPoint, isCommandValueLinkedToPoint } from "./8-helpers.tsx";
@@ -16,11 +18,43 @@ import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-dra
 
 export function CommandsListPanel() {
     return (
-        <SectionPanel sectionKey="commands" label="Path Commands" contentClassName="px-0 pt-0.5 pb-4">
-            <div className="px-1 py-2 max-h-64 text-xs font-ui border bg-muted/20 rounded overflow-auto">
-                <CommandsList />
-            </div>
-        </SectionPanel>
+        <TooltipProvider delayDuration={250}>
+            <SectionPanel
+                sectionKey="commands"
+                label="Path Commands"
+                contentClassName="px-0 pt-0.5 pb-4"
+                overlay={<ScrollOnHoverToggleOverlay />}
+            >
+                <div className="px-1 py-2 max-h-64 text-xs font-ui border bg-muted/20 rounded overflow-auto">
+                    <CommandsList />
+                </div>
+            </SectionPanel>
+        </TooltipProvider>
+    );
+}
+
+function ScrollOnHoverToggleOverlay() {
+    const { scrollOnHover } = useSnapshot(appSettings.canvas);
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <Button
+                    className={cn("mr-1 size-6 rounded-sm text-muted-foreground hover:text-foreground", scrollOnHover && "bg-background/80 text-foreground")}
+                    onClick={() => appSettings.canvas.scrollOnHover = !scrollOnHover}
+                    variant="ghost"
+                    size="icon"
+                    type="button"
+                    aria-label={scrollOnHover ? "Disable scroll on hover" : "Enable scroll on hover"}
+                    aria-pressed={scrollOnHover}
+                >
+                    <ArrowLeftRight className="size-3" />
+                </Button>
+            </TooltipTrigger>
+
+            <TooltipContent sideOffset={6}>
+                {scrollOnHover ? "Disable scroll on hover" : "Enable scroll on hover"}
+            </TooltipContent>
+        </Tooltip>
     );
 }
 
@@ -58,7 +92,7 @@ export function CommandsList() {
     }
 
     return (
-        <TooltipProvider delayDuration={250}>
+        <>
             <CommandsListScrollEffects rowRefs={rowRefs} rowsLength={rows.length} />
             {rows.map(
                 (row: SvgSegmentSummary) => (
@@ -75,7 +109,7 @@ export function CommandsList() {
                     />
                 )
             )}
-        </TooltipProvider>
+        </>
     );
 }
 
