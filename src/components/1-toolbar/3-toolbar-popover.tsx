@@ -1,9 +1,9 @@
 import { useSnapshot } from "valtio";
+import { appSettings } from "@/store/0-ui-settings";
 import { Settings as IconSettings } from "lucide-react";
 import { Button } from "@/components/ui/shadcn/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
-import { appSettings } from "@/store/0-ui-settings";
-import { StrokeInput, ToggleValueRow, ZoomInput } from "@/components/2-editor/2-props/4-panel-options/0-view-options-controls";
+import { StrokeInput, ZoomInput } from "@/components/2-editor/2-props/4-panel-options/8-options-controls";
 
 export function SettingsPopover() {
     const { canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);

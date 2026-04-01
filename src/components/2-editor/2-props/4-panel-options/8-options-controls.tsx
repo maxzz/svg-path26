@@ -29,7 +29,7 @@ export function ZoomInput() {
             label="Zoom"
             value={zoom}
             displayValue={`${zoom.toFixed(1)}x`}
-            min={0.25}
+            min={0.1}
             max={16}
             step={0.1}
             onValueChange={(nextZoom) => {
