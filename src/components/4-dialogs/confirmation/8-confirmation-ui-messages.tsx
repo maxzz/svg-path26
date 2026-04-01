@@ -1,9 +1,9 @@
-import { AlertTriangle } from "lucide-react";
 import { type ConfirmationUi } from "./2-7-confirmation-dialog";
+import { SymbolWarning } from "@/components/ui/icons";
 
 const confirmOverwriteSavedPathMessages: ConfirmationUi = {
     title: "Overwrite saved path?",
-    icon: <AlertTriangle className="size-4" />,
+    icon: <SymbolWarning className="p-0.5 size-6" />,
     message: "",
     buttonOk: "Overwrite",
     buttonCancel: "Cancel",
@@ -13,11 +13,9 @@ const confirmOverwriteSavedPathMessages: ConfirmationUi = {
 export function getConfirmOverwriteSavedPathMessages(name: string): ConfirmationUi {
     return {
         ...confirmOverwriteSavedPathMessages,
-        message: (
-            <>
-                A saved path named <span className="font-medium text-foreground">{name}</span> already exists.
-                Save will replace its stored path data and update timestamp.
-            </>
-        ),
+        message: (<>
+            A saved path named <span className="font-medium text-orange-600">{name}</span> already exists.
+            Save will replace its stored path data and update timestamp.
+        </>),
     };
 }

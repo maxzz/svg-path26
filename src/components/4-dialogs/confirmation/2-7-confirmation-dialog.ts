@@ -20,8 +20,10 @@ export const isOpenConfirmDialogAtom = atom<ConfirmationData | undefined>(undefi
 export const doAsyncExecuteConfirmDialogAtom = atom(
     null,
     async (_get, set, ui: ConfirmationUi): Promise<boolean> => {
-        return await new Promise<boolean>((resolve) => {
-            set(isOpenConfirmDialogAtom, { ui, resolve });
-        });
+        return await new Promise<boolean>(
+            (resolve) => {
+                set(isOpenConfirmDialogAtom, { ui, resolve });
+            }
+        );
     },
 );

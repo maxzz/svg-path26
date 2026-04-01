@@ -8,7 +8,7 @@ export function Footer() {
     const { showGrid, darkCanvas } = useSnapshot(appSettings.canvas);
 
     return (
-        <footer className="flex items-center justify-between border-t px-4 py-2 text-xs text-muted-foreground">
+        <footer className="px-4 py-2 text-xs text-muted-foreground border-t flex items-center justify-between">
             <span>Commands: {commandCount}</span>
             <span>{showGrid ? "Grid on" : "Grid off"} / {darkCanvas ? "Dark canvas" : "Light canvas"}</span>
         </footer>

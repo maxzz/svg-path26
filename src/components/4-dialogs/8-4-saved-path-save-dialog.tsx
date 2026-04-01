@@ -56,7 +56,7 @@ export function SavePathDialog() {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="max-w-md">
+            <DialogContent className="w-[400px]! max-w-md!">
                 <DialogHeader>
                     <DialogTitle>
                         Save path
@@ -75,10 +75,10 @@ export function SavePathDialog() {
                             placeholder="My path"
                         />
                         {existingMatch ? (
-                            <p className="text-[11px] text-muted-foreground">
+                            <p className="h-4 text-[10px] text-orange-700 transition-colors duration-300">
                                 Saving with this name will overwrite the existing saved path after confirmation.
                             </p>
-                        ) : null}
+                        ) : <p className="h-4" />}
                     </div>
 
                     <div className="space-y-2">
@@ -92,7 +92,7 @@ export function SavePathDialog() {
                         </div>
 
                         <ScrollArea className="h-44 rounded-md border" fixedWidth parentContentWidth>
-                            <div className="p-2 space-y-1">
+                            <div className="p-1 space-y-0.5">
                                 {sortedStoredPaths.length === 0
                                     ? (
                                         <p className="px-1 py-2 text-xs text-muted-foreground">
@@ -132,7 +132,7 @@ function Row({ entry, selected, setSaveNameDraft }: { entry: StoredPathEntry; se
     return (
         <button
             className={classNames(
-                "px-2 py-1.5 w-full text-left border transition-colors rounded-md flex items-center gap-3",
+                "px-2 py-1.5 w-full text-left border rounded-md transition-colors duration-100 flex items-center gap-3",
                 selected
                     ? "text-slate-950 bg-blue-300 border-transparent"
                     : "bg-background hover:bg-accent/60",
@@ -140,7 +140,7 @@ function Row({ entry, selected, setSaveNameDraft }: { entry: StoredPathEntry; se
             onClick={() => setSaveNameDraft(entry.name)}
             type="button"
         >
-            <PathPreview className={classNames("shrink-0 w-16 h-10 rounded bg-muted/20", selected && "bg-white/50")} path={entry.path} />
+            <PathPreview className={classNames("shrink-0 size-10 rounded bg-muted/20", selected && "bg-white/50")} path={entry.path} />
 
             <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium truncate">

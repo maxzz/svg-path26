@@ -1,8 +1,8 @@
 import { useAtom } from "jotai";
+import { classNames } from "@/utils";
 import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
 import { type ConfirmationData, isOpenConfirmDialogAtom } from "@/components/4-dialogs/confirmation/2-7-confirmation-dialog";
-import { classNames } from "@/utils";
 
 const DESCRIPTION_ID = "confirmation-dialog-message";
 
@@ -21,7 +21,7 @@ export function ConfirmationDialog() {
 
     return (
         <Dialog open={!!currentConfirmData} onOpenChange={() => onDlgClose(false)}>
-            <DialogContent className="max-w-sm gap-0 p-0" modal showCloseButton={false} aria-describedby={DESCRIPTION_ID}>
+            <DialogContent className="max-w-sm! gap-0! p-0!" modal showCloseButton={false} aria-describedby={DESCRIPTION_ID}>
                 <DialogHeader className="gap-0 border-b px-4 py-3 text-left">
                     <DialogTitle className="text-sm">
                         {currentConfirmData.ui.title}
@@ -39,7 +39,6 @@ export function ConfirmationDialog() {
 
 function Body({ confirmDialogOpen, onDlgClose }: { confirmDialogOpen: ConfirmationData; onDlgClose: (ok: boolean) => void; }) {
     const { ui: { icon, message, buttonOk, buttonCancel, isDafaultOk } } = confirmDialogOpen;
-
     return (
         <div className="px-4 py-3">
             <div id={DESCRIPTION_ID} className="flex items-start gap-2 text-xs leading-5 text-foreground/90">
@@ -59,11 +58,11 @@ function Body({ confirmDialogOpen, onDlgClose }: { confirmDialogOpen: Confirmati
                     {buttonOk}
                 </Button>
 
-                {buttonCancel ? (
+                {buttonCancel && (
                     <Button variant={isDafaultOk ? "outline" : "default"} onClick={() => onDlgClose(false)}>
                         {buttonCancel}
                     </Button>
-                ) : null}
+                )}
             </DialogFooter>
         </div>
     );
