@@ -56,7 +56,7 @@ export function SavePathDialog() {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="w-[400px]! max-w-md!">
+            <DialogContent className="w-100! max-w-md!">
                 <DialogHeader>
                     <DialogTitle>
                         Save path

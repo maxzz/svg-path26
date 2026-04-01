@@ -29,6 +29,7 @@ export function PathCanvas() {
 export function PathCanvasElement({ children }: { children: ReactNode; }) {
     const { darkCanvas, canvasPreview } = useSnapshot(appSettings.canvas);
 
+    const canvasRootSvgElement = useAtomValue(canvasRootSvgElementAtom);
     const svgPathInput = useAtomValue(svgPathInputAtom);
     const parseError = useAtomValue(parseErrorAtom);
     const viewPort = useAtomValue(canvasViewPortAtom);
@@ -56,13 +57,27 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
         },
         [rootSvgElementSize]);
 
+    useEffect(
+        () => {
+            if (!canvasRootSvgElement) return;
+
+            const handleWheel = (event: WheelEvent) => {
+                doWheelZoomViewPort(event);
+            };
+
+            canvasRootSvgElement.addEventListener("wheel", handleWheel, { passive: false });
+            return () => {
+                canvasRootSvgElement.removeEventListener("wheel", handleWheel);
+            };
+        },
+        [canvasRootSvgElement, doWheelZoomViewPort]);
+
     return (
         <div className={classNames("absolute w-full h-full overflow-hidden", canvasPreview ? "bg-white" : (darkCanvas ? "bg-[#040d1c]" : "bg-white"))}>
             <svg
                 ref={(node) => setCanvasRootSvgElement(node)}
                 viewBox={viewPort.join(" ")}
                 className="size-full touch-none"
-                onWheel={doWheelZoomViewPort}
                 onPointerDown={startCanvasPointerDown}
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}

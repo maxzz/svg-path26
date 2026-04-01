@@ -1,4 +1,3 @@
-import { type WheelEvent as ReactWheelEvent } from "react";
 import { atom } from "jotai";
 import { appSettings } from "@/store/0-ui-settings";
 import { type Point, type SizeWH, type ViewBox } from "@/svg-core/9-types-svg-model";
@@ -159,7 +158,7 @@ export const doAdjustViewPortToAspectAtom = atom(
 
 export const doWheelZoomViewPortAtom = atom(
     null,
-    (get, set, event: ReactWheelEvent<SVGSVGElement>) => {
+    (get, set, event: WheelEvent) => {
         event.preventDefault();
         const rootSvgElement = get(canvasRootSvgElementAtom);
         if (!rootSvgElement) return;
@@ -179,3 +178,20 @@ function clampZoom(value: number): number {
     }
     return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value));
 }
+
+/*
+What would be better for browser and the application performance to keep this handler as passive or keep it as active?
+
+Passive is better for browser scroll performance when you do not need to cancel the default behavior. The browser can keep 
+scrolling on the compositor path without waiting for JavaScript. An active listener is slower in that specific sense, because 
+the browser has to wait and see whether your code calls preventDefault().
+
+For this canvas, active is the correct choice. Your wheel handler is not just observing the event; it is taking over the interaction, 
+canceling native scroll, and applying SVG zoom in 2-3-canvas-viewport.ts:161, with the listener attached only on the SVG in 0-canvas.tsx:64. 
+That keeps the scope small, so the browser cost is limited to wheel events over the canvas. Making it passive would be better for the browser 
+only if you were willing to let native page scrolling happen instead of custom zoom.
+
+The practical rule is simple: use passive by default, switch to active only where you must call preventDefault(). 
+This handler falls into the second category. If zoom ever feels heavy, the main optimization target is reducing 
+the work done per wheel event or batching it to requestAnimationFrame, not changing the listener back to passive.
+*/
