@@ -56,7 +56,7 @@ type StoredPathEntry = {
 
 function Row({ entry, onOpen, onDelete }: { entry: StoredPathEntry; onOpen: () => void; onDelete: () => void; }) {
     return (
-        <div className="px-2 flex items-center gap-3 rounded border">
+        <div className="pr-1 rounded border flex items-center gap-3">
             <PathPreview path={entry.path} className="h-10 w-16 rounded bg-muted/20" />
 
             <div className="min-w-0 flex-1">
@@ -66,13 +66,15 @@ function Row({ entry, onOpen, onDelete }: { entry: StoredPathEntry; onOpen: () =
                 </p>
             </div>
 
-            <Button className="h-7 px-2" variant="outline" onClick={onOpen}>
-                Open
-            </Button>
+            <div className="flex items-center gap-0.5">
+                <Button className="h-7 px-2" variant="outline" onClick={onOpen}>
+                    Open
+                </Button>
 
-            <Button className="h-7 px-2 text-destructive" variant="outline" onClick={onDelete} aria-label="Delete" title="Delete">
-                <IconTrash className="size-4" aria-hidden="true" />
-            </Button>
+                <Button className="size-6" variant="ghost" size="icon" onClick={onDelete} aria-label="Delete" title="Delete">
+                    <IconTrash className="size-3.5" aria-hidden="true" />
+                </Button>
+            </div>
         </div>
     );
 }
