@@ -7,6 +7,7 @@ import { OpenPathDialog } from "../4-dialogs/8-3-saved-path-open-dialog";
 import { ExportSvgDialog } from "../4-dialogs/8-1-export-svg-dialog";
 import { AddImageDialog } from "../4-dialogs/8-2-add-image-dialog";
 import { AboutDialog } from "../4-dialogs/8-8-about-dialog";
+import { OptionsDialog } from "../4-dialogs/8-9-options-dialog";
 import { ConfirmationDialog } from "../4-dialogs/confirmation/1-confirmation-dialog";
 
 export function App() {
@@ -26,6 +27,7 @@ export function App() {
             <ExportSvgDialog />
             <AddImageDialog />
             <AboutDialog />
+            <OptionsDialog />
         </div>
     </>);
 }
