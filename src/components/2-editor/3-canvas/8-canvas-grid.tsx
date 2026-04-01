@@ -21,6 +21,7 @@ export function CanvasGrid() {
 
     return (
         <g className="svg-ticks select-none" pointerEvents="none">
+
             {/* X axis (vertical lines) */}
             {grid.xGrid.map((v) =>
                 <line
@@ -29,6 +30,7 @@ export function CanvasGrid() {
                     style={{ strokeWidth: canvasStroke }}
                 />
             )}
+
             {/* Y axis (horizontal lines) */}
             {grid.yGrid.map((v) =>
                 <line
@@ -39,30 +41,43 @@ export function CanvasGrid() {
             )}
 
             {showTicks && <>
+
                 {/* X axis numbers */}
-                {grid.xGrid.map((v) => <Fragment key={v}>
-                    {v % tickInterval === 0 &&
-                        <text className="fill-[#744]"
-                            y={-5 * canvasStroke}
-                            x={v - 5 * canvasStroke}
-                            style={{ fontSize: canvasStroke * 10 + 'px', stroke: "white", strokeWidth: canvasStroke * .2 }}
-                        >
-                            {v}
-                        </text>
-                    }
-                </Fragment>)}
+                {grid.xGrid.map(
+                    (v) => (
+                        <Fragment key={v}>
+                            {v % tickInterval === 0 &&
+                                <text className="fill-[#744]"
+                                    y={-5 * canvasStroke}
+                                    x={v - 5 * canvasStroke}
+                                    style={{ fontSize: canvasStroke * 10 + 'px', stroke: "white", strokeWidth: canvasStroke * .2 }}
+                                >
+                                    {v}
+                                </text>
+                            }
+                        </Fragment>
+                    )
+                )}
+
                 {/* Y axis numbers */}
-                {grid.yGrid.map((v) => <Fragment key={v}>
-                    {v % tickInterval === 0 &&
-                        <text className="fill-[#744]"
-                            x={-5 * canvasStroke}
-                            y={v - 5 * canvasStroke}
-                            style={{ fontSize: canvasStroke * 10 + 'px', stroke: "white", strokeWidth: canvasStroke * .2 }}
-                        >
-                            {v}
-                        </text>
-                    }
-                </Fragment>)}
+                {grid.yGrid.map(
+                    (v) => (
+                        <Fragment key={v}>
+                            {v % tickInterval === 0 &&
+                                <text className="fill-[#744]"
+                                    x={5 * canvasStroke}
+                                    y={v}
+                                    dominantBaseline="middle"
+                                    textAnchor="start"
+                                    style={{ fontSize: canvasStroke * 10 + 'px', stroke: "white", strokeWidth: canvasStroke * .2 }}
+                                >
+                                    {v}
+                                </text>
+                            }
+                        </Fragment>
+                    )
+                )}
+
             </>}
         </g>
     );

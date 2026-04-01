@@ -4,7 +4,7 @@ import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
 import { Button } from "@/components/ui/shadcn/button";
 import { IconZoomIn, IconZoomNormal, IconZoomOut } from "@/components/ui/icons/normal";
-import { CanvasGrid } from "./2-canvas-grid";
+import { CanvasGrid } from "./8-canvas-grid";
 import { CanvasHelperOverlays } from "./1-overlays/1-canvas-overlays";
 import { useCanvasDragAndDrop } from "./3-canvas-drag";
 import { PathCanvasImages } from "./1-overlays/6-images";
@@ -60,14 +60,10 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
     useEffect(
         () => {
             if (!canvasRootSvgElement) return;
-
-            const handleWheel = (event: WheelEvent) => {
-                doWheelZoomViewPort(event);
-            };
-
-            canvasRootSvgElement.addEventListener("wheel", handleWheel, { passive: false });
+            const controller = new AbortController();
+            canvasRootSvgElement.addEventListener("wheel", doWheelZoomViewPort, { passive: false, signal: controller.signal });
             return () => {
-                canvasRootSvgElement.removeEventListener("wheel", handleWheel);
+                controller.abort();
             };
         },
         [canvasRootSvgElement, doWheelZoomViewPort]);
