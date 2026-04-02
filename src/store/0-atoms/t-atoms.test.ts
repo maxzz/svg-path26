@@ -2,7 +2,7 @@ import { createStore } from "jotai";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { doDeleteSelectedSegmentsAtom, doSetPointLocationWithoutHistoryAtom, selectedCommandIndicesAtom } from "./2-4-editor-actions";
 import { commandRowsAtom, targetPointsAtom } from "./2-0-svg-model";
-import { canvasViewPortAtom, doFitViewPortAtom, doFitViewPortToPathViewBoxAtom, doPanViewPortAtom, doSetViewPortAtom, doZoomViewPortAtom } from "./2-3-canvas-viewport";
+import { canvasViewPortAtom, doFitViewPortAtom, doFitViewPortToPathViewBoxAtom, doPanViewPortAtom, doSetViewPortAtom, doZoomViewPortAtom, rootSvgElementSizeAtom } from "./2-3-canvas-viewport";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "./1-2-history";
 import { doApplySvgInputTextAtom, doSelectSvgInputNodeAtom, svgInputDocumentAtom, svgInputSelectedNodeIdAtom } from "./1-3-svg-input";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
@@ -138,10 +138,15 @@ describe("svg path state atoms", () => {
     it("fits the current path at 1x zoom and then scales from that baseline", () => {
         const store = createStore();
         appSettings.pathEditor.zoom = 2;
+        store.set(rootSvgElementSizeAtom, { width: 120, height: 90 });
         store.set(svgPathInputAtom, "M 0 0 L 50 25");
         store.set(doFitViewPortAtom);
 
         const before = store.get(canvasViewPortAtom);
+        expect(before[0]).toBeCloseTo(-12.5);
+        expect(before[1]).toBeCloseTo(-15.625);
+        expect(before[2]).toBeCloseTo(75);
+        expect(before[3]).toBeCloseTo(56.25);
         expect(appSettings.pathEditor.zoom).toBe(1);
         store.set(doZoomViewPortAtom, { scale: 0.9 });
         const after = store.get(canvasViewPortAtom);
@@ -154,11 +159,16 @@ describe("svg path state atoms", () => {
     it("fits the stored path viewBox into the canvas aspect at 1x zoom", () => {
         const store = createStore();
         appSettings.pathEditor.zoom = 3;
+        store.set(rootSvgElementSizeAtom, { width: 120, height: 90 });
         store.set(doSetPathViewBoxAtom, [0, 0, 24, 24]);
 
         store.set(doFitViewPortToPathViewBoxAtom);
 
-        expect(store.get(canvasViewPortAtom)).toEqual([-4, 0, 32, 24]);
+        const fitted = store.get(canvasViewPortAtom);
+        expect(fitted[0]).toBeCloseTo(-16.8);
+        expect(fitted[1]).toBeCloseTo(-9.6);
+        expect(fitted[2]).toBeCloseTo(57.6);
+        expect(fitted[3]).toBeCloseTo(43.2);
         expect(appSettings.pathEditor.zoom).toBe(1);
     });
 

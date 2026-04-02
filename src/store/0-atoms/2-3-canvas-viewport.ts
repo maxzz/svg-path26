@@ -11,6 +11,7 @@ const DEFAULT_VIEWPORT_X = 0;
 const DEFAULT_VIEWPORT_Y = 0;
 const DEFAULT_VIEWPORT_WIDTH = 120;
 const DEFAULT_VIEWPORT_HEIGHT = 90;
+const FIT_VIEWPORT_MARGIN_PX = 20;
 
 export const rootSvgElementSizeAtom = atom<SizeWH | null>(null);
 export const canvasRootSvgElementAtom = atom<SVGSVGElement | null>(null);
@@ -99,18 +100,15 @@ export const doFitViewPortAtom = atom(
         }
 
         const bounds = model.getBounds();
-        const widthRaw = Math.max(10, bounds.xmax - bounds.xmin);
-        const heightRaw = Math.max(10, bounds.ymax - bounds.ymin);
-        const padding = Math.max(widthRaw, heightRaw) * 0.12 + 2;
         const frame: ViewBox = [
-            bounds.xmin - padding,
-            bounds.ymin - padding,
-            widthRaw + padding * 2,
-            heightRaw + padding * 2,
+            bounds.xmin,
+            bounds.ymin,
+            Math.max(1, bounds.xmax - bounds.xmin),
+            Math.max(1, bounds.ymax - bounds.ymin),
         ];
 
         appSettings.pathEditor.zoom = 1;
-        set(doSetViewPortAtom, fitFrameToCanvasAspect(frame, get(rootSvgElementSizeAtom)));
+        set(doSetViewPortAtom, fitFrameToCanvas(frame, get(rootSvgElementSizeAtom)));
     }
 );
 
@@ -120,7 +118,7 @@ export const doFitViewPortToPathViewBoxAtom = atom(
         if (appSettings.pathEditor.viewPortLocked) return;
 
         appSettings.pathEditor.zoom = 1;
-        set(doSetViewPortAtom, fitFrameToCanvasAspect(get(pathViewBoxAtom), get(rootSvgElementSizeAtom)));
+        set(doSetViewPortAtom, fitFrameToCanvas(get(pathViewBoxAtom), get(rootSvgElementSizeAtom)));
     }
 );
 
@@ -178,14 +176,30 @@ function getDefaultViewPort(): ViewBox {
     return [DEFAULT_VIEWPORT_X, DEFAULT_VIEWPORT_Y, DEFAULT_VIEWPORT_WIDTH, DEFAULT_VIEWPORT_HEIGHT];
 }
 
-function fitFrameToCanvasAspect(frame: ViewBox, rootSvgElementSize: SizeWH | null): ViewBox {
+function fitFrameToCanvas(frame: ViewBox, rootSvgElementSize: SizeWH | null): ViewBox {
     const centerX = frame[0] + frame[2] / 2;
     const centerY = frame[1] + frame[3] / 2;
-    let width = Math.max(1e-3, frame[2]);
-    let height = Math.max(1e-3, frame[3]);
-    const aspect = (rootSvgElementSize && rootSvgElementSize.width > 0 && rootSvgElementSize.height > 0)
-        ? rootSvgElementSize.width / rootSvgElementSize.height
-        : 4 / 3;
+    const frameWidth = Math.max(1e-3, frame[2]);
+    const frameHeight = Math.max(1e-3, frame[3]);
+
+    if (rootSvgElementSize && rootSvgElementSize.width > 0 && rootSvgElementSize.height > 0) {
+        const availableWidthPx = Math.max(1, rootSvgElementSize.width - FIT_VIEWPORT_MARGIN_PX * 2);
+        const availableHeightPx = Math.max(1, rootSvgElementSize.height - FIT_VIEWPORT_MARGIN_PX * 2);
+        const unitsPerPixel = Math.max(frameWidth / availableWidthPx, frameHeight / availableHeightPx);
+        const width = Math.max(1e-3, unitsPerPixel * rootSvgElementSize.width);
+        const height = Math.max(1e-3, unitsPerPixel * rootSvgElementSize.height);
+
+        return [
+            centerX - width / 2,
+            centerY - height / 2,
+            width,
+            height,
+        ];
+    }
+
+    let width = frameWidth;
+    let height = frameHeight;
+    const aspect = 4 / 3;
 
     if (width / height > aspect) {
         height = width / aspect;

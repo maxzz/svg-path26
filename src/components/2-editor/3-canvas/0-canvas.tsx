@@ -54,12 +54,13 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
                 hasNonEmptyPathRef.current = false;
                 return;
             }
+            if (!rootSvgElementSize || rootSvgElementSize.width <= 0 || rootSvgElementSize.height <= 0) return;
             if (hasNonEmptyPathRef.current) return;
 
             hasNonEmptyPathRef.current = true;
             doFitViewPort();
         },
-        [doFitViewPort, svgPathInput]);
+        [doFitViewPort, rootSvgElementSize, svgPathInput]);
 
     useEffect(
         () => {
