@@ -1,5 +1,6 @@
 import { atom } from "jotai";
 import { rawPathAtom } from "./1-0-raw-path";
+import { doSyncSvgInputBoundPathAtom } from "./1-3-svg-input-state";
 
 const HISTORY_LIMIT = 120;
 
@@ -51,6 +52,7 @@ export const doSetPathWithoutHistoryAtom = atom(
     null,
     (_get, set, nextPath: string) => {
         set(rawPathAtom, nextPath);
+        set(doSyncSvgInputBoundPathAtom, nextPath);
     }
 );
 

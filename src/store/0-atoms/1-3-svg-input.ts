@@ -2,18 +2,7 @@ import { atom } from "jotai";
 import { findSvgInputNodeById, parseSvgInputText, type SvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-input";
 import { rawPathAtom } from "./1-0-raw-path";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
-
-interface SvgInputState {
-    document: SvgInputDocument | null;
-    selectedNodeId: string | null;
-    parseError: string | null;
-}
-
-const svgInputStateAtom = atom<SvgInputState>({
-    document: null,
-    selectedNodeId: null,
-    parseError: null,
-});
+import { svgInputStateAtom } from "./1-3-svg-input-state";
 
 export const svgInputDocumentAtom = atom(
     (get) => get(svgInputStateAtom).document,
@@ -46,6 +35,7 @@ export const doApplySvgInputTextAtom = atom(
                 document: parsed.document,
                 selectedNodeId: parsed.initialSelectedNodeId,
                 parseError: null,
+                boundPathNodeId: parsed.initialPathData !== null ? parsed.initialSelectedNodeId : null,
             });
 
             if (parsed.initialPathData !== null && parsed.initialPathData !== get(rawPathAtom)) {
@@ -56,6 +46,7 @@ export const doApplySvgInputTextAtom = atom(
                 document: null,
                 selectedNodeId: null,
                 parseError: error instanceof Error ? error.message : String(error),
+                boundPathNodeId: null,
             });
         }
     },
@@ -71,7 +62,15 @@ export const doSelectSvgInputNodeAtom = atom(
         const node = findSvgInputNodeById(root, nodeId);
         if (!node) return;
 
-        if (state.selectedNodeId !== nodeId) {
+        if (node.pathData !== null) {
+            if (state.selectedNodeId !== nodeId || state.boundPathNodeId !== nodeId) {
+                set(svgInputStateAtom, {
+                    ...state,
+                    selectedNodeId: nodeId,
+                    boundPathNodeId: nodeId,
+                });
+            }
+        } else if (state.selectedNodeId !== nodeId) {
             set(svgInputStateAtom, {
                 ...state,
                 selectedNodeId: nodeId,

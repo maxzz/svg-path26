@@ -1,6 +1,7 @@
 import { createStore } from "jotai";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { doDeleteSelectedSegmentsAtom, doSetPointLocationWithoutHistoryAtom, selectedCommandIndicesAtom } from "./2-4-editor-actions";
+import { findSvgInputNodeById } from "@/svg-core/3-svg-input";
+import { doDeleteSelectedSegmentsAtom, doSetCommandValueAtom, doSetPointLocationWithoutHistoryAtom, selectedCommandIndicesAtom } from "./2-4-editor-actions";
 import { commandRowsAtom, targetPointsAtom } from "./2-0-svg-model";
 import { canvasViewPortAtom, doFitViewPortAtom, doFitViewPortToPathViewBoxAtom, doPanViewPortAtom, doSetViewPortAtom, doZoomViewPortAtom, rootSvgElementSizeAtom } from "./2-3-canvas-viewport";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "./1-2-history";
@@ -285,6 +286,57 @@ describe("svg path state atoms", () => {
 
         expect(store.get(svgInputSelectedNodeIdAtom)).toBe("0.0.0");
         expect(store.get(svgPathInputAtom)).toBe("M 1 1 L 2 2");
+    });
+
+    it("syncs the bound SVG input path when command edits change the current path", () => {
+        const store = createStore();
+
+        store.set(doApplySvgInputTextAtom, `
+            <svg viewBox="0 0 10 10">
+                <g>
+                    <path d="M 1 1 L 2 2" />
+                </g>
+            </svg>
+        `);
+        store.set(doSelectSvgInputNodeAtom, "0.0.0");
+
+        store.set(doSetCommandValueAtom, {
+            commandIndex: 1,
+            valueIndex: 1,
+            value: 7,
+        });
+
+        const root = store.get(svgInputDocumentAtom)?.root;
+        const pathNode = root ? findSvgInputNodeById(root, "0.0.0") : null;
+
+        expect(store.get(svgPathInputAtom)).toBe("M 1 1 L 2 7");
+        expect(pathNode?.pathData).toBe("M 1 1 L 2 7");
+        expect(pathNode?.attributes.find((attribute) => attribute.name === "d")?.value).toBe("M 1 1 L 2 7");
+    });
+
+    it("syncs the bound SVG input path while dragging points on the canvas", () => {
+        const store = createStore();
+
+        store.set(doApplySvgInputTextAtom, `
+            <svg viewBox="0 0 10 10">
+                <g>
+                    <path d="M 1 1 L 2 2" />
+                </g>
+            </svg>
+        `);
+        store.set(doSelectSvgInputNodeAtom, "0.0.0");
+
+        store.set(doSetPointLocationWithoutHistoryAtom, {
+            point: store.get(targetPointsAtom)[1],
+            to: { x: 20, y: 30 },
+        });
+
+        const root = store.get(svgInputDocumentAtom)?.root;
+        const pathNode = root ? findSvgInputNodeById(root, "0.0.0") : null;
+
+        expect(store.get(svgPathInputAtom)).toBe("M 1 1 L 20 30");
+        expect(pathNode?.pathData).toBe("M 1 1 L 20 30");
+        expect(pathNode?.attributes.find((attribute) => attribute.name === "d")?.value).toBe("M 1 1 L 20 30");
     });
 
     it("migrates legacy canvas settings into the nested canvas branch", () => {
