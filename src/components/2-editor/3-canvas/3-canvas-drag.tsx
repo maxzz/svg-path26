@@ -1,4 +1,4 @@
-import { useEffect, useRef, type PointerEvent as ReactPointerEvent, type TouchEvent } from "react";
+import { useCallback, useEffect, useRef, type PointerEvent as ReactPointerEvent, type TouchEvent } from "react";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
@@ -26,6 +26,36 @@ export type ImageHandle = "move" | "left" | "right" | "top" | "bottom" | "topLef
 type TouchGestureState =
     | { mode: "pan"; lastClientX: number; lastClientY: number; }
     | { mode: "pinch"; lastDistance: number; lastCenter: Point; };
+
+type EdgeAutoPanDirection = { x: -1 | 0 | 1; y: -1 | 0 | 1; };
+
+type EdgeAutoPanState = {
+    clientX: number;
+    clientY: number;
+    direction: EdgeAutoPanDirection | null;
+    activationTimeoutId: number | null;
+    repeatIntervalId: number | null;
+    accumulatedDx: number;
+    accumulatedDy: number;
+};
+
+type LiveDragContext = {
+    dragState: DragState | null;
+    rootSvgElement: SVGSVGElement | null;
+    viewPort: ViewBox;
+    targetPoints: SvgCanvasPoint[];
+    controlPoints: SvgCanvasPoint[];
+    segmentHitAreaElements: Record<number, SVGPathElement | null>;
+    snapToGrid: boolean;
+    dragPrecision: number;
+    viewPortLocked: boolean;
+};
+
+const EDGE_AUTO_PAN_ZONE_PX = 20;
+const EDGE_AUTO_PAN_DELAY_MS = 1000;
+const EDGE_AUTO_PAN_INTERVAL_MS = 120;
+const EDGE_AUTO_PAN_STEP_PX = 8;
+const EDGE_AUTO_PAN_MOVEMENT_TOLERANCE_PX = 2;
 
 export const canvasDragStateAtom = atom<DragState | null>(null);
 
@@ -163,169 +193,364 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
     const doStartImageDrag = useSetAtom(doStartImageDragAtom);
 
     const touchGestureRef = useRef<TouchGestureState | null>(null);
+    const pointerCtrlKeyRef = useRef(false);
+    const edgeAutoPanRef = useRef<EdgeAutoPanState>({
+        clientX: 0,
+        clientY: 0,
+        direction: null,
+        activationTimeoutId: null,
+        repeatIntervalId: null,
+        accumulatedDx: 0,
+        accumulatedDy: 0,
+    });
+    const liveRef = useRef<LiveDragContext>({
+        dragState,
+        rootSvgElement,
+        viewPort,
+        targetPoints,
+        controlPoints,
+        segmentHitAreaElements,
+        snapToGrid,
+        dragPrecision,
+        viewPortLocked,
+    });
+    liveRef.current = {
+        dragState,
+        rootSvgElement,
+        viewPort,
+        targetPoints,
+        controlPoints,
+        segmentHitAreaElements,
+        snapToGrid,
+        dragPrecision,
+        viewPortLocked,
+    };
     const [, , vw, vh] = viewPort;
+
+    const stopEdgeAutoPanScheduling = useCallback(
+        () => {
+            const state = edgeAutoPanRef.current;
+            if (state.activationTimeoutId !== null) {
+                window.clearTimeout(state.activationTimeoutId);
+                state.activationTimeoutId = null;
+            }
+            if (state.repeatIntervalId !== null) {
+                window.clearInterval(state.repeatIntervalId);
+                state.repeatIntervalId = null;
+            }
+            state.direction = null;
+        },
+        []);
+
+    const resetEdgeAutoPan = useCallback(
+        () => {
+            stopEdgeAutoPanScheduling();
+            edgeAutoPanRef.current.accumulatedDx = 0;
+            edgeAutoPanRef.current.accumulatedDy = 0;
+        },
+        [stopEdgeAutoPanScheduling]);
+
+    const replaceDragState = useCallback(
+        (nextDragState: DragState) => {
+            liveRef.current.dragState = nextDragState;
+            setDragState(nextDragState);
+        },
+        [setDragState]);
+
+    const applyViewPortPan = useCallback(
+        (dx: number, dy: number): ViewBox => {
+            doPanViewPort({ dx, dy });
+            const [x, y, width, height] = liveRef.current.viewPort;
+            const nextViewPort: ViewBox = [x + dx, y + dy, width, height];
+            liveRef.current.viewPort = nextViewPort;
+            return nextViewPort;
+        },
+        [doPanViewPort]);
+
+    const stopActiveDrag = useCallback(
+        () => {
+            resetEdgeAutoPan();
+            liveRef.current.dragState = null;
+            doStopCanvasDrag();
+        },
+        [doStopCanvasDrag, resetEdgeAutoPan]);
+
+    const applyDragAtClientPosition = useCallback(
+        (clientX: number, clientY: number, viewPortOverride?: ViewBox) => {
+            const current = liveRef.current;
+            const activeDragState = current.dragState;
+            const activeRootSvgElement = current.rootSvgElement;
+            if (!activeDragState || !activeRootSvgElement) return;
+
+            const activeViewPort = viewPortOverride ?? current.viewPort;
+            const next = eventToSvgPoint(activeRootSvgElement, clientX, clientY, activeViewPort);
+            if (!next) return;
+
+            if (activeDragState.mode === "point") {
+                const baseDecimals = current.snapToGrid ? 0 : Math.max(0, current.dragPrecision);
+                const decimals = pointerCtrlKeyRef.current ? (baseDecimals ? 0 : 3) : baseDecimals;
+                const x = Number.parseFloat(next.x.toFixed(decimals));
+                const y = Number.parseFloat(next.y.toFixed(decimals));
+                setPointLocationWithoutHistory({
+                    point: activeDragState.point,
+                    to: { x, y },
+                });
+                return;
+            }
+
+            if (activeDragState.mode === "selection") {
+                const dxPx = clientX - activeDragState.startClientX;
+                const dyPx = clientY - activeDragState.startClientY;
+                const delta = clientDeltaToSvgDelta(activeRootSvgElement, dxPx, dyPx, activeDragState.viewBox);
+                if (!delta) return;
+
+                const totalDx = delta.x + edgeAutoPanRef.current.accumulatedDx;
+                const totalDy = delta.y + edgeAutoPanRef.current.accumulatedDy;
+                const moved = activeDragState.moved
+                    || Math.abs(dxPx) > 1
+                    || Math.abs(dyPx) > 1
+                    || Math.abs(totalDx) > 1e-6
+                    || Math.abs(totalDy) > 1e-6;
+                if (moved !== activeDragState.moved) {
+                    replaceDragState({ ...activeDragState, moved });
+                }
+                if (!moved) return;
+
+                doTranslateSelectedSegmentsWithoutHistory({
+                    segmentIndices: activeDragState.segmentIndices,
+                    dx: totalDx,
+                    dy: totalDy,
+                    startPath: activeDragState.startPath,
+                });
+                return;
+            }
+
+            if (activeDragState.mode === "canvas") {
+                if (current.viewPortLocked) return;
+                const rect = activeRootSvgElement.getBoundingClientRect();
+                if (!rect.width || !rect.height) return;
+
+                const dxPx = clientX - activeDragState.lastClientX;
+                const dyPx = clientY - activeDragState.lastClientY;
+                const dx = -(dxPx / rect.width) * activeViewPort[2];
+                const dy = -(dyPx / rect.height) * activeViewPort[3];
+                applyViewPortPan(dx, dy);
+                replaceDragState({
+                    ...activeDragState,
+                    moved: activeDragState.moved || Math.abs(dxPx) > 1 || Math.abs(dyPx) > 1,
+                    lastClientX: clientX,
+                    lastClientY: clientY,
+                });
+                return;
+            }
+
+            if (activeDragState.mode === "marquee") {
+                const moved = activeDragState.moved
+                    || Math.abs(clientX - activeDragState.startClientX) > 1
+                    || Math.abs(clientY - activeDragState.startClientY) > 1;
+                replaceDragState({
+                    ...activeDragState,
+                    current: next,
+                    moved,
+                });
+                if (!moved) return;
+
+                const nextSelection = applyCommandSelection(
+                    activeDragState.initialSelection,
+                    getMarqueeSelectionIndices({
+                        start: activeDragState.start,
+                        current: next,
+                        targetPoints: current.targetPoints,
+                        controlPoints: current.controlPoints,
+                        pathElements: current.segmentHitAreaElements,
+                    }),
+                    activeDragState.selectionMode,
+                );
+                setSelectedCommandIndices(nextSelection);
+                return;
+            }
+
+            const dx = next.x - activeDragState.start.x;
+            const dy = next.y - activeDragState.start.y;
+            const patch = patchImageByHandle(activeDragState.initial, activeDragState.handle, dx, dy);
+            doUpdateImage({
+                id: activeDragState.imageId,
+                patch,
+            });
+        },
+        [applyViewPortPan, doTranslateSelectedSegmentsWithoutHistory, doUpdateImage, replaceDragState, setPointLocationWithoutHistory, setSelectedCommandIndices]);
+
+    const runEdgeAutoPanTick = useCallback(
+        () => {
+            const activeDragState = liveRef.current.dragState;
+            const activeRootSvgElement = liveRef.current.rootSvgElement;
+            if (!activeDragState || !activeRootSvgElement || !supportsEdgeAutoPan(activeDragState.mode) || liveRef.current.viewPortLocked) {
+                stopEdgeAutoPanScheduling();
+                return;
+            }
+
+            const rect = activeRootSvgElement.getBoundingClientRect();
+            if (!rect.width || !rect.height) {
+                stopEdgeAutoPanScheduling();
+                return;
+            }
+
+            const edgeDirection = getEdgeAutoPanDirection(
+                rect,
+                edgeAutoPanRef.current.clientX,
+                edgeAutoPanRef.current.clientY,
+                EDGE_AUTO_PAN_ZONE_PX,
+            );
+            if (!edgeDirection) {
+                stopEdgeAutoPanScheduling();
+                return;
+            }
+
+            const dx = (EDGE_AUTO_PAN_STEP_PX / rect.width) * liveRef.current.viewPort[2] * edgeDirection.x;
+            const dy = (EDGE_AUTO_PAN_STEP_PX / rect.height) * liveRef.current.viewPort[3] * edgeDirection.y;
+            if (dx === 0 && dy === 0) return;
+
+            const nextViewPort = applyViewPortPan(dx, dy);
+            edgeAutoPanRef.current.accumulatedDx += dx;
+            edgeAutoPanRef.current.accumulatedDy += dy;
+            applyDragAtClientPosition(edgeAutoPanRef.current.clientX, edgeAutoPanRef.current.clientY, nextViewPort);
+        },
+        [applyDragAtClientPosition, applyViewPortPan, stopEdgeAutoPanScheduling]);
+
+    const scheduleEdgeAutoPan = useCallback(
+        (clientX: number, clientY: number) => {
+            const activeDragState = liveRef.current.dragState;
+            const activeRootSvgElement = liveRef.current.rootSvgElement;
+            const autoPanState = edgeAutoPanRef.current;
+
+            const previousClientX = autoPanState.clientX;
+            const previousClientY = autoPanState.clientY;
+            const previousDirection = autoPanState.direction;
+
+            autoPanState.clientX = clientX;
+            autoPanState.clientY = clientY;
+
+            if (!activeDragState || !activeRootSvgElement || !supportsEdgeAutoPan(activeDragState.mode) || liveRef.current.viewPortLocked) {
+                stopEdgeAutoPanScheduling();
+                return;
+            }
+
+            const rect = activeRootSvgElement.getBoundingClientRect();
+            if (!rect.width || !rect.height) {
+                stopEdgeAutoPanScheduling();
+                return;
+            }
+
+            const nextDirection = getEdgeAutoPanDirection(rect, clientX, clientY, EDGE_AUTO_PAN_ZONE_PX);
+            if (!nextDirection) {
+                stopEdgeAutoPanScheduling();
+                return;
+            }
+
+            const movedEnough = Math.abs(previousClientX - clientX) > EDGE_AUTO_PAN_MOVEMENT_TOLERANCE_PX
+                || Math.abs(previousClientY - clientY) > EDGE_AUTO_PAN_MOVEMENT_TOLERANCE_PX;
+            const directionChanged = previousDirection?.x !== nextDirection.x || previousDirection?.y !== nextDirection.y;
+            if (!movedEnough && !directionChanged) return;
+
+            stopEdgeAutoPanScheduling();
+            autoPanState.direction = nextDirection;
+            autoPanState.activationTimeoutId = window.setTimeout(
+                () => {
+                    autoPanState.activationTimeoutId = null;
+                    runEdgeAutoPanTick();
+                    autoPanState.repeatIntervalId = window.setInterval(runEdgeAutoPanTick, EDGE_AUTO_PAN_INTERVAL_MS);
+                },
+                EDGE_AUTO_PAN_DELAY_MS,
+            );
+        },
+        [runEdgeAutoPanTick, stopEdgeAutoPanScheduling]);
 
     useEffect(
         () => {
             if (!dragState) return;
+            resetEdgeAutoPan();
 
             function onPointerMove(event: PointerEvent) {
-                if (!dragState) return;
-                if (event.pointerId !== dragState.pointerId) return;
-                if (!rootSvgElement) return;
+                const activeDragState = liveRef.current.dragState;
+                if (!activeDragState) return;
+                if (event.pointerId !== activeDragState.pointerId) return;
 
-                const next = eventToSvgPoint(rootSvgElement, event.clientX, event.clientY, viewPort);
-                if (!next) return;
-
-                if (dragState.mode === "point") {
-                    const baseDecimals = snapToGrid ? 0 : Math.max(0, dragPrecision);
-                    const decimals = event.ctrlKey ? (baseDecimals ? 0 : 3) : baseDecimals;
-                    const x = Number.parseFloat(next.x.toFixed(decimals));
-                    const y = Number.parseFloat(next.y.toFixed(decimals));
-                    setPointLocationWithoutHistory({
-                        point: dragState.point,
-                        to: { x, y },
-                    });
-                    return;
-                }
-
-                if (dragState.mode === "selection") {
-                    const dxPx = event.clientX - dragState.startClientX;
-                    const dyPx = event.clientY - dragState.startClientY;
-                    const delta = clientDeltaToSvgDelta(rootSvgElement, dxPx, dyPx, dragState.viewBox);
-                    if (!delta) return;
-
-                    const moved = dragState.moved || Math.abs(dxPx) > 1 || Math.abs(dyPx) > 1;
-                    if (moved !== dragState.moved) {
-                        setDragState({ ...dragState, moved });
-                    }
-                    if (!moved) return;
-
-                    doTranslateSelectedSegmentsWithoutHistory({
-                        segmentIndices: dragState.segmentIndices,
-                        dx: delta.x,
-                        dy: delta.y,
-                        startPath: dragState.startPath,
-                    });
-                    return;
-                }
-
-                if (dragState.mode === "canvas") {
-                    if (viewPortLocked) return;
-                    const rect = rootSvgElement.getBoundingClientRect();
-                    if (!rect.width || !rect.height) return;
-                    const dxPx = event.clientX - dragState.lastClientX;
-                    const dyPx = event.clientY - dragState.lastClientY;
-                    const dx = -(dxPx / rect.width) * viewPort[2];
-                    const dy = -(dyPx / rect.height) * viewPort[3];
-                    doPanViewPort({ dx, dy });
-                    setDragState({
-                        ...dragState,
-                        moved: dragState.moved || Math.abs(dxPx) > 1 || Math.abs(dyPx) > 1,
-                        lastClientX: event.clientX,
-                        lastClientY: event.clientY,
-                    });
-                    return;
-                }
-
-                if (dragState.mode === "marquee") {
-                    const moved = dragState.moved
-                        || Math.abs(event.clientX - dragState.startClientX) > 1
-                        || Math.abs(event.clientY - dragState.startClientY) > 1;
-                    setDragState({
-                        ...dragState,
-                        current: next,
-                        moved,
-                    });
-                    if (!moved) return;
-
-                    const nextSelection = applyCommandSelection(
-                        dragState.initialSelection,
-                        getMarqueeSelectionIndices({
-                            start: dragState.start,
-                            current: next,
-                            targetPoints,
-                            controlPoints,
-                            pathElements: segmentHitAreaElements,
-                        }),
-                        dragState.selectionMode,
-                    );
-                    setSelectedCommandIndices(nextSelection);
-                    return;
-                }
-
-                const dx = next.x - dragState.start.x;
-                const dy = next.y - dragState.start.y;
-                const patch = patchImageByHandle(dragState.initial, dragState.handle, dx, dy);
-                doUpdateImage({
-                    id: dragState.imageId,
-                    patch,
-                });
+                pointerCtrlKeyRef.current = event.ctrlKey;
+                scheduleEdgeAutoPan(event.clientX, event.clientY);
+                applyDragAtClientPosition(event.clientX, event.clientY);
             }
 
             function onPointerUp(event: PointerEvent) {
-                if (!dragState) return;
-                if (event.pointerId !== dragState.pointerId) return;
+                const activeDragState = liveRef.current.dragState;
+                if (!activeDragState) return;
+                if (event.pointerId !== activeDragState.pointerId) return;
 
-                if (dragState.mode === "point") {
-                    doCommitCurrentPathToHistory(dragState.startPath);
-                } else if (dragState.mode === "selection" && dragState.moved) {
-                    doCommitCurrentPathToHistory(dragState.startPath);
-                } else if (dragState.mode === "marquee") {
-                    if (!dragState.moved) {
-                        setSelectedCommandIndices(dragState.initialSelection);
+                if (activeDragState.mode === "point") {
+                    doCommitCurrentPathToHistory(activeDragState.startPath);
+                } else if (activeDragState.mode === "selection" && activeDragState.moved) {
+                    doCommitCurrentPathToHistory(activeDragState.startPath);
+                } else if (activeDragState.mode === "marquee") {
+                    if (!activeDragState.moved) {
+                        setSelectedCommandIndices(activeDragState.initialSelection);
                     }
                     doSuppressNextCanvasFocusClear();
-                } else if (dragState.mode === "canvas" && dragState.moved) {
+                } else if (activeDragState.mode === "canvas" && activeDragState.moved) {
                     doSuppressNextCanvasFocusClear();
                 }
-                doStopCanvasDrag();
+                pointerCtrlKeyRef.current = false;
+                stopActiveDrag();
             }
 
             const controller = new AbortController();
             window.addEventListener("pointermove", onPointerMove, { signal: controller.signal });
             window.addEventListener("pointerup", onPointerUp, { signal: controller.signal });
             window.addEventListener("pointercancel", onPointerUp, { signal: controller.signal });
-            return () => controller.abort();
+            return () => {
+                resetEdgeAutoPan();
+                controller.abort();
+            };
         },
-        [controlPoints, doCommitCurrentPathToHistory, doPanViewPort, doStopCanvasDrag, doSuppressNextCanvasFocusClear, doTranslateSelectedSegmentsWithoutHistory, dragState, dragPrecision, rootSvgElement, segmentHitAreaElements, setDragState, setPointLocationWithoutHistory, setSelectedCommandIndices, snapToGrid, targetPoints, viewPort, viewPortLocked]);
+        [applyDragAtClientPosition, doCommitCurrentPathToHistory, doSuppressNextCanvasFocusClear, dragState?.pointerId, resetEdgeAutoPan, scheduleEdgeAutoPan, setSelectedCommandIndices, stopActiveDrag]);
 
     useEffect(
         () => {
             if (!dragState) return;
 
             const onKeyDown = (event: KeyboardEvent) => {
+                const activeDragState = liveRef.current.dragState;
+                if (!activeDragState) return;
                 if (event.key !== "Escape") return;
                 event.preventDefault();
 
-                if (dragState.mode === "point") {
-                    setPathValue(dragState.startPath);
-                } else if (dragState.mode === "selection") {
-                    setPathValue(dragState.startPath);
-                } else if (dragState.mode === "marquee") {
-                    setSelectedCommandIndices(dragState.initialSelection);
-                } else if (dragState.mode === "image") {
+                if (activeDragState.mode === "point") {
+                    setPathValue(activeDragState.startPath);
+                } else if (activeDragState.mode === "selection") {
+                    setPathValue(activeDragState.startPath);
+                } else if (activeDragState.mode === "marquee") {
+                    setSelectedCommandIndices(activeDragState.initialSelection);
+                } else if (activeDragState.mode === "image") {
                     doUpdateImage({
-                        id: dragState.imageId,
+                        id: activeDragState.imageId,
                         patch: {
-                            x1: dragState.initial.x1,
-                            y1: dragState.initial.y1,
-                            x2: dragState.initial.x2,
-                            y2: dragState.initial.y2,
-                            preserveAspectRatio: dragState.initial.preserveAspectRatio,
-                            opacity: dragState.initial.opacity,
+                            x1: activeDragState.initial.x1,
+                            y1: activeDragState.initial.y1,
+                            x2: activeDragState.initial.x2,
+                            y2: activeDragState.initial.y2,
+                            preserveAspectRatio: activeDragState.initial.preserveAspectRatio,
+                            opacity: activeDragState.initial.opacity,
                         },
                     });
                 }
 
-                doStopCanvasDrag();
+                pointerCtrlKeyRef.current = false;
+                stopActiveDrag();
             };
 
             const controller = new AbortController();
             window.addEventListener("keydown", onKeyDown, { signal: controller.signal });
             return () => controller.abort();
         },
-        [doStopCanvasDrag, doUpdateImage, dragState, setPathValue, setSelectedCommandIndices]);
+        [doUpdateImage, dragState?.pointerId, setPathValue, setSelectedCommandIndices, stopActiveDrag]);
 
     function onTouchStart(event: TouchEvent<SVGSVGElement>) {
         if (imageEditMode || canvasPreview) return;
@@ -371,10 +596,7 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
             if (previous.mode === "pinch" && previous.lastDistance > 0 && distance > 0) {
                 const scale = previous.lastDistance / distance;
                 doZoomViewPort({ scale, center });
-                doPanViewPort({
-                    dx: previous.lastCenter.x - center.x,
-                    dy: previous.lastCenter.y - center.y,
-                });
+                applyViewPortPan(previous.lastCenter.x - center.x, previous.lastCenter.y - center.y);
             }
             touchGestureRef.current = {
                 mode: "pinch",
@@ -392,7 +614,7 @@ export function useCanvasDragAndDrop(viewPort: ViewBox) {
                 const dyPx = touch.clientY - previous.lastClientY;
                 const dx = -(dxPx / rect.width) * vw;
                 const dy = -(dyPx / rect.height) * vh;
-                doPanViewPort({ dx, dy });
+                applyViewPortPan(dx, dy);
             }
             touchGestureRef.current = {
                 mode: "pan",
@@ -499,6 +721,26 @@ function clientDeltaToSvgDelta(svg: SVGSVGElement | null, dxPx: number, dyPx: nu
         x: (dxPx / rect.width) * viewBox[2],
         y: (dyPx / rect.height) * viewBox[3],
     };
+}
+
+function supportsEdgeAutoPan(mode: DragState["mode"]): boolean {
+    return mode === "point" || mode === "selection" || mode === "image";
+}
+
+function getEdgeAutoPanDirection(rect: DOMRect, clientX: number, clientY: number, activationZonePx: number): EdgeAutoPanDirection | null {
+    const x: EdgeAutoPanDirection["x"] = clientX <= rect.left + activationZonePx
+        ? -1
+        : clientX >= rect.right - activationZonePx
+            ? 1
+            : 0;
+    const y: EdgeAutoPanDirection["y"] = clientY <= rect.top + activationZonePx
+        ? -1
+        : clientY >= rect.bottom - activationZonePx
+            ? 1
+            : 0;
+
+    if (x === 0 && y === 0) return null;
+    return { x, y };
 }
 
 function isValidViewBox(viewBox: unknown): viewBox is ViewBox {

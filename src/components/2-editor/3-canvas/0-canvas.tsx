@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
@@ -28,6 +28,7 @@ export function PathCanvas() {
 
 export function PathCanvasElement({ children }: { children: ReactNode; }) {
     const { darkCanvas, canvasPreview } = useSnapshot(appSettings.canvas);
+    const hasNonEmptyPathRef = useRef(false);
 
     const canvasRootSvgElement = useAtomValue(canvasRootSvgElementAtom);
     const svgPathInput = useAtomValue(svgPathInputAtom);
@@ -47,9 +48,17 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
 
     useEffect(
         () => {
+            const hasPath = svgPathInput.trim().length > 0;
+            if (!hasPath) {
+                hasNonEmptyPathRef.current = false;
+                return;
+            }
+            if (hasNonEmptyPathRef.current) return;
+
+            hasNonEmptyPathRef.current = true;
             doFitViewPort();
         },
-        [svgPathInput]);
+        [doFitViewPort, svgPathInput]);
 
     useEffect(
         () => {
