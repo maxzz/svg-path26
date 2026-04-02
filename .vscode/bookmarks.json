@@ -11,6 +11,16 @@
 			]
 		},
 		{
+			"path": "README.md",
+			"bookmarks": [
+				{
+					"line": 6,
+					"column": 13,
+					"label": "README: references"
+				}
+			]
+		},
+		{
 			"path": "src/assets/docs/TODOs.txt",
 			"bookmarks": [
 				{

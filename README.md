@@ -7,7 +7,7 @@ SVG path viewer allows you to visualize and edit SVG path data interactively.
 ## References
 
 ##### More or less editors/viewers
-- [SVG path exploration - svg-path first implementation - tm](https://github.com/maxzz/svg-path)
+- [SVG path exploration - svg-path first implementation - tm](https://github.com/maxzz/svg-path) and [demo](https://maxzz.github.io/svg-path)
 - [SVG Path Editor](https://yqnn.github.io/svg-path-editor)
 - [SVG Path Visualizer](https://svg-path-visualizer.netlify.app)
 - [paths: Edit SVG paths](https://github.com/jxnblk/paths)
