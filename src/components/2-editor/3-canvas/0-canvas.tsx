@@ -42,7 +42,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
     const doAdjustViewPortToAspect = useSetAtom(doAdjustViewPortToAspectAtom);
     const rootSvgElementSize = useAtomValue(rootSvgElementSizeAtom);
 
-    const { onTouchEnd, onTouchMove, onTouchStart, startCanvasPointerDown } = useCanvasDragAndDrop(viewPort);
+    const { onTouchEnd, onTouchMove, onTouchStart, startCanvasPointerDown } = useCanvasDragAndDrop();
 
     useSyncCanvasViewportSize();
 
