@@ -30,29 +30,15 @@ export function PathCanvas() {
 export function PathCanvasElement({ children }: { children: ReactNode; }) {
     const { darkCanvas, canvasPreview } = useSnapshot(appSettings.canvas);
     const hasNonEmptyPathRef = useRef(false);
-    const store = useStore();
 
     const canvasRootSvgElement = useAtomValue(canvasRootSvgElementAtom);
     const svgPathInput = useAtomValue(svgPathInputAtom);
     const parseError = useAtomValue(parseErrorAtom);
 
-    const doClearCanvasFocus = useSetAtom(doClearCanvasFocusAtom);
-    const setCanvasRootSvgElement = useSetAtom(canvasRootSvgElementAtom);
     const doWheelZoomViewPort = useSetAtom(doWheelZoomViewPortAtom);
     const doFitViewPort = useSetAtom(doFitViewPortAtom);
     const doAdjustViewPortToAspect = useSetAtom(doAdjustViewPortToAspectAtom);
     const rootSvgElementSize = useAtomValue(rootSvgElementSizeAtom);
-
-    const setCanvasRootSvgRef = useCallback(
-        (node: SVGSVGElement | null) => {
-            if (node) {
-                node.setAttribute("viewBox", store.get(canvasViewPortAtom).join(" "));
-            }
-            setCanvasRootSvgElement(node);
-        },
-        [setCanvasRootSvgElement, store]);
-
-    const { onTouchEnd, onTouchMove, onTouchStart, startCanvasPointerDown } = useCanvasDragAndDrop();
 
     useSyncCanvasViewportSize();
 
@@ -90,6 +76,39 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
 
     return (
         <div className={classNames("absolute w-full h-full overflow-hidden", canvasPreview ? "bg-white" : (darkCanvas ? "bg-[#040d1c]" : "bg-white"))}>
+            <CanvasRootSvg>
+                {children}
+            </CanvasRootSvg>
+
+            <ViewportZoomControls />
+
+            {parseError && (
+                <div className="absolute inset-x-4 bottom-4 px-3 py-2 text-xs text-destructive-foreground bg-destructive/90 rounded-md pointer-events-none">
+                    {parseError}
+                </div>
+            )}
+        </div>
+    );
+}
+
+function CanvasRootSvg({ children }: { children: ReactNode; }) {
+    const store = useStore();
+    const doClearCanvasFocus = useSetAtom(doClearCanvasFocusAtom);
+    const setCanvasRootSvgElement = useSetAtom(canvasRootSvgElementAtom);
+
+    const setCanvasRootSvgRef = useCallback(
+        (node: SVGSVGElement | null) => {
+            if (node) {
+                node.setAttribute("viewBox", store.get(canvasViewPortAtom).join(" "));
+            }
+            setCanvasRootSvgElement(node);
+        },
+        [setCanvasRootSvgElement, store]);
+
+    const { onTouchEnd, onTouchMove, onTouchStart, startCanvasPointerDown } = useCanvasDragAndDrop();
+
+    return (
+        <>
             <svg
                 ref={setCanvasRootSvgRef}
                 className="size-full touch-none"
@@ -103,15 +122,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
             </svg>
 
             <CanvasViewPortSync />
-
-            <ViewportZoomControls />
-
-            {parseError && (
-                <div className="absolute inset-x-4 bottom-4 px-3 py-2 text-xs text-destructive-foreground bg-destructive/90 rounded-md pointer-events-none">
-                    {parseError}
-                </div>
-            )}
-        </div>
+        </>
     );
 }
 
