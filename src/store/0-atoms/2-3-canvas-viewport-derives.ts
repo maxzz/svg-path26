@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
-import { type SizeWH, type ViewBox } from "@/svg-core/9-types-svg-model";
-import { canvasRootSvgElementAtom, canvasViewPortAtom, rootSvgElementSizeAtom } from "@/store/0-atoms/2-3-canvas-viewport";
+import { type SizeWH } from "@/svg-core/9-types-svg-model";
+import { canvasRootSvgElementAtom, rootSvgElementSizeAtom, viewPortHeightAtom, viewPortWidthAtom } from "@/store/0-atoms/2-3-canvas-viewport";
 import { strokeWidthAtom } from "@/store/0-atoms/2-4-editor-actions";
 
 export const canvasUnitsPerPixelAtom = atom(
-    (get) => getSvgUnitsPerPixel(get(canvasViewPortAtom), get(rootSvgElementSizeAtom))
+    (get) => getSvgUnitsPerPixel(get(viewPortWidthAtom), get(viewPortHeightAtom), get(rootSvgElementSizeAtom))
 );
 
 export const canvasStrokeWidthAtom = atom(
@@ -45,9 +45,7 @@ export function useSyncCanvasViewportSize() {
         [rootSvgElement]);
 }
 
-function getSvgUnitsPerPixel(viewBox: ViewBox, viePortSize: SizeWH | null): number {
-    const [, , width, height] = viewBox;
-
+function getSvgUnitsPerPixel(width: number, height: number, viePortSize: SizeWH | null): number {
     if (!viePortSize || viePortSize.width <= 0 || viePortSize.height <= 0) {
         return Math.max(width, height) / 1000;
     }

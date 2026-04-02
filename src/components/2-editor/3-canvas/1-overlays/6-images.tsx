@@ -1,4 +1,4 @@
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
 import { canvasViewPortAtom } from "@/store/0-atoms/2-3-canvas-viewport";
@@ -30,11 +30,11 @@ export function PathCanvasImages() {
 export function PathCanvasImageEditOverlays() {
     const { canvasPreview } = useSnapshot(appSettings.canvas);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
+    const store = useStore();
 
     const images = useAtomValue(imagesAtom);
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
     const [focusedImageId, setFocusedImageId] = useAtom(focusedImageIdAtom);
-    const viewPort = useAtomValue(canvasViewPortAtom);
 
     const startImageDrag = useSetAtom(doStartImageDragAtom);
 
@@ -46,6 +46,7 @@ export function PathCanvasImageEditOverlays() {
                 key={`edit:${image.id}`}
                 onPointerDown={(event) => {
                     event.stopPropagation();
+                    const viewPort = store.get(canvasViewPortAtom);
                     const start = eventToSvgPoint(event.currentTarget.ownerSVGElement, event.clientX, event.clientY, viewPort);
                     if (!start) return;
 
@@ -72,6 +73,7 @@ export function PathCanvasImageEditOverlays() {
                             r={unitsPerPixel * 3}
                             onPointerDown={(event) => {
                                 event.stopPropagation();
+                                const viewPort = store.get(canvasViewPortAtom);
                                 const start = eventToSvgPoint(event.currentTarget.ownerSVGElement, event.clientX, event.clientY, viewPort);
                                 if (!start) return;
                                 startImageDrag({ pointerId: event.pointerId, imageId: image.id, handle: handle.type, start, initial: image });

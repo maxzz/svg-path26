@@ -1,5 +1,5 @@
-import { useEffect, useRef, type ReactNode } from "react";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useCallback, useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
+import { useAtomValue, useSetAtom, useStore } from "jotai";
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
 import { Button } from "@/components/ui/shadcn/button";
@@ -30,11 +30,11 @@ export function PathCanvas() {
 export function PathCanvasElement({ children }: { children: ReactNode; }) {
     const { darkCanvas, canvasPreview } = useSnapshot(appSettings.canvas);
     const hasNonEmptyPathRef = useRef(false);
+    const store = useStore();
 
     const canvasRootSvgElement = useAtomValue(canvasRootSvgElementAtom);
     const svgPathInput = useAtomValue(svgPathInputAtom);
     const parseError = useAtomValue(parseErrorAtom);
-    const viewPort = useAtomValue(canvasViewPortAtom);
 
     const doClearCanvasFocus = useSetAtom(doClearCanvasFocusAtom);
     const setCanvasRootSvgElement = useSetAtom(canvasRootSvgElementAtom);
@@ -42,6 +42,15 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
     const doFitViewPort = useSetAtom(doFitViewPortAtom);
     const doAdjustViewPortToAspect = useSetAtom(doAdjustViewPortToAspectAtom);
     const rootSvgElementSize = useAtomValue(rootSvgElementSizeAtom);
+
+    const setCanvasRootSvgRef = useCallback(
+        (node: SVGSVGElement | null) => {
+            if (node) {
+                node.setAttribute("viewBox", store.get(canvasViewPortAtom).join(" "));
+            }
+            setCanvasRootSvgElement(node);
+        },
+        [setCanvasRootSvgElement, store]);
 
     const { onTouchEnd, onTouchMove, onTouchStart, startCanvasPointerDown } = useCanvasDragAndDrop();
 
@@ -82,8 +91,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
     return (
         <div className={classNames("absolute w-full h-full overflow-hidden", canvasPreview ? "bg-white" : (darkCanvas ? "bg-[#040d1c]" : "bg-white"))}>
             <svg
-                ref={(node) => setCanvasRootSvgElement(node)}
-                viewBox={viewPort.join(" ")}
+                ref={setCanvasRootSvgRef}
                 className="size-full touch-none"
                 onPointerDown={startCanvasPointerDown}
                 onTouchStart={onTouchStart}
@@ -94,6 +102,8 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
                 {children}
             </svg>
 
+            <CanvasViewPortSync />
+
             <ViewportZoomControls />
 
             {parseError && (
@@ -103,6 +113,20 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
             )}
         </div>
     );
+}
+
+function CanvasViewPortSync() {
+    const canvasRootSvgElement = useAtomValue(canvasRootSvgElementAtom);
+    const viewPort = useAtomValue(canvasViewPortAtom);
+
+    useLayoutEffect(
+        () => {
+            if (!canvasRootSvgElement) return;
+            canvasRootSvgElement.setAttribute("viewBox", viewPort.join(" "));
+        },
+        [canvasRootSvgElement, viewPort]);
+
+    return null;
 }
 
 function ViewportZoomControls() {
