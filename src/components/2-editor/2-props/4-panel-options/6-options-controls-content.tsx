@@ -18,10 +18,10 @@ export function OptionsControls() {
                 </span>
                 <ViewBoxControls />
 
-                <span className="text-[11px] text-muted-foreground select-none">
+                {/* <span className="text-[11px] text-muted-foreground select-none">
                     viewPort
                 </span>
-                <ViewportControls />
+                <ViewportControls /> */}
             </div>
 
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5">
