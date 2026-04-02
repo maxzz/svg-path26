@@ -4,6 +4,7 @@ import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
 import { Button } from "@/components/ui/shadcn/button";
 import { IconZoomIn, IconZoomNormal, IconZoomOut } from "@/components/ui/icons/normal";
+import { IconViewBox } from "@/components/ui/icons/normal/28-viewbox";
 import { CanvasGrid } from "./8-canvas-grid";
 import { CanvasHelperOverlays } from "./1-overlays/1-canvas-overlays";
 import { useCanvasDragAndDrop } from "./3-canvas-drag";
@@ -12,7 +13,7 @@ import { useSyncCanvasViewportSize } from "../../../store/0-atoms/2-3-canvas-vie
 import { appSettings } from "@/store/0-ui-settings";
 import { doClearCanvasFocusAtom } from "@/store/0-atoms/2-4-editor-actions";
 import { parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
-import { canvasRootSvgElementAtom, canvasViewPortAtom, rootSvgElementSizeAtom, doAdjustViewPortToAspectAtom, doFitViewPortAtom, doWheelZoomViewPortAtom, doZoomViewPortAtom } from "@/store/0-atoms/2-3-canvas-viewport";
+import { canvasRootSvgElementAtom, canvasViewPortAtom, rootSvgElementSizeAtom, doAdjustViewPortToAspectAtom, doFitViewPortAtom, doFitViewPortToPathViewBoxAtom, doWheelZoomViewPortAtom, doZoomViewPortAtom } from "@/store/0-atoms/2-3-canvas-viewport";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 
 export function PathCanvas() {
@@ -106,14 +107,18 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
 function ViewportZoomControls() {
     const { darkCanvas } = useSnapshot(appSettings.canvas);
     const doFitViewPort = useSetAtom(doFitViewPortAtom);
+    const doFitViewPortToPathViewBox = useSetAtom(doFitViewPortToPathViewBoxAtom);
     const doZoomViewPort = useSetAtom(doZoomViewPortAtom);
     const buttonClasses = classNames("size-7 rounded-full", darkCanvas ? "text-slate-500 bg-slate-100/10! border-slate-100/10!" : "text-slate-500 bg-slate-500/10! border-slate-500/10!");
     return (
         <div className="absolute bottom-3 right-3 flex items-center gap-0.5 z-10">
+            <Button variant="outline" size="icon" className={buttonClasses} title="Zoom to viewBox" onClick={() => doFitViewPortToPathViewBox()}>
+                <IconViewBox className="size-3.5" />
+            </Button>
             <Button variant="outline" size="icon" className={buttonClasses} title="Zoom out" onClick={() => doZoomViewPort({ scale: 10 / 9 })}>
                 <IconZoomOut className="size-3.5" />
             </Button>
-            <Button variant="outline" size="icon" className={buttonClasses} title="Fit" onClick={() => doFitViewPort()}>
+            <Button variant="outline" size="icon" className={buttonClasses} title="Zoom to fit current path" onClick={() => doFitViewPort()}>
                 <IconZoomNormal className="size-3.5" />
             </Button>
             <Button variant="outline" size="icon" className={buttonClasses} title="Zoom in" onClick={() => doZoomViewPort({ scale: 9 / 10 })}>

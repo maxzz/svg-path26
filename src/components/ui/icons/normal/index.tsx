@@ -18,6 +18,7 @@ export * from "./27-dnd-target";
 export * from "./27-microscope";
 export * from "./27-not-in-use";
 export * from "./27-stop-circle";
+export * from "./28-viewbox";
 
 export * from "./30-1-theme-moon";
 export * from "./30-2-theme-sun";

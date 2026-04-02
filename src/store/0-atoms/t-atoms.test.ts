@@ -2,7 +2,7 @@ import { createStore } from "jotai";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { doDeleteSelectedSegmentsAtom, doSetPointLocationWithoutHistoryAtom, selectedCommandIndicesAtom } from "./2-4-editor-actions";
 import { commandRowsAtom, targetPointsAtom } from "./2-0-svg-model";
-import { canvasViewPortAtom, doFitViewPortAtom, doPanViewPortAtom, doSetViewPortAtom, doZoomViewPortAtom } from "./2-3-canvas-viewport";
+import { canvasViewPortAtom, doFitViewPortAtom, doFitViewPortToPathViewBoxAtom, doPanViewPortAtom, doSetViewPortAtom, doZoomViewPortAtom } from "./2-3-canvas-viewport";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "./1-2-history";
 import { doApplySvgInputTextAtom, doSelectSvgInputNodeAtom, svgInputDocumentAtom, svgInputSelectedNodeIdAtom } from "./1-3-svg-input";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
@@ -135,19 +135,31 @@ describe("svg path state atoms", () => {
         expect(store.get(canvasViewPortAtom)).toEqual(lockedBefore);
     });
 
-    it("applies zoom scale to the viewport independently from stored zoom", () => {
+    it("fits the current path at 1x zoom and then scales from that baseline", () => {
         const store = createStore();
         appSettings.pathEditor.zoom = 2;
         store.set(svgPathInputAtom, "M 0 0 L 50 25");
         store.set(doFitViewPortAtom);
 
         const before = store.get(canvasViewPortAtom);
+        expect(appSettings.pathEditor.zoom).toBe(1);
         store.set(doZoomViewPortAtom, { scale: 0.9 });
         const after = store.get(canvasViewPortAtom);
 
         expect(after[2]).toBeCloseTo(before[2] * 0.9);
         expect(after[3]).toBeCloseTo(before[3] * 0.9);
-        expect(appSettings.pathEditor.zoom).toBeCloseTo(2 / 0.9);
+        expect(appSettings.pathEditor.zoom).toBeCloseTo(1 / 0.9);
+    });
+
+    it("fits the stored path viewBox into the canvas aspect at 1x zoom", () => {
+        const store = createStore();
+        appSettings.pathEditor.zoom = 3;
+        store.set(doSetPathViewBoxAtom, [0, 0, 24, 24]);
+
+        store.set(doFitViewPortToPathViewBoxAtom);
+
+        expect(store.get(canvasViewPortAtom)).toEqual([-4, 0, 32, 24]);
+        expect(appSettings.pathEditor.zoom).toBe(1);
     });
 
     it("stores and opens named paths", () => {

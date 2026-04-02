@@ -2,6 +2,7 @@ import { atom } from "jotai";
 import { appSettings } from "@/store/0-ui-settings";
 import { type Point, type SizeWH, type ViewBox } from "@/svg-core/9-types-svg-model";
 import { svgModelAtom } from "@/store/0-atoms/2-0-svg-model";
+import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { eventToSvgPoint } from "@/components/2-editor/3-canvas/3-canvas-drag";
 
 const MIN_ZOOM = 0.25;
@@ -92,10 +93,8 @@ export const doFitViewPortAtom = atom(
 
         const model = get(svgModelAtom).model;
         if (!model) {
-            set(viewPortXAtom, DEFAULT_VIEWPORT_X);
-            set(viewPortYAtom, DEFAULT_VIEWPORT_Y);
-            set(viewPortWidthAtom, DEFAULT_VIEWPORT_WIDTH);
-            set(viewPortHeightAtom, DEFAULT_VIEWPORT_HEIGHT);
+            appSettings.pathEditor.zoom = 1;
+            set(doSetViewPortAtom, getDefaultViewPort());
             return;
         }
 
@@ -103,29 +102,25 @@ export const doFitViewPortAtom = atom(
         const widthRaw = Math.max(10, bounds.xmax - bounds.xmin);
         const heightRaw = Math.max(10, bounds.ymax - bounds.ymin);
         const padding = Math.max(widthRaw, heightRaw) * 0.12 + 2;
+        const frame: ViewBox = [
+            bounds.xmin - padding,
+            bounds.ymin - padding,
+            widthRaw + padding * 2,
+            heightRaw + padding * 2,
+        ];
 
-        let width = widthRaw + padding * 2;
-        let height = heightRaw + padding * 2;
-        const rootSvgElementSize = get(rootSvgElementSizeAtom);
-        const aspect = (rootSvgElementSize && rootSvgElementSize.width > 0 && rootSvgElementSize.height > 0)
-            ? rootSvgElementSize.width / rootSvgElementSize.height
-            : 4 / 3;
-        if (width / height > aspect) {
-            height = width / aspect;
-        } else {
-            width = height * aspect;
-        }
+        appSettings.pathEditor.zoom = 1;
+        set(doSetViewPortAtom, fitFrameToCanvasAspect(frame, get(rootSvgElementSizeAtom)));
+    }
+);
 
-        const zoom = clampZoom(appSettings.pathEditor.zoom);
-        width /= zoom;
-        height /= zoom;
-        const centerX = (bounds.xmin + bounds.xmax) / 2;
-        const centerY = (bounds.ymin + bounds.ymax) / 2;
+export const doFitViewPortToPathViewBoxAtom = atom(
+    null,
+    (get, set) => {
+        if (appSettings.pathEditor.viewPortLocked) return;
 
-        set(viewPortXAtom, centerX - width / 2);
-        set(viewPortYAtom, centerY - height / 2);
-        set(viewPortWidthAtom, width);
-        set(viewPortHeightAtom, height);
+        appSettings.pathEditor.zoom = 1;
+        set(doSetViewPortAtom, fitFrameToCanvasAspect(get(pathViewBoxAtom), get(rootSvgElementSizeAtom)));
     }
 );
 
@@ -177,4 +172,31 @@ function clampZoom(value: number): number {
         return 1;
     }
     return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value));
+}
+
+function getDefaultViewPort(): ViewBox {
+    return [DEFAULT_VIEWPORT_X, DEFAULT_VIEWPORT_Y, DEFAULT_VIEWPORT_WIDTH, DEFAULT_VIEWPORT_HEIGHT];
+}
+
+function fitFrameToCanvasAspect(frame: ViewBox, rootSvgElementSize: SizeWH | null): ViewBox {
+    const centerX = frame[0] + frame[2] / 2;
+    const centerY = frame[1] + frame[3] / 2;
+    let width = Math.max(1e-3, frame[2]);
+    let height = Math.max(1e-3, frame[3]);
+    const aspect = (rootSvgElementSize && rootSvgElementSize.width > 0 && rootSvgElementSize.height > 0)
+        ? rootSvgElementSize.width / rootSvgElementSize.height
+        : 4 / 3;
+
+    if (width / height > aspect) {
+        height = width / aspect;
+    } else {
+        width = height * aspect;
+    }
+
+    return [
+        centerX - width / 2,
+        centerY - height / 2,
+        width,
+        height,
+    ];
 }
