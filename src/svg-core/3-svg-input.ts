@@ -68,6 +68,10 @@ export function findSvgInputNodeById(root: SvgInputNode, nodeId: string): SvgInp
     return null;
 }
 
+export function serializeSvgInputDocument(document: SvgInputDocument): string {
+    return serializeSvgInputNode(document.root, 0);
+}
+
 function extractStandalonePathData(text: string): string | null {
     if (text.includes("<")) return null;
 
@@ -141,4 +145,30 @@ function getSourceKind(element: Element): SvgInputSourceKind {
 
 function getElementTagName(element: Element): string {
     return (element.localName || element.tagName).toLowerCase();
+}
+
+function serializeSvgInputNode(node: SvgInputNode, depth: number): string {
+    const indent = "  ".repeat(depth);
+    const attributes = node.attributes
+        .map((attribute) => `${attribute.name}="${escapeAttributeValue(attribute.value)}"`)
+        .join(" ");
+    const openTag = attributes ? `<${node.tagName} ${attributes}` : `<${node.tagName}`;
+
+    if (node.children.length === 0) {
+        return `${indent}${openTag} />`;
+    }
+
+    const children = node.children
+        .map((child) => serializeSvgInputNode(child, depth + 1))
+        .join("\n");
+
+    return `${indent}${openTag}>\n${children}\n${indent}</${node.tagName}>`;
+}
+
+function escapeAttributeValue(value: string): string {
+    return value
+        .replaceAll("&", "&amp;")
+        .replaceAll("\"", "&quot;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
 }

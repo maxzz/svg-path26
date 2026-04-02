@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { findSvgInputNodeById, parseSvgInputText } from "./3-svg-input";
+import { findSvgInputNodeById, parseSvgInputText, serializeSvgInputDocument } from "./3-svg-input";
 
 describe("parseSvgInputText", () => {
     it("parses an SVG document into a nested element tree", () => {
@@ -43,5 +43,31 @@ describe("parseSvgInputText", () => {
         expect(fromAttribute.document.root.pathData).toBe("M 3 3 L 4 4");
         expect(fromPlainValue.document.root.tagName).toBe("path");
         expect(fromPlainValue.initialPathData).toBe("M 5 5 L 6 6");
+    });
+
+    it("serializes nested SVG input documents back to markup", () => {
+        const parsed = parseSvgInputText(`
+            <svg viewBox="0 0 24 24">
+                <g id="layer-a">
+                    <path d="M 0 0 L 4 4" fill="none" />
+                </g>
+                <circle cx="6" cy="7" r="2" />
+            </svg>
+        `);
+
+        expect(serializeSvgInputDocument(parsed.document)).toBe([
+            `<svg viewBox="0 0 24 24">`,
+            `  <g id="layer-a">`,
+            `    <path d="M 0 0 L 4 4" fill="none" />`,
+            `  </g>`,
+            `  <circle cx="6" cy="7" r="2" />`,
+            `</svg>`,
+        ].join("\n"));
+    });
+
+    it("serializes synthetic path input as a path element", () => {
+        const parsed = parseSvgInputText(`M 5 5 L 6 6`);
+
+        expect(serializeSvgInputDocument(parsed.document)).toBe(`<path d="M 5 5 L 6 6" />`);
     });
 });

@@ -16,6 +16,7 @@ import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
 import { SvgTreeView } from "@/components/ui/loacal-ui/2-svg-tree-view";
 import { appSettings } from "@/store/0-ui-settings";
+import { serializeSvgInputDocument, type SvgInputDocument } from "@/svg-core/3-svg-input";
 
 export function EditorPanels() {
     const handleEditorKeyDown = useSetAtom(doHandleEditorKeyDownAtom);
@@ -55,17 +56,19 @@ function SvgInputSection() {
     const { showSvgTreeConnectorLines } = useSnapshot(appSettings.pathEditor);
 
     return (
-        <SectionPanel sectionKey="svg-input" label="SVG Input" contentClassName="px-1 py-1">
-            <SvgTreeView
-                root={document?.root ?? null}
-                selectedNodeId={selectedNodeId}
-                onSelectNode={selectSvgNode}
-                onPasteText={applySvgInputText}
-                showConnectorLines={showSvgTreeConnectorLines}
-                parseError={parseError}
-                className="max-h-72 min-h-24"
-            />
-        </SectionPanel>
+        <TooltipProvider delayDuration={250}>
+            <SectionPanel sectionKey="svg-input" label="SVG Input" contentClassName="px-1 py-1" overlay={<CopySvgOverlay document={document} />}>
+                <SvgTreeView
+                    root={document?.root ?? null}
+                    selectedNodeId={selectedNodeId}
+                    onSelectNode={selectSvgNode}
+                    onPasteText={applySvgInputText}
+                    showConnectorLines={showSvgTreeConnectorLines}
+                    parseError={parseError}
+                    className="max-h-72 min-h-24"
+                />
+            </SectionPanel>
+        </TooltipProvider>
     );
 }
 
@@ -87,9 +90,33 @@ function PathInputSection() {
 }
 
 function CopyPathOverlay({ pathValue }: { pathValue: string; }) {
+    const hasPath = pathValue.trim().length > 0;
+
+    return (
+        <CopyClipboardOverlayButton
+            copyText={pathValue}
+            canCopy={hasPath}
+            idleLabel="Copy path"
+            successLabel="Path copied"
+        />
+    );
+}
+
+function CopySvgOverlay({ document }: { document: SvgInputDocument | null; }) {
+    return (
+        <CopyClipboardOverlayButton
+            copyText={document ? serializeSvgInputDocument(document) : ""}
+            canCopy={Boolean(document)}
+            idleLabel="Copy SVG"
+            successLabel="SVG copied"
+        />
+    );
+}
+
+function CopyClipboardOverlayButton(props: { copyText: string; canCopy: boolean; idleLabel: string; successLabel: string; }) {
+    const { copyText, canCopy, idleLabel, successLabel } = props;
     const [copied, setCopied] = useState(false);
     const resetCopiedTimerRef = useRef<number | null>(null);
-    const hasPath = pathValue.trim().length > 0;
 
     useEffect(
         () => () => {
@@ -99,9 +126,9 @@ function CopyPathOverlay({ pathValue }: { pathValue: string; }) {
         },
         []);
 
-    async function copyPath() {
-        if (!hasPath) return;
-        await navigator.clipboard.writeText(pathValue);
+    async function copyValue() {
+        if (!canCopy) return;
+        await navigator.clipboard.writeText(copyText);
 
         if (resetCopiedTimerRef.current !== null) {
             window.clearTimeout(resetCopiedTimerRef.current);
@@ -121,12 +148,12 @@ function CopyPathOverlay({ pathValue }: { pathValue: string; }) {
             <TooltipTrigger asChild>
                 <Button
                     className={copied ? "mr-1 size-6 rounded-sm bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 hover:text-emerald-700 dark:text-emerald-300" : "mr-1 size-6 rounded-sm text-muted-foreground hover:text-foreground"}
-                    disabled={!hasPath}
-                    onClick={() => void copyPath()}
+                    disabled={!canCopy}
+                    onClick={() => void copyValue()}
                     variant="ghost"
                     size="icon"
                     type="button"
-                    aria-label={copied ? "Path copied" : "Copy path"}
+                    aria-label={copied ? successLabel : idleLabel}
                 >
                     <AnimatePresence mode="wait" initial={false}>
                         {copied ? (
@@ -157,7 +184,7 @@ function CopyPathOverlay({ pathValue }: { pathValue: string; }) {
             </TooltipTrigger>
 
             <TooltipContent sideOffset={6}>
-                {copied ? "Path copied" : (hasPath ? "Copy path" : "Nothing to copy")}
+                {copied ? successLabel : (canCopy ? idleLabel : "Nothing to copy")}
             </TooltipContent>
         </Tooltip>
     );
