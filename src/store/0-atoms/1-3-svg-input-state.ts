@@ -1,5 +1,7 @@
 import { atom } from "jotai";
 import { type SvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-input";
+import { type ViewBox } from "@/svg-core/9-types-svg-model";
+import { pathViewBoxAtom } from "./2-2-path-viewbox";
 
 interface SvgInputState {
     document: SvgInputDocument | null;
@@ -19,7 +21,19 @@ export const doSyncSvgInputBoundPathAtom = atom(
     null,
     (get, set, nextPath: string) => {
         const state = get(svgInputStateAtom);
-        if (!state.document || !state.boundPathNodeId) return;
+        if (!state.document) {
+            if (!nextPath.trim()) return;
+
+            set(svgInputStateAtom, {
+                document: createSvgDocumentWithPath(nextPath, get(pathViewBoxAtom)),
+                selectedNodeId: "0.0",
+                parseError: null,
+                boundPathNodeId: "0.0",
+            });
+            return;
+        }
+
+        if (!state.boundPathNodeId) return;
 
         const nextRoot = replaceNodePathData(state.document.root, state.boundPathNodeId, nextPath);
         if (nextRoot === state.document.root) return;
@@ -33,6 +47,30 @@ export const doSyncSvgInputBoundPathAtom = atom(
         });
     },
 );
+
+function createSvgDocumentWithPath(path: string, viewBox: ViewBox): SvgInputDocument {
+    return {
+        sourceKind: "svg-document",
+        root: {
+            id: "0",
+            tagName: "svg",
+            attributes: [
+                { name: "xmlns", value: "http://www.w3.org/2000/svg" },
+                { name: "viewBox", value: viewBox.join(" ") },
+            ],
+            children: [
+                {
+                    id: "0.0",
+                    tagName: "path",
+                    attributes: [{ name: "d", value: path }],
+                    children: [],
+                    pathData: path,
+                },
+            ],
+            pathData: null,
+        },
+    };
+}
 
 function replaceNodePathData(node: SvgInputNode, nodeId: string, nextPath: string): SvgInputNode {
     if (node.id === nodeId) {

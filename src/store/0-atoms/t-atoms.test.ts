@@ -288,6 +288,24 @@ describe("svg path state atoms", () => {
         expect(store.get(svgPathInputAtom)).toBe("M 1 1 L 2 2");
     });
 
+    it("creates an SVG input document when the path changes without existing SVG input", () => {
+        const store = createStore();
+
+        expect(store.get(svgInputDocumentAtom)).toBeNull();
+
+        store.set(svgPathInputAtom, "M 3 3 L 8 8");
+
+        const root = store.get(svgInputDocumentAtom)?.root;
+        const pathNode = root ? findSvgInputNodeById(root, "0.0") : null;
+
+        expect(root?.tagName).toBe("svg");
+        expect(root?.attributes.find((attribute) => attribute.name === "xmlns")?.value).toBe("http://www.w3.org/2000/svg");
+        expect(root?.attributes.find((attribute) => attribute.name === "viewBox")?.value).toBe("0 0 24 24");
+        expect(pathNode?.tagName).toBe("path");
+        expect(pathNode?.pathData).toBe("M 3 3 L 8 8");
+        expect(store.get(svgInputSelectedNodeIdAtom)).toBe("0.0");
+    });
+
     it("syncs the bound SVG input path when command edits change the current path", () => {
         const store = createStore();
 
