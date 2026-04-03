@@ -13,7 +13,7 @@ export function Footer() {
             <div className="flex items-center gap-1">
                 <TicksToggleInput />
                 <button
-                    className="px-1 pb-px text-[10px] border rounded"
+                    className="px-1 pb-px h-4 text-[10px] border rounded"
                     onClick={() => { appSettings.canvas.showGrid = !showGrid; }}
                     aria-pressed={showGrid}
                     type="button"
@@ -21,7 +21,7 @@ export function Footer() {
                     {showGrid ? "Grid on" : "Grid off"}
                 </button>
                 <button
-                    className="px-1 pb-px text-[10px] border rounded"
+                    className="px-1 pb-px h-4 text-[10px] border rounded"
                     onClick={() => { appSettings.canvas.darkCanvas = !darkCanvas; }}
                     aria-pressed={darkCanvas}
                     type="button"
@@ -29,7 +29,7 @@ export function Footer() {
                     {darkCanvas ? "Dark canvas" : "Light canvas"}
                 </button>
                 <button
-                    className="px-1 pb-px text-[10px] border rounded"
+                    className="px-1 pb-px h-4 text-[10px] border rounded"
                     onClick={() => { appSettings.canvas.showViewBoxFrame = !showViewBoxFrame; }}
                     aria-pressed={showViewBoxFrame}
                     type="button"
@@ -70,17 +70,9 @@ function TicksToggleInput() {
     const { tickInterval } = useSnapshot(appSettings.pathEditor);
 
     return (
-        <>
-            <button
-                className="px-1 pb-px text-[10px] border rounded"
-                onClick={() => { appSettings.canvas.showTicks = !showTicks; }}
-                aria-pressed={showTicks}
-                type="button"
-            >
-                {showTicks ? "Ticks on" : "Ticks off"}
-            </button>
+        <div className="flex items-center 1gap-0.5">
             <input
-                className="h-6 w-14 rounded border bg-background px-2 text-[10px] disabled:opacity-20"
+                className="pl-2 pr-0.5 h-5 w-12 max-w-20 scale-80 text-[10px] text-center rounded border bg-background disabled:opacity-20"
                 disabled={!showTicks}
                 type="number"
                 value={tickInterval}
@@ -91,6 +83,14 @@ function TicksToggleInput() {
                     appSettings.pathEditor.tickInterval = Math.max(1, Number(event.target.value) || 1);
                 }}
             />
-        </>
+            <button
+                className="px-1 pb-px text-[10px] border rounded"
+                onClick={() => { appSettings.canvas.showTicks = !showTicks; }}
+                aria-pressed={showTicks}
+                type="button"
+            >
+                {showTicks ? "Ticks on" : "Ticks off"}
+            </button>
+        </div>
     );
 }
