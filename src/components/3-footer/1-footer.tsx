@@ -8,10 +8,11 @@ export function Footer() {
 
     return (
         <footer className="px-4 py-2 pr-2 text-xs text-muted-foreground border-t flex items-center justify-between">
-            <PathInputSectionStatusInline />
+            <PathStateInfo />
             
             <div className="flex items-center gap-1">
                 <TicksToggleInput />
+
                 <button
                     className="px-1 pb-px h-4 text-[10px] border rounded"
                     onClick={() => { appSettings.canvas.showGrid = !showGrid; }}
@@ -20,6 +21,7 @@ export function Footer() {
                 >
                     {showGrid ? "Grid on" : "Grid off"}
                 </button>
+
                 <button
                     className="px-1 pb-px h-4 text-[10px] border rounded"
                     onClick={() => { appSettings.canvas.darkCanvas = !darkCanvas; }}
@@ -28,6 +30,7 @@ export function Footer() {
                 >
                     {darkCanvas ? "Dark canvas" : "Light canvas"}
                 </button>
+
                 <button
                     className="px-1 pb-px h-4 text-[10px] border rounded"
                     onClick={() => { appSettings.canvas.showViewBoxFrame = !showViewBoxFrame; }}
@@ -41,26 +44,26 @@ export function Footer() {
     );
 }
 
-function PathInputSectionStatusInline() {
-    const error = useAtomValue(parseErrorAtom);
+function PathStateInfo() {
     const commandCount = useAtomValue(commandCountAtom);
-
+    const error = useAtomValue(parseErrorAtom);
     return (
-        <div className="flex items-center gap-2 min-w-0 whitespace-nowrap">
+        <div className="min-w-0 text-[10px] flex items-center gap-2 whitespace-nowrap">
+            <span className="shrink-0">
+                Commands parsed: {commandCount}
+            </span>
+
             {error
                 ? (
-                    <span className="truncate max-w-[220px] rounded bg-destructive/10 px-2 py-1 text-xs text-destructive">
+                    <span className="px-2 py-1 max-w-55 text-xs text-destructive bg-destructive/10 truncate rounded">
                         {error}
                     </span>
                 ) : (
-                    <span className="truncate max-w-[220px] rounded bg-emerald-500/10 px-2 py-1 text-xs text-emerald-700 dark:text-emerald-300">
+                    <span className="px-2 py-1 max-w-55 text-emerald-700 dark:text-emerald-300 truncate rounded">
                         Path parsed successfully.
                     </span>
                 )
             }
-            <span className="shrink-0">
-                Commands parsed: {commandCount}
-            </span>
         </div>
     );
 }
@@ -68,9 +71,8 @@ function PathInputSectionStatusInline() {
 function TicksToggleInput() {
     const { showTicks } = useSnapshot(appSettings.canvas);
     const { tickInterval } = useSnapshot(appSettings.pathEditor);
-
     return (
-        <div className="flex items-center 1gap-0.5">
+        <div className="flex items-center">
             <input
                 className="pl-2 pr-0.5 h-5 w-12 max-w-20 scale-80 text-[10px] text-center rounded border bg-background disabled:opacity-20"
                 disabled={!showTicks}
@@ -84,7 +86,7 @@ function TicksToggleInput() {
                 }}
             />
             <button
-                className="px-1 pb-px text-[10px] border rounded"
+                className="-ml-[3px] px-1 pb-px text-[10px] border rounded"
                 onClick={() => { appSettings.canvas.showTicks = !showTicks; }}
                 aria-pressed={showTicks}
                 type="button"
