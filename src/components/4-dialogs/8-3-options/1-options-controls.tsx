@@ -1,6 +1,5 @@
 import { type InputHTMLAttributes } from "react";
 import { useAtom, type PrimitiveAtom } from "jotai";
-import { useSnapshot } from "valtio";
 import { IconEyeHide, IconEyeShow } from "@/components/ui/icons/normal";
 import { Button } from "@/components/ui/shadcn/button";
 import { Switch } from "@/components/ui/shadcn/switch";
@@ -8,6 +7,7 @@ import { pathViewBoxHeightAtom, pathViewBoxWidthAtom, pathViewBoxXAtom, pathView
 import { appSettings } from "@/store/0-ui-settings";
 import { classNames } from "@/utils";
 import { compactInputClasses, compactLabelClasses } from "../../2-editor/2-props/8-shared-classes/0-classes";
+import { ViewBoxControls } from "./2-viewbox-controls";
 
 export function NumberRow({ label, value, onValueChange, ...rest }: { label: string; value: number; onValueChange: (value: number) => void; } & InputHTMLAttributes<HTMLInputElement>) {
     return (
@@ -50,32 +50,5 @@ function CompactField({ valueAtom, label, className, ...rest }: { valueAtom: Pri
                 {...rest}
             />
         </label>
-    );
-}
-
-export function ViewBoxControls() {
-    const { showViewBoxFrame } = useSnapshot(appSettings.canvas);
-    return (
-        <div className="flex items-start gap-1.5">
-            <div className="grid flex-1 grid-cols-4 gap-1">
-                <CompactField label="x" valueAtom={pathViewBoxXAtom} title="viewBox x" />
-                <CompactField label="y" valueAtom={pathViewBoxYAtom} title="viewBox y" />
-                <CompactField label="width" valueAtom={pathViewBoxWidthAtom} title="viewBox width" min={1e-3} />
-                <CompactField label="height" valueAtom={pathViewBoxHeightAtom} title="viewBox height" min={1e-3} />
-            </div>
-
-            <Button
-                variant="ghost"
-                size="icon"
-                className="shrink-0 mt-px size-8 hover:bg-slate-200 rounded"
-                title={showViewBoxFrame ? "Hide viewBox frame" : "Show viewBox frame"}
-                onClick={() => appSettings.canvas.showViewBoxFrame = !showViewBoxFrame}
-            >
-                {showViewBoxFrame
-                    ? <IconEyeShow className="size-3.5" />
-                    : <IconEyeHide className="size-3" />
-                }
-            </Button>
-        </div>
     );
 }
