@@ -3,7 +3,7 @@ import { appSettings } from "@/store/0-ui-settings";
 import { Settings as IconSettings } from "lucide-react";
 import { Button } from "@/components/ui/shadcn/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
-import { StrokeInput, ZoomInput } from "@/components/4-dialogs/8-options/8-options-controls";
+import { StrokeInput, ZoomInput } from "@/components/4-dialogs/8-options/8-options-sliders";
 
 export function SettingsPopover() {
     const { canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);

@@ -3,7 +3,7 @@ import { useSnapshot } from "valtio";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
 import { doNormalizePathAtom } from "@/store/0-atoms/2-4-editor-actions";
 import { appSettings } from "@/store/0-ui-settings";
-import { CheckboxRow, NumberRow, ViewBoxControls } from "../../../4-dialogs/8-options/7-options-panel-rows";
+import { CheckboxRow, NumberRow, ViewBoxControls } from "../../../4-dialogs/8-options/1-options-controls";
 
 export function OptionsPanel() {
     const { snapToGrid, fillPreview, showHelpers, canvasPreview } = useSnapshot(appSettings.canvas);
