@@ -1,10 +1,38 @@
-import { useSetAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
-import { doNormalizePathAtom } from "@/store/0-atoms/2-4-editor-actions";
 import { appSettings } from "@/store/0-ui-settings";
-import { CheckboxRow, NumberRow, ViewBoxControls, ViewportControls } from "./7-options-panel-rows";
+import { Button } from "@/components/ui/shadcn/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
+import { optionsDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
+import { doNormalizePathAtom } from "@/store/0-atoms/2-4-editor-actions";
+import { CheckboxRow, NumberRow, ViewBoxControls } from "./7-options-panel-rows";
 
-export function OptionsControls() {
+export function OptionsDialog() {
+    const [open, setOpen] = useAtom(optionsDialogOpenAtom);
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogContent className="max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Options</DialogTitle>
+                    <DialogDescription>
+                        View and editor options.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <OptionsControls />
+
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => setOpen(false)}>
+                        Close
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+function OptionsControls() {
     const { showTicks, snapToGrid, scrollOnHover, fillPreview, showGrid, showViewBoxFrame, canvasPreview, showHelpers } = useSnapshot(appSettings.canvas);
     const { minifyOutput, dragPrecision, tickInterval, showSvgTreeConnectorLines } = useSnapshot(appSettings.pathEditor);
 
@@ -17,11 +45,6 @@ export function OptionsControls() {
                     viewBox
                 </span>
                 <ViewBoxControls />
-
-                {/* <span className="text-[11px] text-muted-foreground select-none">
-                    viewPort
-                </span>
-                <ViewportControls /> */}
             </div>
 
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5">

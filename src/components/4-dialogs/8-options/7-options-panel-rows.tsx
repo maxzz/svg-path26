@@ -8,7 +8,7 @@ import { viewPortHeightAtom, viewPortWidthAtom, viewPortXAtom, viewPortYAtom } f
 import { pathViewBoxHeightAtom, pathViewBoxWidthAtom, pathViewBoxXAtom, pathViewBoxYAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { appSettings } from "@/store/0-ui-settings";
 import { classNames } from "@/utils";
-import { compactInputClasses, compactLabelClasses } from "../8-shared-classes/0-classes";
+import { compactInputClasses, compactLabelClasses } from "../../2-editor/2-props/8-shared-classes/0-classes";
 
 export function NumberRow({
     label,
