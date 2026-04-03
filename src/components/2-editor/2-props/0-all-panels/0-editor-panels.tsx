@@ -8,7 +8,6 @@ import { OptionsPanel } from "../4-panel-options/0-all-options-panel";
 import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
 import { CopyClipboardOverlayButton } from "./1-copy-clipboard-overlay-button";
 import { doHandleEditorKeyDownAtom } from "@/store/0-atoms/2-4-editor-actions";
-import { commandCountAtom, parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
 import { doApplySvgInputTextAtom, doSelectSvgInputNodeAtom, svgInputDocumentAtom, svgInputErrorAtom, svgInputSelectedNodeIdAtom } from "@/store/0-atoms/1-3-svg-input";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
@@ -37,10 +36,9 @@ export function EditorPanels() {
                 <CommandsListPanel />
                 <ImagesPanel />
                 <PathOperationsPanel />
-                <OptionsPanel />
             </div>
 
-            <PathInputSectionStatus />
+            <OptionsPanel />
         </aside>
     );
 }
@@ -108,32 +106,5 @@ function CopySvgOverlay({ document }: { document: SvgInputDocument | null; }) {
             idleLabel="Copy SVG"
             successLabel="SVG copied"
         />
-    );
-}
-
-function PathInputSectionStatus() {
-    const error = useAtomValue(parseErrorAtom);
-    const commandCount = useAtomValue(commandCountAtom);
-
-    return (
-        <section className="rounded-lg border p-3">
-            <h2 className="mb-2 text-xs font-semibold">
-                Path Status
-            </h2>
-            {error
-                ? (
-                    <p className="rounded bg-destructive/10 px-2 py-1 text-xs text-destructive">
-                        {error}
-                    </p>
-                ) : (
-                    <p className="rounded bg-emerald-500/10 px-2 py-1 text-xs text-emerald-700 dark:text-emerald-300">
-                        Path parsed successfully.
-                    </p>
-                )
-            }
-            <p className="mt-2 text-xs text-muted-foreground">
-                Commands parsed: {commandCount}
-            </p>
-        </section>
     );
 }
