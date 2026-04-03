@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
-import { type CanvasSettings, type ExportSettings, type PathEditorSettings, type UiSettings, DEFAULT_CANVAS_SETTINGS, DEFAULT_EXPORT_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SETTINGS, DEFAULT_VIEWBOX_SETTINGS } from "./9-ui-settings-types-and-defaults";
+import { type CanvasSettings, type ExportSettings, type FooterSettings, type PathEditorSettings, type UiSettings, DEFAULT_CANVAS_SETTINGS, DEFAULT_EXPORT_SETTINGS, DEFAULT_FOOTER_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SETTINGS, DEFAULT_VIEWBOX_SETTINGS } from "./9-ui-settings-types-and-defaults";
 
 type MutableViewBox = Writeable<ViewBox>;
 
@@ -9,10 +9,12 @@ export function normalizeStoredSettings(value: unknown): UiSettings {
     const defaultCanvasSettings = DEFAULT_CANVAS_SETTINGS;
     const defaultPathEditorSettings = DEFAULT_PATH_EDITOR_SETTINGS;
     const defaultExportSettings = DEFAULT_EXPORT_SETTINGS;
+    const defaultFooterSettings = DEFAULT_FOOTER_SETTINGS;
 
     const fallbackSettings = cloneUiSettings({
         ...defaultSettings,
         canvas: defaultCanvasSettings,
+        footer: defaultFooterSettings,
         pathEditor: defaultPathEditorSettings,
         export: defaultExportSettings,
     });
@@ -20,12 +22,14 @@ export function normalizeStoredSettings(value: unknown): UiSettings {
     const canvasSettingsSchema = createCanvasSettingsSchema(defaultCanvasSettings);
     const pathEditorSchema = createPathEditorSettingsSchema(defaultPathEditorSettings);
     const exportSettingsSchema = createExportSettingsSchema(defaultExportSettings);
+    const footerSettingsSchema = createFooterSettingsSchema(defaultFooterSettings);
 
     const uiSettingsSchema = z.preprocess(
         (value) => toUiSettingsRecord(value, defaultCanvasSettings),
         z.object({
             theme: themeModeSchema.catch(defaultSettings.theme),
             canvas: canvasSettingsSchema.catch(defaultCanvasSettings),
+            footer: footerSettingsSchema.catch(defaultFooterSettings),
             sections: z.record(z.string(), z.boolean()).catch(defaultSettings.sections),
             editorPanelSizes: z.array(z.number()).catch(defaultSettings.editorPanelSizes),
             pathEditor: pathEditorSchema.catch(toPathEditorSchemaDefaults(defaultPathEditorSettings)),
@@ -60,6 +64,10 @@ function cloneUiSettings(settings: UiSettings): UiSettings {
         sections: { ...settings.sections },
         editorPanelSizes: [...settings.editorPanelSizes],
         export: { ...settings.export },
+        footer: {
+            ...settings.footer,
+            buttons: { ...settings.footer.buttons },
+        },
         pathEditor: {
             ...settings.pathEditor,
             viewBox: [...settings.pathEditor.viewBox] as ViewBox,
@@ -84,6 +92,22 @@ function createCanvasSettingsSchema(defaultSettings: CanvasSettings) {
             fillPreview: z.boolean().catch(defaultSettings.fillPreview),
             canvasPreview: z.boolean().catch(defaultSettings.canvasPreview),
             showViewBoxFrame: z.boolean().catch(defaultSettings.showViewBoxFrame),
+        })
+    );
+}
+
+function createFooterSettingsSchema(defaultSettings: FooterSettings) {
+    const defaultButtons = defaultSettings.buttons;
+
+    return z.preprocess(
+        toRecord,
+        z.object({
+            buttons: z.object({
+                showTicksToggle: z.boolean().catch(defaultButtons.showTicksToggle),
+                showGridToggle: z.boolean().catch(defaultButtons.showGridToggle),
+                showDarkCanvasToggle: z.boolean().catch(defaultButtons.showDarkCanvasToggle),
+                showViewBoxFrameToggle: z.boolean().catch(defaultButtons.showViewBoxFrameToggle),
+            }).catch(defaultButtons),
         })
     );
 }

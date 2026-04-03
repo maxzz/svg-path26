@@ -1,46 +1,117 @@
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
+import { Settings as IconSettings } from "lucide-react";
+import { Checkbox } from "@/components/ui/shadcn/checkbox";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
 import { appSettings } from "@/store/0-ui-settings";
 import { commandCountAtom, parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
 
 export function Footer() {
     const { showGrid, darkCanvas, showViewBoxFrame } = useSnapshot(appSettings.canvas);
+    const { buttons: footerButtons } = useSnapshot(appSettings.footer);
 
     return (
         <footer className="px-4 py-2 pr-2 text-xs text-muted-foreground border-t flex items-center justify-between">
             <PathStateInfo />
             
             <div className="flex items-center gap-1">
-                <TicksToggleInput />
+                <FooterButtonsPopover />
 
-                <button
-                    className="px-1 pb-px h-4 text-[10px] border rounded"
-                    onClick={() => { appSettings.canvas.showGrid = !showGrid; }}
-                    aria-pressed={showGrid}
-                    type="button"
-                >
-                    {showGrid ? "Grid on" : "Grid off"}
-                </button>
+                {footerButtons.showTicksToggle && <TicksToggleInput />}
 
-                <button
-                    className="px-1 pb-px h-4 text-[10px] border rounded"
-                    onClick={() => { appSettings.canvas.darkCanvas = !darkCanvas; }}
-                    aria-pressed={darkCanvas}
-                    type="button"
-                >
-                    {darkCanvas ? "Dark canvas" : "Light canvas"}
-                </button>
+                {footerButtons.showGridToggle && (
+                    <button
+                        className="px-1 pb-px h-4 text-[10px] border rounded"
+                        onClick={() => { appSettings.canvas.showGrid = !showGrid; }}
+                        aria-pressed={showGrid}
+                        type="button"
+                    >
+                        {showGrid ? "Grid on" : "Grid off"}
+                    </button>
+                )}
 
-                <button
-                    className="px-1 pb-px h-4 text-[10px] border rounded"
-                    onClick={() => { appSettings.canvas.showViewBoxFrame = !showViewBoxFrame; }}
-                    aria-pressed={showViewBoxFrame}
-                    type="button"
-                >
-                    {showViewBoxFrame ? "viewBox frame on" : "viewBox frame off"}
-                </button>
+                {footerButtons.showDarkCanvasToggle && (
+                    <button
+                        className="px-1 pb-px h-4 text-[10px] border rounded"
+                        onClick={() => { appSettings.canvas.darkCanvas = !darkCanvas; }}
+                        aria-pressed={darkCanvas}
+                        type="button"
+                    >
+                        {darkCanvas ? "Dark canvas" : "Light canvas"}
+                    </button>
+                )}
+
+                {footerButtons.showViewBoxFrameToggle && (
+                    <button
+                        className="px-1 pb-px h-4 text-[10px] border rounded"
+                        onClick={() => { appSettings.canvas.showViewBoxFrame = !showViewBoxFrame; }}
+                        aria-pressed={showViewBoxFrame}
+                        type="button"
+                    >
+                        {showViewBoxFrame ? "viewBox frame on" : "viewBox frame off"}
+                    </button>
+                )}
             </div>
         </footer>
+    );
+}
+
+function FooterButtonsPopover() {
+    const { buttons } = useSnapshot(appSettings.footer);
+
+    return (
+        <Popover>
+            <PopoverTrigger asChild>
+                <button
+                    className="px-1 pb-px h-4 text-[10px] border rounded"
+                    type="button"
+                    aria-label="Choose footer buttons"
+                    title="Choose footer buttons"
+                >
+                    <IconSettings className="size-3.5 stroke-1" />
+                </button>
+            </PopoverTrigger>
+
+            <PopoverContent className="p-3 pt-0 w-auto max-w-56 overflow-hidden" align="end">
+                <h4 className="px-1 py-2 text-xs font-semibold">
+                    Footer buttons
+                </h4>
+
+                <div className="grid gap-2 pb-1">
+                    <label className="flex items-center gap-2 text-[11px] select-none cursor-pointer">
+                        <Checkbox
+                            checked={buttons.showTicksToggle}
+                            onCheckedChange={(checked) => { appSettings.footer.buttons.showTicksToggle = Boolean(checked); }}
+                        />
+                        <span>Ticks</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 text-[11px] select-none cursor-pointer">
+                        <Checkbox
+                            checked={buttons.showGridToggle}
+                            onCheckedChange={(checked) => { appSettings.footer.buttons.showGridToggle = Boolean(checked); }}
+                        />
+                        <span>Grid</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 text-[11px] select-none cursor-pointer">
+                        <Checkbox
+                            checked={buttons.showDarkCanvasToggle}
+                            onCheckedChange={(checked) => { appSettings.footer.buttons.showDarkCanvasToggle = Boolean(checked); }}
+                        />
+                        <span>Dark canvas</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 text-[11px] select-none cursor-pointer">
+                        <Checkbox
+                            checked={buttons.showViewBoxFrameToggle}
+                            onCheckedChange={(checked) => { appSettings.footer.buttons.showViewBoxFrameToggle = Boolean(checked); }}
+                        />
+                        <span>ViewBox frame</span>
+                    </label>
+                </div>
+            </PopoverContent>
+        </Popover>
     );
 }
 

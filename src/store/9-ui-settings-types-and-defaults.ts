@@ -37,6 +37,17 @@ export interface CanvasSettings {
     showViewBoxFrame: boolean;            // Show view box frame or not
 }
 
+export interface FooterButtonsSettings {
+    showTicksToggle: boolean;
+    showGridToggle: boolean;
+    showDarkCanvasToggle: boolean;
+    showViewBoxFrameToggle: boolean;
+}
+
+export interface FooterSettings {
+    buttons: FooterButtonsSettings;
+}
+
 export interface ExportSettings {
     exportFill: boolean;                  // Export fill or not
     exportFillColor: string;              // Export fill color
@@ -48,6 +59,7 @@ export interface ExportSettings {
 export interface UiSettings {
     theme: ThemeMode;                     // Theme mode (light or dark)
     canvas: CanvasSettings;               // Canvas settings
+    footer: FooterSettings;              // Footer button visibility
     sections: Record<string, boolean>;    // Props panel sections collapsed state
     editorPanelSizes: number[];           // Props and Canvas editor panel sizes
     pathEditor: PathEditorSettings;       // Path editor settings
@@ -84,6 +96,15 @@ export const DEFAULT_CANVAS_SETTINGS: CanvasSettings = {
     showViewBoxFrame: false,
 };
 
+export const DEFAULT_FOOTER_SETTINGS: FooterSettings = {
+    buttons: {
+        showTicksToggle: true,
+        showGridToggle: true,
+        showDarkCanvasToggle: true,
+        showViewBoxFrameToggle: true,
+    },
+};
+
 export const DEFAULT_EXPORT_SETTINGS: ExportSettings = {
     exportFill: true,
     exportFillColor: "#000000",
@@ -95,6 +116,7 @@ export const DEFAULT_EXPORT_SETTINGS: ExportSettings = {
 export const DEFAULT_SETTINGS: UiSettings = {
     theme: "light",
     canvas: DEFAULT_CANVAS_SETTINGS,
+    footer: DEFAULT_FOOTER_SETTINGS,
     sections: { "svg-input": true, transform: true, options: true },
     editorPanelSizes: [33, 67],
     pathEditor: DEFAULT_PATH_EDITOR_SETTINGS,
