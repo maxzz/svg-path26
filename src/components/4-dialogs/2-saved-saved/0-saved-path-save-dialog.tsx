@@ -10,8 +10,8 @@ import { ScrollArea } from "@/components/ui/shadcn/scroll-area";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { doSaveNamedPathAtom } from "@/store/0-atoms/2-6-stored-paths-actions";
 import { savePathDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
-import { doAsyncExecuteConfirmDialogAtom } from "@/components/4-dialogs/confirmation/2-7-confirmation-dialog";
-import { getConfirmOverwriteSavedPathMessages } from "@/components/4-dialogs/confirmation/8-confirmation-ui-messages";
+import { doAsyncExecuteConfirmDialogAtom } from "@/components/4-dialogs/8-1-confirmation/9-types-confirmation";
+import { getConfirmOverwriteSavedPathMessages } from "@/components/4-dialogs/8-1-confirmation/8-confirmation-ui-messages";
 import { PathPreview } from "@/components/ui/loacal-ui/8-path-preview";
 
 export function SavePathDialog() {

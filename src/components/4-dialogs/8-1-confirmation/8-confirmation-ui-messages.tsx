@@ -1,4 +1,4 @@
-import { type ConfirmationUi } from "./2-7-confirmation-dialog";
+import { type ConfirmationUi } from "./9-types-confirmation";
 import { SymbolWarning } from "@/components/ui/icons";
 
 const confirmOverwriteSavedPathMessages: ConfirmationUi = {
