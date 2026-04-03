@@ -15,12 +15,7 @@ export function OptionsPanel() {
     return (
         <SectionPanel sectionKey="options" label="Options" contentClassName="px-0 pt-1 pb-4">
             <div className="pl-2.5 pr-2 max-w-[320px] text-[11px] space-y-2.5">
-                <div className="space-y-1.5">
-                    <span className="text-[11px] text-muted-foreground select-none">
-                        viewBox
-                    </span>
-                    <ViewBoxControls />
-                </div>
+                <ViewBoxControls />
 
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5">
                     <CheckboxRow label="Snap to grid" className="col-start-1" checked={snapToGrid} onCheckedChange={(checked) => appSettings.canvas.snapToGrid = checked} />

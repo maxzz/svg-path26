@@ -29,26 +29,31 @@ function CompactField({ valueAtom, label, className, ...rest }: { valueAtom: Pri
 export function ViewBoxControls() {
     const { showViewBoxFrame } = useSnapshot(appSettings.canvas);
     return (
-        <div className="flex items-start gap-1.5">
-            <div className="grid flex-1 grid-cols-4 gap-1">
-                <CompactField label="x" valueAtom={pathViewBoxXAtom} title="viewBox x" />
-                <CompactField label="y" valueAtom={pathViewBoxYAtom} title="viewBox y" />
-                <CompactField label="width" valueAtom={pathViewBoxWidthAtom} title="viewBox width" min={1e-3} />
-                <CompactField label="height" valueAtom={pathViewBoxHeightAtom} title="viewBox height" min={1e-3} />
-            </div>
+        <div className="space-y-1.5">
+            <span className="text-[11px] text-muted-foreground select-none">
+                viewBox
+            </span>
+            <div className="flex items-start gap-1.5">
+                <div className="grid flex-1 grid-cols-4 gap-1">
+                    <CompactField label="x" valueAtom={pathViewBoxXAtom} title="viewBox x" />
+                    <CompactField label="y" valueAtom={pathViewBoxYAtom} title="viewBox y" />
+                    <CompactField label="width" valueAtom={pathViewBoxWidthAtom} title="viewBox width" min={1e-3} />
+                    <CompactField label="height" valueAtom={pathViewBoxHeightAtom} title="viewBox height" min={1e-3} />
+                </div>
 
-            <Button
-                variant="ghost"
-                size="icon"
-                className="shrink-0 mt-px size-8 hover:bg-slate-200 rounded"
-                title={showViewBoxFrame ? "Hide viewBox frame" : "Show viewBox frame"}
-                onClick={() => appSettings.canvas.showViewBoxFrame = !showViewBoxFrame}
-            >
-                {showViewBoxFrame
-                    ? <IconEyeShow className="size-3.5" />
-                    : <IconEyeHide className="size-3" />
-                }
-            </Button>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0 mt-px size-8 hover:bg-slate-200 rounded"
+                    title={showViewBoxFrame ? "Hide viewBox frame" : "Show viewBox frame"}
+                    onClick={() => appSettings.canvas.showViewBoxFrame = !showViewBoxFrame}
+                >
+                    {showViewBoxFrame
+                        ? <IconEyeShow className="size-3.5" />
+                        : <IconEyeHide className="size-3" />
+                    }
+                </Button>
+            </div>
         </div>
     );
 }
