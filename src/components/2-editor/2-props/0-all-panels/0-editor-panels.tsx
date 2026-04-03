@@ -199,15 +199,17 @@ function PathInputSectionStatus() {
             <h2 className="mb-2 text-xs font-semibold">
                 Path Status
             </h2>
-            {error ? (
-                <p className="rounded bg-destructive/10 px-2 py-1 text-xs text-destructive">
-                    {error}
-                </p>
-            ) : (
-                <p className="rounded bg-emerald-500/10 px-2 py-1 text-xs text-emerald-700 dark:text-emerald-300">
-                    Path parsed successfully.
-                </p>
-            )}
+            {error
+                ? (
+                    <p className="rounded bg-destructive/10 px-2 py-1 text-xs text-destructive">
+                        {error}
+                    </p>
+                ) : (
+                    <p className="rounded bg-emerald-500/10 px-2 py-1 text-xs text-emerald-700 dark:text-emerald-300">
+                        Path parsed successfully.
+                    </p>
+                )
+            }
             <p className="mt-2 text-xs text-muted-foreground">
                 Commands parsed: {commandCount}
             </p>
