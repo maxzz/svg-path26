@@ -4,11 +4,9 @@ import { MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu, MenubarS
 import { isImageEditModeAtom } from "@/store/0-atoms/2-8-images";
 import { optionsDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 import { appSettings } from "@/store/0-ui-settings";
-import { toggleTheme } from "@/utils";
 
 export function ViewMenu() {
     const { darkCanvas } = useSnapshot(appSettings.canvas);
-    const { theme } = useSnapshot(appSettings);
     const [isImageEditMode, setIsImageEditMode] = useAtom(isImageEditModeAtom);
     const setOptionsDialogOpen = useSetAtom(optionsDialogOpenAtom);
 
@@ -33,11 +31,6 @@ export function ViewMenu() {
                 <MenubarItem onClick={() => setOptionsDialogOpen(true)}>
                     Options...
                     <MenubarShortcut>Alt+O</MenubarShortcut>
-                </MenubarItem>
-
-                <MenubarItem onClick={() => toggleTheme(theme)}>
-                    Toggle Theme
-                    <MenubarShortcut>Alt+T</MenubarShortcut>
                 </MenubarItem>
             </MenubarContent>
         </MenubarMenu>

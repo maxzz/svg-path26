@@ -7,6 +7,7 @@ import { optionsDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 import { doNormalizePathAtom } from "@/store/0-atoms/2-4-editor-actions";
 import { CheckboxRow, NumberRow } from "./1-options-controls";
 import { ViewBoxControls } from "./2-viewbox-controls";
+import { isThemeDark, toggleTheme } from "@/utils";
 
 export function OptionsDialog() {
     const [open, setOpen] = useAtom(optionsDialogOpenAtom);
@@ -36,6 +37,8 @@ export function OptionsDialog() {
 function OptionsControls() {
     const { showTicks, snapToGrid, scrollOnHover, fillPreview, showGrid, showViewBoxFrame, canvasPreview, showHelpers } = useSnapshot(appSettings.canvas);
     const { minifyOutput, dragPrecision, tickInterval, showSvgTreeConnectorLines } = useSnapshot(appSettings.pathEditor);
+    const { theme } = useSnapshot(appSettings);
+    const isDarkTheme = isThemeDark(theme);
 
     const doNormalizePath = useSetAtom(doNormalizePathAtom);
 
@@ -44,6 +47,7 @@ function OptionsControls() {
             <ViewBoxControls />
 
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5">
+                <CheckboxRow label="Toggle Theme" className="col-start-1" checked={isDarkTheme} onCheckedChange={() => toggleTheme(theme)} />
                 <CheckboxRow label="Show grid" className="col-start-1" checked={showGrid} onCheckedChange={(checked) => appSettings.canvas.showGrid = checked} />
                 <NumberRow label="Drag precision" className="col-start-2" value={dragPrecision} min={0} max={8} step={1} onValueChange={(value) => appSettings.pathEditor.dragPrecision = value} />
                 <CheckboxRow label="Snap to grid" className="col-start-1" checked={snapToGrid} onCheckedChange={(checked) => appSettings.canvas.snapToGrid = checked} />
