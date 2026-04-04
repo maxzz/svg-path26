@@ -111,8 +111,14 @@ function CanvasRootSvg({ children }: { children: ReactNode; }) {
         <>
             <svg
                 ref={setCanvasRootSvgRef}
-                className="size-full touch-none"
-                onPointerDown={startCanvasPointerDown}
+                tabIndex={0}
+                className="size-full touch-none outline-none focus:outline-none"
+                onPointerDown={(event) => {
+                    if (event.pointerType !== "touch") {
+                        event.currentTarget.focus();
+                    }
+                    startCanvasPointerDown(event);
+                }}
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}

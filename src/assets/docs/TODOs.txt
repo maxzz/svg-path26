@@ -10,4 +10,4 @@
 04.03.26
     //TODO: add command scale selected items to fit into viewBox
     //TODO: center selection into viewBox
-    //TODO: add command to select all and shortcut Ctrl+A when canvas selected.
+    //DONE: add command to select all and shortcut Ctrl+A when canvas selected.

@@ -8,6 +8,7 @@ import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doSetPathWithoutHistoryAtom, doUndoPathAtom } from "./1-2-history";
 import { commandRowsAtom, standaloneSegmentPathsAtom, svgModelAtom } from "./2-0-svg-model";
 import { doDeleteImageAtom, focusedImageIdAtom } from "./2-8-images";
+import { canvasRootSvgElementAtom } from "./2-3-canvas-viewport";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
 import { applyCommandSelection, normalizeSelectedCommandIndices, remapSelectedIndicesAfterDelete, type CommandSelectionMode } from "./2-5-editor-selection-utils";
 import { appSettings } from "@/store/0-ui-settings";
@@ -151,6 +152,33 @@ export const doSelectCommandsAtom = atom(
             args.mode,
             get(commandRowsAtom).length,
         ));
+    }
+);
+
+export const doSelectAllCommandsAtom = atom(
+    null,
+    (get, set) => {
+        const rowCount = get(commandRowsAtom).length;
+        if (rowCount <= 0) {
+            set(selectedCommandIndicesAtom, []);
+            return;
+        }
+
+        const activeIndex = get(selectedCommandIndexAtom);
+        const allIndices = Array.from({ length: rowCount }, (_, i) => i);
+
+        // Keep the “active” (last-selected) segment stable after Ctrl+A.
+        if (activeIndex === null) {
+            set(selectedCommandIndicesAtom, allIndices);
+            return;
+        }
+
+        if (!Number.isInteger(activeIndex) || activeIndex < 0 || activeIndex >= rowCount) {
+            set(selectedCommandIndicesAtom, allIndices);
+            return;
+        }
+
+        set(selectedCommandIndicesAtom, allIndices.filter((it) => it !== activeIndex).concat(activeIndex));
     }
 );
 
@@ -340,7 +368,7 @@ export const doConvertSegmentAtom = atom(
 export const doHandleEditorKeyDownAtom = atom(
     null,
     (get, set, event: KeyboardEvent) => {
-        const target = event.target as HTMLElement | null;
+        const target = event.target as Element | null;
         const inInput = target?.tagName === "INPUT" || target?.tagName === "TEXTAREA";
 
         if (event.key === "Escape" && !inInput) {
@@ -364,6 +392,23 @@ export const doHandleEditorKeyDownAtom = atom(
         }
 
         if (inInput) return;
+
+        if (withCtrl && key === "a") {
+            const canvasRootSvgElement = get(canvasRootSvgElementAtom);
+            const hasCanvasFocus = Boolean(
+                canvasRootSvgElement
+                && target instanceof Node
+                && canvasRootSvgElement.contains(target),
+            );
+
+            if (hasCanvasFocus) {
+                event.preventDefault();
+                set(doSelectAllCommandsAtom);
+            }
+
+            // Avoid interpreting Ctrl/Meta+A as a path-command shortcut.
+            return;
+        }
 
         const selectedCommandIndices = get(selectedCommandIndicesAtom);
         const selectedCommandIndex = selectedCommandIndices.length ? selectedCommandIndices[selectedCommandIndices.length - 1] : null;
