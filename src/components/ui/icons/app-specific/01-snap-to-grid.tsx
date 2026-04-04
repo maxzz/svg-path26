@@ -1,4 +1,4 @@
-import { type HTMLAttributes } from "react";
+import { type HTMLAttributes } from "react"; // https://icon-sets.iconify.design/?query=snap fluent-mdl2:snap-to-grid
 import { classNames } from "@/utils";
 
 export function IconSnapToGrid({ className, title, ...rest }: HTMLAttributes<SVGSVGElement>) {
