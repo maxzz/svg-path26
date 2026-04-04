@@ -105,6 +105,9 @@ function createFooterSettingsSchema(defaultSettings: FooterSettings) {
             buttons: z.object({
                 showTicksToggle: z.boolean().catch(defaultButtons.showTicksToggle),
                 showGridToggle: z.boolean().catch(defaultButtons.showGridToggle),
+                showSnapToGridToggle: z.boolean().catch(defaultButtons.showSnapToGridToggle),
+                showShowHelpersToggle: z.boolean().catch(defaultButtons.showShowHelpersToggle),
+                showFillPreviewToggle: z.boolean().catch(defaultButtons.showFillPreviewToggle),
                 showDarkCanvasToggle: z.boolean().catch(defaultButtons.showDarkCanvasToggle),
                 showViewBoxFrameToggle: z.boolean().catch(defaultButtons.showViewBoxFrameToggle),
             }).catch(defaultButtons),

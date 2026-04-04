@@ -7,7 +7,7 @@ import { appSettings } from "@/store/0-ui-settings";
 import { commandCountAtom, parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
 
 export function Footer() {
-    const { showGrid, darkCanvas, showViewBoxFrame } = useSnapshot(appSettings.canvas);
+    const { showGrid, darkCanvas, showViewBoxFrame, snapToGrid, showHelpers, fillPreview } = useSnapshot(appSettings.canvas);
     const { buttons: footerButtons } = useSnapshot(appSettings.footer);
 
     return (
@@ -15,9 +15,18 @@ export function Footer() {
             <PathStateInfo />
             
             <div className="flex items-center gap-1">
-                <FooterButtonsPopover />
-
                 {footerButtons.showTicksToggle && <TicksToggleInput />}
+
+                {footerButtons.showSnapToGridToggle && (
+                    <button
+                        className="px-1 pb-px h-4 text-[10px] border rounded"
+                        onClick={() => { appSettings.canvas.snapToGrid = !snapToGrid; }}
+                        aria-pressed={snapToGrid}
+                        type="button"
+                    >
+                        {snapToGrid ? "Snap to grid on" : "Snap to grid off"}
+                    </button>
+                )}
 
                 {footerButtons.showGridToggle && (
                     <button
@@ -51,6 +60,30 @@ export function Footer() {
                         {showViewBoxFrame ? "viewBox frame on" : "viewBox frame off"}
                     </button>
                 )}
+
+                {footerButtons.showShowHelpersToggle && (
+                    <button
+                        className="px-1 pb-px h-4 text-[10px] border rounded"
+                        onClick={() => { appSettings.canvas.showHelpers = !showHelpers; }}
+                        aria-pressed={showHelpers}
+                        type="button"
+                    >
+                        {showHelpers ? "Point controls on" : "Point controls off"}
+                    </button>
+                )}
+
+                {footerButtons.showFillPreviewToggle && (
+                    <button
+                        className="px-1 pb-px h-4 text-[10px] border rounded"
+                        onClick={() => { appSettings.canvas.fillPreview = !fillPreview; }}
+                        aria-pressed={fillPreview}
+                        type="button"
+                    >
+                        {fillPreview ? "Fill preview on" : "Fill preview off"}
+                    </button>
+                )}
+
+                <FooterButtonsPopover />
             </div>
         </footer>
     );
@@ -88,6 +121,14 @@ function FooterButtonsPopover() {
 
                     <label className="flex items-center gap-2 text-[11px] select-none cursor-pointer">
                         <Checkbox
+                            checked={buttons.showSnapToGridToggle}
+                            onCheckedChange={(checked) => { appSettings.footer.buttons.showSnapToGridToggle = Boolean(checked); }}
+                        />
+                        <span>Snap to grid</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 text-[11px] select-none cursor-pointer">
+                        <Checkbox
                             checked={buttons.showGridToggle}
                             onCheckedChange={(checked) => { appSettings.footer.buttons.showGridToggle = Boolean(checked); }}
                         />
@@ -108,6 +149,22 @@ function FooterButtonsPopover() {
                             onCheckedChange={(checked) => { appSettings.footer.buttons.showViewBoxFrameToggle = Boolean(checked); }}
                         />
                         <span>ViewBox frame</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 text-[11px] select-none cursor-pointer">
+                        <Checkbox
+                            checked={buttons.showShowHelpersToggle}
+                            onCheckedChange={(checked) => { appSettings.footer.buttons.showShowHelpersToggle = Boolean(checked); }}
+                        />
+                        <span>Point controls</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 text-[11px] select-none cursor-pointer">
+                        <Checkbox
+                            checked={buttons.showFillPreviewToggle}
+                            onCheckedChange={(checked) => { appSettings.footer.buttons.showFillPreviewToggle = Boolean(checked); }}
+                        />
+                        <span>Fill path</span>
                     </label>
                 </div>
             </PopoverContent>

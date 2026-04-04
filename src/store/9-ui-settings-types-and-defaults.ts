@@ -40,6 +40,9 @@ export interface CanvasSettings {
 export interface FooterButtonsSettings {
     showTicksToggle: boolean;
     showGridToggle: boolean;
+    showSnapToGridToggle: boolean;
+    showShowHelpersToggle: boolean;
+    showFillPreviewToggle: boolean;
     showDarkCanvasToggle: boolean;
     showViewBoxFrameToggle: boolean;
 }
@@ -100,6 +103,9 @@ export const DEFAULT_FOOTER_SETTINGS: FooterSettings = {
     buttons: {
         showTicksToggle: true,
         showGridToggle: true,
+        showSnapToGridToggle: true,
+        showShowHelpersToggle: true,
+        showFillPreviewToggle: true,
         showDarkCanvasToggle: true,
         showViewBoxFrameToggle: true,
     },
