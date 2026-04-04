@@ -96,12 +96,12 @@ function FooterButtonsPopover() {
         <Popover>
             <PopoverTrigger asChild>
                 <button
-                    className="px-1 pb-px h-4 text-[10px] border rounded"
-                    type="button"
-                    aria-label="Choose footer buttons"
+                    className="size-4 text-[10px] border rounded flex items-center justify-center"
                     title="Choose footer buttons"
+                    aria-label="Choose footer buttons"
+                    type="button"
                 >
-                    <IconAdjustmentsHorizontal className="size-3.5 stroke-1" />
+                    <IconAdjustmentsHorizontal className="size-3" />
                 </button>
             </PopoverTrigger>
 
