@@ -1,8 +1,8 @@
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
-import { Settings as IconSettings } from "lucide-react";
 import { Checkbox } from "@/components/ui/shadcn/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
+import { IconAdjustmentsHorizontal } from "@/components/ui/icons/normal";
 import { appSettings } from "@/store/0-ui-settings";
 import { commandCountAtom, parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
 
@@ -101,7 +101,7 @@ function FooterButtonsPopover() {
                     aria-label="Choose footer buttons"
                     title="Choose footer buttons"
                 >
-                    <IconSettings className="size-3.5 stroke-1" />
+                    <IconAdjustmentsHorizontal className="size-3.5 stroke-1" />
                 </button>
             </PopoverTrigger>
 
@@ -214,7 +214,7 @@ function TicksToggleInput() {
                 }}
             />
             <button
-                className="-ml-[3px] px-1 pb-px text-[10px] border rounded"
+                className="-ml-0.75 px-1 pb-px text-[10px] border rounded"
                 onClick={() => { appSettings.canvas.showTicks = !showTicks; }}
                 aria-pressed={showTicks}
                 type="button"

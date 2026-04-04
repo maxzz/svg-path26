@@ -8,3 +8,4 @@ export * from "./04-zoom-out";
 export * from "./05-eye-hide";
 export * from "./05-eye-show";
 export * from "./06-tash";
+export * from "./07-adjustments-horizontal";
