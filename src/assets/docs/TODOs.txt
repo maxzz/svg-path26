@@ -7,3 +7,7 @@
     //TODO: "Export SVG path" as SVG and "Export SVG"
     //TODO: Saved SVGs and open SVG from saved SVGs
     //TODO: export path as SVG should show and use viewBox not viewPort
+04.03.26
+    //TODO: add command scale selected items to fit into viewBox
+    //TODO: center selection into viewBox
+    //TODO: add command to select all and shortcut Ctrl+A when canvas selected.
