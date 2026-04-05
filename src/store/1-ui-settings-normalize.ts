@@ -25,9 +25,10 @@ export function normalizeStoredSettings(value: unknown): UiSettings {
     const footerSettingsSchema = createFooterSettingsSchema(defaultFooterSettings);
 
     const uiSettingsSchema = z.preprocess(
-        (value) => toUiSettingsRecord(value, defaultCanvasSettings),
+        (value) => toUiSettingsRecord(value, defaultSettings),
         z.object({
             theme: themeModeSchema.catch(defaultSettings.theme),
+            showSvgPreviewSection: z.boolean().catch(defaultSettings.showSvgPreviewSection),
             canvas: canvasSettingsSchema.catch(defaultCanvasSettings),
             footer: footerSettingsSchema.catch(defaultFooterSettings),
             sections: z.record(z.string(), z.boolean()).catch(defaultSettings.sections),
@@ -92,7 +93,6 @@ function createCanvasSettingsSchema(defaultSettings: CanvasSettings) {
             fillPreview: z.boolean().catch(defaultSettings.fillPreview),
             canvasPreview: z.boolean().catch(defaultSettings.canvasPreview),
             showViewBoxFrame: z.boolean().catch(defaultSettings.showViewBoxFrame),
-            showSvgPreview: z.boolean().catch(defaultSettings.showSvgPreview),
         })
     );
 }
@@ -139,13 +139,21 @@ function createPathEditorSettingsSchema(defaultSettings: PathEditorSettings) {
     );
 }
 
-function toUiSettingsRecord(value: unknown, defaultCanvasSettings: CanvasSettings): Record<string, unknown> {
+function toUiSettingsRecord(value: unknown, defaultSettings: UiSettings): Record<string, unknown> {
     const record = toRecord(value);
     const canvasRecord = toRecord(record.canvas);
     const pathEditorRecord = toRecord(record.pathEditor);
 
+    // Backwards compatibility for in-development rename:
+    // - older localStorage used `canvas.showSvgPreview`
+    // - new schema uses `showSvgPreviewSection` on the root UiSettings
+    const legacyShowSvgPreview = (canvasRecord as any).showSvgPreview as unknown;
+    const showSvgPreviewSection = (record as any).showSvgPreviewSection ?? legacyShowSvgPreview ?? defaultSettings.showSvgPreviewSection;
+    const defaultCanvasSettings = defaultSettings.canvas;
+
     return {
         ...record,
+        showSvgPreviewSection,
         canvas: {
             showGrid: canvasRecord.showGrid ?? record.showGrid ?? pathEditorRecord.showGrid ?? defaultCanvasSettings.showGrid,
             showHelpers: canvasRecord.showHelpers ?? record.showHelpers ?? pathEditorRecord.showHelpers ?? defaultCanvasSettings.showHelpers,
@@ -156,7 +164,6 @@ function toUiSettingsRecord(value: unknown, defaultCanvasSettings: CanvasSetting
             fillPreview: canvasRecord.fillPreview ?? record.fillPreview ?? pathEditorRecord.fillPreview ?? defaultCanvasSettings.fillPreview,
             canvasPreview: canvasRecord.canvasPreview ?? record.canvasPreview ?? pathEditorRecord.canvasPreview ?? defaultCanvasSettings.canvasPreview,
             showViewBoxFrame: canvasRecord.showViewBoxFrame ?? record.showViewBoxFrame ?? pathEditorRecord.showViewBoxFrame ?? defaultCanvasSettings.showViewBoxFrame,
-            showSvgPreview: canvasRecord.showSvgPreview ?? record.showSvgPreview ?? pathEditorRecord.showSvgPreview ?? defaultCanvasSettings.showSvgPreview,
         },
         pathEditor: {
             ...pathEditorRecord,

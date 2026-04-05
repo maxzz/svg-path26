@@ -35,9 +35,9 @@ export function OptionsDialog() {
 }
 
 function OptionsControls() {
-    const { showTicks, snapToGrid, scrollOnHover, fillPreview, showGrid, showViewBoxFrame, canvasPreview, showHelpers, showSvgPreview } = useSnapshot(appSettings.canvas);
+    const { showTicks, snapToGrid, scrollOnHover, fillPreview, showGrid, showViewBoxFrame, canvasPreview, showHelpers } = useSnapshot(appSettings.canvas);
     const { minifyOutput, dragPrecision, tickInterval, showSvgTreeConnectorLines } = useSnapshot(appSettings.pathEditor);
-    const { theme } = useSnapshot(appSettings);
+    const { theme, showSvgPreviewSection } = useSnapshot(appSettings);
     const isDarkTheme = isThemeDark(theme);
 
     const doNormalizePath = useSetAtom(doNormalizePathAtom);
@@ -77,7 +77,7 @@ function OptionsControls() {
                 <CheckboxRow label="Show SVG tree lines" className="col-start-1" checked={showSvgTreeConnectorLines} onCheckedChange={(checked) => appSettings.pathEditor.showSvgTreeConnectorLines = checked} />
 
 {/* TODO: separator */}
-                <CheckboxRow label="SVG preview section" className="col-start-1" checked={showSvgPreview} onCheckedChange={(checked) => appSettings.canvas.showSvgPreview = checked} />
+                <CheckboxRow label="SVG preview section" className="col-start-1" checked={showSvgPreviewSection} onCheckedChange={(checked) => appSettings.showSvgPreviewSection = checked} />
             </div>
         </div>
     );

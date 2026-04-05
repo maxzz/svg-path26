@@ -17,7 +17,7 @@ import { serializeSvgInputDocument, type SvgInputDocument } from "@/svg-core/3-s
 
 export function EditorPanels() {
     const handleEditorKeyDown = useSetAtom(doHandleEditorKeyDownAtom);
-    const { showSvgPreview } = useSnapshot(appSettings.canvas);
+    const { showSvgPreviewSection } = useSnapshot(appSettings);
 
     useEffect(
         () => {
@@ -32,7 +32,7 @@ export function EditorPanels() {
     return (
         <aside className="h-full border-r flex flex-col justify-between">
             <div className="grow flex-1 overflow-auto [scrollbar-gutter:stable]">
-                {showSvgPreview && <SvgPreviewSection />}
+                {showSvgPreviewSection && <SvgPreviewSection />}
                 <SvgInputSection />
                 <PathInputSection />
                 <CommandsListPanel />
