@@ -136,16 +136,38 @@ describe("svg path state atoms", () => {
         expect(store.get(canvasViewPortAtom)).toEqual(lockedBefore);
     });
 
-    it("centers current selection into viewPort without changing zoom", () => {
+    it("centers current selection into viewPort on both axes without changing zoom", () => {
         const store = createStore();
         store.set(svgPathInputAtom, "M 0 0 L 10 0 L 10 10");
         store.set(selectedCommandIndicesAtom, [1]);
         store.set(doSetViewPortAtom, [0, 0, 20, 20]);
 
-        store.set(doCenterSelectedSegmentsIntoViewBoxAtom);
+        store.set(doCenterSelectedSegmentsIntoViewBoxAtom, { axis: "both" });
 
         expect(store.get(canvasViewPortAtom)).toEqual([-5, -10, 20, 20]);
         expect(appSettings.pathEditor.zoom).toBe(1);
+    });
+
+    it("centers current selection into viewPort on X only", () => {
+        const store = createStore();
+        store.set(svgPathInputAtom, "M 0 0 L 10 0 L 10 10");
+        store.set(selectedCommandIndicesAtom, [1]);
+        store.set(doSetViewPortAtom, [0, 0, 20, 20]);
+
+        store.set(doCenterSelectedSegmentsIntoViewBoxAtom, { axis: "x" });
+
+        expect(store.get(canvasViewPortAtom)).toEqual([-5, 0, 20, 20]);
+    });
+
+    it("centers current selection into viewPort on Y only", () => {
+        const store = createStore();
+        store.set(svgPathInputAtom, "M 0 0 L 10 0 L 10 10");
+        store.set(selectedCommandIndicesAtom, [1]);
+        store.set(doSetViewPortAtom, [0, 0, 20, 20]);
+
+        store.set(doCenterSelectedSegmentsIntoViewBoxAtom, { axis: "y" });
+
+        expect(store.get(canvasViewPortAtom)).toEqual([0, -10, 20, 20]);
     });
 
     it("fits the current path at 1x zoom and then scales from that baseline", () => {

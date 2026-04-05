@@ -184,7 +184,11 @@ export const doSelectAllCommandsAtom = atom(
 
 export const doCenterSelectedSegmentsIntoViewBoxAtom = atom(
     null,
-    (get, set) => {
+    (get, set, args?: { axis: "x" | "y" | "both"; }) => {
+        const axis = args?.axis ?? "both";
+        const centerX = axis === "x" || axis === "both";
+        const centerY = axis === "y" || axis === "both";
+
         const selectedIndices = get(selectedCommandIndicesAtom);
         if (!selectedIndices.length) return;
 
@@ -225,8 +229,8 @@ export const doCenterSelectedSegmentsIntoViewBoxAtom = atom(
         const viewPortCenterX = viewPortX + viewPortWidth / 2;
         const viewPortCenterY = viewPortY + viewPortHeight / 2;
 
-        const dx = selectionCenterX - viewPortCenterX;
-        const dy = selectionCenterY - viewPortCenterY;
+        const dx = centerX ? selectionCenterX - viewPortCenterX : 0;
+        const dy = centerY ? selectionCenterY - viewPortCenterY : 0;
         if (Math.abs(dx) < 1e-9 && Math.abs(dy) < 1e-9) return;
 
         set(doPanViewPortAtom, { dx, dy });

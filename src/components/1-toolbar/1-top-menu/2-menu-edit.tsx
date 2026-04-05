@@ -1,16 +1,17 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
-import { MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarTrigger } from "@/components/ui/shadcn/menubar";
+import { MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from "@/components/ui/shadcn/menubar";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "@/store/0-atoms/1-2-history";
 import { commandRowsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { doClearPathAtom, doNormalizePathAtom, doSelectAllCommandsAtom, doSetAbsoluteAtom, doSetRelativeAtom } from "@/store/0-atoms/2-4-editor-actions";
+import { doCenterSelectedSegmentsIntoViewBoxAtom, doClearPathAtom, doNormalizePathAtom, doSelectAllCommandsAtom, doSetAbsoluteAtom, doSetRelativeAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-editor-actions";
 import { appSettings } from "@/store/0-ui-settings";
 
 export function EditMenu() {
     const { minifyOutput } = useSnapshot(appSettings.pathEditor);
     const pathValue = useAtomValue(svgPathInputAtom);
     const commandRows = useAtomValue(commandRowsAtom);
+    const selectedCommandIndices = useAtomValue(selectedCommandIndicesAtom);
     const canUndo = useAtomValue(canUndoAtom);
     const canRedo = useAtomValue(canRedoAtom);
 
@@ -21,9 +22,11 @@ export function EditMenu() {
     const doSetRelative = useSetAtom(doSetRelativeAtom);
     const doClear = useSetAtom(doClearPathAtom);
     const doSelectAll = useSetAtom(doSelectAllCommandsAtom);
+    const doCenter = useSetAtom(doCenterSelectedSegmentsIntoViewBoxAtom);
 
     const hasPath = Boolean(pathValue.trim());
     const canSelectAll = commandRows.length > 0;
+    const canCenter = selectedCommandIndices.length > 0;
 
     async function copyPath() {
         if (!hasPath) return;
@@ -57,6 +60,21 @@ export function EditMenu() {
                     Select All
                     <MenubarShortcut>Ctrl+A</MenubarShortcut>
                 </MenubarItem>
+
+                <MenubarSub>
+                    <MenubarSubTrigger>Center</MenubarSubTrigger>
+                    <MenubarSubContent>
+                        <MenubarItem disabled={!canCenter} onClick={() => doCenter({ axis: "both" })}>
+                            Center X+Y
+                        </MenubarItem>
+                        <MenubarItem disabled={!canCenter} onClick={() => doCenter({ axis: "x" })}>
+                            Center X
+                        </MenubarItem>
+                        <MenubarItem disabled={!canCenter} onClick={() => doCenter({ axis: "y" })}>
+                            Center Y
+                        </MenubarItem>
+                    </MenubarSubContent>
+                </MenubarSub>
 
                 <MenubarItem disabled={!hasPath} onClick={() => doNormalize()}>
                     Normalize
