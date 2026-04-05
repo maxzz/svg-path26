@@ -196,14 +196,41 @@ export const doCenterSelectedSegmentsIntoViewBoxAtom = atom(
         const model = get(svgModelAtom).model;
         if (!model) return;
 
-        // Use standalone segment paths so bounds account for each segment's actual start/end,
-        // instead of only the segment's end target point.
+        const canvasSegmentHitAreas = get(canvasSegmentHitAreaElementsAtom);
+
+        // Compute the selection bounding-box in viewBox (path) coordinates.
+        // Prefer the actual rendered SVG path bbox (more accurate for curves); fall back to model bounds.
         let xmin = Infinity;
         let ymin = Infinity;
         let xmax = -Infinity;
         let ymax = -Infinity;
 
         for (const segmentIndex of selectedIndices) {
+            const element = canvasSegmentHitAreas[segmentIndex];
+            if (element) {
+                try {
+                    const box = element.getBBox();
+                    const bxmin = box.x;
+                    const bymin = box.y;
+                    const bxmax = box.x + box.width;
+                    const bymax = box.y + box.height;
+                    if (
+                        Number.isFinite(bxmin)
+                        && Number.isFinite(bymin)
+                        && Number.isFinite(bxmax)
+                        && Number.isFinite(bymax)
+                    ) {
+                        xmin = Math.min(xmin, bxmin);
+                        ymin = Math.min(ymin, bymin);
+                        xmax = Math.max(xmax, bxmax);
+                        ymax = Math.max(ymax, bymax);
+                        continue;
+                    }
+                } catch {
+                    // fall through to model bounds
+                }
+            }
+
             const standalonePath = model.getStandaloneSegmentPath(segmentIndex);
             if (!standalonePath) continue;
 
