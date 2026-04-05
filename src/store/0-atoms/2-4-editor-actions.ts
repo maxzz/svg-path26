@@ -8,7 +8,8 @@ import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doSetPathWithoutHistoryAtom, doUndoPathAtom } from "./1-2-history";
 import { commandRowsAtom, standaloneSegmentPathsAtom, svgModelAtom } from "./2-0-svg-model";
 import { doDeleteImageAtom, focusedImageIdAtom } from "./2-8-images";
-import { canvasRootSvgElementAtom, canvasViewPortAtom, doPanViewPortAtom } from "./2-3-canvas-viewport";
+import { canvasRootSvgElementAtom } from "./2-3-canvas-viewport";
+import { pathViewBoxAtom } from "./2-2-path-viewbox";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
 import { applyCommandSelection, normalizeSelectedCommandIndices, remapSelectedIndicesAfterDelete, type CommandSelectionMode } from "./2-5-editor-selection-utils";
 import { appSettings } from "@/store/0-ui-settings";
@@ -225,15 +226,18 @@ export const doCenterSelectedSegmentsIntoViewBoxAtom = atom(
         const selectionCenterX = (xmin + xmax) / 2;
         const selectionCenterY = (ymin + ymax) / 2;
 
-        const [viewPortX, viewPortY, viewPortWidth, viewPortHeight] = get(canvasViewPortAtom);
-        const viewPortCenterX = viewPortX + viewPortWidth / 2;
-        const viewPortCenterY = viewPortY + viewPortHeight / 2;
+        const viewBox = get(pathViewBoxAtom);
+        const viewBoxCenterX = viewBox[0] + viewBox[2] / 2;
+        const viewBoxCenterY = viewBox[1] + viewBox[3] / 2;
 
-        const dx = centerX ? selectionCenterX - viewPortCenterX : 0;
-        const dy = centerY ? selectionCenterY - viewPortCenterY : 0;
+        // Translate selected segments so their bounding-box center matches the viewBox center.
+        const dx = centerX ? viewBoxCenterX - selectionCenterX : 0;
+        const dy = centerY ? viewBoxCenterY - selectionCenterY : 0;
         if (Math.abs(dx) < 1e-9 && Math.abs(dy) < 1e-9) return;
 
-        set(doPanViewPortAtom, { dx, dy });
+        set(doApplySvgModelAtom, (model) => {
+            model.translateSegments(selectedIndices, dx, dy);
+        });
     }
 );
 

@@ -2,7 +2,7 @@ import { createStore } from "jotai";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { findSvgInputNodeById } from "@/svg-core/3-svg-input";
 import { doCenterSelectedSegmentsIntoViewBoxAtom, doDeleteSelectedSegmentsAtom, doSetCommandValueAtom, doSetPointLocationWithoutHistoryAtom, selectedCommandIndicesAtom } from "./2-4-editor-actions";
-import { commandRowsAtom, targetPointsAtom } from "./2-0-svg-model";
+import { commandRowsAtom, svgModelAtom, targetPointsAtom } from "./2-0-svg-model";
 import { canvasViewPortAtom, doFitViewPortAtom, doFitViewPortToPathViewBoxAtom, doPanViewPortAtom, doSetViewPortAtom, doZoomViewPortAtom, rootSvgElementSizeAtom } from "./2-3-canvas-viewport";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "./1-2-history";
 import { doApplySvgInputTextAtom, doSelectSvgInputNodeAtom, svgInputDocumentAtom, svgInputSelectedNodeIdAtom } from "./1-3-svg-input";
@@ -10,10 +10,43 @@ import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } from "./1-2-history";
 import { doAsyncExecuteConfirmDialogAtom, isOpenConfirmDialogAtom } from "../../components/4-dialogs/8-1-confirmation/9-types-confirmation";
 import { doOpenNamedPathAtom, doSaveNamedPathAtom } from "./2-6-stored-paths-actions";
-import { doSetPathViewBoxAtom } from "./2-2-path-viewbox";
+import { doSetPathViewBoxAtom, pathViewBoxAtom } from "./2-2-path-viewbox";
 import { appSettings } from "@/store/0-ui-settings";
 import { normalizeStoredSettings } from "@/store/1-ui-settings-normalize";
 import { DEFAULT_PATH_EDITOR_SETTINGS } from "@/store/9-ui-settings-types-and-defaults";
+import { SvgPathModel } from "@/svg-core/2-svg-model";
+
+function getSelectionBounds(model: SvgPathModel, selectionIndices: number[]) {
+    let xmin = Infinity;
+    let ymin = Infinity;
+    let xmax = -Infinity;
+    let ymax = -Infinity;
+
+    for (const segmentIndex of selectionIndices) {
+        const standalonePath = model.getStandaloneSegmentPath(segmentIndex);
+        if (!standalonePath) continue;
+
+        const standaloneModel = new SvgPathModel(standalonePath);
+        const bounds = standaloneModel.getBounds();
+        if (!Number.isFinite(bounds.xmin) || !Number.isFinite(bounds.ymin) || !Number.isFinite(bounds.xmax) || !Number.isFinite(bounds.ymax)) continue;
+
+        xmin = Math.min(xmin, bounds.xmin);
+        ymin = Math.min(ymin, bounds.ymin);
+        xmax = Math.max(xmax, bounds.xmax);
+        ymax = Math.max(ymax, bounds.ymax);
+    }
+
+    if (!Number.isFinite(xmin) || !Number.isFinite(ymin) || !Number.isFinite(xmax) || !Number.isFinite(ymax)) return null;
+
+    return {
+        xmin,
+        ymin,
+        xmax,
+        ymax,
+        centerX: (xmin + xmax) / 2,
+        centerY: (ymin + ymax) / 2,
+    };
+}
 
 describe("svg path state atoms", () => {
     beforeEach(() => {
@@ -140,34 +173,86 @@ describe("svg path state atoms", () => {
         const store = createStore();
         store.set(svgPathInputAtom, "M 0 0 L 10 0 L 10 10");
         store.set(selectedCommandIndicesAtom, [1]);
-        store.set(doSetViewPortAtom, [0, 0, 20, 20]);
+        store.set(doSetPathViewBoxAtom, [0, 0, 20, 20]);
+        store.set(doSetViewPortAtom, [2, 3, 20, 20]);
+
+        const beforeViewPort = store.get(canvasViewPortAtom);
+        const viewBox = store.get(pathViewBoxAtom);
+        const viewBoxCenterX = viewBox[0] + viewBox[2] / 2;
+        const viewBoxCenterY = viewBox[1] + viewBox[3] / 2;
 
         store.set(doCenterSelectedSegmentsIntoViewBoxAtom, { axis: "both" });
 
-        expect(store.get(canvasViewPortAtom)).toEqual([-5, -10, 20, 20]);
-        expect(appSettings.pathEditor.zoom).toBe(1);
+        expect(store.get(canvasViewPortAtom)).toEqual(beforeViewPort);
+        expect(store.get(pathViewBoxAtom)).toEqual(viewBox);
+
+        const model = store.get(svgModelAtom).model;
+        if (!model) throw new Error("expected parsed model");
+
+        const bounds = getSelectionBounds(model, [1]);
+        expect(bounds).not.toBeNull();
+        expect(bounds!.centerX).toBeCloseTo(viewBoxCenterX);
+        expect(bounds!.centerY).toBeCloseTo(viewBoxCenterY);
     });
 
-    it("centers current selection into viewPort on X only", () => {
+    it("centers current selection into viewBox on X only", () => {
         const store = createStore();
         store.set(svgPathInputAtom, "M 0 0 L 10 0 L 10 10");
         store.set(selectedCommandIndicesAtom, [1]);
-        store.set(doSetViewPortAtom, [0, 0, 20, 20]);
+        store.set(doSetPathViewBoxAtom, [0, 0, 20, 20]);
+        store.set(doSetViewPortAtom, [2, 3, 20, 20]);
+
+        const beforeViewPort = store.get(canvasViewPortAtom);
+        const viewBox = store.get(pathViewBoxAtom);
+        const viewBoxCenterX = viewBox[0] + viewBox[2] / 2;
+
+        const modelBefore = store.get(svgModelAtom).model;
+        if (!modelBefore) throw new Error("expected parsed model");
+        const beforeBounds = getSelectionBounds(modelBefore, [1]);
+        if (!beforeBounds) throw new Error("expected selection bounds");
 
         store.set(doCenterSelectedSegmentsIntoViewBoxAtom, { axis: "x" });
 
-        expect(store.get(canvasViewPortAtom)).toEqual([-5, 0, 20, 20]);
+        expect(store.get(canvasViewPortAtom)).toEqual(beforeViewPort);
+        expect(store.get(pathViewBoxAtom)).toEqual(viewBox);
+
+        const modelAfter = store.get(svgModelAtom).model;
+        if (!modelAfter) throw new Error("expected parsed model");
+        const afterBounds = getSelectionBounds(modelAfter, [1]);
+        if (!afterBounds) throw new Error("expected selection bounds");
+
+        expect(afterBounds.centerX).toBeCloseTo(viewBoxCenterX);
+        expect(afterBounds.centerY).toBeCloseTo(beforeBounds.centerY);
     });
 
-    it("centers current selection into viewPort on Y only", () => {
+    it("centers current selection into viewBox on Y only", () => {
         const store = createStore();
         store.set(svgPathInputAtom, "M 0 0 L 10 0 L 10 10");
         store.set(selectedCommandIndicesAtom, [1]);
-        store.set(doSetViewPortAtom, [0, 0, 20, 20]);
+        store.set(doSetPathViewBoxAtom, [0, 0, 20, 20]);
+        store.set(doSetViewPortAtom, [2, 3, 20, 20]);
+
+        const beforeViewPort = store.get(canvasViewPortAtom);
+        const viewBox = store.get(pathViewBoxAtom);
+        const viewBoxCenterY = viewBox[1] + viewBox[3] / 2;
+
+        const modelBefore = store.get(svgModelAtom).model;
+        if (!modelBefore) throw new Error("expected parsed model");
+        const beforeBounds = getSelectionBounds(modelBefore, [1]);
+        if (!beforeBounds) throw new Error("expected selection bounds");
 
         store.set(doCenterSelectedSegmentsIntoViewBoxAtom, { axis: "y" });
 
-        expect(store.get(canvasViewPortAtom)).toEqual([0, -10, 20, 20]);
+        expect(store.get(canvasViewPortAtom)).toEqual(beforeViewPort);
+        expect(store.get(pathViewBoxAtom)).toEqual(viewBox);
+
+        const modelAfter = store.get(svgModelAtom).model;
+        if (!modelAfter) throw new Error("expected parsed model");
+        const afterBounds = getSelectionBounds(modelAfter, [1]);
+        if (!afterBounds) throw new Error("expected selection bounds");
+
+        expect(afterBounds.centerY).toBeCloseTo(viewBoxCenterY);
+        expect(afterBounds.centerX).toBeCloseTo(beforeBounds.centerX);
     });
 
     it("fits the current path at 1x zoom and then scales from that baseline", () => {
