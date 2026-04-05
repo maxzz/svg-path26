@@ -1,7 +1,7 @@
 import { createStore } from "jotai";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { findSvgInputNodeById } from "@/svg-core/3-svg-input";
-import { doDeleteSelectedSegmentsAtom, doSetCommandValueAtom, doSetPointLocationWithoutHistoryAtom, selectedCommandIndicesAtom } from "./2-4-editor-actions";
+import { doCenterSelectedSegmentsIntoViewBoxAtom, doDeleteSelectedSegmentsAtom, doSetCommandValueAtom, doSetPointLocationWithoutHistoryAtom, selectedCommandIndicesAtom } from "./2-4-editor-actions";
 import { commandRowsAtom, targetPointsAtom } from "./2-0-svg-model";
 import { canvasViewPortAtom, doFitViewPortAtom, doFitViewPortToPathViewBoxAtom, doPanViewPortAtom, doSetViewPortAtom, doZoomViewPortAtom, rootSvgElementSizeAtom } from "./2-3-canvas-viewport";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "./1-2-history";
@@ -134,6 +134,18 @@ describe("svg path state atoms", () => {
         const lockedBefore = store.get(canvasViewPortAtom);
         store.set(doPanViewPortAtom, { dx: 5, dy: 5 });
         expect(store.get(canvasViewPortAtom)).toEqual(lockedBefore);
+    });
+
+    it("centers current selection into viewPort without changing zoom", () => {
+        const store = createStore();
+        store.set(svgPathInputAtom, "M 0 0 L 10 0 L 10 10");
+        store.set(selectedCommandIndicesAtom, [1]);
+        store.set(doSetViewPortAtom, [0, 0, 20, 20]);
+
+        store.set(doCenterSelectedSegmentsIntoViewBoxAtom);
+
+        expect(store.get(canvasViewPortAtom)).toEqual([-5, -10, 20, 20]);
+        expect(appSettings.pathEditor.zoom).toBe(1);
     });
 
     it("fits the current path at 1x zoom and then scales from that baseline", () => {

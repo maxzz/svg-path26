@@ -8,7 +8,7 @@ import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doSetPathWithoutHistoryAtom, doUndoPathAtom } from "./1-2-history";
 import { commandRowsAtom, standaloneSegmentPathsAtom, svgModelAtom } from "./2-0-svg-model";
 import { doDeleteImageAtom, focusedImageIdAtom } from "./2-8-images";
-import { canvasRootSvgElementAtom } from "./2-3-canvas-viewport";
+import { canvasRootSvgElementAtom, canvasViewPortAtom, doPanViewPortAtom } from "./2-3-canvas-viewport";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
 import { applyCommandSelection, normalizeSelectedCommandIndices, remapSelectedIndicesAfterDelete, type CommandSelectionMode } from "./2-5-editor-selection-utils";
 import { appSettings } from "@/store/0-ui-settings";
@@ -179,6 +179,57 @@ export const doSelectAllCommandsAtom = atom(
         }
 
         set(selectedCommandIndicesAtom, allIndices.filter((it) => it !== activeIndex).concat(activeIndex));
+    }
+);
+
+export const doCenterSelectedSegmentsIntoViewBoxAtom = atom(
+    null,
+    (get, set) => {
+        const selectedIndices = get(selectedCommandIndicesAtom);
+        if (!selectedIndices.length) return;
+
+        const model = get(svgModelAtom).model;
+        if (!model) return;
+
+        // Use standalone segment paths so bounds account for each segment's actual start/end,
+        // instead of only the segment's end target point.
+        let xmin = Infinity;
+        let ymin = Infinity;
+        let xmax = -Infinity;
+        let ymax = -Infinity;
+
+        for (const segmentIndex of selectedIndices) {
+            const standalonePath = model.getStandaloneSegmentPath(segmentIndex);
+            if (!standalonePath) continue;
+
+            try {
+                const standaloneModel = new SvgPathModel(standalonePath);
+                const bounds = standaloneModel.getBounds();
+                if (!Number.isFinite(bounds.xmin) || !Number.isFinite(bounds.ymin) || !Number.isFinite(bounds.xmax) || !Number.isFinite(bounds.ymax)) continue;
+
+                xmin = Math.min(xmin, bounds.xmin);
+                ymin = Math.min(ymin, bounds.ymin);
+                xmax = Math.max(xmax, bounds.xmax);
+                ymax = Math.max(ymax, bounds.ymax);
+            } catch {
+                // no-op for a single problematic segment
+            }
+        }
+
+        if (!Number.isFinite(xmin) || !Number.isFinite(ymin) || !Number.isFinite(xmax) || !Number.isFinite(ymax)) return;
+
+        const selectionCenterX = (xmin + xmax) / 2;
+        const selectionCenterY = (ymin + ymax) / 2;
+
+        const [viewPortX, viewPortY, viewPortWidth, viewPortHeight] = get(canvasViewPortAtom);
+        const viewPortCenterX = viewPortX + viewPortWidth / 2;
+        const viewPortCenterY = viewPortY + viewPortHeight / 2;
+
+        const dx = selectionCenterX - viewPortCenterX;
+        const dy = selectionCenterY - viewPortCenterY;
+        if (Math.abs(dx) < 1e-9 && Math.abs(dy) < 1e-9) return;
+
+        set(doPanViewPortAtom, { dx, dy });
     }
 );
 
