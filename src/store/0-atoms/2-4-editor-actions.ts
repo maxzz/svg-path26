@@ -268,6 +268,107 @@ export const doCenterSelectedSegmentsIntoViewBoxAtom = atom(
     }
 );
 
+export const doScaleSelectedSegmentsIntoViewBoxAtom = atom(
+    null,
+    (get, set, args?: { axis: "x" | "y" | "both"; }) => {
+        const axis = args?.axis ?? "both";
+        const scaleX = axis === "x" || axis === "both";
+        const scaleY = axis === "y" || axis === "both";
+
+        const selectedIndices = get(selectedCommandIndicesAtom);
+        if (!selectedIndices.length) return;
+
+        const model = get(svgModelAtom).model;
+        if (!model) return;
+
+        const canvasSegmentHitAreas = get(canvasSegmentHitAreaElementsAtom);
+
+        // Compute the selection bounding-box in viewBox (path) coordinates.
+        let xmin = Infinity;
+        let ymin = Infinity;
+        let xmax = -Infinity;
+        let ymax = -Infinity;
+
+        for (const segmentIndex of selectedIndices) {
+            const element = canvasSegmentHitAreas[segmentIndex];
+            if (element) {
+                try {
+                    const box = element.getBBox();
+                    const bxmin = box.x;
+                    const bymin = box.y;
+                    const bxmax = box.x + box.width;
+                    const bymax = box.y + box.height;
+                    if (
+                        Number.isFinite(bxmin)
+                        && Number.isFinite(bymin)
+                        && Number.isFinite(bxmax)
+                        && Number.isFinite(bymax)
+                    ) {
+                        xmin = Math.min(xmin, bxmin);
+                        ymin = Math.min(ymin, bymin);
+                        xmax = Math.max(xmax, bxmax);
+                        ymax = Math.max(ymax, bymax);
+                        continue;
+                    }
+                } catch {
+                    // fall through to model bounds
+                }
+            }
+
+            const standalonePath = model.getStandaloneSegmentPath(segmentIndex);
+            if (!standalonePath) continue;
+
+            try {
+                const standaloneModel = new SvgPathModel(standalonePath);
+                const bounds = standaloneModel.getBounds();
+                if (!Number.isFinite(bounds.xmin) || !Number.isFinite(bounds.ymin) || !Number.isFinite(bounds.xmax) || !Number.isFinite(bounds.ymax)) continue;
+
+                xmin = Math.min(xmin, bounds.xmin);
+                ymin = Math.min(ymin, bounds.ymin);
+                xmax = Math.max(xmax, bounds.xmax);
+                ymax = Math.max(ymax, bounds.ymax);
+            } catch {
+                // no-op for a single problematic segment
+            }
+        }
+
+        if (!Number.isFinite(xmin) || !Number.isFinite(ymin) || !Number.isFinite(xmax) || !Number.isFinite(ymax)) return;
+
+        const selectionCenterX = (xmin + xmax) / 2;
+        const selectionCenterY = (ymin + ymax) / 2;
+
+        const selectionWidth = xmax - xmin;
+        const selectionHeight = ymax - ymin;
+
+        const viewBox = get(pathViewBoxAtom);
+        const viewBoxCenterX = viewBox[0] + viewBox[2] / 2;
+        const viewBoxCenterY = viewBox[1] + viewBox[3] / 2;
+
+        const viewBoxWidth = viewBox[2];
+        const viewBoxHeight = viewBox[3];
+
+        const EPS = 1e-9;
+        const scaleXFactor = scaleX ? (Math.abs(selectionWidth) > EPS ? viewBoxWidth / selectionWidth : 1) : 1;
+        const scaleYFactor = scaleY ? (Math.abs(selectionHeight) > EPS ? viewBoxHeight / selectionHeight : 1) : 1;
+
+        const dx = scaleX ? viewBoxCenterX - selectionCenterX : 0;
+        const dy = scaleY ? viewBoxCenterY - selectionCenterY : 0;
+
+        const shouldSkip =
+            Math.abs(scaleXFactor - 1) < 1e-9
+            && Math.abs(scaleYFactor - 1) < 1e-9
+            && Math.abs(dx) < 1e-9
+            && Math.abs(dy) < 1e-9;
+
+        if (shouldSkip) return;
+
+        set(doApplySvgModelAtom, (model) => {
+            model.scaleSegments(selectedIndices, scaleXFactor, scaleYFactor, { x: selectionCenterX, y: selectionCenterY });
+            model.translateSegments(selectedIndices, dx, dy);
+        });
+    }
+);
+
 const COMMAND_SHORTCUT_PATTERN = /^[mlvhcsqtaz]$/i;
 
 // Selected standalone segment path

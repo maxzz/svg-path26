@@ -476,6 +476,73 @@ export class SvgPathModel {
         });
     }
 
+    scaleSegments(segmentIndices: number[], scaleX: number, scaleY: number, pivot: Point) {
+        if (!segmentIndices.length) return;
+        if (scaleX === 1 && scaleY === 1) return;
+        if (!Number.isFinite(scaleX) || !Number.isFinite(scaleY)) return;
+
+        const absolute = this.computeAbsoluteSegments();
+        const selected = new Set(segmentIndices.filter((index) => index >= 0 && index < absolute.length));
+        if (!selected.size) return;
+
+        const subpathStartSegmentByIndex = new Map<number, number>();
+        let currentSubpathStartIndex = 0;
+        absolute.forEach((segmentData) => {
+            if (segmentData.command === "M") {
+                currentSubpathStartIndex = segmentData.index;
+            }
+            subpathStartSegmentByIndex.set(segmentData.index, currentSubpathStartIndex);
+        });
+
+        const targetScaled = new Set<number>();
+        absolute.forEach((segmentData) => {
+            if (!selected.has(segmentData.index)) return;
+
+            if (segmentData.command === "Z") {
+                const previousIndex = segmentData.index - 1;
+                if (previousIndex >= 0) {
+                    targetScaled.add(previousIndex);
+                }
+                targetScaled.add(subpathStartSegmentByIndex.get(segmentData.index) ?? 0);
+                return;
+            }
+
+            targetScaled.add(segmentData.index);
+
+            const previousIndex = segmentData.index - 1;
+            if (previousIndex >= 0 && !selected.has(previousIndex)) {
+                targetScaled.add(previousIndex);
+            }
+        });
+
+        const scaledAbsoluteValues = absolute.map((segmentData) => {
+            const nextValues = [...segmentData.values];
+            if (selected.has(segmentData.index)) {
+                scaleAbsoluteSegmentValues(segmentData.command, nextValues, scaleX, scaleY, pivot.x, pivot.y);
+            } else if (targetScaled.has(segmentData.index)) {
+                scaleAbsoluteSegmentTarget(segmentData.command, nextValues, scaleX, scaleY, pivot.x, pivot.y);
+            }
+            return nextValues;
+        });
+
+        let current: Point = { x: 0, y: 0 };
+        let subpathStart: Point = { x: 0, y: 0 };
+
+        this.segments.forEach((segment, index) => {
+            const command = upper(segment.command);
+            const absoluteValues = scaledAbsoluteValues[index] ?? [];
+            segment.values = isRelative(segment.command)
+                ? this.absoluteToRelativeValues(command, absoluteValues, current)
+                : absoluteValues;
+
+            const target = getSegmentTargetFromAbsolute(command, absoluteValues, current, subpathStart);
+            if (command === "M") {
+                subpathStart = clonePoint(target);
+            }
+            current = command === "Z" ? clonePoint(subpathStart) : clonePoint(target);
+        });
+    }
+
     setRelative(makeRelative: boolean) {
         const absolute = this.computeAbsoluteSegments();
         absolute.forEach((entry) => {
@@ -882,6 +949,82 @@ function translateAbsoluteSegmentTarget(command: string, values: number[], delta
             }
             break;
         }
+    }
+}
+
+function scaleAbsoluteSegmentValues(command: string, values: number[], scaleX: number, scaleY: number, pivotX: number, pivotY: number) {
+    const scaleAround = (value: number, pivot: number, scale: number) => pivot + (value - pivot) * scale;
+
+    switch (command) {
+        case "M":
+        case "L":
+        case "T":
+        case "C":
+        case "S":
+        case "Q":
+            for (let i = 0; i < values.length; i += 2) {
+                values[i] = scaleAround(values[i], pivotX, scaleX);
+                values[i + 1] = scaleAround(values[i + 1], pivotY, scaleY);
+            }
+            break;
+        case "H":
+            values[0] = scaleAround(values[0], pivotX, scaleX);
+            break;
+        case "V":
+            values[0] = scaleAround(values[0], pivotY, scaleY);
+            break;
+        case "A":
+            // Radii scale with magnitude; endpoint scales around pivot.
+            values[0] = Math.abs(values[0] * scaleX);
+            values[1] = Math.abs(values[1] * scaleY);
+            values[5] = scaleAround(values[5], pivotX, scaleX);
+            values[6] = scaleAround(values[6], pivotY, scaleY);
+            break;
+        case "Z":
+            break;
+        default:
+            break;
+    }
+}
+
+function scaleAbsoluteSegmentTarget(command: string, values: number[], scaleX: number, scaleY: number, pivotX: number, pivotY: number) {
+    const scaleAround = (value: number, pivot: number, scale: number) => pivot + (value - pivot) * scale;
+
+    switch (command) {
+        case "H":
+            values[0] = scaleAround(values[0], pivotX, scaleX);
+            break;
+        case "V":
+            values[0] = scaleAround(values[0], pivotY, scaleY);
+            break;
+        case "A":
+            values[5] = scaleAround(values[5], pivotX, scaleX);
+            values[6] = scaleAround(values[6], pivotY, scaleY);
+            break;
+        case "M":
+        case "L":
+        case "T":
+        case "C":
+        case "S":
+        case "Q":
+            {
+                const xIndex = values.length - 2;
+                const yIndex = values.length - 1;
+                if (xIndex >= 0 && yIndex >= 0) {
+                    values[xIndex] = scaleAround(values[xIndex], pivotX, scaleX);
+                    values[yIndex] = scaleAround(values[yIndex], pivotY, scaleY);
+                }
+            }
+            break;
+        default: {
+            const xIndex = values.length - 2;
+            const yIndex = values.length - 1;
+            if (xIndex >= 0 && yIndex >= 0) {
+                values[xIndex] = scaleAround(values[xIndex], pivotX, scaleX);
+                values[yIndex] = scaleAround(values[yIndex], pivotY, scaleY);
+            }
+        }
+            break;
     }
 }
 
