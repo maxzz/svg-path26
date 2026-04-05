@@ -65,10 +65,10 @@ export function CanvasGrid() {
                         <Fragment key={v}>
                             {v % tickInterval === 0 &&
                                 <text className="fill-[#744]"
-                                    x={5 * canvasStroke}
+                                    x={-5 * canvasStroke}
                                     y={v === 0 ? -5 * canvasStroke : v}
                                     dominantBaseline={v === 0 ? undefined : "middle"}
-                                    textAnchor="start"
+                                    textAnchor="end"
                                     style={{ fontSize: canvasStroke * 10 + 'px', stroke: "white", strokeWidth: canvasStroke * .2 }}
                                 >
                                     {v}
