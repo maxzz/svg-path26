@@ -35,6 +35,7 @@ export interface CanvasSettings {
     fillPreview: boolean;                 // Fill preview or not (when enabled, the fill will be shown on the canvas)
     canvasPreview: boolean;               // Show stored viewBox frame on canvas
     showViewBoxFrame: boolean;            // Show view box frame or not
+    showSvgPreview: boolean;             // Show "SVG preview" section above SVG input
 }
 
 export interface FooterButtonsSettings {
@@ -97,6 +98,7 @@ export const DEFAULT_CANVAS_SETTINGS: CanvasSettings = {
     fillPreview: false,
     canvasPreview: false,
     showViewBoxFrame: false,
+    showSvgPreview: false,
 };
 
 export const DEFAULT_FOOTER_SETTINGS: FooterSettings = {
@@ -123,7 +125,7 @@ export const DEFAULT_SETTINGS: UiSettings = {
     theme: "light",
     canvas: DEFAULT_CANVAS_SETTINGS,
     footer: DEFAULT_FOOTER_SETTINGS,
-    sections: { "svg-input": true, transform: true, options: true },
+    sections: { "svg-preview": true, "svg-input": true, transform: true, options: true },
     editorPanelSizes: [33, 67],
     pathEditor: DEFAULT_PATH_EDITOR_SETTINGS,
     export: DEFAULT_EXPORT_SETTINGS,

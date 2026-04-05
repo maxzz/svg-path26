@@ -9,7 +9,9 @@ const STORAGE_ID = `${STORE_KEY}__${STORE_VER}`;
 const SAVE_SETTINGS_DELAY_MS = 150;
 
 function loadSettings(): UiSettings {
-    return normalizeStoredSettings(loadStoredSettings());
+    const storedSettings = loadStoredSettings();
+    const extractedAppSettings = unwrapStoredSettings(storedSettings);
+    return normalizeStoredSettings(extractedAppSettings);
 
     function loadStoredSettings(): unknown {
         try {
@@ -23,6 +25,23 @@ function loadSettings(): UiSettings {
 
         return null;
     }
+
+    function unwrapStoredSettings(value: unknown): unknown {
+        if (!value || typeof value !== "object") return value;
+
+        const record = value as Record<string, unknown>;
+        const uiSettings = record.uiSettings as Record<string, unknown> | undefined;
+        const wrappedAppSettings = uiSettings?.appSettings;
+
+        // New format: { uiSettings: { appSettings: ... } }
+        if (wrappedAppSettings) return wrappedAppSettings;
+
+        // Backwards compatibility: allow { appSettings: ... } or the legacy direct object shape.
+        const legacyAppSettings = record.appSettings;
+        if (legacyAppSettings) return legacyAppSettings;
+
+        return value;
+    }
 }
 
 export const appSettings = proxy<UiSettings>(loadSettings());
@@ -31,7 +50,8 @@ themeApplyMode(appSettings.theme);
 
 const persistAppSettings = debounceDevTools(() => {
     try {
-        localStorage.setItem(STORAGE_ID, JSON.stringify(appSettings));
+        // New format: keep the app settings under `uiSettings.appSettings` for consistency.
+        localStorage.setItem(STORAGE_ID, JSON.stringify({ uiSettings: { appSettings } }));
     } catch (error) {
         console.error("Failed to save UI settings", error);
     }

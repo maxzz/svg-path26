@@ -35,7 +35,7 @@ export function OptionsDialog() {
 }
 
 function OptionsControls() {
-    const { showTicks, snapToGrid, scrollOnHover, fillPreview, showGrid, showViewBoxFrame, canvasPreview, showHelpers } = useSnapshot(appSettings.canvas);
+    const { showTicks, snapToGrid, scrollOnHover, fillPreview, showGrid, showViewBoxFrame, canvasPreview, showHelpers, showSvgPreview } = useSnapshot(appSettings.canvas);
     const { minifyOutput, dragPrecision, tickInterval, showSvgTreeConnectorLines } = useSnapshot(appSettings.pathEditor);
     const { theme } = useSnapshot(appSettings);
     const isDarkTheme = isThemeDark(theme);
@@ -68,11 +68,16 @@ function OptionsControls() {
 
                 <CheckboxRow label="Show point controls" className="col-start-1" checked={showHelpers} onCheckedChange={(checked) => appSettings.canvas.showHelpers = checked} />
                 <CheckboxRow label="Fill path" className="col-start-1" checked={fillPreview} onCheckedChange={(checked) => appSettings.canvas.fillPreview = checked} />
-                <CheckboxRow label="Show SVG tree lines" className="col-start-1" checked={showSvgTreeConnectorLines} onCheckedChange={(checked) => appSettings.pathEditor.showSvgTreeConnectorLines = checked} />
                 <CheckboxRow label="Minify output" checked={minifyOutput} className="col-start-1" onCheckedChange={(checked) => { appSettings.pathEditor.minifyOutput = checked; doNormalizePath(); }} />
                 
                 <CheckboxRow label="Show viewBox frame" checked={showViewBoxFrame} className="col-start-1" onCheckedChange={(checked) => { appSettings.canvas.showViewBoxFrame = checked; }} />
                 <CheckboxRow label="Preview mode" checked={canvasPreview} className="col-start-1" onCheckedChange={(checked) => { appSettings.canvas.canvasPreview = checked; }} />
+
+{/* TODO: separator */}
+                <CheckboxRow label="Show SVG tree lines" className="col-start-1" checked={showSvgTreeConnectorLines} onCheckedChange={(checked) => appSettings.pathEditor.showSvgTreeConnectorLines = checked} />
+
+{/* TODO: separator */}
+                <CheckboxRow label="SVG preview section" className="col-start-1" checked={showSvgPreview} onCheckedChange={(checked) => appSettings.canvas.showSvgPreview = checked} />
             </div>
         </div>
     );

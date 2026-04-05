@@ -92,6 +92,7 @@ function createCanvasSettingsSchema(defaultSettings: CanvasSettings) {
             fillPreview: z.boolean().catch(defaultSettings.fillPreview),
             canvasPreview: z.boolean().catch(defaultSettings.canvasPreview),
             showViewBoxFrame: z.boolean().catch(defaultSettings.showViewBoxFrame),
+            showSvgPreview: z.boolean().catch(defaultSettings.showSvgPreview),
         })
     );
 }
@@ -155,6 +156,7 @@ function toUiSettingsRecord(value: unknown, defaultCanvasSettings: CanvasSetting
             fillPreview: canvasRecord.fillPreview ?? record.fillPreview ?? pathEditorRecord.fillPreview ?? defaultCanvasSettings.fillPreview,
             canvasPreview: canvasRecord.canvasPreview ?? record.canvasPreview ?? pathEditorRecord.canvasPreview ?? defaultCanvasSettings.canvasPreview,
             showViewBoxFrame: canvasRecord.showViewBoxFrame ?? record.showViewBoxFrame ?? pathEditorRecord.showViewBoxFrame ?? defaultCanvasSettings.showViewBoxFrame,
+            showSvgPreview: canvasRecord.showSvgPreview ?? record.showSvgPreview ?? pathEditorRecord.showSvgPreview ?? defaultCanvasSettings.showSvgPreview,
         },
         pathEditor: {
             ...pathEditorRecord,
