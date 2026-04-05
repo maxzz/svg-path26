@@ -4,14 +4,14 @@ import { type UiSettings } from "./9-ui-settings-types-and-defaults";
 import { normalizeStoredSettings } from "@/store/1-ui-settings-normalize";
 
 const STORE_KEY = "svg-path26";
-const STORE_VER = "v3";
+const STORE_VER = "v4";
 const STORAGE_ID = `${STORE_KEY}__${STORE_VER}`;
 const SAVE_SETTINGS_DELAY_MS = 150;
 
 function loadSettings(): UiSettings {
     const storedSettings = loadStoredSettings();
-    const extractedAppSettings = unwrapStoredSettings(storedSettings);
-    return normalizeStoredSettings(extractedAppSettings);
+    const appSettingsRecord = (storedSettings as any)?.uiSettings?.appSettings ?? null;
+    return normalizeStoredSettings(appSettingsRecord);
 
     function loadStoredSettings(): unknown {
         try {
@@ -24,23 +24,6 @@ function loadSettings(): UiSettings {
         }
 
         return null;
-    }
-
-    function unwrapStoredSettings(value: unknown): unknown {
-        if (!value || typeof value !== "object") return value;
-
-        const record = value as Record<string, unknown>;
-        const uiSettings = record.uiSettings as Record<string, unknown> | undefined;
-        const wrappedAppSettings = uiSettings?.appSettings;
-
-        // New format: { uiSettings: { appSettings: ... } }
-        if (wrappedAppSettings) return wrappedAppSettings;
-
-        // Backwards compatibility: allow { appSettings: ... } or the legacy direct object shape.
-        const legacyAppSettings = record.appSettings;
-        if (legacyAppSettings) return legacyAppSettings;
-
-        return value;
     }
 }
 

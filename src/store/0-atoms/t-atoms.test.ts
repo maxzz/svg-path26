@@ -77,14 +77,14 @@ describe("svg path state atoms", () => {
             appSettings.canvas.showGrid = false;
             appSettings.canvas.showHelpers = false;
 
-            expect(localStorage.getItem("svg-path26__v3")).toBeNull();
+            expect(localStorage.getItem("svg-path26__v4")).toBeNull();
 
             await vi.advanceTimersByTimeAsync(149);
-            expect(localStorage.getItem("svg-path26__v3")).toBeNull();
+            expect(localStorage.getItem("svg-path26__v4")).toBeNull();
 
             await vi.advanceTimersByTimeAsync(1);
 
-            const storedSettings = localStorage.getItem("svg-path26__v3");
+            const storedSettings = localStorage.getItem("svg-path26__v4");
             expect(storedSettings).not.toBeNull();
             expect(storedSettings).toContain('"showGrid":false');
             expect(storedSettings).toContain('"showHelpers":false');
