@@ -1,3 +1,4 @@
+import { type PointerEvent } from "react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { canvasStrokeWidthAtom, hoveredSegmentStrokeWidthAtom, selectedSegmentStrokeWidthAtom } from "../../../../store/0-atoms/2-3-canvas-viewport-derives";
@@ -57,7 +58,7 @@ export function CanvasSegmentHitAreas() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     onPointerDown={(event) => { event.stopPropagation(); doCanvasSegmentHitAreaPointerDown(index, event); }}
-                    onMouseEnter={() => { doCanvasSegmentHitAreaMouseEnter({ index }); }}
+                    onMouseEnter={() => { doCanvasSegmentHitAreaMouseEnter(index); }}
                     onMouseLeave={() => { doCanvasSegmentHitAreaMouseLeave(); }}
                     data-selection-hit="true"
                     key={`segment-hit:${index}`}
@@ -69,7 +70,7 @@ export function CanvasSegmentHitAreas() {
 
 const doCanvasSegmentHitAreaPointerDownAtom = atom(
     null,
-    (get, set, index: number, event: { pointerId: number; clientX: number; clientY: number; shiftKey: boolean; ctrlKey: boolean; metaKey: boolean; }) => {
+    (get, set, index: number, event: PointerEvent<SVGElement>) => {
         const selectedCommandIndices = get(selectedCommandIndicesAtom);
         const pathValue = get(svgPathInputAtom);
 
@@ -85,11 +86,7 @@ const doCanvasSegmentHitAreaPointerDownAtom = atom(
 
         set(doSelectCommandAtom, {
             index,
-            mode: getCommandSelectionMode({
-                shiftKey: event.shiftKey,
-                ctrlKey: event.ctrlKey,
-                metaKey: event.metaKey,
-            }),
+            mode: getCommandSelectionMode(event),
         });
         set(hoveredCommandIndexAtom, index);
         set(hoveredCanvasPointAtom, null);
@@ -98,8 +95,8 @@ const doCanvasSegmentHitAreaPointerDownAtom = atom(
 
 const doCanvasSegmentHitAreaMouseEnterAtom = atom(
     null,
-    (_get, set, args: { index: number; }) => {
-        set(hoveredCommandIndexAtom, args.index);
+    (_get, set, index: number) => {
+        set(hoveredCommandIndexAtom, index);
         set(hoveredCanvasPointAtom, null);
     }
 );

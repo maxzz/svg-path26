@@ -2,15 +2,15 @@ import { type Bounds, type Point, type SvgCanvasPoint } from "@/svg-core/9-types
 
 export type CommandSelectionMode = "replace" | "add" | "remove";
 
-export function getCommandSelectionMode(modifiers: { shiftKey: boolean; ctrlKey: boolean; metaKey: boolean; }): CommandSelectionMode {
-    if (modifiers.ctrlKey || modifiers.metaKey) return "remove";
-    if (modifiers.shiftKey) return "add";
+export function getCommandSelectionMode(event: { shiftKey: boolean; ctrlKey: boolean; metaKey: boolean; }): CommandSelectionMode {
+    if (event.ctrlKey || event.metaKey) return "remove";
+    if (event.shiftKey) return "add";
     return "replace";
 }
 
-export function getMarqueeSelectionMode(modifiers: { shiftKey: boolean; ctrlKey: boolean; metaKey: boolean; }): CommandSelectionMode | null {
-    if (!modifiers.shiftKey) return null;
-    if (modifiers.ctrlKey || modifiers.metaKey) return "remove";
+export function getMarqueeSelectionMode(event: { shiftKey: boolean; ctrlKey: boolean; metaKey: boolean; }): CommandSelectionMode | null {
+    if (!event.shiftKey) return null;
+    if (event.ctrlKey || event.metaKey) return "remove";
     return "add";
 }
 
