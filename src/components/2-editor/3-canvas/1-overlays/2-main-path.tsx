@@ -18,10 +18,10 @@ export function CanvasMainPathOverlay() {
     return (
         <path
             className={getCanvasPathClasses(canvasPreview, fillPreview, darkCanvas)}
+            d={parseError || !svgPathInput ? "M 0 0" : svgPathInput}
             strokeWidth={canvasStrokeWidth}
             strokeLinecap="round"
             strokeLinejoin="round"
-            d={parseError || !svgPathInput ? "M 0 0" : svgPathInput}
             pointerEvents="none"
         />
     );

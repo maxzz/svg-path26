@@ -6,19 +6,19 @@ import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { canvasUnitsPerPixelAtom } from "../../../../store/0-atoms/2-3-canvas-viewport-derives";
 import { commandHoveredAtom, commandSelectedAtom, doFocusPointCommandAtom, doSelectCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-editor-actions";
 import { getCommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils";
-import { targetPointsAtom } from "@/store/0-atoms/2-0-svg-model";
+import { pathPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
 import { doStartPointDragAtom, doStartSelectedSegmentsDragAtom } from "../3-canvas-drag";
 import { getControlHaloFill, getEditorStroke, getPointInteractionClassName, getTargetPointFill } from "./8-canvas-color-palette";
 
-export function CanvasTargetPoints() {
-    const { darkCanvas } = useSnapshot(appSettings.canvas);
-    const targetPoints = useAtomValue(targetPointsAtom);
+export function CanvasPathPoints() {
+    const pathPoints = useAtomValue(pathPointsAtom);
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
+    const { darkCanvas } = useSnapshot(appSettings.canvas);
 
-    return targetPoints.map(
+    return pathPoints.map(
         (point: SvgCanvasPoint) => (
-            <CanvasTargetPoint
+            <CanvasPathPoint
                 key={point.id}
                 point={point}
                 darkCanvas={darkCanvas}
@@ -26,23 +26,18 @@ export function CanvasTargetPoints() {
             />
         )
     );
-}
+    }
 
-function CanvasTargetPoint(props: {
-    point: SvgCanvasPoint;
-    darkCanvas: boolean;
-    unitsPerPixel: number;
-}) {
-    const { point, darkCanvas, unitsPerPixel } = props;
+function CanvasPathPoint({ point, darkCanvas, unitsPerPixel }: { point: SvgCanvasPoint; darkCanvas: boolean; unitsPerPixel: number; }) {
     const selected = useAtomValue(commandSelectedAtom(point.segmentIndex));
     const hovered = useAtomValue(commandHoveredAtom(point.segmentIndex));
     const targetPointColor = getTargetPointFill(selected, hovered, darkCanvas);
     const haloRadius = unitsPerPixel * 8;
     const pointRadius = unitsPerPixel * (selected ? 5 : 4);
 
-    const doCanvasTargetPointPointerDown = useSetAtom(doCanvasTargetPointPointerDownAtom);
-    const doCanvasTargetPointMouseEnter = useSetAtom(doCanvasTargetPointMouseEnterAtom);
-    const doCanvasTargetPointMouseLeave = useSetAtom(doCanvasTargetPointMouseLeaveAtom);
+    const doCanvasPathPointPointerDown = useSetAtom(doCanvasPathPointPointerDownAtom);
+    const doCanvasPathPointMouseEnter = useSetAtom(doCanvasPathPointMouseEnterAtom);
+    const doCanvasPathPointMouseLeave = useSetAtom(doCanvasPathPointMouseLeaveAtom);
 
     return (
         <g>
@@ -67,9 +62,9 @@ function CanvasTargetPoint(props: {
                 strokeWidth={unitsPerPixel * (point.movable ? 12 : 0)}
                 fill="transparent"
                 stroke="transparent"
-                onPointerDown={(event) => { event.stopPropagation(); doCanvasTargetPointPointerDown(point, event); }}
-                onMouseEnter={() => { doCanvasTargetPointMouseEnter(point); }}
-                onMouseLeave={() => { doCanvasTargetPointMouseLeave(); }}
+                onPointerDown={(event) => { event.stopPropagation(); doCanvasPathPointPointerDown(point, event); }}
+                onMouseEnter={() => { doCanvasPathPointMouseEnter(point); }}
+                onMouseLeave={() => { doCanvasPathPointMouseLeave(); }}
                 data-selection-hit="true"
             />
 
@@ -86,7 +81,7 @@ function CanvasTargetPoint(props: {
     );
 }
 
-const doCanvasTargetPointPointerDownAtom = atom(
+const doCanvasPathPointPointerDownAtom = atom(
     null,
     (get, set, point: SvgCanvasPoint, event: PointerEvent<SVGElement>) => {
         const selectedCommandIndices = get(selectedCommandIndicesAtom);
@@ -110,7 +105,7 @@ const doCanvasTargetPointPointerDownAtom = atom(
     }
 );
 
-const doCanvasTargetPointMouseEnterAtom = atom(
+const doCanvasPathPointMouseEnterAtom = atom(
     null,
     (_get, set, point: SvgCanvasPoint) => {
         set(hoveredCommandIndexAtom, point.segmentIndex);
@@ -118,7 +113,7 @@ const doCanvasTargetPointMouseEnterAtom = atom(
     }
 );
 
-const doCanvasTargetPointMouseLeaveAtom = atom(
+const doCanvasPathPointMouseLeaveAtom = atom(
     null,
     (_get, set) => {
         set(hoveredCommandIndexAtom, null);

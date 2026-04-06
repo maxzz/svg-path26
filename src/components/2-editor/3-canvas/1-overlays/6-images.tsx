@@ -10,18 +10,19 @@ export function PathCanvasImages() {
     const images = useAtomValue(imagesAtom);
 
     return images.map(
-        (image) => (
+        (image: EditorImage) => (
             <image
-                key={image.id}
                 href={image.data}
                 preserveAspectRatio={image.preserveAspectRatio ? "xMidYMid meet" : "none"}
-                opacity={image.opacity}
-                pointerEvents="none"
 
                 x={Math.min(image.x1, image.x2)}
                 y={Math.min(image.y1, image.y2)}
                 width={Math.abs(image.x2 - image.x1)}
                 height={Math.abs(image.y2 - image.y1)}
+
+                opacity={image.opacity}
+                pointerEvents="none"
+                key={image.id}
             />
         )
     );
@@ -56,12 +57,13 @@ export function PathCanvasImageEditOverlays() {
             >
                 <rect
                     className={getImageEditRectClasses(image.id === focusedImageId)}
-                    strokeWidth={unitsPerPixel * 2}
 
                     x={Math.min(image.x1, image.x2)}
                     y={Math.min(image.y1, image.y2)}
                     width={Math.abs(image.x2 - image.x1)}
                     height={Math.abs(image.y2 - image.y1)}
+                    
+                    strokeWidth={unitsPerPixel * 2}
                 />
 
                 {buildImageHandles(image).map(

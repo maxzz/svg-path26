@@ -3,7 +3,7 @@ import { atom, useAtomValue, useSetAtom, useStore } from "jotai";
 import { appSettings } from "@/store/0-ui-settings";
 import { type Point, type SvgCanvasPoint, type ViewBox } from "@/svg-core/9-types-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { controlPointsAtom, targetPointsAtom } from "@/store/0-atoms/2-0-svg-model";
+import { controlPointsAtom, pathPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { canvasRootSvgElementAtom, canvasViewPortAtom, doPanViewPortAtom, doZoomViewPortAtom } from "@/store/0-atoms/2-3-canvas-viewport";
 import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { canvasSegmentHitAreaElementsAtom, doSetPointLocationWithoutHistoryAtom, doSuppressNextCanvasFocusClearAtom, doTranslateSelectedSegmentsWithoutHistoryAtom, draggedCanvasPointAtom, isCanvasDraggingAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-editor-actions";
@@ -252,7 +252,7 @@ export const doApplyActiveCanvasDragAtClientAtom = atom(
                 getMarqueeSelectionIndices({
                     start: activeDragState.start,
                     current: next,
-                    targetPoints: get(targetPointsAtom),
+                    targetPoints: get(pathPointsAtom),
                     controlPoints: get(controlPointsAtom),
                     pathElements: get(canvasSegmentHitAreaElementsAtom),
                 }),

@@ -35,7 +35,7 @@ export const canvasGeometryAtom = atom(
     (get) => get(svgModelAtom).model?.getCanvasGeometry() ?? EMPTY_GEOMETRY
 );
 
-export const targetPointsAtom = atom<SvgCanvasPoint[]>(
+export const pathPointsAtom = atom<SvgCanvasPoint[]>(
     (get) => get(canvasGeometryAtom).targets
 );
 

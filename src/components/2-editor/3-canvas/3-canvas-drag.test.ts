@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { appSettings } from "@/store/0-ui-settings";
 import { canUndoAtom, doUndoPathAtom } from "@/store/0-atoms/1-2-history";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { targetPointsAtom } from "@/store/0-atoms/2-0-svg-model";
+import { pathPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { doSetPathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { canvasRootSvgElementAtom, canvasViewPortAtom, doSetViewPortAtom } from "@/store/0-atoms/2-3-canvas-viewport";
 import { isCanvasDraggingAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-editor-actions";
@@ -25,7 +25,7 @@ describe("canvas drag atoms", () => {
         store.set(svgPathInputAtom, "M 0 0 L 10 10");
 
         const startPath = store.get(svgPathInputAtom);
-        const point = store.get(targetPointsAtom)[1];
+        const point = store.get(pathPointsAtom)[1];
         expect(point).toBeDefined();
 
         store.set(doStartPointDragAtom, {

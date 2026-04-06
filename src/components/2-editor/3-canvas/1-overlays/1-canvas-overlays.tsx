@@ -6,7 +6,7 @@ import { isImageEditModeAtom } from "@/store/0-atoms/2-8-images";
 import { CanvasMainPathOverlay } from "./2-main-path";
 import { CanvasControlLines, CanvasControlPoints } from "./4-control-points-and-lines";
 import { CanvasHoveredSegmentOverlay, CanvasSegmentHitAreas, CanvasSelectedSegmentOverlay } from "./5-canvas-segment-overlays";
-import { CanvasTargetPoints } from "./3-target-points";
+import { CanvasPathPoints } from "./3-path-points";
 import { PathCanvasImageEditOverlays } from "./6-images";
 import { CanvasViewBoxFrame } from "./7-viewbox-frame";
 import { CanvasSelectionMarquee } from "../../../ui/loacal-ui/3-selection-marquee";
@@ -20,21 +20,23 @@ export function CanvasHelperOverlays() {
 
         {!canvasPreview && showViewBoxFrame && <CanvasViewBoxFrame />}
 
-        {!canvasPreview && (<>
-            <CanvasSegmentHitAreas />
-            <CanvasHoveredSegmentOverlay />
-            <CanvasSelectedSegmentOverlay />
+        {!canvasPreview &&
+            (<>
+                <CanvasSegmentHitAreas />
+                <CanvasHoveredSegmentOverlay />
+                <CanvasSelectedSegmentOverlay />
 
-            {!imageEditMode && showHelpers && (
-                <>
-                    <CanvasControlLines />
-                    <CanvasControlPoints />
-                    <CanvasTargetPoints />
-                </>
-            )}
+                {!imageEditMode && showHelpers && (
+                    <>
+                        <CanvasControlLines />
+                        <CanvasControlPoints />
+                        <CanvasPathPoints />
+                    </>
+                )}
 
-            <CanvasSelectionMarquee />
-        </>)}
+                <CanvasSelectionMarquee />
+            </>)
+        }
 
         <PathCanvasImageEditOverlays />
     </>);
