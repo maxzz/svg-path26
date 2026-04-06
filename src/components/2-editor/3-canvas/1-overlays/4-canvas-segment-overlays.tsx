@@ -1,4 +1,4 @@
-import { useAtomValue, useSetAtom } from "jotai";
+import { atom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { canvasStrokeWidthAtom, hoveredSegmentStrokeWidthAtom, selectedSegmentStrokeWidthAtom } from "../../../../store/0-atoms/2-3-canvas-viewport-derives";
 import { doRegisterCanvasSegmentHitAreaAtom, doSelectCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, hoveredStandaloneSegmentPathAtom, selectedCommandIndicesAtom, selectedStandaloneSegmentPathsAtom } from "@/store/0-atoms/2-4-editor-actions";
@@ -9,16 +9,57 @@ import { appSettings } from "@/store/0-ui-settings";
 import { doStartSelectedSegmentsDragAtom } from "../3-canvas-drag";
 import { getSegmentActiveStroke, getSegmentHoverStroke } from "./8-canvas-color-palette";
 
+const doCanvasSegmentHitAreaPointerDownAtom = atom(
+    null,
+    (get, set, args: { index: number; pointerId: number; clientX: number; clientY: number; shiftKey: boolean; ctrlKey: boolean; metaKey: boolean; }) => {
+        const selectedCommandIndices = get(selectedCommandIndicesAtom);
+        const pathValue = get(svgPathInputAtom);
+
+        if (selectedCommandIndices.includes(args.index) && !args.shiftKey && !args.ctrlKey && !args.metaKey) {
+            set(doStartSelectedSegmentsDragAtom, {
+                pointerId: args.pointerId,
+                clientX: args.clientX,
+                clientY: args.clientY,
+                startPath: pathValue,
+            });
+            return;
+        }
+
+        set(doSelectCommandAtom, {
+            index: args.index,
+            mode: getCommandSelectionMode({
+                shiftKey: args.shiftKey,
+                ctrlKey: args.ctrlKey,
+                metaKey: args.metaKey,
+            }),
+        });
+        set(hoveredCommandIndexAtom, args.index);
+        set(hoveredCanvasPointAtom, null);
+    }
+);
+
+const doCanvasSegmentHitAreaMouseEnterAtom = atom(
+    null,
+    (_get, set, args: { index: number; }) => {
+        set(hoveredCommandIndexAtom, args.index);
+        set(hoveredCanvasPointAtom, null);
+    }
+);
+
+const doCanvasSegmentHitAreaMouseLeaveAtom = atom(
+    null,
+    (_get, set) => {
+        set(hoveredCommandIndexAtom, null);
+    }
+);
+
 export function CanvasSegmentHitAreas() {
     const segmentPaths = useAtomValue(standaloneSegmentPathsAtom);
-    const pathValue = useAtomValue(svgPathInputAtom);
-    const selectedCommandIndices = useAtomValue(selectedCommandIndicesAtom);
     const canvasStrokeWidth = useAtomValue(canvasStrokeWidthAtom);
     const doRegisterSegmentHitArea = useSetAtom(doRegisterCanvasSegmentHitAreaAtom);
-    const doSelectCommand = useSetAtom(doSelectCommandAtom);
-    const startSelectedSegmentsDrag = useSetAtom(doStartSelectedSegmentsDragAtom);
-    const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
-    const setHoveredCanvasPoint = useSetAtom(hoveredCanvasPointAtom);
+    const doCanvasSegmentHitAreaPointerDown = useSetAtom(doCanvasSegmentHitAreaPointerDownAtom);
+    const doCanvasSegmentHitAreaMouseEnter = useSetAtom(doCanvasSegmentHitAreaMouseEnterAtom);
+    const doCanvasSegmentHitAreaMouseLeave = useSetAtom(doCanvasSegmentHitAreaMouseLeaveAtom);
 
     return segmentPaths.map(
         (segmentPath, index) => {
@@ -36,29 +77,25 @@ export function CanvasSegmentHitAreas() {
                     strokeWidth={Math.max(canvasStrokeWidth * 10, canvasStrokeWidth * 4)}
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    onPointerDown={(event) => {
-                        event.stopPropagation();
-
-                        if (selectedCommandIndices.includes(index) && !event.shiftKey && !event.ctrlKey && !event.metaKey) {
-                            startSelectedSegmentsDrag({
+                    onPointerDown={
+                        (event) => {
+                            event.stopPropagation();
+                            doCanvasSegmentHitAreaPointerDown({
+                                index,
                                 pointerId: event.pointerId,
                                 clientX: event.clientX,
                                 clientY: event.clientY,
-                                startPath: pathValue,
+                                shiftKey: event.shiftKey,
+                                ctrlKey: event.ctrlKey,
+                                metaKey: event.metaKey,
                             });
-                            return;
                         }
-
-                        doSelectCommand({ index, mode: getCommandSelectionMode(event) });
-                        setHoveredCommandIndex(index);
-                        setHoveredCanvasPoint(null);
-                    }}
+                    }
                     onMouseEnter={() => {
-                        setHoveredCommandIndex(index);
-                        setHoveredCanvasPoint(null);
+                        doCanvasSegmentHitAreaMouseEnter({ index });
                     }}
                     onMouseLeave={() => {
-                        setHoveredCommandIndex(null);
+                        doCanvasSegmentHitAreaMouseLeave();
                     }}
                     data-selection-hit="true"
                 />
