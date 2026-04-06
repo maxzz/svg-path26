@@ -9,24 +9,7 @@ import { appSettings } from "@/store/0-ui-settings";
 import { doStartSelectedSegmentsDragAtom } from "../3-canvas-drag";
 import { getSegmentActiveStroke, getSegmentHoverStroke } from "./8-canvas-color-palette";
 
-export function CanvasHoveredSegmentOverlay() {
-    const { darkCanvas } = useSnapshot(appSettings.canvas);
-    const hoveredSegmentPath = useAtomValue(hoveredStandaloneSegmentPathAtom);
-    const hoveredSegmentStrokeWidth = useAtomValue(hoveredSegmentStrokeWidthAtom);
-    if (!hoveredSegmentPath) return null;
-
-    return (
-        <path
-            fill="none"
-            stroke={getSegmentHoverStroke(darkCanvas)}
-            strokeWidth={hoveredSegmentStrokeWidth}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d={hoveredSegmentPath}
-            pointerEvents="none"
-        />
-    );
-}
+// Selected segment overlay
 
 export function CanvasSelectedSegmentOverlay() {
     const { darkCanvas } = useSnapshot(appSettings.canvas);
@@ -37,18 +20,20 @@ export function CanvasSelectedSegmentOverlay() {
     return selectedSegmentPaths.map(
         (selectedSegmentPath, index) => (
             <path
-                key={`selected-segment:${index}:${selectedSegmentPath}`}
-                fill="none"
-                stroke={getSegmentActiveStroke(darkCanvas)}
+                d={selectedSegmentPath}
                 strokeWidth={selectedSegmentStrokeWidth}
+                stroke={getSegmentActiveStroke(darkCanvas)}
+                fill="none"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d={selectedSegmentPath}
                 pointerEvents="none"
+                key={`selected-segment:${index}:${selectedSegmentPath}`}
             />
         )
     );
 }
+
+// Segment hit areas
 
 export function CanvasSegmentHitAreas() {
     const segmentPaths = useAtomValue(standaloneSegmentPathsAtom);
@@ -62,32 +47,20 @@ export function CanvasSegmentHitAreas() {
     return segmentPaths.map(
         (segmentPath, index) => {
             if (!segmentPath) return null;
-
             return (
                 <path
-                    key={`segment-hit:${index}`}
-                    ref={(element) => {
-                        doRegisterSegmentHitArea({ index, element });
-                    }}
+                    ref={(element) => { doRegisterSegmentHitArea({ index, element }); }}
                     d={segmentPath}
-                    fill="none"
-                    stroke="transparent"
                     strokeWidth={Math.max(canvasStrokeWidth * 10, canvasStrokeWidth * 4)}
+                    stroke="transparent"
+                    fill="none"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    onPointerDown={
-                        (event) => {
-                            event.stopPropagation();
-                            doCanvasSegmentHitAreaPointerDown(index, event);
-                        }
-                    }
-                    onMouseEnter={() => {
-                        doCanvasSegmentHitAreaMouseEnter({ index });
-                    }}
-                    onMouseLeave={() => {
-                        doCanvasSegmentHitAreaMouseLeave();
-                    }}
+                    onPointerDown={(event) => { event.stopPropagation(); doCanvasSegmentHitAreaPointerDown(index, event); }}
+                    onMouseEnter={() => { doCanvasSegmentHitAreaMouseEnter({ index }); }}
+                    onMouseLeave={() => { doCanvasSegmentHitAreaMouseLeave(); }}
                     data-selection-hit="true"
+                    key={`segment-hit:${index}`}
                 />
             );
         }
@@ -137,3 +110,24 @@ const doCanvasSegmentHitAreaMouseLeaveAtom = atom(
         set(hoveredCommandIndexAtom, null);
     }
 );
+
+// Hovered segment overlay
+
+export function CanvasHoveredSegmentOverlay() {
+    const { darkCanvas } = useSnapshot(appSettings.canvas);
+    const hoveredSegmentPath = useAtomValue(hoveredStandaloneSegmentPathAtom);
+    const hoveredSegmentStrokeWidth = useAtomValue(hoveredSegmentStrokeWidthAtom);
+    if (!hoveredSegmentPath) return null;
+
+    return (
+        <path
+            d={hoveredSegmentPath}
+            stroke={getSegmentHoverStroke(darkCanvas)}
+            strokeWidth={hoveredSegmentStrokeWidth}
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            pointerEvents="none"
+        />
+    );
+}
