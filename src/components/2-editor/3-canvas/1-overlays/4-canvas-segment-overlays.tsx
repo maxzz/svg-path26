@@ -78,8 +78,7 @@ export function CanvasSegmentHitAreas() {
                     onPointerDown={
                         (event) => {
                             event.stopPropagation();
-                            const { pointerId, clientX, clientY, shiftKey, ctrlKey, metaKey } = event;
-                            doCanvasSegmentHitAreaPointerDown(index, { pointerId, clientX, clientY, shiftKey, ctrlKey, metaKey });
+                            doCanvasSegmentHitAreaPointerDown(index, event);
                         }
                     }
                     onMouseEnter={() => {
@@ -97,15 +96,15 @@ export function CanvasSegmentHitAreas() {
 
 const doCanvasSegmentHitAreaPointerDownAtom = atom(
     null,
-    (get, set, index: number, args: { pointerId: number; clientX: number; clientY: number; shiftKey: boolean; ctrlKey: boolean; metaKey: boolean; }) => {
+    (get, set, index: number, event: { pointerId: number; clientX: number; clientY: number; shiftKey: boolean; ctrlKey: boolean; metaKey: boolean; }) => {
         const selectedCommandIndices = get(selectedCommandIndicesAtom);
         const pathValue = get(svgPathInputAtom);
 
-        if (selectedCommandIndices.includes(index) && !args.shiftKey && !args.ctrlKey && !args.metaKey) {
+        if (selectedCommandIndices.includes(index) && !event.shiftKey && !event.ctrlKey && !event.metaKey) {
             set(doStartSelectedSegmentsDragAtom, {
-                pointerId: args.pointerId,
-                clientX: args.clientX,
-                clientY: args.clientY,
+                pointerId: event.pointerId,
+                clientX: event.clientX,
+                clientY: event.clientY,
                 startPath: pathValue,
             });
             return;
@@ -114,9 +113,9 @@ const doCanvasSegmentHitAreaPointerDownAtom = atom(
         set(doSelectCommandAtom, {
             index,
             mode: getCommandSelectionMode({
-                shiftKey: args.shiftKey,
-                ctrlKey: args.ctrlKey,
-                metaKey: args.metaKey,
+                shiftKey: event.shiftKey,
+                ctrlKey: event.ctrlKey,
+                metaKey: event.metaKey,
             }),
         });
         set(hoveredCommandIndexAtom, index);
