@@ -90,7 +90,7 @@ function CanvasControlPoint(props: {
     const startPointDrag = useSetAtom(doStartPointDragAtom);
     const startSelectedSegmentsDrag = useSetAtom(doStartSelectedSegmentsDragAtom);
     const pointSize = unitsPerPixel * (point.movable ? 6 : 5);
-    const pointRadius = pointSize / 2;
+    const pointOffset = pointSize / 2;
     const haloSize = unitsPerPixel * 16;
     const haloOffset = haloSize / 2;
 
@@ -110,11 +110,12 @@ function CanvasControlPoint(props: {
             )}
 
             {/* Invisible hit area for pointer selection/dragging */}
-            <circle
+            <rect
                 className={getPointInteractionClassName(point.movable)}
-                cx={point.x}
-                cy={point.y}
-                r={pointRadius}
+                x={point.x - pointOffset}
+                y={point.y - pointOffset}
+                width={pointSize}
+                height={pointSize}
                 fill="transparent"
                 stroke="transparent"
                 strokeWidth={unitsPerPixel * 10}
@@ -146,11 +147,12 @@ function CanvasControlPoint(props: {
                 data-selection-hit="true"
             />
 
-            {/* Visible control point: unfilled ring unless selected */}
-            <circle
-                cx={point.x}
-                cy={point.y}
-                r={pointRadius}
+            {/* Visible control point: unfilled square unless selected */}
+            <rect
+                x={point.x - pointOffset}
+                y={point.y - pointOffset}
+                width={pointSize}
+                height={pointSize}
                 fill={selected ? controlPointColor : "none"}
                 stroke={controlPointColor}
                 strokeWidth={unitsPerPixel * (point.movable ? 2 : 1.5)}
