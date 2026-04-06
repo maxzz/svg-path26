@@ -80,14 +80,15 @@ export function CanvasSegmentHitAreas() {
                     onPointerDown={
                         (event) => {
                             event.stopPropagation();
+                            const { pointerId, clientX, clientY, shiftKey, ctrlKey, metaKey } = event;
                             doCanvasSegmentHitAreaPointerDown({
                                 index,
-                                pointerId: event.pointerId,
-                                clientX: event.clientX,
-                                clientY: event.clientY,
-                                shiftKey: event.shiftKey,
-                                ctrlKey: event.ctrlKey,
-                                metaKey: event.metaKey,
+                                pointerId,
+                                clientX,
+                                clientY,
+                                shiftKey,
+                                ctrlKey,
+                                metaKey,
                             });
                         }
                     }
