@@ -96,8 +96,8 @@ export const doStartMarqueeDragAtom = atom(
 
 export const doStartSelectedSegmentsDragAtom = atom(
     null,
-    (get, set, args: { pointerId: number; clientX: number; clientY: number; startPath: string; segmentIndices?: number[]; }) => {
-        const selection = args.segmentIndices?.length ? args.segmentIndices : get(selectedCommandIndicesAtom);
+    (get, set, startPath: string, segmentIndices: number[] | undefined, event: { pointerId: number; clientX: number; clientY: number; }) => {
+        const selection = segmentIndices?.length ? segmentIndices : get(selectedCommandIndicesAtom);
         if (!selection.length) return;
 
         const pathViewBox = get(pathViewBoxAtom);
@@ -110,11 +110,11 @@ export const doStartSelectedSegmentsDragAtom = atom(
         set(isCanvasDraggingAtom, true);
         set(canvasDragStateAtom, {
             mode: "selection",
-            pointerId: args.pointerId,
+            pointerId: event.pointerId,
             segmentIndices: selection,
-            startPath: args.startPath,
-            startClientX: args.clientX,
-            startClientY: args.clientY,
+            startPath,
+            startClientX: event.clientX,
+            startClientY: event.clientY,
             moved: false,
             viewBox: pathViewBox,
         });

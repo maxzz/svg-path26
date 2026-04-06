@@ -96,11 +96,10 @@ const doCanvasTargetPointPointerDownAtom = atom(
         set(hoveredCanvasPointAtom, point);
 
         if (selectedCommandIndices.includes(point.segmentIndex) && !event.shiftKey && !event.ctrlKey && !event.metaKey) {
-            set(doStartSelectedSegmentsDragAtom, {
+            set(doStartSelectedSegmentsDragAtom, pathValue, selectedCommandIndices, {
                 pointerId: event.pointerId,
                 clientX: event.clientX,
                 clientY: event.clientY,
-                startPath: pathValue,
             });
             return;
         }

@@ -58,11 +58,10 @@ describe("canvas drag atoms", () => {
         store.set(selectedCommandIndicesAtom, [1]);
 
         const startPath = store.get(svgPathInputAtom);
-        store.set(doStartSelectedSegmentsDragAtom, {
+        store.set(doStartSelectedSegmentsDragAtom, startPath, undefined, {
             pointerId: 2,
             clientX: 10,
             clientY: 10,
-            startPath,
         });
         store.set(doApplyActiveCanvasDragAtClientAtom, {
             clientX: 20,
