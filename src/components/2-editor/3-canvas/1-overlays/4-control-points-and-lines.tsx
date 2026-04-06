@@ -1,7 +1,7 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { type PointerEvent } from "react";
 import { useSnapshot } from "valtio";
-import { type SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
+import { type Point, type SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { canvasStrokeWidthAtom, canvasUnitsPerPixelAtom } from "../../../../store/0-atoms/2-3-canvas-viewport-derives";
 import { commandHoveredAtom, commandSelectedAtom, doFocusPointCommandAtom, doSelectCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-editor-actions";
@@ -20,38 +20,32 @@ export function CanvasControlLines() {
 
     return controlPoints.flatMap(
         (point: SvgCanvasPoint, pointIndex: number) => point.relations.map(
-            (relation, relationIndex) => (
+            (relation: Point, relationIndex: number) => (
                 <CanvasControlLine
-                    key={`line:${pointIndex}:${relationIndex}`}
                     point={point}
                     relation={relation}
                     darkCanvas={darkCanvas}
                     strokeWidth={strokeWidth}
+                    key={`line:${pointIndex}:${relationIndex}`}
                 />
             )
         )
     );
 }
 
-function CanvasControlLine(props: {
-    point: SvgCanvasPoint;
-    relation: { x: number; y: number; };
-    darkCanvas: boolean;
-    strokeWidth: number;
-}) {
-    const { point, relation, darkCanvas, strokeWidth } = props;
+function CanvasControlLine({ point, relation, darkCanvas, strokeWidth }: { point: SvgCanvasPoint; relation: { x: number; y: number; }; darkCanvas: boolean; strokeWidth: number; }) {
     const selected = useAtomValue(commandSelectedAtom(point.segmentIndex));
     const hovered = useAtomValue(commandHoveredAtom(point.segmentIndex));
 
     return (
         <line
-            stroke={getControlLineStroke(selected, hovered, darkCanvas)}
-            strokeWidth={strokeWidth}
-            strokeDasharray={`${strokeWidth * 3} ${strokeWidth * 5}`}
             x1={point.x}
             y1={point.y}
             x2={relation.x}
             y2={relation.y}
+            stroke={getControlLineStroke(selected, hovered, darkCanvas)}
+            strokeWidth={strokeWidth}
+            strokeDasharray={`${strokeWidth * 3} ${strokeWidth * 5}`}
             pointerEvents="none"
         />
     );
@@ -66,33 +60,24 @@ export function CanvasControlPoints() {
 
     return controlPoints.map(
         (point: SvgCanvasPoint) => (
-            <CanvasControlPoint
-                key={point.id}
-                point={point}
-                darkCanvas={darkCanvas}
-                unitsPerPixel={unitsPerPixel}
-            />
+            <CanvasControlPoint point={point} darkCanvas={darkCanvas} unitsPerPixel={unitsPerPixel} key={point.id} />
         )
     );
 }
 
-function CanvasControlPoint(props: {
-    point: SvgCanvasPoint;
-    darkCanvas: boolean;
-    unitsPerPixel: number;
-}) {
-    const { point, darkCanvas, unitsPerPixel } = props;
+function CanvasControlPoint({ point, darkCanvas, unitsPerPixel }: { point: SvgCanvasPoint; darkCanvas: boolean; unitsPerPixel: number; }) {
     const selected = useAtomValue(commandSelectedAtom(point.segmentIndex));
     const hovered = useAtomValue(commandHoveredAtom(point.segmentIndex));
     const controlPointColor = getControlPointFill(selected, hovered, darkCanvas);
-    const pointSize = unitsPerPixel * (point.movable ? 6 : 5);
-    const pointOffset = pointSize / 2;
-    const haloSize = unitsPerPixel * 16;
-    const haloOffset = haloSize / 2;
 
     const doCanvasControlPointPointerDown = useSetAtom(doCanvasControlPointPointerDownAtom);
     const doCanvasControlPointMouseEnter = useSetAtom(doCanvasControlPointMouseEnterAtom);
     const doCanvasControlPointMouseLeave = useSetAtom(doCanvasControlPointMouseLeaveAtom);
+
+    const pointSize = unitsPerPixel * (point.movable ? 6 : 5);
+    const pointOffset = pointSize / 2;
+    const haloSize = unitsPerPixel * 16;
+    const haloOffset = haloSize / 2;
 
     return (
         <g>
@@ -102,9 +87,9 @@ function CanvasControlPoint(props: {
                     y={point.y - haloOffset}
                     width={haloSize}
                     height={haloSize}
-                    fill={selected ? getControlHaloFill(selected, darkCanvas) : "none"}
                     stroke={getEditorStroke(darkCanvas)}
                     strokeWidth={unitsPerPixel * 6}
+                    fill={selected ? getControlHaloFill(selected, darkCanvas) : "none"}
                     pointerEvents="none"
                 />
             )}
@@ -116,13 +101,10 @@ function CanvasControlPoint(props: {
                 y={point.y - pointOffset}
                 width={pointSize}
                 height={pointSize}
-                fill="transparent"
-                stroke="transparent"
                 strokeWidth={unitsPerPixel * 10}
-                onPointerDown={(event) => {
-                    event.stopPropagation();
-                    doCanvasControlPointPointerDown(point, event);
-                }}
+                stroke="transparent"
+                fill="transparent"
+                onPointerDown={(event) => { event.stopPropagation(); doCanvasControlPointPointerDown(point, event); }}
                 onMouseEnter={() => { doCanvasControlPointMouseEnter(point); }}
                 onMouseLeave={() => { doCanvasControlPointMouseLeave(); }}
                 data-selection-hit="true"
@@ -134,9 +116,9 @@ function CanvasControlPoint(props: {
                 y={point.y - pointOffset}
                 width={pointSize}
                 height={pointSize}
-                fill={selected ? controlPointColor : "none"}
-                stroke={controlPointColor}
                 strokeWidth={unitsPerPixel * (point.movable ? 2 : 1.5)}
+                stroke={controlPointColor}
+                fill={selected ? controlPointColor : "none"}
                 pointerEvents="none"
             />
         </g>
