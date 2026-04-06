@@ -82,6 +82,7 @@ function CanvasControlPoint(props: {
     const { point, darkCanvas, pathValue, unitsPerPixel } = props;
     const selected = useAtomValue(commandSelectedAtom(point.segmentIndex));
     const hovered = useAtomValue(commandHoveredAtom(point.segmentIndex));
+    const controlPointColor = getControlPointFill(selected, hovered, darkCanvas);
     const doSelectCommand = useSetAtom(doSelectCommandAtom);
     const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
     const setHoveredCanvasPoint = useSetAtom(hoveredCanvasPointAtom);
@@ -89,7 +90,7 @@ function CanvasControlPoint(props: {
     const startPointDrag = useSetAtom(doStartPointDragAtom);
     const startSelectedSegmentsDrag = useSetAtom(doStartSelectedSegmentsDragAtom);
     const pointSize = unitsPerPixel * (point.movable ? 6 : 5);
-    const pointOffset = pointSize / 2;
+    const pointRadius = pointSize / 2;
     const haloSize = unitsPerPixel * 16;
     const haloOffset = haloSize / 2;
 
@@ -101,20 +102,20 @@ function CanvasControlPoint(props: {
                     y={point.y - haloOffset}
                     width={haloSize}
                     height={haloSize}
-                    fill={getControlHaloFill(selected, darkCanvas)}
+                    fill={selected ? getControlHaloFill(selected, darkCanvas) : "none"}
                     stroke={getEditorStroke(darkCanvas)}
                     strokeWidth={unitsPerPixel * 6}
                     pointerEvents="none"
                 />
             )}
 
-            <rect
+            {/* Invisible hit area for pointer selection/dragging */}
+            <circle
                 className={getPointInteractionClassName(point.movable)}
-                x={point.x - pointOffset}
-                y={point.y - pointOffset}
-                width={pointSize}
-                height={pointSize}
-                fill={getControlPointFill(selected, hovered, darkCanvas)}
+                cx={point.x}
+                cy={point.y}
+                r={pointRadius}
+                fill="transparent"
                 stroke="transparent"
                 strokeWidth={unitsPerPixel * 10}
                 onPointerDown={(event) => {
@@ -143,6 +144,17 @@ function CanvasControlPoint(props: {
                 onMouseEnter={() => { setHoveredCommandIndex(point.segmentIndex); setHoveredCanvasPoint(point); }}
                 onMouseLeave={() => { setHoveredCommandIndex(null); setHoveredCanvasPoint(null); }}
                 data-selection-hit="true"
+            />
+
+            {/* Visible control point: unfilled ring unless selected */}
+            <circle
+                cx={point.x}
+                cy={point.y}
+                r={pointRadius}
+                fill={selected ? controlPointColor : "none"}
+                stroke={controlPointColor}
+                strokeWidth={unitsPerPixel * (point.movable ? 2 : 1.5)}
+                pointerEvents="none"
             />
         </g>
     );
