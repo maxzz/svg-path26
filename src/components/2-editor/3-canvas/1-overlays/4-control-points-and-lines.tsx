@@ -125,11 +125,7 @@ function CanvasControlPoint(props: {
                     setHoveredCanvasPoint(point);
 
                     if (selected && !event.shiftKey && !event.ctrlKey && !event.metaKey) {
-                        startSelectedSegmentsDrag(pathValue, undefined, {
-                            pointerId: event.pointerId,
-                            clientX: event.clientX,
-                            clientY: event.clientY,
-                        });
+                        startSelectedSegmentsDrag(pathValue, undefined, event);
                         return;
                     }
 

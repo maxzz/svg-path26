@@ -75,11 +75,7 @@ const doCanvasSegmentHitAreaPointerDownAtom = atom(
         const pathValue = get(svgPathInputAtom);
 
         if (selectedCommandIndices.includes(index) && !event.shiftKey && !event.ctrlKey && !event.metaKey) {
-            set(doStartSelectedSegmentsDragAtom, pathValue, selectedCommandIndices, {
-                pointerId: event.pointerId,
-                clientX: event.clientX,
-                clientY: event.clientY,
-            });
+            set(doStartSelectedSegmentsDragAtom, pathValue, selectedCommandIndices, event);
             return;
         }
 
