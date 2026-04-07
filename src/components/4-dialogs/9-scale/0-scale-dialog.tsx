@@ -6,10 +6,10 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/shadcn/button";
 import { Switch } from "@/components/ui/shadcn/switch";
 
-import { pivotFromBounds, ScalePivotSelect } from "./1-scale-selection";
-import { ScalePreviewPane } from "./2-scale-preview-pane";
-import { ScaleModeSelector } from "./3-scale-mode-selector";
-import { ScaleMultiplierInputs } from "./4-scale-multiplier-inputs";
+import { pivotFromBounds, ScalePivotSelect } from "./3-scale-selection";
+import { ScalePreviewPane } from "./4-scale-preview-pane";
+import { ScaleModeSelector } from "./1-scale-mode-selector";
+import { ScaleMultiplierInputs } from "./2-scale-multiplier-inputs";
 import {
     doInitScaleDialogDraftAtom,
     scaleDialogLinkedAtom,
@@ -22,7 +22,7 @@ import {
     scaleDialogScaleYAtom,
     scaleDialogSelectionBoundsAtom,
     scaleDialogSelectionIndicesDraftAtom,
-} from "./5-scale-dialog-atoms";
+} from "./5-scale-atoms";
 
 import { doSetPathWithoutHistoryAtom } from "@/store/0-atoms/1-2-history";
 import { rawPathAtom } from "@/store/0-atoms/1-0-raw-path";

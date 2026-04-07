@@ -1,4 +1,4 @@
-import type { SelectionBounds } from "./1-scale-selection";
+import type { SelectionBounds } from "./3-scale-selection";
 
 export type ScalePreviewData = { path: string; bounds: SelectionBounds; };
 

@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 
 import { SvgPathModel } from "@/svg-core/2-svg-model";
-import { computeSelectionBounds, type SelectionBounds } from "./1-scale-selection";
+import { computeSelectionBounds, type SelectionBounds } from "./3-scale-selection";
 import type { ScaleDialogAxisMode, ScaleDialogPivotPoint } from "@/store/10-dialogs-ui-settings-types-and-defaults";
 import { canvasSegmentHitAreaElementsAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-editor-actions";
 import { rawPathAtom } from "@/store/0-atoms/1-0-raw-path";
