@@ -1,16 +1,6 @@
 import type { SelectionBounds } from "./3-scale-selection";
 
-export type ScalePreviewData = { path: string; bounds: SelectionBounds; };
-
-export function ScalePreviewPane({
-    preview,
-    fillPreview,
-    strokeWidth,
-}: {
-    preview: ScalePreviewData | null;
-    fillPreview: boolean;
-    strokeWidth: number;
-}) {
+export function ScalePreviewPane({ preview, fillPreview, strokeWidth }: { preview: { path: string; bounds: SelectionBounds; } | null; fillPreview: boolean; strokeWidth: number; }) {
     if (!preview) {
         return (
             <div className="h-56 flex items-center justify-center text-muted-foreground">
