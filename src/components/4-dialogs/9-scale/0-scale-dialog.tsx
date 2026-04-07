@@ -36,9 +36,6 @@ export function ScaleDialog() {
 
     const currentPath = useAtomValue(rawPathAtom);
 
-    const setSvgPathInput = useSetAtom(svgPathInputAtom);
-    const setPathWithoutHistory = useSetAtom(doSetPathWithoutHistoryAtom);
-
     const { strokeWidth } = useSnapshot(appSettings.pathEditor);
 
     const didInitRef = useRef(false);
@@ -53,6 +50,11 @@ export function ScaleDialog() {
     const linked = useAtomValue(scaleDialogLinkedAtom);
     const pivot = useAtomValue(scaleDialogPivotAtom);
     const previewOnCanvas = useAtomValue(scaleDialogPreviewOnCanvasAtom);
+
+    // set atoms
+
+    const setSvgPathInput = useSetAtom(svgPathInputAtom);
+    const setPathWithoutHistory = useSetAtom(doSetPathWithoutHistoryAtom);
 
     const setOriginalRawPath = useSetAtom(scaleDialogOriginalRawPathAtom);
     const setOriginalModel = useSetAtom(scaleDialogOriginalModelAtom);
@@ -70,44 +72,52 @@ export function ScaleDialog() {
 
     const closingWithOkRef = useRef(false);
 
-    useLayoutEffect(() => {
-        if (!open) return;
-        if (didInitRef.current) return;
-        didInitRef.current = true;
+    useLayoutEffect(
+        () => {
+            if (!open) return;
+            if (didInitRef.current) return;
+            didInitRef.current = true;
 
-        initScaleDialogDraft();
-    }, [open, initScaleDialogDraft]);
+            initScaleDialogDraft();
+        },
+        [open, initScaleDialogDraft]);
 
-    useEffect(() => {
-        if (open) return;
-        closingWithOkRef.current = false;
-        didInitRef.current = false;
-        setOriginalRawPath(null);
-        setOriginalModel(null);
-        setSelectionIndicesDraft([]);
-        setSelectionBounds(null);
-    }, [open]);
+    useEffect(
+        () => {
+            if (open) return;
+            closingWithOkRef.current = false;
+            didInitRef.current = false;
+            setOriginalRawPath(null);
+            setOriginalModel(null);
+            setSelectionIndicesDraft([]);
+            setSelectionBounds(null);
+        },
+        [open]);
 
     // Keep X and Y in sync when "linked" is enabled in uniform mode.
-    useEffect(() => {
-        if (mode !== "uniform") return;
-        if (!linked) return;
-        if (Math.abs(scaleY - scaleX) < 1e-12) return;
-        setScaleY(scaleX);
-    }, [mode, linked, scaleX]);
+    useEffect(
+        () => {
+            if (mode !== "uniform") return;
+            if (!linked) return;
+            if (Math.abs(scaleY - scaleX) < 1e-12) return;
+            setScaleY(scaleX);
+        },
+        [mode, linked, scaleX]);
 
     // Main-canvas preview:
-    useEffect(() => {
-        if (!open) return;
-        if (closingWithOkRef.current) return;
-        if (!originalRawPath) return;
+    useEffect(
+        () => {
+            if (!open) return;
+            if (closingWithOkRef.current) return;
+            if (!originalRawPath) return;
 
-        const nextPath = previewOnCanvas ? preview?.path : originalRawPath;
-        if (!nextPath) return;
+            const nextPath = previewOnCanvas ? preview?.path : originalRawPath;
+            if (!nextPath) return;
 
-        if (nextPath === currentPath) return;
-        setPathWithoutHistory(nextPath);
-    }, [open, previewOnCanvas, preview?.path, originalRawPath, currentPath, setPathWithoutHistory]);
+            if (nextPath === currentPath) return;
+            setPathWithoutHistory(nextPath);
+        },
+        [open, previewOnCanvas, preview?.path, originalRawPath, currentPath, setPathWithoutHistory]);
 
     function cancel() {
         // Prevent the live preview effect from re-applying the draft while we restore the original path.
@@ -139,18 +149,20 @@ export function ScaleDialog() {
     return (
         <Dialog
             open={open}
-            onOpenChange={(nextOpen) => {
-                if (nextOpen) {
-                    setOpen(true);
-                    return;
+            onOpenChange={
+                (nextOpen) => {
+                    if (nextOpen) {
+                        setOpen(true);
+                        return;
+                    }
+                    if (closingWithOkRef.current) {
+                        closingWithOkRef.current = false;
+                        setOpen(false);
+                        return;
+                    }
+                    cancel();
                 }
-                if (closingWithOkRef.current) {
-                    closingWithOkRef.current = false;
-                    setOpen(false);
-                    return;
-                }
-                cancel();
-            }}
+            }
         >
             <DialogContent className="max-w-2xl">
                 <DialogHeader>

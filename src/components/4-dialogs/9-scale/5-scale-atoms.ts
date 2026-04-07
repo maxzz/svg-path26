@@ -27,6 +27,9 @@ export const scaleDialogMinifyOutputAtom = createAtomAppSetting("minifyOutput");
 export const doInitScaleDialogDraftAtom = atom(
     null,
     (get, set) => {
+        // Note: we intentionally don't reset mode/scale/pivot here. When the dialog is reopened,
+        // `doInitScaleDialogDraftAtom` rehydrates them from persisted UI settings.
+
         const currentPath = get(rawPathAtom);
         set(scaleDialogOriginalRawPathAtom, currentPath);
 
@@ -57,43 +60,41 @@ export const doInitScaleDialogDraftAtom = atom(
     }
 );
 
-// Note: we intentionally don't reset mode/scale/pivot here. When the dialog is reopened,
-// `doInitScaleDialogDraftAtom` rehydrates them from persisted UI settings.
+export const scaleDialogPreviewAtom = atom(
+    (get) => {
+        const originalModel = get(scaleDialogOriginalModelAtom);
+        if (!originalModel) return null;
 
-export const scaleDialogPreviewAtom = atom((get) => {
-    const originalModel = get(scaleDialogOriginalModelAtom);
-    if (!originalModel) return null;
+        const selectionIndicesDraft = get(scaleDialogSelectionIndicesDraftAtom);
+        if (!selectionIndicesDraft.length) return null;
 
-    const selectionIndicesDraft = get(scaleDialogSelectionIndicesDraftAtom);
-    if (!selectionIndicesDraft.length) return null;
+        const selectionBounds = get(scaleDialogSelectionBoundsAtom);
+        if (!selectionBounds) return null;
 
-    const selectionBounds = get(scaleDialogSelectionBoundsAtom);
-    if (!selectionBounds) return null;
+        const mode = get(scaleDialogModeAtom);
+        const scaleX = get(scaleDialogScaleXAtom);
+        const scaleY = get(scaleDialogScaleYAtom);
+        const linked = get(scaleDialogLinkedAtom);
+        const pivot = get(scaleDialogPivotAtom);
 
-    const mode = get(scaleDialogModeAtom);
-    const scaleX = get(scaleDialogScaleXAtom);
-    const scaleY = get(scaleDialogScaleYAtom);
-    const linked = get(scaleDialogLinkedAtom);
-    const pivot = get(scaleDialogPivotAtom);
+        const pivotPoint = pivotFromBounds(selectionBounds, pivot);
 
-    const pivotPoint = pivotFromBounds(selectionBounds, pivot);
+        const effectiveScaleX = mode === "uniform" || mode === "x" ? scaleX : 1;
+        const effectiveScaleY = mode === "uniform"
+            ? (linked ? scaleX : scaleY)
+            : mode === "y"
+                ? scaleY
+                : 1;
 
-    const effectiveScaleX = mode === "uniform" || mode === "x" ? scaleX : 1;
-    const effectiveScaleY = mode === "uniform"
-        ? (linked ? scaleX : scaleY)
-        : mode === "y"
-            ? scaleY
-            : 1;
+        const decimals = get(scaleDialogDecimalsAtom);
+        const minifyOutput = get(scaleDialogMinifyOutputAtom);
 
-    const decimals = get(scaleDialogDecimalsAtom);
-    const minifyOutput = get(scaleDialogMinifyOutputAtom);
+        const model = originalModel.clone();
+        model.scaleSegments(selectionIndicesDraft, effectiveScaleX, effectiveScaleY, pivotPoint);
 
-    const model = originalModel.clone();
-    model.scaleSegments(selectionIndicesDraft, effectiveScaleX, effectiveScaleY, pivotPoint);
+        const path = model.toString(decimals, minifyOutput);
+        const bounds = model.getBounds();
 
-    const path = model.toString(decimals, minifyOutput);
-    const bounds = model.getBounds();
-
-    return { path, bounds };
-});
-
+        return { path, bounds };
+    }
+);
