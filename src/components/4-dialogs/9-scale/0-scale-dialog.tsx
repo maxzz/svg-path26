@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 
@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/shadcn/button";
 import { Switch } from "@/components/ui/shadcn/switch";
 
-import { pivotFromBounds, ScalePivotSelect } from "./3-scale-selection";
+import { ScalePivotSelect } from "./3-scale-selection";
 import { ScalePreviewPane } from "./4-scale-preview-pane";
 import { ScaleModeSelector } from "./1-scale-mode-selector";
 import { ScaleMultiplierInputs } from "./2-scale-multiplier-inputs";
@@ -17,6 +17,7 @@ import {
     scaleDialogOriginalModelAtom,
     scaleDialogOriginalRawPathAtom,
     scaleDialogPivotAtom,
+    scaleDialogPreviewAtom,
     scaleDialogPreviewOnCanvasAtom,
     scaleDialogScaleXAtom,
     scaleDialogScaleYAtom,
@@ -38,14 +39,13 @@ export function ScaleDialog() {
     const setSvgPathInput = useSetAtom(svgPathInputAtom);
     const setPathWithoutHistory = useSetAtom(doSetPathWithoutHistoryAtom);
 
-    const { decimals, minifyOutput, strokeWidth } = useSnapshot(appSettings.pathEditor);
+    const { strokeWidth } = useSnapshot(appSettings.pathEditor);
 
     const didInitRef = useRef(false);
 
     const originalRawPath = useAtomValue(scaleDialogOriginalRawPathAtom);
-    const originalModel = useAtomValue(scaleDialogOriginalModelAtom);
-    const selectionIndicesDraft = useAtomValue(scaleDialogSelectionIndicesDraftAtom);
     const selectionBounds = useAtomValue(scaleDialogSelectionBoundsAtom);
+    const preview = useAtomValue(scaleDialogPreviewAtom);
 
     const mode = useAtomValue(scaleDialogModeAtom);
     const scaleX = useAtomValue(scaleDialogScaleXAtom);
@@ -95,45 +95,6 @@ export function ScaleDialog() {
         if (Math.abs(scaleY - scaleX) < 1e-12) return;
         setScaleY(scaleX);
     }, [mode, linked, scaleX]);
-
-    const pivotPoint = useMemo(() => {
-        if (!selectionBounds) return null;
-        return pivotFromBounds(selectionBounds, pivot);
-    }, [selectionBounds, pivot]);
-
-    const preview = useMemo(() => {
-        if (!originalModel) return null;
-        if (!selectionIndicesDraft.length) return null;
-        if (!pivotPoint) return null;
-
-        const effectiveScaleX = mode === "uniform" || mode === "x" ? scaleX : 1;
-        const effectiveScaleY = mode === "uniform"
-            ? (linked ? scaleX : scaleY)
-            : mode === "y"
-                ? scaleY
-                : 1;
-
-        const model = originalModel.clone();
-        model.scaleSegments(selectionIndicesDraft, effectiveScaleX, effectiveScaleY, pivotPoint);
-
-        const path = model.toString(decimals, minifyOutput);
-        const bounds = model.getBounds();
-
-        return {
-            path,
-            bounds,
-        };
-    }, [
-        originalModel,
-        selectionIndicesDraft,
-        pivotPoint,
-        mode,
-        scaleX,
-        scaleY,
-        linked,
-        decimals,
-        minifyOutput,
-    ]);
 
     // Main-canvas preview:
     useEffect(() => {
