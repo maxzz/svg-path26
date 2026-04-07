@@ -173,6 +173,101 @@ function ScalePivotSelect({ pivot, onChange, disabled }: { pivot: ScaleDialogPiv
     );
 }
 
+function ScaleMultiplierInputs({
+    mode,
+    scaleX,
+    scaleY,
+    linked,
+    onSetScaleX,
+    onSetScaleY,
+    onSetLinked,
+}: {
+    mode: ScaleDialogAxisMode;
+    scaleX: number;
+    scaleY: number;
+    linked: boolean;
+    onSetScaleX: (next: number) => void;
+    onSetScaleY: (next: number) => void;
+    onSetLinked: (next: boolean) => void;
+}) {
+    if (mode === "uniform") {
+        return (
+            <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-end">
+                <label className="space-y-1">
+                    <span className="text-muted-foreground">X multiplier</span>
+                    <Input
+                        type="number"
+                        step={0.1}
+                        value={scaleX}
+                        onChange={(event) => {
+                            const next = Number(event.target.value);
+                            onSetScaleX(next);
+                            if (linked) onSetScaleY(next);
+                        }}
+                    />
+                </label>
+
+                <button
+                    type="button"
+                    className="h-8 w-8 inline-flex items-center justify-center rounded border bg-background hover:bg-muted/50"
+                    title={linked ? "Unlink X and Y" : "Link X and Y"}
+                    onClick={() => {
+                        const nextLinked = !linked;
+                        if (nextLinked) onSetScaleY(scaleX);
+                        onSetLinked(nextLinked);
+                    }}
+                >
+                    {linked ? <Link2 className="size-4" /> : <Unlink2 className="size-4" />}
+                </button>
+
+                <label className="space-y-1">
+                    <span className="text-muted-foreground">Y multiplier</span>
+                    <Input
+                        type="number"
+                        step={0.1}
+                        value={scaleY}
+                        onChange={(event) => {
+                            const next = Number(event.target.value);
+                            onSetScaleY(next);
+                            if (linked) onSetScaleX(next);
+                        }}
+                    />
+                </label>
+            </div>
+        );
+    }
+
+    if (mode === "x") {
+        return (
+            <div className="grid grid-cols-1 gap-3">
+                <label className="space-y-1">
+                    <span className="text-muted-foreground">X multiplier</span>
+                    <Input
+                        type="number"
+                        step={0.1}
+                        value={scaleX}
+                        onChange={(event) => onSetScaleX(Number(event.target.value))}
+                    />
+                </label>
+            </div>
+        );
+    }
+
+    return (
+        <div className="grid grid-cols-1 gap-3">
+            <label className="space-y-1">
+                <span className="text-muted-foreground">Y multiplier</span>
+                <Input
+                    type="number"
+                    step={0.1}
+                    value={scaleY}
+                    onChange={(event) => onSetScaleY(Number(event.target.value))}
+                />
+            </label>
+        </div>
+    );
+}
+
 function ScaleModeSelector({ mode, onChange }: { mode: ScaleDialogAxisMode; onChange: (next: ScaleDialogAxisMode) => void; }) {
     return (
         <div className="rounded border p-3">
@@ -390,78 +485,15 @@ export function ScaleDialog() {
                     <div className="rounded border p-3">
                         <div className="mb-2 text-[11px] text-muted-foreground">Scale inputs</div>
 
-                        {mode === "uniform" ? (
-                            <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-end">
-                                <label className="space-y-1">
-                                    <span className="text-muted-foreground">X multiplier</span>
-                                    <Input
-                                        type="number"
-                                        step={0.1}
-                                        value={scaleX}
-                                        onChange={(event) => {
-                                            const next = Number(event.target.value);
-                                            setScaleX(next);
-                                            if (linked) setScaleY(next);
-                                        }}
-                                    />
-                                </label>
-
-                                <button
-                                    type="button"
-                                    className="h-8 w-8 inline-flex items-center justify-center rounded border bg-background hover:bg-muted/50"
-                                    title={linked ? "Unlink X and Y" : "Link X and Y"}
-                                    onClick={() => {
-                                        setLinked((previous) => {
-                                            const next = !previous;
-                                            if (next) {
-                                                setScaleY(scaleX);
-                                            }
-                                            return next;
-                                        });
-                                    }}
-                                >
-                                    {linked ? <Link2 className="size-4" /> : <Unlink2 className="size-4" />}
-                                </button>
-
-                                <label className="space-y-1">
-                                    <span className="text-muted-foreground">Y multiplier</span>
-                                    <Input
-                                        type="number"
-                                        step={0.1}
-                                        value={scaleY}
-                                        onChange={(event) => {
-                                            const next = Number(event.target.value);
-                                            setScaleY(next);
-                                            if (linked) setScaleX(next);
-                                        }}
-                                    />
-                                </label>
-                            </div>
-                        ) : mode === "x" ? (
-                            <div className="grid grid-cols-1 gap-3">
-                                <label className="space-y-1">
-                                    <span className="text-muted-foreground">X multiplier</span>
-                                    <Input
-                                        type="number"
-                                        step={0.1}
-                                        value={scaleX}
-                                        onChange={(event) => setScaleX(Number(event.target.value))}
-                                    />
-                                </label>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 gap-3">
-                                <label className="space-y-1">
-                                    <span className="text-muted-foreground">Y multiplier</span>
-                                    <Input
-                                        type="number"
-                                        step={0.1}
-                                        value={scaleY}
-                                        onChange={(event) => setScaleY(Number(event.target.value))}
-                                    />
-                                </label>
-                            </div>
-                        )}
+                        <ScaleMultiplierInputs
+                            mode={mode}
+                            scaleX={scaleX}
+                            scaleY={scaleY}
+                            linked={linked}
+                            onSetScaleX={setScaleX}
+                            onSetScaleY={setScaleY}
+                            onSetLinked={(next) => setLinked(next)}
+                        />
                     </div>
 
                     <ScalePivotSelect
