@@ -40,22 +40,24 @@ export function ScaleDialog() {
 
     // set atoms
 
-    const setSvgPathInput = useSetAtom(svgPathInputAtom);
-    const setPathWithoutHistory = useSetAtom(doSetPathWithoutHistoryAtom);
+    const doSetSvgPathInput = useSetAtom(svgPathInputAtom);
+    const doSetPathWithoutHistory = useSetAtom(doSetPathWithoutHistoryAtom);
 
-    const setOriginalRawPath = useSetAtom(scaleAtoms.scaleDialogOriginalRawPathAtom);
-    const setOriginalModel = useSetAtom(scaleAtoms.scaleDialogOriginalModelAtom);
-    const setSelectionIndicesDraft = useSetAtom(scaleAtoms.scaleDialogSelectionIndicesDraftAtom);
-    const setSelectionBounds = useSetAtom(scaleAtoms.scaleDialogSelectionBoundsAtom);
+    const doSetOriginalRawPath = useSetAtom(scaleAtoms.scaleDialogOriginalRawPathAtom);
+    const doSetOriginalModel = useSetAtom(scaleAtoms.scaleDialogOriginalModelAtom);
+    const doSetSelectionIndicesDraft = useSetAtom(scaleAtoms.scaleDialogSelectionIndicesDraftAtom);
+    const doSetSelectionBounds = useSetAtom(scaleAtoms.scaleDialogSelectionBoundsAtom);
 
-    const setMode = useSetAtom(scaleAtoms.scaleDialogModeAtom);
-    const setScaleX = useSetAtom(scaleAtoms.scaleDialogScaleXAtom);
-    const setScaleY = useSetAtom(scaleAtoms.scaleDialogScaleYAtom);
-    const setLinked = useSetAtom(scaleAtoms.scaleDialogLinkedAtom);
-    const setPivot = useSetAtom(scaleAtoms.scaleDialogPivotAtom);
-    const setPreviewOnCanvas = useSetAtom(scaleAtoms.scaleDialogPreviewOnCanvasAtom);
+    const doSetMode = useSetAtom(scaleAtoms.scaleDialogModeAtom);
+    const doSetScaleX = useSetAtom(scaleAtoms.scaleDialogScaleXAtom);
+    const doSetScaleY = useSetAtom(scaleAtoms.scaleDialogScaleYAtom);
+    const doSetLinked = useSetAtom(scaleAtoms.scaleDialogLinkedAtom);
+    const doSetPivot = useSetAtom(scaleAtoms.scaleDialogPivotAtom);
+    const doSetPreviewOnCanvas = useSetAtom(scaleAtoms.scaleDialogPreviewOnCanvasAtom);
 
-    const initScaleDialogDraft = useSetAtom(scaleAtoms.doInitScaleDialogDraftAtom);
+    const doInitScaleDialogDraft = useSetAtom(scaleAtoms.doInitScaleDialogDraftAtom);
+
+    // dialog open/close lifecycle. TODO: use promises instead of refs.
 
     const closingWithOkRef = useRef(false);
 
@@ -65,19 +67,19 @@ export function ScaleDialog() {
             if (didInitRef.current) return;
             didInitRef.current = true;
 
-            initScaleDialogDraft();
+            doInitScaleDialogDraft();
         },
-        [open, initScaleDialogDraft]);
+        [open, doInitScaleDialogDraft]);
 
     useEffect(
         () => {
             if (open) return;
             closingWithOkRef.current = false;
             didInitRef.current = false;
-            setOriginalRawPath(null);
-            setOriginalModel(null);
-            setSelectionIndicesDraft([]);
-            setSelectionBounds(null);
+            doSetOriginalRawPath(null);
+            doSetOriginalModel(null);
+            doSetSelectionIndicesDraft([]);
+            doSetSelectionBounds(null);
         },
         [open]);
 
@@ -87,7 +89,7 @@ export function ScaleDialog() {
             if (mode !== "uniform") return;
             if (!linked) return;
             if (Math.abs(scaleY - scaleX) < 1e-12) return;
-            setScaleY(scaleX);
+            doSetScaleY(scaleX);
         },
         [mode, linked, scaleX]);
 
@@ -102,16 +104,16 @@ export function ScaleDialog() {
             if (!nextPath) return;
 
             if (nextPath === currentPath) return;
-            setPathWithoutHistory(nextPath);
+            doSetPathWithoutHistory(nextPath);
         },
-        [open, previewOnCanvas, preview?.path, originalRawPath, currentPath, setPathWithoutHistory]);
+        [open, previewOnCanvas, preview?.path, originalRawPath, currentPath, doSetPathWithoutHistory]);
 
     function cancel() {
         // Prevent the live preview effect from re-applying the draft while we restore the original path.
         closingWithOkRef.current = true;
         const restorePath = originalRawPath ?? currentPath;
         if (restorePath) {
-            setPathWithoutHistory(restorePath);
+            doSetPathWithoutHistory(restorePath);
         }
         setOpen(false);
     }
@@ -129,7 +131,7 @@ export function ScaleDialog() {
         dialogsSettings.scale.pivot = pivot;
         dialogsSettings.scale.previewOnCanvas = previewOnCanvas;
 
-        setSvgPathInput(preview.path);
+        doSetSvgPathInput(preview.path);
         setOpen(false);
     }
 
@@ -160,7 +162,7 @@ export function ScaleDialog() {
                 </DialogHeader>
 
                 <div className="space-y-4 text-xs">
-                    <ScaleModeSelector mode={mode} onChange={(next) => setMode(next)} />
+                    <ScaleModeSelector mode={mode} onChange={(next) => doSetMode(next)} />
 
                     <div className="rounded border p-3">
                         <div className="mb-2 text-[11px] text-muted-foreground">Scale inputs</div>
@@ -170,21 +172,21 @@ export function ScaleDialog() {
                             scaleX={scaleX}
                             scaleY={scaleY}
                             linked={linked}
-                            onSetScaleX={setScaleX}
-                            onSetScaleY={setScaleY}
-                            onSetLinked={(next) => setLinked(next)}
+                            onSetScaleX={doSetScaleX}
+                            onSetScaleY={doSetScaleY}
+                            onSetLinked={(next) => doSetLinked(next)}
                         />
                     </div>
 
                     <ScalePivotSelect
                         pivot={pivot}
-                        onChange={(next) => setPivot(next)}
+                        onChange={(next) => doSetPivot(next)}
                         disabled={!selectionBounds}
                     />
 
                     <div className="rounded border p-3 flex items-center justify-between gap-2">
                         <span className="text-[11px] text-muted-foreground">Preview on main canvas</span>
-                        <Switch checked={previewOnCanvas} onCheckedChange={(checked) => setPreviewOnCanvas(Boolean(checked))} />
+                        <Switch checked={previewOnCanvas} onCheckedChange={(checked) => doSetPreviewOnCanvas(Boolean(checked))} />
                     </div>
 
                     <div className="rounded border p-3">
