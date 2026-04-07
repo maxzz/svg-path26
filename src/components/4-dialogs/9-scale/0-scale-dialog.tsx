@@ -10,20 +10,7 @@ import { ScalePivotSelect } from "./3-scale-selection";
 import { ScalePreviewPane } from "./4-scale-preview-pane";
 import { ScaleModeSelector } from "./1-scale-mode-selector";
 import { ScaleMultiplierInputs } from "./2-scale-multiplier-inputs";
-import {
-    doInitScaleDialogDraftAtom,
-    scaleDialogLinkedAtom,
-    scaleDialogModeAtom,
-    scaleDialogOriginalModelAtom,
-    scaleDialogOriginalRawPathAtom,
-    scaleDialogPivotAtom,
-    scaleDialogPreviewAtom,
-    scaleDialogPreviewOnCanvasAtom,
-    scaleDialogScaleXAtom,
-    scaleDialogScaleYAtom,
-    scaleDialogSelectionBoundsAtom,
-    scaleDialogSelectionIndicesDraftAtom,
-} from "./5-scale-atoms";
+import * as scaleAtoms from "./5-scale-atoms";
 
 import { doSetPathWithoutHistoryAtom } from "@/store/0-atoms/1-2-history";
 import { rawPathAtom } from "@/store/0-atoms/1-0-raw-path";
@@ -40,35 +27,35 @@ export function ScaleDialog() {
 
     const didInitRef = useRef(false);
 
-    const originalRawPath = useAtomValue(scaleDialogOriginalRawPathAtom);
-    const selectionBounds = useAtomValue(scaleDialogSelectionBoundsAtom);
-    const preview = useAtomValue(scaleDialogPreviewAtom);
+    const originalRawPath = useAtomValue(scaleAtoms.scaleDialogOriginalRawPathAtom);
+    const selectionBounds = useAtomValue(scaleAtoms.scaleDialogSelectionBoundsAtom);
+    const preview = useAtomValue(scaleAtoms.scaleDialogPreviewAtom);
 
-    const mode = useAtomValue(scaleDialogModeAtom);
-    const scaleX = useAtomValue(scaleDialogScaleXAtom);
-    const scaleY = useAtomValue(scaleDialogScaleYAtom);
-    const linked = useAtomValue(scaleDialogLinkedAtom);
-    const pivot = useAtomValue(scaleDialogPivotAtom);
-    const previewOnCanvas = useAtomValue(scaleDialogPreviewOnCanvasAtom);
+    const mode = useAtomValue(scaleAtoms.scaleDialogModeAtom);
+    const scaleX = useAtomValue(scaleAtoms.scaleDialogScaleXAtom);
+    const scaleY = useAtomValue(scaleAtoms.scaleDialogScaleYAtom);
+    const linked = useAtomValue(scaleAtoms.scaleDialogLinkedAtom);
+    const pivot = useAtomValue(scaleAtoms.scaleDialogPivotAtom);
+    const previewOnCanvas = useAtomValue(scaleAtoms.scaleDialogPreviewOnCanvasAtom);
 
     // set atoms
 
     const setSvgPathInput = useSetAtom(svgPathInputAtom);
     const setPathWithoutHistory = useSetAtom(doSetPathWithoutHistoryAtom);
 
-    const setOriginalRawPath = useSetAtom(scaleDialogOriginalRawPathAtom);
-    const setOriginalModel = useSetAtom(scaleDialogOriginalModelAtom);
-    const setSelectionIndicesDraft = useSetAtom(scaleDialogSelectionIndicesDraftAtom);
-    const setSelectionBounds = useSetAtom(scaleDialogSelectionBoundsAtom);
+    const setOriginalRawPath = useSetAtom(scaleAtoms.scaleDialogOriginalRawPathAtom);
+    const setOriginalModel = useSetAtom(scaleAtoms.scaleDialogOriginalModelAtom);
+    const setSelectionIndicesDraft = useSetAtom(scaleAtoms.scaleDialogSelectionIndicesDraftAtom);
+    const setSelectionBounds = useSetAtom(scaleAtoms.scaleDialogSelectionBoundsAtom);
 
-    const setMode = useSetAtom(scaleDialogModeAtom);
-    const setScaleX = useSetAtom(scaleDialogScaleXAtom);
-    const setScaleY = useSetAtom(scaleDialogScaleYAtom);
-    const setLinked = useSetAtom(scaleDialogLinkedAtom);
-    const setPivot = useSetAtom(scaleDialogPivotAtom);
-    const setPreviewOnCanvas = useSetAtom(scaleDialogPreviewOnCanvasAtom);
+    const setMode = useSetAtom(scaleAtoms.scaleDialogModeAtom);
+    const setScaleX = useSetAtom(scaleAtoms.scaleDialogScaleXAtom);
+    const setScaleY = useSetAtom(scaleAtoms.scaleDialogScaleYAtom);
+    const setLinked = useSetAtom(scaleAtoms.scaleDialogLinkedAtom);
+    const setPivot = useSetAtom(scaleAtoms.scaleDialogPivotAtom);
+    const setPreviewOnCanvas = useSetAtom(scaleAtoms.scaleDialogPreviewOnCanvasAtom);
 
-    const initScaleDialogDraft = useSetAtom(doInitScaleDialogDraftAtom);
+    const initScaleDialogDraft = useSetAtom(scaleAtoms.doInitScaleDialogDraftAtom);
 
     const closingWithOkRef = useRef(false);
 
