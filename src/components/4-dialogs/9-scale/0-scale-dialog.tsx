@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 
@@ -7,10 +7,22 @@ import { Button } from "@/components/ui/shadcn/button";
 import { Switch } from "@/components/ui/shadcn/switch";
 
 import { SvgPathModel } from "@/svg-core/2-svg-model";
-import { computeSelectionBounds, pivotFromBounds, ScalePivotSelect, type SelectionBounds } from "./1-scale-selection";
+import { computeSelectionBounds, pivotFromBounds, ScalePivotSelect } from "./1-scale-selection";
 import { ScalePreviewPane } from "./2-scale-preview-pane";
 import { ScaleModeSelector } from "./3-scale-mode-selector";
 import { ScaleMultiplierInputs } from "./4-scale-multiplier-inputs";
+import {
+    scaleDialogLinkedAtom,
+    scaleDialogModeAtom,
+    scaleDialogOriginalModelAtom,
+    scaleDialogOriginalRawPathAtom,
+    scaleDialogPivotAtom,
+    scaleDialogPreviewOnCanvasAtom,
+    scaleDialogScaleXAtom,
+    scaleDialogScaleYAtom,
+    scaleDialogSelectionBoundsAtom,
+    scaleDialogSelectionIndicesDraftAtom,
+} from "./5-scale-dialog-atoms";
 
 import { canvasSegmentHitAreaElementsAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-editor-actions";
 import { doSetPathWithoutHistoryAtom } from "@/store/0-atoms/1-2-history";
@@ -18,7 +30,6 @@ import { rawPathAtom } from "@/store/0-atoms/1-0-raw-path";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { scaleDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 import { appSettings, dialogsSettings } from "@/store/0-ui-settings";
-import type { ScaleDialogAxisMode, ScaleDialogPivotPoint } from "@/store/10-dialogs-ui-settings-types-and-defaults";
 
 export function ScaleDialog() {
     const [open, setOpen] = useAtom(scaleDialogOpenAtom);
@@ -33,21 +44,31 @@ export function ScaleDialog() {
     const { decimals, minifyOutput, strokeWidth } = useSnapshot(appSettings.pathEditor);
     const scaleUiSettingsSnapshot = useSnapshot(dialogsSettings.scale);
 
-    const originalRawPathRef = useRef<string | null>(null);
     const didInitRef = useRef(false);
 
-    const [originalRawPath, setOriginalRawPath] = useState<string | null>(null);
-    const [originalModel, setOriginalModel] = useState<SvgPathModel | null>(null);
-    const [selectionIndicesDraft, setSelectionIndicesDraft] = useState<number[]>([]);
-    const [selectionBounds, setSelectionBounds] = useState<SelectionBounds | null>(null);
+    const originalRawPath = useAtomValue(scaleDialogOriginalRawPathAtom);
+    const originalModel = useAtomValue(scaleDialogOriginalModelAtom);
+    const selectionIndicesDraft = useAtomValue(scaleDialogSelectionIndicesDraftAtom);
+    const selectionBounds = useAtomValue(scaleDialogSelectionBoundsAtom);
 
-    // Draft controls:
-    const [mode, setMode] = useState<ScaleDialogAxisMode>("uniform");
-    const [scaleX, setScaleX] = useState<number>(1);
-    const [scaleY, setScaleY] = useState<number>(1);
-    const [linked, setLinked] = useState<boolean>(true);
-    const [pivot, setPivot] = useState<ScaleDialogPivotPoint>("center");
-    const [previewOnCanvas, setPreviewOnCanvas] = useState<boolean>(false);
+    const mode = useAtomValue(scaleDialogModeAtom);
+    const scaleX = useAtomValue(scaleDialogScaleXAtom);
+    const scaleY = useAtomValue(scaleDialogScaleYAtom);
+    const linked = useAtomValue(scaleDialogLinkedAtom);
+    const pivot = useAtomValue(scaleDialogPivotAtom);
+    const previewOnCanvas = useAtomValue(scaleDialogPreviewOnCanvasAtom);
+
+    const setOriginalRawPath = useSetAtom(scaleDialogOriginalRawPathAtom);
+    const setOriginalModel = useSetAtom(scaleDialogOriginalModelAtom);
+    const setSelectionIndicesDraft = useSetAtom(scaleDialogSelectionIndicesDraftAtom);
+    const setSelectionBounds = useSetAtom(scaleDialogSelectionBoundsAtom);
+
+    const setMode = useSetAtom(scaleDialogModeAtom);
+    const setScaleX = useSetAtom(scaleDialogScaleXAtom);
+    const setScaleY = useSetAtom(scaleDialogScaleYAtom);
+    const setLinked = useSetAtom(scaleDialogLinkedAtom);
+    const setPivot = useSetAtom(scaleDialogPivotAtom);
+    const setPreviewOnCanvas = useSetAtom(scaleDialogPreviewOnCanvasAtom);
 
     const closingWithOkRef = useRef(false);
 
@@ -57,7 +78,6 @@ export function ScaleDialog() {
         didInitRef.current = true;
 
         const nextOriginalRawPath = currentPath;
-        originalRawPathRef.current = nextOriginalRawPath;
         setOriginalRawPath(nextOriginalRawPath);
 
         let parsedModel: SvgPathModel | null = null;
@@ -89,7 +109,6 @@ export function ScaleDialog() {
         if (open) return;
         closingWithOkRef.current = false;
         didInitRef.current = false;
-        originalRawPathRef.current = null;
         setOriginalRawPath(null);
         setOriginalModel(null);
         setSelectionIndicesDraft([]);
@@ -159,7 +178,7 @@ export function ScaleDialog() {
     function cancel() {
         // Prevent the live preview effect from re-applying the draft while we restore the original path.
         closingWithOkRef.current = true;
-        const restorePath = originalRawPathRef.current ?? currentPath;
+        const restorePath = originalRawPath ?? currentPath;
         if (restorePath) {
             setPathWithoutHistory(restorePath);
         }
@@ -201,7 +220,9 @@ export function ScaleDialog() {
         >
             <DialogContent className="max-w-2xl">
                 <DialogHeader>
-                    <DialogTitle>Scale</DialogTitle>
+                    <DialogTitle>
+                        Scale
+                    </DialogTitle>
                     <DialogDescription>Scale selected elements with a chosen pivot point.</DialogDescription>
                 </DialogHeader>
 
