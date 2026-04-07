@@ -150,6 +150,55 @@ function ScalePreviewPane({ preview, fillPreview, strokeWidth }: { preview: Scal
     );
 }
 
+function ScalePivotSelect({ pivot, onChange, disabled }: { pivot: ScaleDialogPivotPoint; onChange: (next: ScaleDialogPivotPoint) => void; disabled: boolean; }) {
+    return (
+        <div className="rounded border p-3">
+            <div className="mb-2 text-[11px] text-muted-foreground">Pivot point</div>
+            <label className="space-y-1">
+                <span className="text-muted-foreground">Pivot Point (selection bounds)</span>
+                <select
+                    className="h-8 w-full rounded border bg-background px-2 text-xs disabled:opacity-50"
+                    value={pivot}
+                    onChange={(event) => onChange(event.target.value as ScaleDialogPivotPoint)}
+                    disabled={disabled}
+                >
+                    {pivotOptions.map((it) => (
+                        <option key={it.value} value={it.value}>
+                            {it.label}
+                        </option>
+                    ))}
+                </select>
+            </label>
+        </div>
+    );
+}
+
+function ScaleModeSelector({ mode, onChange }: { mode: ScaleDialogAxisMode; onChange: (next: ScaleDialogAxisMode) => void; }) {
+    return (
+        <div className="rounded border p-3">
+            <div className="mb-2 text-[11px] text-muted-foreground">Mode</div>
+            <RadioGroup
+                value={mode}
+                onValueChange={(value) => onChange(value as ScaleDialogAxisMode)}
+                className="grid grid-cols-1 sm:grid-cols-3 gap-2"
+            >
+                <label className="flex items-center justify-between gap-2 rounded border px-2 py-1.5 select-none">
+                    <span>Scale Uniform</span>
+                    <RadioGroupItem value="uniform" />
+                </label>
+                <label className="flex items-center justify-between gap-2 rounded border px-2 py-1.5 select-none">
+                    <span>Scale by X only</span>
+                    <RadioGroupItem value="x" />
+                </label>
+                <label className="flex items-center justify-between gap-2 rounded border px-2 py-1.5 select-none">
+                    <span>Scale by Y only</span>
+                    <RadioGroupItem value="y" />
+                </label>
+            </RadioGroup>
+        </div>
+    );
+}
+
 export function ScaleDialog() {
     const [open, setOpen] = useAtom(scaleDialogOpenAtom);
 
@@ -336,27 +385,7 @@ export function ScaleDialog() {
                 </DialogHeader>
 
                 <div className="space-y-4 text-xs">
-                    <div className="rounded border p-3">
-                        <div className="mb-2 text-[11px] text-muted-foreground">Mode</div>
-                        <RadioGroup
-                            value={mode}
-                            onValueChange={(value) => setMode(value as ScaleDialogAxisMode)}
-                            className="grid grid-cols-1 sm:grid-cols-3 gap-2"
-                        >
-                            <label className="flex items-center justify-between gap-2 rounded border px-2 py-1.5 select-none">
-                                <span>Scale Uniform</span>
-                                <RadioGroupItem value="uniform" />
-                            </label>
-                            <label className="flex items-center justify-between gap-2 rounded border px-2 py-1.5 select-none">
-                                <span>Scale by X only</span>
-                                <RadioGroupItem value="x" />
-                            </label>
-                            <label className="flex items-center justify-between gap-2 rounded border px-2 py-1.5 select-none">
-                                <span>Scale by Y only</span>
-                                <RadioGroupItem value="y" />
-                            </label>
-                        </RadioGroup>
-                    </div>
+                    <ScaleModeSelector mode={mode} onChange={(next) => setMode(next)} />
 
                     <div className="rounded border p-3">
                         <div className="mb-2 text-[11px] text-muted-foreground">Scale inputs</div>
@@ -435,25 +464,11 @@ export function ScaleDialog() {
                         )}
                     </div>
 
-                    <div className="rounded border p-3">
-                        <div className="mb-2 text-[11px] text-muted-foreground">Pivot point</div>
-
-                        <label className="space-y-1">
-                            <span className="text-muted-foreground">Pivot Point (selection bounds)</span>
-                            <select
-                                className="h-8 w-full rounded border bg-background px-2 text-xs disabled:opacity-50"
-                                value={pivot}
-                                onChange={(event) => setPivot(event.target.value as ScaleDialogPivotPoint)}
-                                disabled={!selectionBounds}
-                            >
-                                {pivotOptions.map((it) => (
-                                    <option key={it.value} value={it.value}>
-                                        {it.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </label>
-                    </div>
+                    <ScalePivotSelect
+                        pivot={pivot}
+                        onChange={(next) => setPivot(next)}
+                        disabled={!selectionBounds}
+                    />
 
                     <div className="rounded border p-3 flex items-center justify-between gap-2">
                         <span className="text-[11px] text-muted-foreground">Preview on main canvas</span>
