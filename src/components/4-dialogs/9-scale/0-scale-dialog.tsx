@@ -6,12 +6,12 @@ import { Link2, Unlink2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
 import { Button } from "@/components/ui/shadcn/button";
 import { Input } from "@/components/ui/shadcn/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/shadcn/radio-group";
 import { Switch } from "@/components/ui/shadcn/switch";
 
 import { SvgPathModel } from "@/svg-core/2-svg-model";
 import { computeSelectionBounds, pivotFromBounds, ScalePivotSelect, type SelectionBounds } from "./1-scale-selection";
 import { ScalePreviewPane } from "./2-scale-preview-pane";
+import { ScaleModeSelector } from "./3-scale-mode-selector";
 
 import { canvasSegmentHitAreaElementsAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-editor-actions";
 import { doSetPathWithoutHistoryAtom } from "@/store/0-atoms/1-2-history";
@@ -112,32 +112,6 @@ function ScaleMultiplierInputs({
                     onChange={(event) => onSetScaleY(Number(event.target.value))}
                 />
             </label>
-        </div>
-    );
-}
-
-function ScaleModeSelector({ mode, onChange }: { mode: ScaleDialogAxisMode; onChange: (next: ScaleDialogAxisMode) => void; }) {
-    return (
-        <div className="rounded border p-3">
-            <div className="mb-2 text-[11px] text-muted-foreground">Mode</div>
-            <RadioGroup
-                value={mode}
-                onValueChange={(value) => onChange(value as ScaleDialogAxisMode)}
-                className="grid grid-cols-1 sm:grid-cols-3 gap-2"
-            >
-                <label className="flex items-center justify-between gap-2 rounded border px-2 py-1.5 select-none">
-                    <span>Scale Uniform</span>
-                    <RadioGroupItem value="uniform" />
-                </label>
-                <label className="flex items-center justify-between gap-2 rounded border px-2 py-1.5 select-none">
-                    <span>Scale by X only</span>
-                    <RadioGroupItem value="x" />
-                </label>
-                <label className="flex items-center justify-between gap-2 rounded border px-2 py-1.5 select-none">
-                    <span>Scale by Y only</span>
-                    <RadioGroupItem value="y" />
-                </label>
-            </RadioGroup>
         </div>
     );
 }
