@@ -10,7 +10,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/shadcn/radio-group";
 import { Switch } from "@/components/ui/shadcn/switch";
 
 import { SvgPathModel } from "@/svg-core/2-svg-model";
-import { computeSelectionBounds, pivotFromBounds, ScalePivotSelect, ScalePreviewPane, type SelectionBounds } from "./1-scale-selection";
+import { computeSelectionBounds, pivotFromBounds, ScalePivotSelect, type SelectionBounds } from "./1-scale-selection";
+import { ScalePreviewPane } from "./2-scale-preview-pane";
 
 import { canvasSegmentHitAreaElementsAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-editor-actions";
 import { doSetPathWithoutHistoryAtom } from "@/store/0-atoms/1-2-history";
