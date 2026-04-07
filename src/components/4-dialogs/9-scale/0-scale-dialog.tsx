@@ -6,12 +6,12 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/shadcn/button";
 import { Switch } from "@/components/ui/shadcn/switch";
 
-import { SvgPathModel } from "@/svg-core/2-svg-model";
-import { computeSelectionBounds, pivotFromBounds, ScalePivotSelect } from "./1-scale-selection";
+import { pivotFromBounds, ScalePivotSelect } from "./1-scale-selection";
 import { ScalePreviewPane } from "./2-scale-preview-pane";
 import { ScaleModeSelector } from "./3-scale-mode-selector";
 import { ScaleMultiplierInputs } from "./4-scale-multiplier-inputs";
 import {
+    doInitScaleDialogDraftAtom,
     scaleDialogLinkedAtom,
     scaleDialogModeAtom,
     scaleDialogOriginalModelAtom,
@@ -24,7 +24,6 @@ import {
     scaleDialogSelectionIndicesDraftAtom,
 } from "./5-scale-dialog-atoms";
 
-import { canvasSegmentHitAreaElementsAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-editor-actions";
 import { doSetPathWithoutHistoryAtom } from "@/store/0-atoms/1-2-history";
 import { rawPathAtom } from "@/store/0-atoms/1-0-raw-path";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
@@ -34,15 +33,12 @@ import { appSettings, dialogsSettings } from "@/store/0-ui-settings";
 export function ScaleDialog() {
     const [open, setOpen] = useAtom(scaleDialogOpenAtom);
 
-    const selectionIndices = useAtomValue(selectedCommandIndicesAtom);
-    const hitAreas = useAtomValue(canvasSegmentHitAreaElementsAtom);
     const currentPath = useAtomValue(rawPathAtom);
 
     const setSvgPathInput = useSetAtom(svgPathInputAtom);
     const setPathWithoutHistory = useSetAtom(doSetPathWithoutHistoryAtom);
 
     const { decimals, minifyOutput, strokeWidth } = useSnapshot(appSettings.pathEditor);
-    const scaleUiSettingsSnapshot = useSnapshot(dialogsSettings.scale);
 
     const didInitRef = useRef(false);
 
@@ -70,6 +66,8 @@ export function ScaleDialog() {
     const setPivot = useSetAtom(scaleDialogPivotAtom);
     const setPreviewOnCanvas = useSetAtom(scaleDialogPreviewOnCanvasAtom);
 
+    const initScaleDialogDraft = useSetAtom(doInitScaleDialogDraftAtom);
+
     const closingWithOkRef = useRef(false);
 
     useLayoutEffect(() => {
@@ -77,33 +75,8 @@ export function ScaleDialog() {
         if (didInitRef.current) return;
         didInitRef.current = true;
 
-        const nextOriginalRawPath = currentPath;
-        setOriginalRawPath(nextOriginalRawPath);
-
-        let parsedModel: SvgPathModel | null = null;
-        try {
-            parsedModel = new SvgPathModel(nextOriginalRawPath.trim());
-        } catch {
-            parsedModel = null;
-        }
-        setOriginalModel(parsedModel);
-
-        setSelectionIndicesDraft(selectionIndices);
-        if (parsedModel) {
-            setSelectionBounds(computeSelectionBounds(selectionIndices, hitAreas, parsedModel));
-        } else {
-            setSelectionBounds(null);
-        }
-
-        setMode(scaleUiSettingsSnapshot.mode);
-        setScaleX(scaleUiSettingsSnapshot.scaleX);
-        setScaleY(scaleUiSettingsSnapshot.mode === "uniform" && scaleUiSettingsSnapshot.linked
-            ? scaleUiSettingsSnapshot.scaleX
-            : scaleUiSettingsSnapshot.scaleY);
-        setLinked(scaleUiSettingsSnapshot.linked);
-        setPivot(scaleUiSettingsSnapshot.pivot);
-        setPreviewOnCanvas(scaleUiSettingsSnapshot.previewOnCanvas);
-    }, [open]);
+        initScaleDialogDraft();
+    }, [open, initScaleDialogDraft]);
 
     useEffect(() => {
         if (open) return;
