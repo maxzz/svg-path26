@@ -1,17 +1,16 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
-import { Link2, Unlink2 } from "lucide-react";
 
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
 import { Button } from "@/components/ui/shadcn/button";
-import { Input } from "@/components/ui/shadcn/input";
 import { Switch } from "@/components/ui/shadcn/switch";
 
 import { SvgPathModel } from "@/svg-core/2-svg-model";
 import { computeSelectionBounds, pivotFromBounds, ScalePivotSelect, type SelectionBounds } from "./1-scale-selection";
 import { ScalePreviewPane } from "./2-scale-preview-pane";
 import { ScaleModeSelector } from "./3-scale-mode-selector";
+import { ScaleMultiplierInputs } from "./4-scale-multiplier-inputs";
 
 import { canvasSegmentHitAreaElementsAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-editor-actions";
 import { doSetPathWithoutHistoryAtom } from "@/store/0-atoms/1-2-history";
@@ -20,101 +19,6 @@ import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { scaleDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 import { appSettings, dialogsSettings } from "@/store/0-ui-settings";
 import type { ScaleDialogAxisMode, ScaleDialogPivotPoint } from "@/store/10-dialogs-ui-settings-types-and-defaults";
-
-function ScaleMultiplierInputs({
-    mode,
-    scaleX,
-    scaleY,
-    linked,
-    onSetScaleX,
-    onSetScaleY,
-    onSetLinked,
-}: {
-    mode: ScaleDialogAxisMode;
-    scaleX: number;
-    scaleY: number;
-    linked: boolean;
-    onSetScaleX: (next: number) => void;
-    onSetScaleY: (next: number) => void;
-    onSetLinked: (next: boolean) => void;
-}) {
-    if (mode === "uniform") {
-        return (
-            <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-end">
-                <label className="space-y-1">
-                    <span className="text-muted-foreground">X multiplier</span>
-                    <Input
-                        type="number"
-                        step={0.1}
-                        value={scaleX}
-                        onChange={(event) => {
-                            const next = Number(event.target.value);
-                            onSetScaleX(next);
-                            if (linked) onSetScaleY(next);
-                        }}
-                    />
-                </label>
-
-                <button
-                    type="button"
-                    className="h-8 w-8 inline-flex items-center justify-center rounded border bg-background hover:bg-muted/50"
-                    title={linked ? "Unlink X and Y" : "Link X and Y"}
-                    onClick={() => {
-                        const nextLinked = !linked;
-                        if (nextLinked) onSetScaleY(scaleX);
-                        onSetLinked(nextLinked);
-                    }}
-                >
-                    {linked ? <Link2 className="size-4" /> : <Unlink2 className="size-4" />}
-                </button>
-
-                <label className="space-y-1">
-                    <span className="text-muted-foreground">Y multiplier</span>
-                    <Input
-                        type="number"
-                        step={0.1}
-                        value={scaleY}
-                        onChange={(event) => {
-                            const next = Number(event.target.value);
-                            onSetScaleY(next);
-                            if (linked) onSetScaleX(next);
-                        }}
-                    />
-                </label>
-            </div>
-        );
-    }
-
-    if (mode === "x") {
-        return (
-            <div className="grid grid-cols-1 gap-3">
-                <label className="space-y-1">
-                    <span className="text-muted-foreground">X multiplier</span>
-                    <Input
-                        type="number"
-                        step={0.1}
-                        value={scaleX}
-                        onChange={(event) => onSetScaleX(Number(event.target.value))}
-                    />
-                </label>
-            </div>
-        );
-    }
-
-    return (
-        <div className="grid grid-cols-1 gap-3">
-            <label className="space-y-1">
-                <span className="text-muted-foreground">Y multiplier</span>
-                <Input
-                    type="number"
-                    step={0.1}
-                    value={scaleY}
-                    onChange={(event) => onSetScaleY(Number(event.target.value))}
-                />
-            </label>
-        </div>
-    );
-}
 
 export function ScaleDialog() {
     const [open, setOpen] = useAtom(scaleDialogOpenAtom);
