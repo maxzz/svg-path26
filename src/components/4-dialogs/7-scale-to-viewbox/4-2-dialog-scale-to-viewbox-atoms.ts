@@ -1,9 +1,8 @@
 import { atom } from "jotai";
-import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
-import { doScaleSelectedSegmentsIntoViewBoxAtom } from "../../../store/0-atoms/2-4-editor-actions";
+import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { pathViewBoxAtom } from "../../../store/0-atoms/2-2-path-viewbox";
-import { scaleToViewBoxDialogOpenAtom } from "../../../store/0-atoms/4-0-dialogs-atoms";
+import { doScaleSelectedSegmentsIntoViewBoxAtom } from "../../../store/0-atoms/2-4-editor-actions";
 
 export const scaleToViewBoxMarginDraftAtom = atom<number>(appSettings.dialogs.scaleToViewBox.margin);
 
@@ -52,7 +51,6 @@ export const applyButtonAtom = atom(
         }
 
         set(doScaleSelectedSegmentsIntoViewBoxFromDraftAtom);
-        set(scaleToViewBoxDialogOpenAtom, false);
         return true;
     },
 );

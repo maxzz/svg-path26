@@ -1,4 +1,4 @@
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
 import { NumberField } from "@/components/ui/loacal-ui/2-number-field";
@@ -38,13 +38,18 @@ export function ScaleToViewBoxDialog() {
 
 function ApplyButton() {
     const [canApply, setCanApply] = useAtom(applyButtonAtom);
+    const setOpen = useSetAtom(scaleToViewBoxDialogOpenAtom);
     console.log("canApply", canApply);
     return (
         <Button
             //disabled={!canApply}
             onClick={() => {
                 const applied = setCanApply();
-                !applied && notice.info("Scale cannot be applied because the margin is too large.");
+                if (!applied) {
+                    notice.info("Scale cannot be applied because the margin is too large.");
+                    return;
+                }
+                setOpen(false);
             }}
         >
             Scale
