@@ -9,6 +9,7 @@ import { AddImageDialog } from "../4-dialogs/6-add-image/0-add-image-dialog";
 import { AboutDialog } from "../4-dialogs/8-2-about/0-about-dialog";
 import { OptionsDialog } from "../4-dialogs/8-3-options/0-options-dialog";
 import { ConfirmationDialog } from "../4-dialogs/8-1-confirmation/0-confirmation-dialog";
+import { ScaleDialog } from "../4-dialogs/9-scale/0-scale-dialog";
 
 export function App() {
     return (<>
@@ -28,6 +29,7 @@ export function App() {
             <AddImageDialog />
             <AboutDialog />
             <OptionsDialog />
+            <ScaleDialog />
         </div>
     </>);
 }
