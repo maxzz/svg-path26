@@ -4,9 +4,8 @@ import { MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu, MenubarS
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "@/store/0-atoms/1-2-history";
 import { commandRowsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { doCenterSelectedSegmentsIntoViewBoxAtom, doClearPathAtom, doNormalizePathAtom, doSelectAllCommandsAtom, doSetAbsoluteAtom, doSetRelativeAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-editor-actions";
+import { doCenterSelectedSegmentsIntoViewBoxAtom, doClearPathAtom, doNormalizePathAtom, doScaleSelectedSegmentsIntoViewBoxAtom, doSelectAllCommandsAtom, doSetAbsoluteAtom, doSetRelativeAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-editor-actions";
 import { appSettings } from "@/store/0-ui-settings";
-import { scaleDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 
 export function EditMenu() {
     const { minifyOutput } = useSnapshot(appSettings.pathEditor);
@@ -24,7 +23,7 @@ export function EditMenu() {
     const doClear = useSetAtom(doClearPathAtom);
     const doSelectAll = useSetAtom(doSelectAllCommandsAtom);
     const doCenter = useSetAtom(doCenterSelectedSegmentsIntoViewBoxAtom);
-    const setScaleDialogOpen = useSetAtom(scaleDialogOpenAtom);
+    const doScale = useSetAtom(doScaleSelectedSegmentsIntoViewBoxAtom);
 
     const hasPath = Boolean(pathValue.trim());
     const canSelectAll = commandRows.length > 0;
@@ -81,8 +80,14 @@ export function EditMenu() {
                 <MenubarSub>
                     <MenubarSubTrigger>Scale</MenubarSubTrigger>
                     <MenubarSubContent>
-                        <MenubarItem disabled={!canCenter} onClick={() => setScaleDialogOpen(true)}>
-                            Scale
+                        <MenubarItem disabled={!canCenter} onClick={() => doScale({ axis: "both" })}>
+                            Scale X+Y
+                        </MenubarItem>
+                        <MenubarItem disabled={!canCenter} onClick={() => doScale({ axis: "x" })}>
+                            Scale X
+                        </MenubarItem>
+                        <MenubarItem disabled={!canCenter} onClick={() => doScale({ axis: "y" })}>
+                            Scale Y
                         </MenubarItem>
                     </MenubarSubContent>
                 </MenubarSub>

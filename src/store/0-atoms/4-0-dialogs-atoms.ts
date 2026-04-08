@@ -9,7 +9,6 @@ const openPathDialogOpenBaseAtom = atom(false);
 const addImageDialogOpenBaseAtom = atom(false);
 const aboutDialogOpenBaseAtom = atom(false);
 const optionsDialogOpenBaseAtom = atom(false);
-const scaleDialogOpenBaseAtom = atom(false);
 
 export const exportSvgDialogOpenAtom = atom(
     (get) => get(exportSvgDialogOpenBaseAtom),
@@ -53,12 +52,5 @@ export const optionsDialogOpenAtom = atom(
     (get) => get(optionsDialogOpenBaseAtom),
     (_get, set, open: boolean) => {
         set(optionsDialogOpenBaseAtom, open);
-    },
-);
-
-export const scaleDialogOpenAtom = atom(
-    (get) => get(scaleDialogOpenBaseAtom),
-    (_get, set, open: boolean) => {
-        set(scaleDialogOpenBaseAtom, open);
     },
 );
