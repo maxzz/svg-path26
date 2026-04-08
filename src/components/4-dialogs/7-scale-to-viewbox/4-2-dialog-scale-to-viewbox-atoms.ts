@@ -3,6 +3,7 @@ import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
 import { doScaleSelectedSegmentsIntoViewBoxAtom } from "../../../store/0-atoms/2-4-editor-actions";
 import { pathViewBoxAtom } from "../../../store/0-atoms/2-2-path-viewbox";
+import { scaleToViewBoxDialogOpenAtom } from "../../../store/0-atoms/4-0-dialogs-atoms";
 
 export const scaleToViewBoxMarginDraftAtom = atom<number>(appSettings.dialogs.scaleToViewBox.margin);
 
@@ -40,3 +41,18 @@ const SCALE_TO_VIEWBOX_MARGIN_EPS = 1e-9;
 function normalizeScaleToViewBoxMargin(value: number) {
     return Number.isFinite(value) ? Math.max(0, value) : 0;
 }
+
+export const applyButtonAtom = atom(
+    (get) => isValidScaleToViewBoxMargin(get(scaleToViewBoxMarginDraftAtom), get(pathViewBoxAtom)),
+    (get, set): boolean => {
+        const margin = get(scaleToViewBoxMarginDraftAtom);
+        const pathViewBox = get(pathViewBoxAtom);
+        if (!isValidScaleToViewBoxMargin(margin, pathViewBox)) {
+            return false;
+        }
+
+        set(doScaleSelectedSegmentsIntoViewBoxFromDraftAtom);
+        set(scaleToViewBoxDialogOpenAtom, false);
+        return true;
+    },
+);
