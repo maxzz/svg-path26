@@ -1,15 +1,17 @@
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
 import { NumberField } from "@/components/ui/loacal-ui/2-number-field";
+import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { scaleToViewBoxDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 import { doScaleSelectedSegmentsIntoViewBoxFromDraftAtom, isValidScaleToViewBoxMargin, scaleToViewBoxMarginDraftAtom } from "@/store/0-atoms/4-2-dialog-scale-to-viewbox-atoms";
 
 export function ScaleToViewBoxDialog() {
     const [open, setOpen] = useAtom(scaleToViewBoxDialogOpenAtom);
     const [margin, setMargin] = useAtom(scaleToViewBoxMarginDraftAtom);
+    const pathViewBox = useAtomValue(pathViewBoxAtom);
     const doScaleToViewBoxFromDraft = useSetAtom(doScaleSelectedSegmentsIntoViewBoxFromDraftAtom);
-    const canApply = isValidScaleToViewBoxMargin(margin);
+    const canApply = isValidScaleToViewBoxMargin(margin, pathViewBox);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

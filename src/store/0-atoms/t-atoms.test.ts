@@ -11,7 +11,7 @@ import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } fr
 import { doAsyncExecuteConfirmDialogAtom, isOpenConfirmDialogAtom } from "../../components/4-dialogs/8-1-confirmation/9-types-confirmation";
 import { doOpenNamedPathAtom, doSaveNamedPathAtom } from "./2-6-stored-paths-actions";
 import { doSetPathViewBoxAtom, pathViewBoxAtom } from "./2-2-path-viewbox";
-import { doResetScaleToViewBoxMarginDraftAtom, doScaleSelectedSegmentsIntoViewBoxFromDraftAtom } from "./4-2-dialog-scale-to-viewbox-atoms";
+import { doResetScaleToViewBoxMarginDraftAtom, doScaleSelectedSegmentsIntoViewBoxFromDraftAtom, scaleToViewBoxMarginDraftAtom } from "./4-2-dialog-scale-to-viewbox-atoms";
 import { appSettings } from "@/store/0-ui-settings";
 import { normalizeStoredSettings } from "@/store/1-ui-settings-normalize";
 import { DEFAULT_DIALOGS_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS } from "@/store/9-ui-settings-types-and-defaults";
@@ -313,6 +313,22 @@ describe("svg path state atoms", () => {
         expect(afterBounds.centerY).toBeCloseTo(viewBoxCenterY);
         expect(afterBounds.xmax - afterBounds.xmin).toBeCloseTo(17);
         expect(afterBounds.ymax - afterBounds.ymin).toBeCloseTo(17);
+    });
+
+    it("rejects a margin that would collapse the available viewBox area", () => {
+        const store = createStore();
+        store.set(svgPathInputAtom, "M 0 0 L 10 10");
+        store.set(selectedCommandIndicesAtom, [1]);
+        store.set(doSetPathViewBoxAtom, [0, 0, 20, 20]);
+        appSettings.dialogs.scaleToViewBox.margin = 1;
+        store.set(scaleToViewBoxMarginDraftAtom, 10);
+
+        const beforePath = store.get(svgPathInputAtom);
+
+        store.set(doScaleSelectedSegmentsIntoViewBoxFromDraftAtom);
+
+        expect(store.get(svgPathInputAtom)).toBe(beforePath);
+        expect(appSettings.dialogs.scaleToViewBox.margin).toBe(1);
     });
 
     it("fits the current path at 1x zoom and then scales from that baseline", () => {
