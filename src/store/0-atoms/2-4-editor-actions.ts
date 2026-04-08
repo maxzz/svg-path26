@@ -13,7 +13,6 @@ import { pathViewBoxAtom } from "./2-2-path-viewbox";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
 import { notice } from "@/components/ui/loacal-ui/7-toaster/7-toaster";
 import { applyCommandSelection, normalizeSelectedCommandIndices, remapSelectedIndicesAfterDelete, type CommandSelectionMode } from "./2-5-editor-selection-utils";
-import { normalizeScaleToViewBoxMargin, scaleToViewBoxMarginSettingAtom } from "./4-2-dialog-scale-to-viewbox-atoms";
 import { appSettings } from "@/store/0-ui-settings";
 
 export const strokeWidthAtom = createAtomAppSetting("strokeWidth");
@@ -272,11 +271,8 @@ export const doCenterSelectedSegmentsIntoViewBoxAtom = atom(
 
 export const doScaleSelectedSegmentsIntoViewBoxAtom = atom(
     null,
-    (get, set, args?: { margin?: number; }) => {
-        const margin = normalizeScaleToViewBoxMargin(args?.margin ?? appSettings.dialogs.scaleToViewBox.margin);
-        if (args?.margin !== undefined) {
-            set(scaleToViewBoxMarginSettingAtom, margin);
-        }
+    (get, set, args: { margin: number; }) => {
+        const { margin } = args;
 
         const selectedIndices = get(selectedCommandIndicesAtom);
         if (!selectedIndices.length) return;

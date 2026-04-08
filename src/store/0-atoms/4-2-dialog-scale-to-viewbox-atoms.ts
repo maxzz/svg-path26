@@ -1,9 +1,14 @@
 import { atom } from "jotai";
 import { subscribe } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
+import { doScaleSelectedSegmentsIntoViewBoxAtom } from "./2-4-editor-actions";
 
 export function normalizeScaleToViewBoxMargin(value: number) {
     return Number.isFinite(value) ? Math.max(0, value) : 0;
+}
+
+export function isValidScaleToViewBoxMargin(value: number) {
+    return Number.isFinite(value) && value >= 0;
 }
 
 const scaleToViewBoxMarginSettingBaseAtom = atom(appSettings.dialogs.scaleToViewBox.margin);
@@ -38,5 +43,17 @@ export const doResetScaleToViewBoxMarginDraftAtom = atom(
     null,
     (_get, set) => {
         set(scaleToViewBoxMarginDraftAtom, normalizeScaleToViewBoxMargin(appSettings.dialogs.scaleToViewBox.margin));
+    },
+);
+
+export const doScaleSelectedSegmentsIntoViewBoxFromDraftAtom = atom(
+    null,
+    (get, set) => {
+        const marginDraft = get(scaleToViewBoxMarginDraftAtom);
+        if (!isValidScaleToViewBoxMargin(marginDraft)) return;
+
+        const margin = normalizeScaleToViewBoxMargin(marginDraft);
+        set(scaleToViewBoxMarginSettingAtom, margin);
+        set(doScaleSelectedSegmentsIntoViewBoxAtom, { margin });
     },
 );

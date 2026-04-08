@@ -11,6 +11,7 @@ import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } fr
 import { doAsyncExecuteConfirmDialogAtom, isOpenConfirmDialogAtom } from "../../components/4-dialogs/8-1-confirmation/9-types-confirmation";
 import { doOpenNamedPathAtom, doSaveNamedPathAtom } from "./2-6-stored-paths-actions";
 import { doSetPathViewBoxAtom, pathViewBoxAtom } from "./2-2-path-viewbox";
+import { doResetScaleToViewBoxMarginDraftAtom, doScaleSelectedSegmentsIntoViewBoxFromDraftAtom } from "./4-2-dialog-scale-to-viewbox-atoms";
 import { appSettings } from "@/store/0-ui-settings";
 import { normalizeStoredSettings } from "@/store/1-ui-settings-normalize";
 import { DEFAULT_DIALOGS_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS } from "@/store/9-ui-settings-types-and-defaults";
@@ -284,20 +285,21 @@ describe("svg path state atoms", () => {
         expect(afterBounds.ymax - afterBounds.ymin).toBeCloseTo(8);
     });
 
-    it("uses the stored scale-to-viewBox dialog margin when no explicit margin is provided", () => {
+    it("uses the stored scale-to-viewBox dialog margin through the dialog draft action", () => {
         const store = createStore();
         store.set(svgPathInputAtom, "M 0 0 L 10 10");
         store.set(selectedCommandIndicesAtom, [1]);
         store.set(doSetPathViewBoxAtom, [0, 0, 20, 20]);
         store.set(doSetViewPortAtom, [2, 3, 20, 20]);
         appSettings.dialogs.scaleToViewBox.margin = 1.5;
+        store.set(doResetScaleToViewBoxMarginDraftAtom);
 
         const beforeViewPort = store.get(canvasViewPortAtom);
         const viewBox = store.get(pathViewBoxAtom);
         const viewBoxCenterX = viewBox[0] + viewBox[2] / 2;
         const viewBoxCenterY = viewBox[1] + viewBox[3] / 2;
 
-        store.set(doScaleSelectedSegmentsIntoViewBoxAtom);
+        store.set(doScaleSelectedSegmentsIntoViewBoxFromDraftAtom);
 
         expect(store.get(canvasViewPortAtom)).toEqual(beforeViewPort);
         expect(store.get(pathViewBoxAtom)).toEqual(viewBox);
