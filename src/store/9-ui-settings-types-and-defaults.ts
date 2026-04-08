@@ -59,10 +59,19 @@ export interface ExportSettings {
     exportStrokeWidth: number;            // Export stroke width
 }
 
+export interface ScaleToViewBoxDialogSettings {
+    margin: number;
+}
+
+export interface DialogSettings {
+    scaleToViewBox: ScaleToViewBoxDialogSettings;
+}
+
 export interface UiSettings {
     theme: ThemeMode;                     // Theme mode (light or dark)
     showSvgPreviewSection: boolean;       // Show "SVG preview" section above SVG input
     canvas: CanvasSettings;               // Canvas settings
+    dialogs: DialogSettings;              // Dialog-specific settings
     footer: FooterSettings;               // Footer button visibility
     sections: Record<string, boolean>;    // Props panel sections collapsed state
     editorPanelSizes: number[];           // Props and Canvas editor panel sizes
@@ -120,10 +129,17 @@ export const DEFAULT_EXPORT_SETTINGS: ExportSettings = {
     exportStrokeWidth: 0.1,
 };
 
+export const DEFAULT_DIALOGS_SETTINGS: DialogSettings = {
+    scaleToViewBox: {
+        margin: 10,
+    },
+};
+
 export const DEFAULT_SETTINGS: UiSettings = {
     theme: "light",
     showSvgPreviewSection: false,
     canvas: DEFAULT_CANVAS_SETTINGS,
+    dialogs: DEFAULT_DIALOGS_SETTINGS,
     footer: DEFAULT_FOOTER_SETTINGS,
     sections: { "svg-preview": true, "svg-input": true, transform: true, options: true },
     editorPanelSizes: [33, 67],

@@ -1,12 +1,13 @@
 import { z } from "zod";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
-import { type CanvasSettings, type ExportSettings, type FooterSettings, type PathEditorSettings, type UiSettings, DEFAULT_CANVAS_SETTINGS, DEFAULT_EXPORT_SETTINGS, DEFAULT_FOOTER_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SETTINGS, DEFAULT_VIEWBOX_SETTINGS } from "./9-ui-settings-types-and-defaults";
+import { type CanvasSettings, type DialogSettings, type ExportSettings, type FooterSettings, type PathEditorSettings, type UiSettings, DEFAULT_CANVAS_SETTINGS, DEFAULT_DIALOGS_SETTINGS, DEFAULT_EXPORT_SETTINGS, DEFAULT_FOOTER_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SETTINGS, DEFAULT_VIEWBOX_SETTINGS } from "./9-ui-settings-types-and-defaults";
 
 type MutableViewBox = Writeable<ViewBox>;
 
 export function normalizeStoredSettings(value: unknown): UiSettings {
     const defaultSettings = DEFAULT_SETTINGS;
     const defaultCanvasSettings = DEFAULT_CANVAS_SETTINGS;
+    const defaultDialogsSettings = DEFAULT_DIALOGS_SETTINGS;
     const defaultPathEditorSettings = DEFAULT_PATH_EDITOR_SETTINGS;
     const defaultExportSettings = DEFAULT_EXPORT_SETTINGS;
     const defaultFooterSettings = DEFAULT_FOOTER_SETTINGS;
@@ -14,12 +15,14 @@ export function normalizeStoredSettings(value: unknown): UiSettings {
     const fallbackSettings = cloneUiSettings({
         ...defaultSettings,
         canvas: defaultCanvasSettings,
+        dialogs: defaultDialogsSettings,
         footer: defaultFooterSettings,
         pathEditor: defaultPathEditorSettings,
         export: defaultExportSettings,
     });
 
     const canvasSettingsSchema = createCanvasSettingsSchema(defaultCanvasSettings);
+    const dialogsSettingsSchema = createDialogsSettingsSchema(defaultDialogsSettings);
     const pathEditorSchema = createPathEditorSettingsSchema(defaultPathEditorSettings);
     const exportSettingsSchema = createExportSettingsSchema(defaultExportSettings);
     const footerSettingsSchema = createFooterSettingsSchema(defaultFooterSettings);
@@ -30,6 +33,7 @@ export function normalizeStoredSettings(value: unknown): UiSettings {
             theme: themeModeSchema.catch(defaultSettings.theme),
             showSvgPreviewSection: z.boolean().catch(defaultSettings.showSvgPreviewSection),
             canvas: canvasSettingsSchema.catch(defaultCanvasSettings),
+            dialogs: dialogsSettingsSchema.catch(defaultDialogsSettings),
             footer: footerSettingsSchema.catch(defaultFooterSettings),
             sections: z.record(z.string(), z.boolean()).catch(defaultSettings.sections),
             editorPanelSizes: z.array(z.number()).catch(defaultSettings.editorPanelSizes),
@@ -62,6 +66,10 @@ function cloneUiSettings(settings: UiSettings): UiSettings {
     return {
         ...settings,
         canvas: { ...settings.canvas },
+        dialogs: {
+            ...settings.dialogs,
+            scaleToViewBox: { ...settings.dialogs.scaleToViewBox },
+        },
         sections: { ...settings.sections },
         editorPanelSizes: [...settings.editorPanelSizes],
         export: { ...settings.export },
@@ -93,6 +101,22 @@ function createCanvasSettingsSchema(defaultSettings: CanvasSettings) {
             fillPreview: z.boolean().catch(defaultSettings.fillPreview),
             canvasPreview: z.boolean().catch(defaultSettings.canvasPreview),
             showViewBoxFrame: z.boolean().catch(defaultSettings.showViewBoxFrame),
+        })
+    );
+}
+
+function createDialogsSettingsSchema(defaultSettings: DialogSettings) {
+    const defaultScaleToViewBoxSettings = defaultSettings.scaleToViewBox;
+
+    return z.preprocess(
+        toRecord,
+        z.object({
+            scaleToViewBox: z.preprocess(
+                toRecord,
+                z.object({
+                    margin: z.number().catch(defaultScaleToViewBoxSettings.margin),
+                })
+            ).catch(defaultScaleToViewBoxSettings),
         })
     );
 }

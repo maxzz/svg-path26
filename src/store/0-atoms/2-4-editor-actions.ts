@@ -11,7 +11,9 @@ import { doDeleteImageAtom, focusedImageIdAtom } from "./2-8-images";
 import { canvasRootSvgElementAtom } from "./2-3-canvas-viewport";
 import { pathViewBoxAtom } from "./2-2-path-viewbox";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
+import { notice } from "@/components/ui/loacal-ui/7-toaster/7-toaster";
 import { applyCommandSelection, normalizeSelectedCommandIndices, remapSelectedIndicesAfterDelete, type CommandSelectionMode } from "./2-5-editor-selection-utils";
+import { normalizeScaleToViewBoxMargin, scaleToViewBoxMarginSettingAtom } from "./4-2-dialog-scale-to-viewbox-atoms";
 import { appSettings } from "@/store/0-ui-settings";
 
 export const strokeWidthAtom = createAtomAppSetting("strokeWidth");
@@ -270,10 +272,11 @@ export const doCenterSelectedSegmentsIntoViewBoxAtom = atom(
 
 export const doScaleSelectedSegmentsIntoViewBoxAtom = atom(
     null,
-    (get, set, args?: { axis: "x" | "y" | "both"; }) => {
-        const axis = args?.axis ?? "both";
-        const scaleX = axis === "x" || axis === "both";
-        const scaleY = axis === "y" || axis === "both";
+    (get, set, args?: { margin?: number; }) => {
+        const margin = normalizeScaleToViewBoxMargin(args?.margin ?? appSettings.dialogs.scaleToViewBox.margin);
+        if (args?.margin !== undefined) {
+            set(scaleToViewBoxMarginSettingAtom, margin);
+        }
 
         const selectedIndices = get(selectedCommandIndicesAtom);
         if (!selectedIndices.length) return;
@@ -348,22 +351,37 @@ export const doScaleSelectedSegmentsIntoViewBoxAtom = atom(
         const viewBoxHeight = viewBox[3];
 
         const EPS = 1e-9;
-        const scaleXFactor = scaleX ? (Math.abs(selectionWidth) > EPS ? viewBoxWidth / selectionWidth : 1) : 1;
-        const scaleYFactor = scaleY ? (Math.abs(selectionHeight) > EPS ? viewBoxHeight / selectionHeight : 1) : 1;
+        const availableWidth = viewBoxWidth - margin * 2;
+        const availableHeight = viewBoxHeight - margin * 2;
 
-        const dx = scaleX ? viewBoxCenterX - selectionCenterX : 0;
-        const dy = scaleY ? viewBoxCenterY - selectionCenterY : 0;
+        if (availableWidth <= EPS || availableHeight <= EPS) {
+            notice.info("Scale margin is too large for the current viewBox.");
+            return;
+        }
+
+        const scaleCandidates: number[] = [];
+        if (Math.abs(selectionWidth) > EPS) {
+            scaleCandidates.push(availableWidth / selectionWidth);
+        }
+        if (Math.abs(selectionHeight) > EPS) {
+            scaleCandidates.push(availableHeight / selectionHeight);
+        }
+
+        const scaleFactor = scaleCandidates.length ? Math.min(...scaleCandidates) : 1;
+        if (!Number.isFinite(scaleFactor) || scaleFactor <= 0) return;
+
+        const dx = viewBoxCenterX - selectionCenterX;
+        const dy = viewBoxCenterY - selectionCenterY;
 
         const shouldSkip =
-            Math.abs(scaleXFactor - 1) < 1e-9
-            && Math.abs(scaleYFactor - 1) < 1e-9
+            Math.abs(scaleFactor - 1) < 1e-9
             && Math.abs(dx) < 1e-9
             && Math.abs(dy) < 1e-9;
 
         if (shouldSkip) return;
 
         set(doApplySvgModelAtom, (model) => {
-            model.scaleSegments(selectedIndices, scaleXFactor, scaleYFactor, { x: selectionCenterX, y: selectionCenterY });
+            model.scaleSegments(selectedIndices, scaleFactor, scaleFactor, { x: selectionCenterX, y: selectionCenterY });
             model.translateSegments(selectedIndices, dx, dy);
         });
     }

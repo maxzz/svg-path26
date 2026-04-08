@@ -1,5 +1,6 @@
 import { atom } from "jotai";
 import { doResetExportViewBoxDraftAtom } from "./4-1-dialog-export-atoms";
+import { doResetScaleToViewBoxMarginDraftAtom } from "./4-2-dialog-scale-to-viewbox-atoms";
 
 // Dialog atoms extracted from 2-5-canvas-actions-menu
 
@@ -9,6 +10,7 @@ const openPathDialogOpenBaseAtom = atom(false);
 const addImageDialogOpenBaseAtom = atom(false);
 const aboutDialogOpenBaseAtom = atom(false);
 const optionsDialogOpenBaseAtom = atom(false);
+const scaleToViewBoxDialogOpenBaseAtom = atom(false);
 
 export const exportSvgDialogOpenAtom = atom(
     (get) => get(exportSvgDialogOpenBaseAtom),
@@ -24,6 +26,16 @@ export const savePathDialogOpenAtom = atom(
     (get) => get(savePathDialogOpenBaseAtom),
     (_get, set, open: boolean) => {
         set(savePathDialogOpenBaseAtom, open);
+    },
+);
+
+export const scaleToViewBoxDialogOpenAtom = atom(
+    (get) => get(scaleToViewBoxDialogOpenBaseAtom),
+    (_get, set, open: boolean) => {
+        if (open) {
+            set(doResetScaleToViewBoxMarginDraftAtom);
+        }
+        set(scaleToViewBoxDialogOpenBaseAtom, open);
     },
 );
 
