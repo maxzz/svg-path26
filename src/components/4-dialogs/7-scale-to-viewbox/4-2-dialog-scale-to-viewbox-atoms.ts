@@ -1,10 +1,8 @@
 import { atom } from "jotai";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
-import { doScaleSelectedSegmentsIntoViewBoxAtom } from "./2-4-editor-actions";
-import { pathViewBoxAtom } from "./2-2-path-viewbox";
-
-const SCALE_TO_VIEWBOX_MARGIN_EPS = 1e-9;
+import { doScaleSelectedSegmentsIntoViewBoxAtom } from "../../../store/0-atoms/2-4-editor-actions";
+import { pathViewBoxAtom } from "../../../store/0-atoms/2-2-path-viewbox";
 
 export const scaleToViewBoxMarginDraftAtom = atom<number>(appSettings.dialogs.scaleToViewBox.margin);
 
@@ -36,6 +34,8 @@ export function isValidScaleToViewBoxMargin(value: number, viewBox: ViewBox) {
     const availableHeight = viewBox[3] - margin * 2;
     return availableWidth > SCALE_TO_VIEWBOX_MARGIN_EPS && availableHeight > SCALE_TO_VIEWBOX_MARGIN_EPS;
 }
+
+const SCALE_TO_VIEWBOX_MARGIN_EPS = 1e-9;
 
 function normalizeScaleToViewBoxMargin(value: number) {
     return Number.isFinite(value) ? Math.max(0, value) : 0;

@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import { doResetExportViewBoxDraftAtom } from "./4-1-dialog-export-atoms";
-import { doResetScaleToViewBoxMarginDraftAtom } from "./4-2-dialog-scale-to-viewbox-atoms";
+import { doResetScaleToViewBoxMarginDraftAtom } from "../../components/4-dialogs/7-scale-to-viewbox/4-2-dialog-scale-to-viewbox-atoms";
 
 // Dialog atoms extracted from 2-5-canvas-actions-menu
 
