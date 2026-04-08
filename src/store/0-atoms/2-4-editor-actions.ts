@@ -271,9 +271,7 @@ export const doCenterSelectedSegmentsIntoViewBoxAtom = atom(
 
 export const doScaleSelectedSegmentsIntoViewBoxAtom = atom(
     null,
-    (get, set, args: { margin: number; }) => {
-        const { margin } = args;
-
+    (get, set, { margin }: { margin: number; }) => {
         const selectedIndices = get(selectedCommandIndicesAtom);
         if (!selectedIndices.length) return;
 

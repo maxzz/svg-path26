@@ -60,7 +60,7 @@ export interface ExportSettings {
 }
 
 export interface ScaleToViewBoxDialogSettings {
-    margin: number;
+    margin: number;                       // ViewBox margin as a percentage of the viewBox size
 }
 
 export interface DialogSettings {
@@ -131,7 +131,7 @@ export const DEFAULT_EXPORT_SETTINGS: ExportSettings = {
 
 export const DEFAULT_DIALOGS_SETTINGS: DialogSettings = {
     scaleToViewBox: {
-        margin: 10,
+        margin: 1,
     },
 };
 
