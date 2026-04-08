@@ -18,6 +18,11 @@ import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { scaleDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 import { appSettings, dialogsSettings } from "@/store/0-ui-settings";
 
+//TODO: margin on viewBox in scale dialog
+//TODO: update top menu may be use operations section instead
+//TODO: viewBox in preview control
+//TODO: compound path support
+
 export function ScaleDialog() {
     const [open, setOpen] = useAtom(scaleDialogOpenAtom);
 
