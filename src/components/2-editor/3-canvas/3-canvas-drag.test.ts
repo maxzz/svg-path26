@@ -6,7 +6,7 @@ import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { pathPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { doSetPathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { canvasRootSvgElementAtom, canvasViewPortAtom, doSetViewPortAtom } from "@/store/0-atoms/2-3-canvas-viewport";
-import { isCanvasDraggingAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-editor-actions";
+import { isCanvasDraggingAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { imagesAtom, type EditorImage } from "@/store/0-atoms/2-8-images";
 import { canvasDragStateAtom, doApplyActiveCanvasDragAtClientAtom, doCancelActiveCanvasDragAtom, doCommitActiveCanvasDragAtom, doStartCanvasDragAtom, doStartImageDragAtom, doStartPointDragAtom, doStartSelectedSegmentsDragAtom } from "./3-canvas-drag";
 

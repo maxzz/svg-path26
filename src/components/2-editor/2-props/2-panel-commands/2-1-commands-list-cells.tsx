@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSetAtom } from "jotai";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
-import { doSetCommandValueAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-editor-actions";
+import { doSetCommandValueAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { cn } from "@/utils";
 import { commandValueTooltip } from "./8-helpers";
 

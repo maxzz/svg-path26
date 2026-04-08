@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { doClearPathAtom, doNormalizePathAtom, doSetAbsoluteAtom, doSetRelativeAtom } from "@/store/0-atoms/2-4-editor-actions";
+import { doClearPathAtom, doNormalizePathAtom, doSetAbsoluteAtom, doSetRelativeAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { aboutDialogOpenAtom, exportSvgDialogOpenAtom, openPathDialogOpenAtom, optionsDialogOpenAtom, savePathDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 import { isImageEditModeAtom } from "@/store/0-atoms/2-8-images";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";

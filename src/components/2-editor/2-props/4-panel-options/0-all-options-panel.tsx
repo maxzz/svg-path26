@@ -1,7 +1,7 @@
 import { useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
-import { doNormalizePathAtom } from "@/store/0-atoms/2-4-editor-actions";
+import { doNormalizePathAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { appSettings } from "@/store/0-ui-settings";
 import { CheckboxRow, NumberRow } from "../../../4-dialogs/8-3-options/1-options-controls";
 import { ViewBoxControls } from "../../../4-dialogs/8-3-options/2-viewbox-controls";

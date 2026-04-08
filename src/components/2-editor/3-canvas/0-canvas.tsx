@@ -11,7 +11,7 @@ import { useCanvasDragAndDrop } from "./3-canvas-drag";
 import { PathCanvasImages } from "./1-overlays/6-images";
 import { useSyncCanvasViewportSize } from "../../../store/0-atoms/2-3-canvas-viewport-derives";
 import { appSettings } from "@/store/0-ui-settings";
-import { doClearCanvasFocusAtom } from "@/store/0-atoms/2-4-editor-actions";
+import { doClearCanvasFocusAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
 import { canvasRootSvgElementAtom, canvasViewPortAtom, rootSvgElementSizeAtom, doAdjustViewPortToAspectAtom, doFitViewPortAtom, doFitViewPortToPathViewBoxAtom, doWheelZoomViewPortAtom, doZoomViewPortAtom } from "@/store/0-atoms/2-3-canvas-viewport";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";

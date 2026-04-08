@@ -2,7 +2,7 @@ import { atom } from "jotai";
 import { appSettings } from "@/store/0-ui-settings";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { pathViewBoxAtom } from "../../../store/0-atoms/2-2-path-viewbox";
-import { doScaleSelectedSegmentsIntoViewBoxAtom } from "../../../store/0-atoms/2-4-editor-actions";
+import { doScaleSelectedSegmentsIntoViewBoxAtom } from "../../../store/0-atoms/2-4-1-editor-actions-scale";
 
 export const scaleToViewBoxMarginDraftAtom = atom<number>(appSettings.dialogs.scaleToViewBox.margin);
 

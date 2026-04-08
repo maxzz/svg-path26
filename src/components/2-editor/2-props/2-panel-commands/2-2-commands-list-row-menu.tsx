@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/shadcn/button";
 import { IconRadix_DotsHorizontal } from "@/components/ui/icons/normal";
 import { commandLabel } from "./8-helpers";
 import { svgModelAtom } from "@/store/0-atoms/2-0-svg-model";
-import { doConvertSegmentAtom, doDeleteSegmentAtom, doInsertSegmentAtom, doToggleSegmentRelativeAtom } from "@/store/0-atoms/2-4-editor-actions";
+import { doConvertSegmentAtom, doDeleteSegmentAtom, doInsertSegmentAtom, doToggleSegmentRelativeAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 
 const COMMAND_TYPES = ["M", "L", "V", "H", "C", "S", "Q", "T", "A", "Z"] as const;
 

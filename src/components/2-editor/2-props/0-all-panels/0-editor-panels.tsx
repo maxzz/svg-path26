@@ -7,7 +7,7 @@ import { ImagesPanel } from "../5-panel-images/3-images-panel";
 import { OptionsPanel } from "../4-panel-options/0-all-options-panel";
 import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
 import { CopyClipboardOverlayButton } from "./1-copy-clipboard-overlay-button";
-import { doHandleEditorKeyDownAtom } from "@/store/0-atoms/2-4-editor-actions";
+import { doHandleEditorKeyDownAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { doApplySvgInputTextAtom, doSelectSvgInputNodeAtom, svgInputDocumentAtom, svgInputErrorAtom, svgInputSelectedNodeAtom, svgInputSelectedNodeIdAtom } from "@/store/0-atoms/1-3-svg-input";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";

@@ -2,7 +2,7 @@ import { useAtom, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { Slider } from "@/components/ui/shadcn/slider";
 import { Switch } from "@/components/ui/shadcn/switch";
-import { strokeWidthAtom } from "@/store/0-atoms/2-4-editor-actions";
+import { strokeWidthAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { doZoomViewPortAtom } from "@/store/0-atoms/2-3-canvas-viewport";
 import { appSettings } from "@/store/0-ui-settings";
 

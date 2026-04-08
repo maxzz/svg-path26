@@ -4,7 +4,7 @@ import { appSettings } from "@/store/0-ui-settings";
 import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
 import { optionsDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
-import { doNormalizePathAtom } from "@/store/0-atoms/2-4-editor-actions";
+import { doNormalizePathAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { CheckboxRow, NumberRow } from "./1-options-controls";
 import { ViewBoxControls } from "./2-viewbox-controls";
 import { isThemeDark, toggleTheme } from "@/utils";

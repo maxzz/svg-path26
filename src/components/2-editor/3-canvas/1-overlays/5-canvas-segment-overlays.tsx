@@ -2,7 +2,7 @@ import { type PointerEvent } from "react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { canvasStrokeWidthAtom, hoveredSegmentStrokeWidthAtom, selectedSegmentStrokeWidthAtom } from "../../../../store/0-atoms/2-3-canvas-viewport-derives";
-import { doRegisterCanvasSegmentHitAreaAtom, doSelectCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, hoveredStandaloneSegmentPathAtom, selectedCommandIndicesAtom, selectedStandaloneSegmentPathsAtom } from "@/store/0-atoms/2-4-editor-actions";
+import { doRegisterCanvasSegmentHitAreaAtom, doSelectCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, hoveredStandaloneSegmentPathAtom, selectedCommandIndicesAtom, selectedStandaloneSegmentPathsAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { getCommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils";
 import { standaloneSegmentPathsAtom } from "@/store/0-atoms/2-0-svg-model";
