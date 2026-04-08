@@ -14,16 +14,9 @@ export const scaleToViewBoxDialogOpenAtom = atom(
     (get) => get(scaleToViewBoxDialogOpenBaseAtom),
     (_get, set, open: boolean) => {
         if (open) {
-            set(doResetScaleToViewBoxMarginDraftAtom);
+            set(scaleToViewBoxMarginDraftAtom, normalizeScaleToViewBoxMargin(appSettings.dialogs.scaleToViewBox.margin)); // reset the draft margin to the current margin
         }
         set(scaleToViewBoxDialogOpenBaseAtom, open);
-    },
-);
-
-export const doResetScaleToViewBoxMarginDraftAtom = atom( // exported for testing only and inline use
-    null,
-    (_get, set) => {
-        set(scaleToViewBoxMarginDraftAtom, normalizeScaleToViewBoxMargin(appSettings.dialogs.scaleToViewBox.margin));
     },
 );
 
@@ -53,7 +46,7 @@ function isValidScaleToViewBoxMargin(value: number, viewBox: ViewBox) {
 
 const SCALE_TO_VIEWBOX_MARGIN_EPS = 1e-9;
 
-function normalizeScaleToViewBoxMargin(value: number) {
+export function normalizeScaleToViewBoxMargin(value: number) {
     return Number.isFinite(value) ? Math.max(0, value) : 0;
 }
 

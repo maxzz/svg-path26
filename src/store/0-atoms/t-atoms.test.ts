@@ -12,7 +12,7 @@ import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } fr
 import { doAsyncExecuteConfirmDialogAtom, isOpenConfirmDialogAtom } from "../../components/4-dialogs/8-1-confirmation/9-types-confirmation";
 import { doOpenNamedPathAtom, doSaveNamedPathAtom } from "./2-6-stored-paths-actions";
 import { doSetPathViewBoxAtom, pathViewBoxAtom } from "./2-2-path-viewbox";
-import { doResetScaleToViewBoxMarginDraftAtom, doScaleSelectedSegmentsIntoViewBoxFromDraftAtom, scaleToViewBoxMarginDraftAtom } from "../../components/4-dialogs/7-scale-to-viewbox/1-scale-to-viewbox-atoms";
+import { doScaleSelectedSegmentsIntoViewBoxFromDraftAtom, scaleToViewBoxMarginDraftAtom } from "../../components/4-dialogs/7-scale-to-viewbox/1-scale-to-viewbox-atoms";
 import { appSettings } from "@/store/0-ui-settings";
 import { normalizeStoredSettings } from "@/store/1-ui-settings-normalize";
 import { DEFAULT_DIALOGS_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS } from "@/store/9-ui-settings-types-and-defaults";
@@ -293,7 +293,7 @@ describe("svg path state atoms", () => {
         store.set(doSetPathViewBoxAtom, [0, 0, 20, 20]);
         store.set(doSetViewPortAtom, [2, 3, 20, 20]);
         appSettings.dialogs.scaleToViewBox.margin = 1.5;
-        store.set(doResetScaleToViewBoxMarginDraftAtom);
+        store.set(scaleToViewBoxMarginDraftAtom, 1.5);
 
         const beforeViewPort = store.get(canvasViewPortAtom);
         const viewBox = store.get(pathViewBoxAtom);
