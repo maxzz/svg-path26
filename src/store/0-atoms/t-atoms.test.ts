@@ -11,7 +11,7 @@ import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } fr
 import { doAsyncExecuteConfirmDialogAtom, isOpenConfirmDialogAtom } from "../../components/4-dialogs/8-1-confirmation/9-types-confirmation";
 import { doOpenNamedPathAtom, doSaveNamedPathAtom } from "./2-6-stored-paths-actions";
 import { doSetPathViewBoxAtom, pathViewBoxAtom } from "./2-2-path-viewbox";
-import { doResetScaleToViewBoxMarginDraftAtom, doScaleSelectedSegmentsIntoViewBoxFromDraftAtom, scaleToViewBoxMarginDraftAtom } from "../../components/4-dialogs/7-scale-to-viewbox/4-2-dialog-scale-to-viewbox-atoms";
+import { doResetScaleToViewBoxMarginDraftAtom, doScaleSelectedSegmentsIntoViewBoxFromDraftAtom, scaleToViewBoxMarginDraftAtom } from "../../components/4-dialogs/7-scale-to-viewbox/8-scale-to-viewbox-atoms";
 import { appSettings } from "@/store/0-ui-settings";
 import { normalizeStoredSettings } from "@/store/1-ui-settings-normalize";
 import { DEFAULT_DIALOGS_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS } from "@/store/9-ui-settings-types-and-defaults";

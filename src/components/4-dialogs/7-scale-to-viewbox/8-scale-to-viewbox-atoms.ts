@@ -13,6 +13,18 @@ export const doResetScaleToViewBoxMarginDraftAtom = atom(
     },
 );
 
+const scaleToViewBoxDialogOpenBaseAtom = atom(false);
+
+export const scaleToViewBoxDialogOpenAtom = atom(
+    (get) => get(scaleToViewBoxDialogOpenBaseAtom),
+    (_get, set, open: boolean) => {
+        if (open) {
+            set(doResetScaleToViewBoxMarginDraftAtom);
+        }
+        set(scaleToViewBoxDialogOpenBaseAtom, open);
+    },
+);
+
 export const doScaleSelectedSegmentsIntoViewBoxFromDraftAtom = atom(
     null,
     (get, set) => {

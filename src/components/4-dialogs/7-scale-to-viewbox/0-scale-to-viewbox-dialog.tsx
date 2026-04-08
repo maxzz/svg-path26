@@ -2,8 +2,7 @@ import { useAtom, useSetAtom } from "jotai";
 import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
 import { NumberField } from "@/components/ui/loacal-ui/2-number-field";
-import { scaleToViewBoxDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
-import { applyButtonAtom, scaleToViewBoxMarginDraftAtom } from "@/components/4-dialogs/7-scale-to-viewbox/4-2-dialog-scale-to-viewbox-atoms";
+import { applyButtonAtom, scaleToViewBoxDialogOpenAtom, scaleToViewBoxMarginDraftAtom } from "@/components/4-dialogs/7-scale-to-viewbox/8-scale-to-viewbox-atoms";
 import { notice } from "@/components/ui/loacal-ui/7-toaster";
 
 export function ScaleToViewBoxDialog() {
