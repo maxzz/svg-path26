@@ -5,7 +5,7 @@ import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "@/stor
 import { commandRowsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { doCenterSelectedSegmentsIntoViewBoxAtom, doClearPathAtom, doNormalizePathAtom, doSelectAllCommandsAtom, doSetAbsoluteAtom, doSetRelativeAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-0-editor-actions";
-import { scaleToViewBoxDialogOpenAtom } from "@/components/4-dialogs/7-scale-to-viewbox/8-scale-to-viewbox-atoms";
+import { scaleToViewBoxDialogOpenAtom } from "@/components/4-dialogs/7-scale-to-viewbox/1-scale-to-viewbox-atoms";
 import { appSettings } from "@/store/0-ui-settings";
 
 export function EditMenu() {

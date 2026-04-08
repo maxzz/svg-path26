@@ -1,9 +1,9 @@
 import { atom } from "jotai";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
 import { notice } from "@/components/ui/loacal-ui/7-toaster/7-toaster";
-import { svgModelAtom } from "./2-0-svg-model";
-import { pathViewBoxAtom } from "./2-2-path-viewbox";
-import { canvasSegmentHitAreaElementsAtom, doApplySvgModelAtom, selectedCommandIndicesAtom } from "./2-4-0-editor-actions";
+import { svgModelAtom } from "../../../store/0-atoms/2-0-svg-model";
+import { pathViewBoxAtom } from "../../../store/0-atoms/2-2-path-viewbox";
+import { canvasSegmentHitAreaElementsAtom, doApplySvgModelAtom, selectedCommandIndicesAtom } from "../../../store/0-atoms/2-4-0-editor-actions";
 
 export const doScaleSelectedSegmentsIntoViewBoxAtom = atom(
     null,

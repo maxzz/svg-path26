@@ -2,16 +2,18 @@ import { atom } from "jotai";
 import { appSettings } from "@/store/0-ui-settings";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { pathViewBoxAtom } from "../../../store/0-atoms/2-2-path-viewbox";
-import { doScaleSelectedSegmentsIntoViewBoxAtom } from "../../../store/0-atoms/2-4-1-editor-actions-scale";
+import { doScaleSelectedSegmentsIntoViewBoxAtom } from "./2-do-scale";
 
 export const scaleToViewBoxMarginDraftAtom = atom<number>(appSettings.dialogs.scaleToViewBox.margin);
 
-export const doResetScaleToViewBoxMarginDraftAtom = atom(
+export const doResetScaleToViewBoxMarginDraftAtom = atom( // exported for testing only
     null,
     (_get, set) => {
         set(scaleToViewBoxMarginDraftAtom, normalizeScaleToViewBoxMargin(appSettings.dialogs.scaleToViewBox.margin));
     },
 );
+
+// Open dialog atom
 
 const scaleToViewBoxDialogOpenBaseAtom = atom(false);
 
@@ -24,6 +26,8 @@ export const scaleToViewBoxDialogOpenAtom = atom(
         set(scaleToViewBoxDialogOpenBaseAtom, open);
     },
 );
+
+// Scale selected segments into viewBox from the draft margin.
 
 export const doScaleSelectedSegmentsIntoViewBoxFromDraftAtom = atom(
     null,
@@ -38,7 +42,7 @@ export const doScaleSelectedSegmentsIntoViewBoxFromDraftAtom = atom(
     },
 );
 
-export function isValidScaleToViewBoxMargin(value: number, viewBox: ViewBox) {
+function isValidScaleToViewBoxMargin(value: number, viewBox: ViewBox) {
     if (!Number.isFinite(value) || value < 0) return false;
 
     const margin = normalizeScaleToViewBoxMargin(value);
@@ -52,6 +56,8 @@ const SCALE_TO_VIEWBOX_MARGIN_EPS = 1e-9;
 function normalizeScaleToViewBoxMargin(value: number) {
     return Number.isFinite(value) ? Math.max(0, value) : 0;
 }
+
+// Apply button atom returns whether the scale can be applied based on the draft margin and the path viewBox.
 
 export const applyButtonAtom = atom(
     (get) => isValidScaleToViewBoxMargin(get(scaleToViewBoxMarginDraftAtom), get(pathViewBoxAtom)),
