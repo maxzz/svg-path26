@@ -6,13 +6,6 @@ import { doScaleSelectedSegmentsIntoViewBoxAtom } from "./2-do-scale";
 
 export const scaleToViewBoxMarginDraftAtom = atom<number>(appSettings.dialogs.scaleToViewBox.margin);
 
-export const doResetScaleToViewBoxMarginDraftAtom = atom( // exported for testing only
-    null,
-    (_get, set) => {
-        set(scaleToViewBoxMarginDraftAtom, normalizeScaleToViewBoxMargin(appSettings.dialogs.scaleToViewBox.margin));
-    },
-);
-
 // Open dialog atom
 
 const scaleToViewBoxDialogOpenBaseAtom = atom(false);
@@ -24,6 +17,13 @@ export const scaleToViewBoxDialogOpenAtom = atom(
             set(doResetScaleToViewBoxMarginDraftAtom);
         }
         set(scaleToViewBoxDialogOpenBaseAtom, open);
+    },
+);
+
+export const doResetScaleToViewBoxMarginDraftAtom = atom( // exported for testing only and inline use
+    null,
+    (_get, set) => {
+        set(scaleToViewBoxMarginDraftAtom, normalizeScaleToViewBoxMargin(appSettings.dialogs.scaleToViewBox.margin));
     },
 );
 
