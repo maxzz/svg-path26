@@ -1,32 +1,11 @@
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
 import { NumberField } from "@/components/ui/loacal-ui/2-number-field";
 import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { scaleToViewBoxDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 import { doScaleSelectedSegmentsIntoViewBoxFromDraftAtom, isValidScaleToViewBoxMargin, scaleToViewBoxMarginDraftAtom } from "@/components/4-dialogs/7-scale-to-viewbox/4-2-dialog-scale-to-viewbox-atoms";
-
-function ScaleToViewBoxApplyButton() {
-    const margin = useAtomValue(scaleToViewBoxMarginDraftAtom);
-    const pathViewBox = useAtomValue(pathViewBoxAtom);
-    const doScaleToViewBoxFromDraft = useSetAtom(doScaleSelectedSegmentsIntoViewBoxFromDraftAtom);
-    const setOpen = useSetAtom(scaleToViewBoxDialogOpenAtom);
-
-    const canApply = isValidScaleToViewBoxMargin(margin, pathViewBox);
-
-    return (
-        <Button
-            disabled={!canApply}
-            onClick={() => {
-                if (!canApply) return;
-                doScaleToViewBoxFromDraft();
-                setOpen(false);
-            }}
-        >
-            Scale
-        </Button>
-    );
-}
+import { notice } from "@/components/ui/loacal-ui/7-toaster";
 
 export function ScaleToViewBoxDialog() {
     const [open, setOpen] = useAtom(scaleToViewBoxDialogOpenAtom);
@@ -51,9 +30,40 @@ export function ScaleToViewBoxDialog() {
 
                 <DialogFooter>
                     <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-                    <ScaleToViewBoxApplyButton />
+                    <ApplyButton />
                 </DialogFooter>
             </DialogContent>
         </Dialog>
     );
 }
+
+function ApplyButton() {
+    const [canApply, setCanApply] = useAtom(applyButtonAtom);
+    console.log("canApply", canApply);
+    return (
+        <Button
+            //disabled={!canApply}
+            onClick={() => {
+                const applied = setCanApply();
+                !applied && notice.info("Scale cannot be applied because the margin is too large.");
+            }}
+        >
+            Scale
+        </Button>
+    );
+}
+
+const applyButtonAtom = atom(
+    (get) => isValidScaleToViewBoxMargin(get(scaleToViewBoxMarginDraftAtom), get(pathViewBoxAtom)),
+    (get, set): boolean => {
+        const margin = get(scaleToViewBoxMarginDraftAtom);
+        const pathViewBox = get(pathViewBoxAtom);
+        if (!isValidScaleToViewBoxMargin(margin, pathViewBox)) {
+            return false;
+        }
+
+        set(doScaleSelectedSegmentsIntoViewBoxFromDraftAtom);
+        set(scaleToViewBoxDialogOpenAtom, false);
+        return true;
+    },
+);

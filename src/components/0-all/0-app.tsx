@@ -10,10 +10,12 @@ import { ScaleToViewBoxDialog } from "../4-dialogs/7-scale-to-viewbox/0-scale-to
 import { AboutDialog } from "../4-dialogs/8-2-about/0-about-dialog";
 import { OptionsDialog } from "../4-dialogs/8-3-options/0-options-dialog";
 import { ConfirmationDialog } from "../4-dialogs/8-1-confirmation/0-confirmation-dialog";
+import { Toaster as SonnerToaster } from "sonner";
 
 export function App() {
     return (<>
         <UISymbolDefs />
+        <SonnerToaster />
 
         <div className="h-screen w-screen text-foreground bg-background overflow-hidden">
             <div className="h-full flex flex-col">
