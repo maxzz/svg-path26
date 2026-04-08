@@ -8,52 +8,49 @@ import { notice } from "@/components/ui/loacal-ui/7-toaster";
 export function ScaleToViewBoxDialog() {
     const [open, setOpen] = useAtom(scaleToViewBoxDialogOpenAtom);
     const [margin, setMargin] = useAtom(scaleToViewBoxMarginDraftAtom);
+    const [, applyScaleToViewBox] = useAtom(applyButtonAtom);
+
+    const handleSubmit = () => {
+        const applied = applyScaleToViewBox();
+        if (!applied) {
+            notice.info("Scale cannot be applied because the margin is too large.");
+            return;
+        }
+        setOpen(false);
+    };
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="max-w-xs!">
-                <DialogHeader>
-                    <DialogTitle>Scale to viewBox</DialogTitle>
-                    <DialogDescription>
-                        Scale the current selection uniformly so it fits inside the current viewBox.
-                    </DialogDescription>
-                </DialogHeader>
+                <form
+                    className="space-y-6"
+                    onSubmit={(event) => {
+                        event.preventDefault();
+                        handleSubmit();
+                    }}
+                >
+                    <DialogHeader>
+                        <DialogTitle>Scale to viewBox</DialogTitle>
+                        <DialogDescription>
+                            Scale the current selection uniformly so it fits inside the current viewBox.
+                        </DialogDescription>
+                    </DialogHeader>
 
-                <div className="space-y-3 text-xs">
-                    <NumberField label="Margin" value={margin} min={0} onChange={setMargin} />
-                    <p className="text-muted-foreground">
-                        The margin is applied equally on all four sides before the selection is centered.
-                    </p>
-                </div>
+                    <div className="space-y-3 text-xs">
+                        <NumberField label="Margin" value={margin} min={0} onChange={setMargin} />
+                        <p className="text-muted-foreground">
+                            The margin is applied equally on all four sides before the selection is centered.
+                        </p>
+                    </div>
 
-                <DialogFooter>
-                    <Button variant="outline" onClick={() => setOpen(false)}>
-                        Cancel
-                    </Button>
-                    <ApplyButton />
-                </DialogFooter>
+                    <DialogFooter>
+                        <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button type="submit">Scale</Button>
+                    </DialogFooter>
+                </form>
             </DialogContent>
         </Dialog>
-    );
-}
-
-function ApplyButton() {
-    const [canApply, setCanApply] = useAtom(applyButtonAtom);
-    const setOpen = useSetAtom(scaleToViewBoxDialogOpenAtom);
-    console.log("canApply", canApply);
-    return (
-        <Button
-            //disabled={!canApply}
-            onClick={() => {
-                const applied = setCanApply();
-                if (!applied) {
-                    notice.info("Scale cannot be applied because the margin is too large.");
-                    return;
-                }
-                setOpen(false);
-            }}
-        >
-            Scale
-        </Button>
     );
 }
