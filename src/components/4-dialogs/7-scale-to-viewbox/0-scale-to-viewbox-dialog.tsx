@@ -11,7 +11,7 @@ export function ScaleToViewBoxDialog() {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="max-w-sm">
+            <DialogContent className="max-w-xs!">
                 <DialogHeader>
                     <DialogTitle>Scale to viewBox</DialogTitle>
                     <DialogDescription>
@@ -27,7 +27,9 @@ export function ScaleToViewBoxDialog() {
                 </div>
 
                 <DialogFooter>
-                    <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+                    <Button variant="outline" onClick={() => setOpen(false)}>
+                        Cancel
+                    </Button>
                     <ApplyButton />
                 </DialogFooter>
             </DialogContent>

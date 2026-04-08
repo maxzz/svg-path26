@@ -293,7 +293,7 @@ describe("svg path state atoms", () => {
         store.set(doSetPathViewBoxAtom, [0, 0, 20, 20]);
         store.set(doSetViewPortAtom, [2, 3, 20, 20]);
         appSettings.dialogs.scaleToViewBox.margin = 1.5;
-        store.set(scaleToViewBoxMarginDraftAtom, 1.5);
+        store.set(scaleToViewBoxMarginDraftAtom, appSettings.dialogs.scaleToViewBox.margin);
 
         const beforeViewPort = store.get(canvasViewPortAtom);
         const viewBox = store.get(pathViewBoxAtom);
