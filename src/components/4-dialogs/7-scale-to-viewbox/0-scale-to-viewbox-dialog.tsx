@@ -6,12 +6,31 @@ import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { scaleToViewBoxDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 import { doScaleSelectedSegmentsIntoViewBoxFromDraftAtom, isValidScaleToViewBoxMargin, scaleToViewBoxMarginDraftAtom } from "@/components/4-dialogs/7-scale-to-viewbox/4-2-dialog-scale-to-viewbox-atoms";
 
+function ScaleToViewBoxApplyButton() {
+    const margin = useAtomValue(scaleToViewBoxMarginDraftAtom);
+    const pathViewBox = useAtomValue(pathViewBoxAtom);
+    const doScaleToViewBoxFromDraft = useSetAtom(doScaleSelectedSegmentsIntoViewBoxFromDraftAtom);
+    const setOpen = useSetAtom(scaleToViewBoxDialogOpenAtom);
+
+    const canApply = isValidScaleToViewBoxMargin(margin, pathViewBox);
+
+    return (
+        <Button
+            disabled={!canApply}
+            onClick={() => {
+                if (!canApply) return;
+                doScaleToViewBoxFromDraft();
+                setOpen(false);
+            }}
+        >
+            Scale
+        </Button>
+    );
+}
+
 export function ScaleToViewBoxDialog() {
     const [open, setOpen] = useAtom(scaleToViewBoxDialogOpenAtom);
     const [margin, setMargin] = useAtom(scaleToViewBoxMarginDraftAtom);
-    const pathViewBox = useAtomValue(pathViewBoxAtom);
-    const doScaleToViewBoxFromDraft = useSetAtom(doScaleSelectedSegmentsIntoViewBoxFromDraftAtom);
-    const canApply = isValidScaleToViewBoxMargin(margin, pathViewBox);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -32,16 +51,7 @@ export function ScaleToViewBoxDialog() {
 
                 <DialogFooter>
                     <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-                    <Button
-                        disabled={!canApply}
-                        onClick={() => {
-                            if (!canApply) return;
-                            doScaleToViewBoxFromDraft();
-                            setOpen(false);
-                        }}
-                    >
-                        Scale
-                    </Button>
+                    <ScaleToViewBoxApplyButton />
                 </DialogFooter>
             </DialogContent>
         </Dialog>
