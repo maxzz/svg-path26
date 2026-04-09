@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
-import { doHandleEditorKeyDownAtom } from "@/store/0-atoms/2-4-0-editor-actions";
+import { doHandleEditorKeyDownAtom } from "./8-atoms";
 
 import { Section_SvgPreview } from "../1-section-svg-preview/0-all-svg-preview";
 import { Section_SvgInput } from "../2-section-input-svg/0-all-input-svg";
@@ -13,7 +13,6 @@ import { Section_Options } from "../6-section-options/0-all-options";
 import { Section_Images } from "../7-section-images/0-all-images";
 
 export function EditorPanels() {
-    const { showSvgPreviewSection } = useSnapshot(appSettings);
     const handleEditorKeyDown = useSetAtom(doHandleEditorKeyDownAtom);
 
     useEffect(
@@ -29,7 +28,7 @@ export function EditorPanels() {
     return (
         <aside className="h-full border-r flex flex-col justify-between">
             <div className="grow flex-1 overflow-auto [scrollbar-gutter:stable]">
-                {showSvgPreviewSection && <Section_SvgPreview />}
+                <Section_SvgPreview />
                 <Section_SvgInput />
                 <Section_PathInput />
                 <Section_PathCommands />
