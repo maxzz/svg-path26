@@ -1,12 +1,13 @@
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
+import { classNames } from "@/utils";
+import { appSettings } from "@/store/0-ui-settings";
+import { IconGrid, IconSnapToGrid, IconSnapToGrid2 } from "../ui/icons";
 import { Checkbox } from "@/components/ui/shadcn/checkbox";
 import { Button } from "@/components/ui/shadcn/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
 import { IconAdjustmentsHorizontal } from "@/components/ui/icons/normal";
-import { appSettings } from "@/store/0-ui-settings";
 import { commandCountAtom, parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
-import { IconSnapToGrid2 } from "../ui/icons";
 
 export function Footer() {
     const { showGrid, darkCanvas, showViewBoxFrame, snapToGrid, showHelpers, fillPreview } = useSnapshot(appSettings.canvas);
@@ -26,10 +27,10 @@ export function Footer() {
                         className="px-1 pb-px h-4 text-[10px] border rounded"
                         onClick={() => { appSettings.canvas.snapToGrid = !snapToGrid; }}
                         aria-pressed={snapToGrid}
+                        title={snapToGrid ? "Snap to grid on" : "Snap to grid off"}
                         type="button"
                     >
-                        <IconSnapToGrid2 className="size-3" />
-                        {/* {snapToGrid ? "Snap to grid on" : "Snap to grid off"} */}
+                        <IconSnapToGrid2 className={classNames("size-3", snapToGrid ? "text-emerald-700 dark:text-emerald-300" : "text-muted-foreground")} />
                     </Button>
                 )}
 
@@ -40,9 +41,10 @@ export function Footer() {
                         className="px-1 pb-px h-4 text-[10px] border rounded"
                         onClick={() => { appSettings.canvas.showGrid = !showGrid; }}
                         aria-pressed={showGrid}
+                        title={showGrid ? "Grid on" : "Grid off"}
                         type="button"
                     >
-                        {showGrid ? "Grid on" : "Grid off"}
+                        <IconGrid className={classNames("size-3", showGrid ? "stroke-3! text-emerald-700 dark:text-emerald-300" : "text-muted-foreground")} />
                     </Button>
                 )}
 
