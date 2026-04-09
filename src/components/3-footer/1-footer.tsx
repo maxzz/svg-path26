@@ -1,10 +1,12 @@
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { Checkbox } from "@/components/ui/shadcn/checkbox";
+import { Button } from "@/components/ui/shadcn/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
 import { IconAdjustmentsHorizontal } from "@/components/ui/icons/normal";
 import { appSettings } from "@/store/0-ui-settings";
 import { commandCountAtom, parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
+import { IconSnapToGrid2 } from "../ui/icons";
 
 export function Footer() {
     const { showGrid, darkCanvas, showViewBoxFrame, snapToGrid, showHelpers, fillPreview } = useSnapshot(appSettings.canvas);
@@ -18,69 +20,82 @@ export function Footer() {
                 {footerButtons.showTicksToggle && <TicksToggleInput />}
 
                 {footerButtons.showSnapToGridToggle && (
-                    <button
+                    <Button
+                        variant="outline"
+                        size="xs"
                         className="px-1 pb-px h-4 text-[10px] border rounded"
                         onClick={() => { appSettings.canvas.snapToGrid = !snapToGrid; }}
                         aria-pressed={snapToGrid}
                         type="button"
                     >
-                        {snapToGrid ? "Snap to grid on" : "Snap to grid off"}
-                    </button>
+                        <IconSnapToGrid2 className="size-3" />
+                        {/* {snapToGrid ? "Snap to grid on" : "Snap to grid off"} */}
+                    </Button>
                 )}
 
                 {footerButtons.showGridToggle && (
-                    <button
+                    <Button
+                        variant="outline"
+                        size="xs"
                         className="px-1 pb-px h-4 text-[10px] border rounded"
                         onClick={() => { appSettings.canvas.showGrid = !showGrid; }}
                         aria-pressed={showGrid}
                         type="button"
                     >
                         {showGrid ? "Grid on" : "Grid off"}
-                    </button>
+                    </Button>
                 )}
 
                 {footerButtons.showDarkCanvasToggle && (
-                    <button
+                    <Button
+                        variant="outline"
+                        size="xs"
                         className="px-1 pb-px h-4 text-[10px] border rounded"
                         onClick={() => { appSettings.canvas.darkCanvas = !darkCanvas; }}
                         aria-pressed={darkCanvas}
                         type="button"
                     >
                         {darkCanvas ? "Dark canvas" : "Light canvas"}
-                    </button>
+                    </Button>
                 )}
 
                 {footerButtons.showViewBoxFrameToggle && (
-                    <button
+                    <Button
+                        variant="outline"
+                        size="xs"
                         className="px-1 pb-px h-4 text-[10px] border rounded"
                         onClick={() => { appSettings.canvas.showViewBoxFrame = !showViewBoxFrame; }}
                         aria-pressed={showViewBoxFrame}
                         type="button"
                     >
                         {showViewBoxFrame ? "viewBox frame on" : "viewBox frame off"}
-                    </button>
+                    </Button>
                 )}
 
                 {footerButtons.showShowHelpersToggle && (
-                    <button
+                    <Button
+                        variant="outline"
+                        size="xs"
                         className="px-1 pb-px h-4 text-[10px] border rounded"
                         onClick={() => { appSettings.canvas.showHelpers = !showHelpers; }}
                         aria-pressed={showHelpers}
                         type="button"
                     >
                         {showHelpers ? "Point controls on" : "Point controls off"}
-                    </button>
+                    </Button>
                 )}
 
                 {footerButtons.showFillPreviewToggle && (
-                    <button
+                    <Button
+                        variant="outline"
+                        size="xs"
                         className="px-1 pb-px h-4 text-[10px] border rounded"
                         onClick={() => { appSettings.canvas.fillPreview = !fillPreview; }}
                         aria-pressed={fillPreview}
                         type="button"
                     >
                         {fillPreview ? "Fill preview on" : "Fill preview off"}
-                    </button>
+                    </Button>
                 )}
 
                 <FooterButtonsPopover />
@@ -95,14 +110,16 @@ function FooterButtonsPopover() {
     return (
         <Popover>
             <PopoverTrigger asChild>
-                <button
+                <Button
+                    variant="outline"
+                    size="icon"
                     className="size-4 text-[10px] border rounded flex items-center justify-center"
                     title="Choose footer buttons"
                     aria-label="Choose footer buttons"
                     type="button"
                 >
                     <IconAdjustmentsHorizontal className="size-3" />
-                </button>
+                </Button>
             </PopoverTrigger>
 
             <PopoverContent className="p-3 pt-0 w-auto max-w-56 overflow-hidden" align="end">
@@ -213,14 +230,16 @@ function TicksToggleInput() {
                     appSettings.pathEditor.tickInterval = Math.max(1, Number(event.target.value) || 1);
                 }}
             />
-            <button
-                className="-ml-0.75 px-1 pb-px text-[10px] border rounded"
+            <Button
+                variant="outline"
+                size="xs"
+                className="-ml-0.75 px-1 pb-px h-4 text-[10px] border rounded"
                 onClick={() => { appSettings.canvas.showTicks = !showTicks; }}
                 aria-pressed={showTicks}
                 type="button"
             >
                 {showTicks ? "Ticks on" : "Ticks off"}
-            </button>
+            </Button>
         </div>
     );
 }
