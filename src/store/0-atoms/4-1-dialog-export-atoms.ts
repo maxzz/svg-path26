@@ -3,7 +3,7 @@ import { appSettings } from "@/store/0-ui-settings";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { pathViewBoxAtom } from "./2-2-path-viewbox";
-import { computeExportViewBox } from "@/components/2-editor/2-props/2-panel-commands/8-helpers";
+import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-path-commands/8-helpers";
 
 export type ExportViewBoxDraft = ViewBox;
 

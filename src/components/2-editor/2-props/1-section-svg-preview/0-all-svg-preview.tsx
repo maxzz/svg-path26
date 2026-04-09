@@ -1,13 +1,12 @@
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
-import { CopyClipboardOverlayButton } from "../../../ui/loacal-ui/4-copy-clipboard-overlay-button";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
 import { appSettings } from "@/store/0-ui-settings";
 import { svgInputDocumentAtom, svgInputErrorAtom, svgInputSelectedNodeAtom } from "@/store/0-atoms/1-3-svg-input";
-import { serializeSvgInputDocument, type SvgInputDocument } from "@/svg-core/3-svg-input";
+import { serializeSvgInputDocument } from "@/svg-core/3-svg-input";
 
-export function SvgPreviewSection() {
+export function Section_SvgPreview() {
     const document = useAtomValue(svgInputDocumentAtom);
     const selectedNode = useAtomValue(svgInputSelectedNodeAtom);
     const parseError = useAtomValue(svgInputErrorAtom);
@@ -51,15 +50,3 @@ export function SvgPreviewSection() {
         </TooltipProvider>
     );
 }
-
-export function CopySvgOverlay({ document }: { document: SvgInputDocument | null; }) {
-    return (
-        <CopyClipboardOverlayButton
-            copyText={document ? serializeSvgInputDocument(document) : ""}
-            canCopy={Boolean(document)}
-            idleLabel="Copy SVG"
-            successLabel="SVG copied"
-        />
-    );
-}
-
