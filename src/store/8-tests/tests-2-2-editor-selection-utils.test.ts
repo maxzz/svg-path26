@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyCommandSelection, getCommandSelectionMode, getMarqueeSelectionMode, remapSelectedIndicesAfterDelete } from "./0-atoms/2-5-editor-selection-utils";
+import { applyCommandSelection, getCommandSelectionMode, getMarqueeSelectionMode, remapSelectedIndicesAfterDelete } from "../0-atoms/2-5-editor-selection-utils";
 
 describe("editor selection utils", () => {
     it("applies replace, add, and remove selection modes", () => {
