@@ -12,7 +12,7 @@ export const doEnsureHistoryReadyAtom = atom(
     null,
     (get, set, initialPath?: string) => {
         if (get(historyReadyAtom)) return;
-        
+
         const initial = initialPath ?? get(rawPathAtom);
         set(historyStackAtom, [initial]);
         set(historyIndexAtom, 0);
@@ -79,7 +79,9 @@ export const doUndoPathAtom = atom(
         set(doEnsureHistoryReadyAtom);
         const index = get(historyIndexAtom);
         const stack = get(historyStackAtom);
-        if (index <= 0) return;
+        if (index <= 0) {
+            return;
+        }
 
         const nextIndex = index - 1;
         set(historyIndexAtom, nextIndex);
@@ -93,7 +95,9 @@ export const doRedoPathAtom = atom(
         set(doEnsureHistoryReadyAtom);
         const index = get(historyIndexAtom);
         const stack = get(historyStackAtom);
-        if (index === -1 || index >= stack.length - 1) return;
+        if (index === -1 || index >= stack.length - 1) {
+            return;
+        }
 
         const nextIndex = index + 1;
         set(historyIndexAtom, nextIndex);

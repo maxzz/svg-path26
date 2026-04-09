@@ -11,17 +11,17 @@ export function Section_SvgPreview() {
     if (!showSvgPreviewSection) {
         return null;
     }
-    
+
     return (
         <TooltipProvider delayDuration={250}>
             <SectionPanel sectionKey="svg-preview" label="SVG preview" contentClassName="px-1 py-1">
-                <Section_SvgPreview2 />
+                <SvgPreview />
             </SectionPanel>
         </TooltipProvider>
     );
 }
 
-export function Section_SvgPreview2() {
+export function SvgPreview() {
     const document = useAtomValue(svgInputDocumentAtom);
     const selectedNode = useAtomValue(svgInputSelectedNodeAtom);
     const parseError = useAtomValue(svgInputErrorAtom);

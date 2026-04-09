@@ -6,26 +6,23 @@ import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "./2-4-0-editor-actions";
 import { doSetPathViewBoxAtom, pathViewBoxAtom } from "./2-2-path-viewbox";
 
-export type StoredPath = {
-    name: string;
-    path: string;
-    viewBox: ViewBox;
-    createdAt: number;
-    updatedAt: number;
-};
-
 export const doSaveNamedPathAtom = atom(
     null,
     (get, set, nameRaw: string) => {
         const path = get(rawPathAtom).trim();
         const name = nameRaw.trim();
-        if (!path || !name) return;
+        if (!path || !name) {
+            return;
+        }
+
         const viewBox = [...get(pathViewBoxAtom)] as ViewBox;
         const now = Date.now();
         const existing = appSettings.pathEditor.storedPaths;
         const match = existing.find((it) => it.name === name);
         if (match) {
-            appSettings.pathEditor.storedPaths = existing.map((it) => it.name === name ? { ...it, path, viewBox, updatedAt: now } : it);
+            appSettings.pathEditor.storedPaths = existing.map(
+                (it) => it.name === name ? { ...it, path, viewBox, updatedAt: now } : it
+            );
         } else {
             appSettings.pathEditor.storedPaths = [...existing, { name, path, viewBox, createdAt: now, updatedAt: now }];
         }
@@ -36,7 +33,9 @@ export const doSaveNamedPathAtom = atom(
 export const doDeleteNamedPathAtom = atom(
     null,
     (get, set, name: string) => {
-        appSettings.pathEditor.storedPaths = appSettings.pathEditor.storedPaths.filter((it) => it.name !== name);
+        appSettings.pathEditor.storedPaths = appSettings.pathEditor.storedPaths.filter(
+            (it) => it.name !== name
+        );
         if (appSettings.pathEditor.pathName === name) {
             appSettings.pathEditor.pathName = "";
         }
@@ -47,7 +46,10 @@ export const doOpenNamedPathAtom = atom(
     null,
     (get, set, name: string) => {
         const match = appSettings.pathEditor.storedPaths.find((it) => it.name === name);
-        if (!match) return;
+        if (!match) {
+            return;
+        }
+
         set(svgPathInputAtom, match.path);
         set(doSetPathViewBoxAtom, match.viewBox);
         appSettings.pathEditor.pathName = name;

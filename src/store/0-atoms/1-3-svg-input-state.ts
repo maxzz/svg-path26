@@ -87,11 +87,13 @@ function replaceNodePathData(node: SvgInputNode, nodeId: string, nextPath: strin
     }
 
     let changed = false;
-    const nextChildren = node.children.map((child) => {
-        const nextChild = replaceNodePathData(child, nodeId, nextPath);
-        if (nextChild !== child) changed = true;
-        return nextChild;
-    });
+    const nextChildren = node.children.map(
+        (child) => {
+            const nextChild = replaceNodePathData(child, nodeId, nextPath);
+            if (nextChild !== child) changed = true;
+            return nextChild;
+        }
+    );
 
     if (!changed) return node;
     return {
@@ -105,10 +107,14 @@ function replacePathDataAttribute(attributes: SvgInputNode["attributes"], nextPa
     let found = false;
 
     const nextAttributes = attributes.map((attribute) => {
-        if (attribute.name !== "d") return attribute;
+        if (attribute.name !== "d") {
+            return attribute;
+        }
 
         found = true;
-        if (attribute.value === nextPath) return attribute;
+        if (attribute.value === nextPath) {
+            return attribute;
+        }
 
         changed = true;
         return {

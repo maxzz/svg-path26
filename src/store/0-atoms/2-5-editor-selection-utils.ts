@@ -42,11 +42,13 @@ export function remapSelectedIndicesAfterDelete(current: Iterable<number>, delet
     const deleted = normalizeSelectedCommandIndices(deletedIndices).sort((a, b) => a - b);
     const deletedSet = new Set(deleted);
 
-    return currentIndices.flatMap((index) => {
-        if (deletedSet.has(index)) return [];
-        const shift = deleted.reduce((count, deletedIndex) => count + Number(deletedIndex < index), 0);
-        return [index - shift];
-    });
+    return currentIndices.flatMap(
+        (index) => {
+            if (deletedSet.has(index)) return [];
+            const shift = deleted.reduce((count, deletedIndex) => count + Number(deletedIndex < index), 0);
+            return [index - shift];
+        }
+    );
 }
 
 export function getMarqueeSelectionIndices(args: {
@@ -59,19 +61,23 @@ export function getMarqueeSelectionIndices(args: {
     const selectionBounds = normalizeBounds(args.start, args.current);
     const selected = new Set<number>();
 
-    [...args.targetPoints, ...args.controlPoints].forEach((point) => {
-        if (isPointInsideBounds(point, selectionBounds)) {
-            selected.add(point.segmentIndex);
+    [...args.targetPoints, ...args.controlPoints].forEach(
+        (point) => {
+            if (isPointInsideBounds(point, selectionBounds)) {
+                selected.add(point.segmentIndex);
+            }
         }
-    });
+    );
 
-    Object.entries(args.pathElements).forEach(([key, element]) => {
-        const index = Number.parseInt(key, 10);
-        if (!element || !Number.isInteger(index) || selected.has(index)) return;
-        if (doesPathIntersectBounds(element, selectionBounds)) {
-            selected.add(index);
+    Object.entries(args.pathElements).forEach(
+        ([key, element]) => {
+            const index = Number.parseInt(key, 10);
+            if (!element || !Number.isInteger(index) || selected.has(index)) return;
+            if (doesPathIntersectBounds(element, selectionBounds)) {
+                selected.add(index);
+            }
         }
-    });
+    );
 
     return [...selected].sort((a, b) => a - b);
 }
@@ -136,10 +142,10 @@ function doesLineSegmentIntersectBounds(start: Point, end: Point, bounds: Bounds
     const bottomLeft = { x: bounds.xmin, y: bounds.ymax };
 
     return (
-        doLineSegmentsIntersect(start, end, topLeft, topRight)
-        || doLineSegmentsIntersect(start, end, topRight, bottomRight)
-        || doLineSegmentsIntersect(start, end, bottomRight, bottomLeft)
-        || doLineSegmentsIntersect(start, end, bottomLeft, topLeft)
+        doLineSegmentsIntersect(start, end, topLeft, topRight) ||
+        doLineSegmentsIntersect(start, end, topRight, bottomRight) ||
+        doLineSegmentsIntersect(start, end, bottomRight, bottomLeft) ||
+        doLineSegmentsIntersect(start, end, bottomLeft, topLeft)
     );
 }
 
@@ -159,15 +165,17 @@ function doLineSegmentsIntersect(a: Point, b: Point, c: Point, d: Point): boolea
 
 function getOrientation(a: Point, b: Point, c: Point): 0 | 1 | 2 {
     const determinant = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
-    if (Math.abs(determinant) < 1e-9) return 0;
+    if (Math.abs(determinant) < 1e-9) {
+        return 0;
+    }
     return determinant > 0 ? 1 : 2;
 }
 
 function isPointOnSegment(point: Point, start: Point, end: Point): boolean {
     return (
-        point.x >= Math.min(start.x, end.x)
-        && point.x <= Math.max(start.x, end.x)
-        && point.y >= Math.min(start.y, end.y)
-        && point.y <= Math.max(start.y, end.y)
+        point.x >= Math.min(start.x, end.x) &&
+        point.x <= Math.max(start.x, end.x) &&
+        point.y >= Math.min(start.y, end.y) &&
+        point.y <= Math.max(start.y, end.y)
     );
 }

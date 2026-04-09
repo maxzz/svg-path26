@@ -7,12 +7,14 @@ export const svgPathInputAtom = atom(
     (get) => get(rawPathAtom),
     (get, set, nextValue: string | ((prev: string) => string)) => {
         const prev = get(rawPathAtom);
-        const resolved = typeof nextValue === "function"
+
+        const value = typeof nextValue === "function"
             ? nextValue(prev)
             : nextValue;
+
         set(doEnsureHistoryReadyAtom);
-        set(rawPathAtom, resolved);
-        set(doSyncSvgInputBoundPathAtom, resolved);
-        set(doPushHistoryAtom, resolved);
+        set(rawPathAtom, value);
+        set(doSyncSvgInputBoundPathAtom, value);
+        set(doPushHistoryAtom, value);
     },
 );

@@ -23,6 +23,7 @@ export const doAddImageAtom = atom(
     null,
     (_get, set, image: Omit<EditorImage, "id">) => {
         const id = `im:${Date.now()}:${Math.random().toString(36).slice(2, 8)}`;
+
         set(imagesAtom, (previous) => [...previous, { ...image, id }]);
         set(focusedImageIdAtom, id);
         set(isImageEditModeAtom, true);
@@ -32,14 +33,18 @@ export const doAddImageAtom = atom(
 export const doUpdateImageAtom = atom(
     null,
     (_get, set, args: { id: string; patch: Partial<EditorImage>; }) => {
-        set(imagesAtom, (previous) => previous.map((it) => it.id === args.id ? { ...it, ...args.patch } : it));
+        set(imagesAtom, (previous) => previous.map(
+            (it) => it.id === args.id ? { ...it, ...args.patch } : it)
+        );
     }
 );
 
 export const doDeleteImageAtom = atom(
     null,
     (get, set, id: string) => {
-        set(imagesAtom, get(imagesAtom).filter((it) => it.id !== id));
+        set(imagesAtom, get(imagesAtom).filter(
+            (it) => it.id !== id
+        ));
         if (get(focusedImageIdAtom) === id) {
             set(focusedImageIdAtom, null);
         }

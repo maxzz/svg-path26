@@ -1,13 +1,6 @@
 import { type InputHTMLAttributes } from "react";
-import { useAtom, type PrimitiveAtom } from "jotai";
-import { IconEyeHide, IconEyeShow } from "@/components/ui/icons/normal";
-import { Button } from "@/components/ui/shadcn/button";
-import { Switch } from "@/components/ui/shadcn/switch";
-import { pathViewBoxHeightAtom, pathViewBoxWidthAtom, pathViewBoxXAtom, pathViewBoxYAtom } from "@/store/0-atoms/2-2-path-viewbox";
-import { appSettings } from "@/store/0-ui-settings";
 import { classNames } from "@/utils";
-import { compactInputClasses, compactLabelClasses } from "../../2-editor/2-props/8-shared-classes/0-classes";
-import { ViewBoxControls } from "./2-viewbox-controls";
+import { Switch } from "@/components/ui/shadcn/switch";
 
 export function NumberRow({ label, value, onValueChange, ...rest }: { label: string; value: number; onValueChange: (value: number) => void; } & InputHTMLAttributes<HTMLInputElement>) {
     return (
@@ -31,24 +24,6 @@ export function CheckboxRow({ label, checked, onCheckedChange, className, }: { l
             <span>
                 {label}
             </span>
-        </label>
-    );
-}
-
-function CompactField({ valueAtom, label, className, ...rest }: { valueAtom: PrimitiveAtom<number>; label: string; } & InputHTMLAttributes<HTMLInputElement>) {
-    const [value, setValue] = useAtom(valueAtom);
-    return (
-        <label className="relative text-xs select-none">
-            <span className={compactLabelClasses}>
-                {label}
-            </span>
-            <input
-                className={classNames(compactInputClasses, className)}
-                value={value}
-                onChange={(event) => setValue(Number(event.target.value))}
-                type="number"
-                {...rest}
-            />
         </label>
     );
 }
