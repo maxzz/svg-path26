@@ -1,9 +1,10 @@
 import { atom } from "jotai";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "@/store/0-atoms/1-2-history";
 import { canvasRootSvgElementAtom } from "@/store/0-atoms/2-3-canvas-viewport";
-import { doConvertSegmentAtom, doDeleteSelectedSegmentsAtom, doInsertSegmentAtom, doSelectAllCommandsAtom, hoveredCommandIndexAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-0-editor-actions";
-import { doDeleteImageAtom, focusedImageIdAtom } from "@/store/0-atoms/2-8-images";
 import { commandRowsAtom, svgModelAtom } from "@/store/0-atoms/2-0-svg-model";
+import { doConvertSegmentAtom, doDeleteSelectedSegmentsAtom, doInsertSegmentAtom, hoveredCommandIndexAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-0-editor-actions";
+import { doSelectAllCommandsAtom } from "@/store/1-atoms-commands/2-select-all";
+import { doDeleteImageAtom, focusedImageIdAtom } from "@/store/0-atoms/2-8-images";
 
 export const doHandleEditorKeyDownAtom = atom(
     null,

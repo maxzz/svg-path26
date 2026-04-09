@@ -1,7 +1,7 @@
 import { createStore } from "jotai";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { findSvgInputNodeById } from "@/svg-core/3-svg-input";
-import { doCenterSelectedSegmentsIntoViewBoxAtom, doDeleteSelectedSegmentsAtom, doSetCommandValueAtom, doSetPointLocationWithoutHistoryAtom, selectedCommandIndicesAtom } from "./2-4-0-editor-actions";
+import { doDeleteSelectedSegmentsAtom, doSetCommandValueAtom, doSetPointLocationWithoutHistoryAtom, selectedCommandIndicesAtom } from "./2-4-0-editor-actions";
 import { doScaleSelectedSegmentsIntoViewBoxAtom } from "../../components/4-dialogs/7-scale-to-viewbox/2-do-scale";
 import { commandRowsAtom, svgModelAtom, pathPointsAtom } from "./2-0-svg-model";
 import { canvasViewPortAtom, doFitViewPortAtom, doFitViewPortToPathViewBoxAtom, doPanViewPortAtom, doSetViewPortAtom, doZoomViewPortAtom, rootSvgElementSizeAtom } from "./2-3-canvas-viewport";
@@ -17,6 +17,7 @@ import { appSettings } from "@/store/0-ui-settings";
 import { normalizeStoredSettings } from "@/store/1-ui-settings-normalize";
 import { DEFAULT_DIALOGS_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS } from "@/store/9-ui-settings-types-and-defaults";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
+import { doCenterSelectedSegmentsIntoViewBoxAtom } from "../1-atoms-commands/1-center-selected";
 
 function getSelectionBounds(model: SvgPathModel, selectionIndices: number[]) {
     let xmin = Infinity;
