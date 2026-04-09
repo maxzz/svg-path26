@@ -6,7 +6,7 @@ import { appSettings } from "@/store/0-ui-settings";
 import { CheckboxRow, NumberRow } from "../../../4-dialogs/8-3-options/1-options-controls";
 import { ViewBoxControls } from "../../../4-dialogs/8-3-options/2-viewbox-controls";
 
-export function OptionsPanel() {
+export function Section_Options() {
     const { snapToGrid, fillPreview, showHelpers, canvasPreview } = useSnapshot(appSettings.canvas);
     const { minifyOutput, dragPrecision, showSvgTreeConnectorLines } = useSnapshot(appSettings.pathEditor);
 

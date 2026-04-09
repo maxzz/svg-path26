@@ -9,14 +9,14 @@ import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel.tsx";
 import { commandSummaryTooltip, isCommandCellLinkedToPoint, isCommandValueLinkedToPoint } from "./8-helpers.tsx";
 import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 import { commandRowsAtom } from "@/store/0-atoms/2-0-svg-model";
-import { CommandSelectionMenu } from "./2-2-commands-list-row-menu.tsx";
+import { CommandSelectionMenu } from "./2-commands-list-row-menu.tsx";
 import { commandHoveredAtom, commandSelectedAtom, doSelectCommandAtom, doToggleSegmentRelativeAtom, highlightedCanvasPointAtomForSegment, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions.ts";
 import { getCommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils.ts";
 import { appSettings } from "@/store/0-ui-settings";
-import { type CommandProps, CommandArcFlagsInput, CommandCellInput } from "./2-1-commands-list-cells.tsx";
+import { type CommandProps, CommandArcFlagsInput, CommandCellInput } from "./1-commands-list-cells.tsx";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
 
-export function CommandsListPanel() {
+export function Section_PathCommands() {
     return (
         <TooltipProvider delayDuration={250}>
             <SectionPanel
