@@ -5,13 +5,10 @@ import { SvgPathModel } from "@/svg-core/2-svg-model";
 import { type Point, type SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
 import { createAtomAppSetting } from "./8-create-atom-app-settings";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
-import { canRedoAtom, canUndoAtom, doRedoPathAtom, doSetPathWithoutHistoryAtom, doUndoPathAtom } from "./1-2-history";
+import { doSetPathWithoutHistoryAtom } from "./1-2-history";
 import { commandRowsAtom, standaloneSegmentPathsAtom, svgModelAtom } from "./2-0-svg-model";
-import { doDeleteImageAtom, focusedImageIdAtom } from "./2-8-images";
-import { canvasRootSvgElementAtom } from "./2-3-canvas-viewport";
-import { pathViewBoxAtom } from "./2-2-path-viewbox";
+import { focusedImageIdAtom } from "./2-8-images";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
-import { notice } from "@/components/ui/loacal-ui/7-toaster/7-toaster";
 import { applyCommandSelection, normalizeSelectedCommandIndices, remapSelectedIndicesAfterDelete, type CommandSelectionMode } from "./2-5-editor-selection-utils";
 import { appSettings } from "@/store/0-ui-settings";
 
@@ -56,16 +53,19 @@ export const doSuppressNextCanvasFocusClearAtom = atom(
 
 export const doRegisterCanvasSegmentHitAreaAtom = atom(
     null,
-    (get, set, args: { index: number; element: SVGPathElement | null; }) => {
+    (get, set, { index, element }: { index: number; element: SVGPathElement | null; }) => {
         const current = get(canvasSegmentHitAreaElementsAtom);
-        if (current[args.index] === args.element) return;
+        if (current[index] === element) {
+            return;
+        }
 
         const next = { ...current };
-        if (args.element) {
-            next[args.index] = args.element;
+        if (element) {
+            next[index] = element;
         } else {
-            delete next[args.index];
+            delete next[index];
         }
+        
         set(canvasSegmentHitAreaElementsAtom, next);
     }
 );
@@ -78,7 +78,9 @@ const highlightedCanvasPointBySegmentAtomCache = new Map<number, Atom<SvgCanvasP
 
 export function commandSelectedAtom(segmentIndex: number) {
     const cached = selectedCommandBySegmentAtomCache.get(segmentIndex);
-    if (cached) return cached;
+    if (cached) {
+        return cached;
+    }
 
     const created = atom((get) => get(selectedCommandIndicesAtom).includes(segmentIndex));
     selectedCommandBySegmentAtomCache.set(segmentIndex, created);
@@ -87,27 +89,37 @@ export function commandSelectedAtom(segmentIndex: number) {
 
 export function commandHoveredAtom(segmentIndex: number) {
     const cached = hoveredCommandBySegmentAtomCache.get(segmentIndex);
-    if (cached) return cached;
+    if (cached) {
+        return cached;
+    }
 
     const created = atom((get) => get(hoveredCommandIndexAtom) === segmentIndex);
     hoveredCommandBySegmentAtomCache.set(segmentIndex, created);
     return created;
 }
 
-export function highlightedCanvasPointAtomForSegment(segmentIndex: number) {
+export function highlightedCanvasPointAtomForSegment(segmentIndex: number): Atom<SvgCanvasPoint | null> {
     const cached = highlightedCanvasPointBySegmentAtomCache.get(segmentIndex);
-    if (cached) return cached;
+    if (cached) {
+        return cached;
+    }
 
     const created = atom(
         (get) => {
             const dragged = get(draggedCanvasPointAtom);
-            if (dragged?.segmentIndex === segmentIndex) return dragged;
+            if (dragged?.segmentIndex === segmentIndex) {
+                return dragged;
+            }
 
             const hovered = get(hoveredCanvasPointAtom);
-            if (!hovered || hovered.segmentIndex !== segmentIndex) return null;
+            if (!hovered || hovered.segmentIndex !== segmentIndex) {
+                return null;
+            }
+
             return get(hoveredCommandIndexAtom) === segmentIndex ? hovered : null;
         }
     );
+
     highlightedCanvasPointBySegmentAtomCache.set(segmentIndex, created);
     return created;
 }
@@ -121,11 +133,15 @@ export const doClearCanvasFocusAtom = atom(
             set(suppressCanvasFocusClearUntilAtom, 0);
             return;
         }
+
         if (event.shiftKey || event.ctrlKey || event.metaKey) return;
         if (event.target !== event.currentTarget) return;
 
         const dragState = get(canvasDragStateAtom);
-        if (dragState && "moved" in dragState && dragState.moved) return;
+        if (dragState && "moved" in dragState && dragState.moved) {
+            return;
+        }
+
         set(selectedCommandIndicesAtom, []);
         set(hoveredCommandIndexAtom, null);
         set(hoveredCanvasPointAtom, null);
@@ -135,11 +151,11 @@ export const doClearCanvasFocusAtom = atom(
 
 export const doSelectCommandAtom = atom(
     null,
-    (get, set, args: { index: number; mode: CommandSelectionMode; }) => {
+    (get, set, { index, mode }: { index: number; mode: CommandSelectionMode; }) => {
         set(selectedCommandIndicesAtom, applyCommandSelection(
             get(selectedCommandIndicesAtom),
-            [args.index],
-            args.mode,
+            [index],
+            mode,
             get(commandRowsAtom).length,
         ));
     }
@@ -147,125 +163,13 @@ export const doSelectCommandAtom = atom(
 
 export const doSelectCommandsAtom = atom(
     null,
-    (get, set, args: { indices: number[]; mode: CommandSelectionMode; }) => {
+    (get, set, { indices, mode }: { indices: number[]; mode: CommandSelectionMode; }) => {
         set(selectedCommandIndicesAtom, applyCommandSelection(
             get(selectedCommandIndicesAtom),
-            args.indices,
-            args.mode,
+            indices,
+            mode,
             get(commandRowsAtom).length,
         ));
-    }
-);
-
-export const doSelectAllCommandsAtom = atom(
-    null,
-    (get, set) => {
-        const rowCount = get(commandRowsAtom).length;
-        if (rowCount <= 0) {
-            set(selectedCommandIndicesAtom, []);
-            return;
-        }
-
-        const activeIndex = get(selectedCommandIndexAtom);
-        const allIndices = Array.from({ length: rowCount }, (_, i) => i);
-
-        // Keep the “active” (last-selected) segment stable after Ctrl+A.
-        if (activeIndex === null) {
-            set(selectedCommandIndicesAtom, allIndices);
-            return;
-        }
-
-        if (!Number.isInteger(activeIndex) || activeIndex < 0 || activeIndex >= rowCount) {
-            set(selectedCommandIndicesAtom, allIndices);
-            return;
-        }
-
-        set(selectedCommandIndicesAtom, allIndices.filter((it) => it !== activeIndex).concat(activeIndex));
-    }
-);
-
-export const doCenterSelectedSegmentsIntoViewBoxAtom = atom(
-    null,
-    (get, set, args?: { axis: "x" | "y" | "both"; }) => {
-        const axis = args?.axis ?? "both";
-        const centerX = axis === "x" || axis === "both";
-        const centerY = axis === "y" || axis === "both";
-
-        const selectedIndices = get(selectedCommandIndicesAtom);
-        if (!selectedIndices.length) return;
-
-        const model = get(svgModelAtom).model;
-        if (!model) return;
-
-        const canvasSegmentHitAreas = get(canvasSegmentHitAreaElementsAtom);
-
-        // Compute the selection bounding-box in viewBox (path) coordinates.
-        // Prefer the actual rendered SVG path bbox (more accurate for curves); fall back to model bounds.
-        let xmin = Infinity;
-        let ymin = Infinity;
-        let xmax = -Infinity;
-        let ymax = -Infinity;
-
-        for (const segmentIndex of selectedIndices) {
-            const element = canvasSegmentHitAreas[segmentIndex];
-            if (element) {
-                try {
-                    const box = element.getBBox();
-                    const bxmin = box.x;
-                    const bymin = box.y;
-                    const bxmax = box.x + box.width;
-                    const bymax = box.y + box.height;
-                    if (
-                        Number.isFinite(bxmin)
-                        && Number.isFinite(bymin)
-                        && Number.isFinite(bxmax)
-                        && Number.isFinite(bymax)
-                    ) {
-                        xmin = Math.min(xmin, bxmin);
-                        ymin = Math.min(ymin, bymin);
-                        xmax = Math.max(xmax, bxmax);
-                        ymax = Math.max(ymax, bymax);
-                        continue;
-                    }
-                } catch {
-                    // fall through to model bounds
-                }
-            }
-
-            const standalonePath = model.getStandaloneSegmentPath(segmentIndex);
-            if (!standalonePath) continue;
-
-            try {
-                const standaloneModel = new SvgPathModel(standalonePath);
-                const bounds = standaloneModel.getBounds();
-                if (!Number.isFinite(bounds.xmin) || !Number.isFinite(bounds.ymin) || !Number.isFinite(bounds.xmax) || !Number.isFinite(bounds.ymax)) continue;
-
-                xmin = Math.min(xmin, bounds.xmin);
-                ymin = Math.min(ymin, bounds.ymin);
-                xmax = Math.max(xmax, bounds.xmax);
-                ymax = Math.max(ymax, bounds.ymax);
-            } catch {
-                // no-op for a single problematic segment
-            }
-        }
-
-        if (!Number.isFinite(xmin) || !Number.isFinite(ymin) || !Number.isFinite(xmax) || !Number.isFinite(ymax)) return;
-
-        const selectionCenterX = (xmin + xmax) / 2;
-        const selectionCenterY = (ymin + ymax) / 2;
-
-        const viewBox = get(pathViewBoxAtom);
-        const viewBoxCenterX = viewBox[0] + viewBox[2] / 2;
-        const viewBoxCenterY = viewBox[1] + viewBox[3] / 2;
-
-        // Translate selected segments so their bounding-box center matches the viewBox center.
-        const dx = centerX ? viewBoxCenterX - selectionCenterX : 0;
-        const dy = centerY ? viewBoxCenterY - selectionCenterY : 0;
-        if (Math.abs(dx) < 1e-9 && Math.abs(dy) < 1e-9) return;
-
-        set(doApplySvgModelAtom, (model) => {
-            model.translateSegments(selectedIndices, dx, dy);
-        });
     }
 );
 
@@ -274,21 +178,31 @@ export const doCenterSelectedSegmentsIntoViewBoxAtom = atom(
 export const selectedStandaloneSegmentPathAtom = atom(
     (get) => {
         const selected = get(selectedCommandIndexAtom);
-        if (selected === null) return null;
+        if (selected === null) {
+            return null;
+        }
         return get(standaloneSegmentPathsAtom)[selected] ?? null;
     }
 );
 
 export const selectedStandaloneSegmentPathsAtom = atom(
-    (get) => get(selectedCommandIndicesAtom)
-        .map((index) => get(standaloneSegmentPathsAtom)[index])
-        .filter((segmentPath): segmentPath is string => Boolean(segmentPath))
+    (get) => {
+        return get(selectedCommandIndicesAtom)
+            .map(
+                (index) => get(standaloneSegmentPathsAtom)[index]
+            )
+            .filter(
+                (segmentPath): segmentPath is string => Boolean(segmentPath)
+            );
+    }
 );
 
 export const hoveredStandaloneSegmentPathAtom = atom(
     (get) => {
         const hovered = get(hoveredCommandIndexAtom);
-        if (hovered === null) return null;
+        if (hovered === null) {
+            return null;
+        }
         return get(standaloneSegmentPathsAtom)[hovered] ?? null;
     }
 );
@@ -297,13 +211,16 @@ export const hoveredStandaloneSegmentPathAtom = atom(
 
 export const doApplySvgModelAtom = atom(
     null,
-    (get, set, updater: (svg: SvgPathModel) => void) => {
+    (get, set, updaterFn: (svg: SvgPathModel) => void) => {
         const path = get(rawPathAtom).trim();
-        if (!path) return;
+        if (!path) {
+            return;
+        }
 
         try {
             const model = new SvgPathModel(path);
-            updater(model);
+            updaterFn(model);
+
             const { decimals, minifyOutput: minify } = appSettings.pathEditor;
             set(svgPathInputAtom, model.toString(decimals, minify));
         } catch {
@@ -314,13 +231,16 @@ export const doApplySvgModelAtom = atom(
 
 const doApplySvgModelWithoutHistoryAtom = atom(
     null,
-    (get, set, updater: (svg: SvgPathModel) => void) => {
+    (get, set, updaterFn: (svg: SvgPathModel) => void) => {
         const path = get(rawPathAtom).trim();
-        if (!path) return;
+        if (!path) {
+            return;
+        }
 
         try {
             const model = new SvgPathModel(path);
-            updater(model);
+            updaterFn(model);
+
             const { decimals, minifyOutput: minify } = appSettings.pathEditor;
             set(doSetPathWithoutHistoryAtom, model.toString(decimals, minify));
         } catch {
@@ -333,33 +253,40 @@ const doApplySvgModelWithoutHistoryAtom = atom(
 
 export const doSetPointLocationAtom = atom(
     null,
-    (_get, set, args: { point: SvgCanvasPoint; to: Point; }) => {
+    (_get, set, { point, to }: { point: SvgCanvasPoint; to: Point; }) => {
         set(doApplySvgModelAtom, (model) => {
-            model.setCanvasPointLocation(args.point, args.to);
+            model.setCanvasPointLocation(point, to);
         });
     }
 );
 
 export const doSetPointLocationWithoutHistoryAtom = atom(
     null,
-    (_get, set, args: { point: SvgCanvasPoint; to: Point; }) => {
+    (_get, set, { point, to }: { point: SvgCanvasPoint; to: Point; }) => {
         set(doApplySvgModelWithoutHistoryAtom, (model) => {
-            model.setCanvasPointLocation(args.point, args.to);
+            model.setCanvasPointLocation(point, to);
         });
     }
 );
 
 export const doTranslateSelectedSegmentsWithoutHistoryAtom = atom(
     null,
-    (get, set, args: { segmentIndices: number[]; dx: number; dy: number; startPath?: string; }) => {
-        const path = (args.startPath ?? get(rawPathAtom)).trim();
-        if (!path) return;
-        if (!args.segmentIndices.length) return;
-        if (args.dx === 0 && args.dy === 0) return;
+    (get, set, { segmentIndices, dx, dy, startPath }: { segmentIndices: number[]; dx: number; dy: number; startPath?: string; }) => {
+        const path = (startPath ?? get(rawPathAtom)).trim();
+        if (!path) {
+            return;
+        }
+
+        if (!segmentIndices.length) {
+            return;
+        }
+        if (dx === 0 && dy === 0) {
+            return;
+        }
 
         try {
             const model = new SvgPathModel(path);
-            model.translateSegments(args.segmentIndices, args.dx, args.dy);
+            model.translateSegments(segmentIndices, dx, dy);
             const { decimals, minifyOutput: minify } = appSettings.pathEditor;
             set(doSetPathWithoutHistoryAtom, model.toString(decimals, minify));
         } catch {
@@ -370,9 +297,9 @@ export const doTranslateSelectedSegmentsWithoutHistoryAtom = atom(
 
 export const doSetCommandValueAtom = atom(
     null,
-    (_get, set, args: { commandIndex: number; valueIndex: number; value: number; }) => {
+    (_get, set, { commandIndex, valueIndex, value }: { commandIndex: number; valueIndex: number; value: number; }) => {
         set(doApplySvgModelAtom, (model) => {
-            model.setSegmentValue(args.commandIndex, args.valueIndex, args.value);
+            model.setSegmentValue(commandIndex, valueIndex, value);
         });
     }
 );
@@ -420,11 +347,11 @@ export const doDeleteSelectedSegmentsAtom = atom(
 
 export const doInsertSegmentAtom = atom(
     null,
-    (get, set, args: { type: string; afterIndex: number | null; }) => {
+    (get, set, { type, afterIndex }: { type: string; afterIndex: number | null; }) => {
         const path = get(rawPathAtom).trim();
         if (!path) {
             const initial = new SvgPathModel("M 0 0");
-            const inserted = initial.insertSegment(args.type, null);
+            const inserted = initial.insertSegment(type, null);
             const { decimals, minifyOutput: minify } = appSettings.pathEditor;
             set(svgPathInputAtom, initial.toString(decimals, minify));
             set(selectedCommandIndicesAtom, [inserted ?? 0]);
@@ -433,7 +360,7 @@ export const doInsertSegmentAtom = atom(
 
         let insertedIndex: number | null = null;
         set(doApplySvgModelAtom, (model) => {
-            insertedIndex = model.insertSegment(args.type, args.afterIndex);
+            insertedIndex = model.insertSegment(type, afterIndex);
         });
         if (insertedIndex !== null) {
             set(selectedCommandIndicesAtom, [insertedIndex]);
@@ -443,9 +370,9 @@ export const doInsertSegmentAtom = atom(
 
 export const doConvertSegmentAtom = atom(
     null,
-    (_get, set, args: { segmentIndex: number; type: string; }) => {
+    (_get, set, { segmentIndex, type }: { segmentIndex: number; type: string; }) => {
         set(doApplySvgModelAtom, (model) => {
-            model.changeSegmentType(args.segmentIndex, args.type);
+            model.changeSegmentType(segmentIndex, type);
         });
     }
 );
