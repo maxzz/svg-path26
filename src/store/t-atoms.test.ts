@@ -1,23 +1,23 @@
-import { createStore } from "jotai";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createStore } from "jotai";
 import { findSvgInputNodeById } from "@/svg-core/3-svg-input";
-import { doDeleteSelectedSegmentsAtom, doSetCommandValueAtom, doSetPointLocationWithoutHistoryAtom, selectedCommandIndicesAtom } from "./2-4-0-editor-actions";
-import { doScaleSelectedSegmentsIntoViewBoxAtom } from "../../components/4-dialogs/7-scale-to-viewbox/2-do-scale";
-import { commandRowsAtom, svgModelAtom, pathPointsAtom } from "./2-0-svg-model";
-import { canvasViewPortAtom, doFitViewPortAtom, doFitViewPortToPathViewBoxAtom, doPanViewPortAtom, doSetViewPortAtom, doZoomViewPortAtom, rootSvgElementSizeAtom } from "./2-3-canvas-viewport";
-import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "./1-2-history";
-import { doApplySvgInputTextAtom, doSelectSvgInputNodeAtom, svgInputDocumentAtom, svgInputSelectedNodeIdAtom } from "./1-3-svg-input";
-import { svgPathInputAtom } from "./1-1-svg-path-input";
-import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } from "./1-2-history";
-import { doAsyncExecuteConfirmDialogAtom, isOpenConfirmDialogAtom } from "../../components/4-dialogs/8-1-confirmation/9-types-confirmation";
-import { doOpenNamedPathAtom, doSaveNamedPathAtom } from "./2-6-stored-paths-actions";
-import { doSetPathViewBoxAtom, pathViewBoxAtom } from "./2-2-path-viewbox";
-import { doScaleSelectedSegmentsIntoViewBoxFromDraftAtom, scaleToViewBoxMarginDraftAtom } from "../../components/4-dialogs/7-scale-to-viewbox/1-scale-to-viewbox-atoms";
+import { doDeleteSelectedSegmentsAtom, doSetCommandValueAtom, doSetPointLocationWithoutHistoryAtom, selectedCommandIndicesAtom } from "./0-atoms/2-4-0-editor-actions";
+import { doScaleSelectedSegmentsIntoViewBoxAtom } from "../components/4-dialogs/7-scale-to-viewbox/2-do-scale";
+import { commandRowsAtom, svgModelAtom, pathPointsAtom } from "./0-atoms/2-0-svg-model";
+import { canvasViewPortAtom, doFitViewPortAtom, doFitViewPortToPathViewBoxAtom, doPanViewPortAtom, doSetViewPortAtom, doZoomViewPortAtom, rootSvgElementSizeAtom } from "./0-atoms/2-3-canvas-viewport";
+import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "./0-atoms/1-2-history";
+import { doApplySvgInputTextAtom, doSelectSvgInputNodeAtom, svgInputDocumentAtom, svgInputSelectedNodeIdAtom } from "./0-atoms/1-3-svg-input";
+import { svgPathInputAtom } from "./0-atoms/1-1-svg-path-input";
+import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } from "./0-atoms/1-2-history";
+import { doAsyncExecuteConfirmDialogAtom, isOpenConfirmDialogAtom } from "../components/4-dialogs/8-1-confirmation/9-types-confirmation";
+import { doOpenNamedPathAtom, doSaveNamedPathAtom } from "./0-atoms/2-6-stored-paths-actions";
+import { doSetPathViewBoxAtom, pathViewBoxAtom } from "./0-atoms/2-2-path-viewbox";
+import { doScaleSelectedSegmentsIntoViewBoxFromDraftAtom, scaleToViewBoxMarginDraftAtom } from "../components/4-dialogs/7-scale-to-viewbox/1-scale-to-viewbox-atoms";
 import { appSettings } from "@/store/0-ui-settings";
 import { normalizeStoredSettings } from "@/store/1-ui-settings-normalize";
 import { DEFAULT_DIALOGS_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS } from "@/store/9-ui-settings-types-and-defaults";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
-import { doCenterSelectedSegmentsIntoViewBoxAtom } from "../1-atoms-commands/1-center-selected";
+import { doCenterSelectedSegmentsIntoViewBoxAtom } from "./1-atoms-commands/1-center-selected";
 
 function getSelectionBounds(model: SvgPathModel, selectionIndices: number[]) {
     let xmin = Infinity;
