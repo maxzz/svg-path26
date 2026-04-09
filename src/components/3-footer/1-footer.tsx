@@ -2,7 +2,7 @@ import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
 import { appSettings } from "@/store/0-ui-settings";
-import { IconGrid, IconSnapToGrid, IconSnapToGrid2 } from "../ui/icons";
+import { IconGrid, IconSnapToGrid, IconSnapToGrid2, IconAxis } from "../ui/icons";
 import { Checkbox } from "@/components/ui/shadcn/checkbox";
 import { Button } from "@/components/ui/shadcn/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
@@ -219,7 +219,7 @@ function TicksToggleInput() {
     const { showTicks } = useSnapshot(appSettings.canvas);
     const { tickInterval } = useSnapshot(appSettings.pathEditor);
     return (
-        <div className="flex items-center">
+        <div className="flex items-center" title={showTicks ? "Ticks on" : "Ticks off"}>
             <input
                 className="pl-2 pr-0.5 h-5 w-12 max-w-20 scale-80 text-[10px] text-center rounded border bg-background disabled:opacity-20"
                 disabled={!showTicks}
@@ -240,7 +240,7 @@ function TicksToggleInput() {
                 aria-pressed={showTicks}
                 type="button"
             >
-                {showTicks ? "Ticks on" : "Ticks off"}
+                <IconAxis className={classNames("size-3", showTicks ? "stroke-2! text-emerald-700 dark:text-emerald-300" : "text-muted-foreground")} />
             </Button>
         </div>
     );
