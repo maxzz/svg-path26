@@ -53,14 +53,15 @@ export function UpdateViewBoxDialog() {
 
     return (
         <Dialog open={!!currentDialogData} onOpenChange={() => close(null)}>
-            <DialogContent className="max-w-sm!" modal showCloseButton={false} aria-describedby={DESCRIPTION_ID}>
+            <DialogContent className="max-w-xs!" modal showCloseButton={false} aria-describedby={DESCRIPTION_ID}>
                 <form className="space-y-4" onSubmit={(event) => { event.preventDefault(); apply(); }}>
+
                     <DialogHeader>
                         <DialogTitle>
                             {currentDialogData.ui.title}
                         </DialogTitle>
                         <DialogDescription id={DESCRIPTION_ID}>
-                            {currentDialogData.ui.description ?? "Update the stored viewBox and optionally scale the current SVG elements to match it."}
+                            {currentDialogData.ui.description ?? ""}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -92,6 +93,7 @@ export function UpdateViewBoxDialog() {
                             {currentDialogData.ui.buttonApply}
                         </Button>
                     </DialogFooter>
+
                 </form>
             </DialogContent>
         </Dialog>

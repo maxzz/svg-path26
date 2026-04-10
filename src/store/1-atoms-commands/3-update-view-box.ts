@@ -31,7 +31,7 @@ export const doAsyncOpenUpdateViewBoxDialogAndApplyAtom = atom(
         const currentViewBox = get(pathViewBoxAtom);
         const result = await set(doAsyncExecuteUpdateViewBoxDialogAtom, {
             title: "Update View Box",
-            description: "Update the stored viewBox and optionally scale the current SVG elements into the new coordinates.",
+            description: "Update the viewBox and optionally scale the current SVG elements into the new coordinates.",
             buttonApply: "Apply",
             buttonCancel: "Cancel",
             initialViewBox: currentViewBox,
