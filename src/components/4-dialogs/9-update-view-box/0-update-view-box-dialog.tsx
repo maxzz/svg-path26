@@ -25,8 +25,7 @@ export function UpdateViewBoxDialog() {
             setDraftViewBox(dialogData.ui.initialViewBox);
             setScaleSvgElements(dialogData.ui.initialScaleSvgElements);
         },
-        [dialogData],
-    );
+        [dialogData]);
 
     if (!dialogData) {
         return null;
@@ -111,11 +110,14 @@ function updateDraftValue(
 
 function sanitizeViewBox(viewBox: ViewBox): ViewBox | null {
     const [x, y, width, height] = viewBox;
+
     if (![x, y, width, height].every((value) => Number.isFinite(value))) {
         return null;
     }
+
     if (width <= 0 || height <= 0) {
         return null;
     }
+    
     return [x, y, Math.max(1e-3, width), Math.max(1e-3, height)];
 }
