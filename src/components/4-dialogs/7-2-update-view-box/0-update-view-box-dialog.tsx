@@ -53,27 +53,29 @@ export function UpdateViewBoxDialog() {
 
     return (
         <Dialog open={!!currentDialogData} onOpenChange={() => close(null)}>
-            <DialogContent className="max-w-md!" modal showCloseButton={false} aria-describedby={DESCRIPTION_ID}>
+            <DialogContent className="max-w-sm!" modal showCloseButton={false} aria-describedby={DESCRIPTION_ID}>
                 <form className="space-y-4" onSubmit={(event) => { event.preventDefault(); apply(); }}>
                     <DialogHeader>
-                        <DialogTitle>{currentDialogData.ui.title}</DialogTitle>
+                        <DialogTitle>
+                            {currentDialogData.ui.title}
+                        </DialogTitle>
                         <DialogDescription id={DESCRIPTION_ID}>
                             {currentDialogData.ui.description ?? "Update the stored viewBox and optionally scale the current SVG elements to match it."}
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className="grid grid-cols-2 gap-3 text-xs">
-                        <NumberField label="x" value={draftViewBox[0]} onChange={(value) => updateDraftValue(setDraftViewBox, 0, value)} />
+                    <div className="text-xs flex items-center gap-2">
+                        <NumberField label="x" value={draftViewBox[ 0]} onChange={(value) => updateDraftValue(setDraftViewBox, 0, value)} />
                         <NumberField label="y" value={draftViewBox[1]} onChange={(value) => updateDraftValue(setDraftViewBox, 1, value)} />
                         <NumberField label="width" min={1e-3} value={draftViewBox[2]} onChange={(value) => updateDraftValue(setDraftViewBox, 2, value)} />
                         <NumberField label="height" min={1e-3} value={draftViewBox[3]} onChange={(value) => updateDraftValue(setDraftViewBox, 3, value)} />
                     </div>
 
-                    <label className="flex items-start gap-3 rounded border px-3 py-2 text-xs">
+                    <label className="py-2 text-xs flex items-start gap-2">
                         <Checkbox
+                            className="mt-0.5"
                             checked={scaleSvgElements}
                             onCheckedChange={(checked) => setScaleSvgElements(checked === true)}
-                            className="mt-0.5"
                         />
 
                         <span className="leading-5">
@@ -118,6 +120,6 @@ function sanitizeViewBox(viewBox: ViewBox): ViewBox | null {
     if (width <= 0 || height <= 0) {
         return null;
     }
-    
+
     return [x, y, Math.max(1e-3, width), Math.max(1e-3, height)];
 }
