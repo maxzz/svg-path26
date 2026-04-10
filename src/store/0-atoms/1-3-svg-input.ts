@@ -1,8 +1,10 @@
 import { atom } from "jotai";
 import { findSvgInputNodeById, parseSvgInputText, type SvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-input";
+import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { rawPathAtom } from "./1-0-raw-path";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { svgInputStateAtom } from "./1-3-svg-input-state";
+import { doSetPathViewBoxAtom } from "./2-2-path-viewbox";
 
 export const svgInputDocumentAtom = atom(
     (get) => get(svgInputStateAtom).document,
@@ -33,6 +35,7 @@ export const doPasteSvgTextAtom = atom(
 
         try {
             const parsed = parseSvgInputText(text);
+            const pastedViewBox = getSvgDocumentViewBox(parsed.document);
             set(svgInputStateAtom, {
                 document: parsed.document,
                 selectedNodeId: parsed.initialSelectedNodeId,
@@ -42,6 +45,10 @@ export const doPasteSvgTextAtom = atom(
 
             if (parsed.initialPathData !== null && parsed.initialPathData !== get(rawPathAtom)) {
                 set(svgPathInputAtom, parsed.initialPathData);
+            }
+
+            if (pastedViewBox) {
+                set(doSetPathViewBoxAtom, pastedViewBox);
             }
         } catch (error) {
             set(svgInputStateAtom, {
@@ -53,6 +60,28 @@ export const doPasteSvgTextAtom = atom(
         }
     },
 );
+
+function getSvgDocumentViewBox(document: SvgInputDocument): ViewBox | null {
+    if (document.sourceKind !== "svg-document" || document.root.tagName !== "svg") {
+        return null;
+    }
+
+    const value = document.root.attributes.find((attribute) => attribute.name.toLowerCase() === "viewbox")?.value;
+    if (!value) {
+        return null;
+    }
+
+    const parts = value
+        .trim()
+        .split(/[\s,]+/)
+        .map((part) => Number(part));
+
+    if (parts.length !== 4 || parts.some((part) => !Number.isFinite(part))) {
+        return null;
+    }
+
+    return [parts[0], parts[1], parts[2], parts[3]];
+}
 
 export const doSelectSvgInputNodeAtom = atom(
     null,

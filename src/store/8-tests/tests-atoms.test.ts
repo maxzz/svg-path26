@@ -463,6 +463,18 @@ describe("svg path state atoms", () => {
         expect(store.get(svgPathInputAtom)).toBe("M 1 1 L 2 2");
     });
 
+    it("updates the stored viewBox when pasting an SVG document", () => {
+        const store = createStore();
+
+        store.set(doPasteSvgTextAtom, `
+            <svg viewBox="1 2 30 40">
+                <path d="M 1 1 L 2 2" />
+            </svg>
+        `);
+
+        expect(store.get(pathViewBoxAtom)).toEqual([1, 2, 30, 40]);
+    });
+
     it("updates the path editor when a path node is selected from SVG input", () => {
         const store = createStore();
         store.set(svgPathInputAtom, "M 0 0 L 9 9");
