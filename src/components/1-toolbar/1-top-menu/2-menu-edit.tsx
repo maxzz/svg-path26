@@ -9,6 +9,7 @@ import { doSelectAllCommandsAtom } from "@/store/1-atoms-commands/2-select-all";
 import { scaleToViewBoxDialogOpenAtom } from "@/components/4-dialogs/7-scale-to-viewbox/1-scale-to-viewbox-atoms";
 import { appSettings } from "@/store/0-ui-settings";
 import { doCenterSelectedSegmentsIntoViewBoxAtom } from "@/store/1-atoms-commands/1-center-selected";
+import { doAsyncOpenUpdateViewBoxDialogAndApplyAtom } from "@/store/1-atoms-commands/3-update-view-box";
 
 export function EditMenu() {
     const { minifyOutput } = useSnapshot(appSettings.pathEditor);
@@ -27,6 +28,7 @@ export function EditMenu() {
     const doSelectAll = useSetAtom(doSelectAllCommandsAtom);
     const doCenter = useSetAtom(doCenterSelectedSegmentsIntoViewBoxAtom);
     const setScaleToViewBoxDialogOpen = useSetAtom(scaleToViewBoxDialogOpenAtom);
+    const openUpdateViewBoxDialog = useSetAtom(doAsyncOpenUpdateViewBoxDialogAndApplyAtom);
 
     const hasPath = Boolean(pathValue.trim());
     const canSelectAll = commandRows.length > 0;
@@ -82,6 +84,10 @@ export function EditMenu() {
 
                 <MenubarItem disabled={!hasSelection} onClick={() => setScaleToViewBoxDialogOpen(true)}>
                     Scale to viewBox...
+                </MenubarItem>
+
+                <MenubarItem onClick={() => { void openUpdateViewBoxDialog(); }}>
+                    Update View Box...
                 </MenubarItem>
 
                 <MenubarItem disabled={!hasPath} onClick={() => doNormalize()}>

@@ -10,6 +10,7 @@ import { doPasteSvgTextAtom, doSelectSvgInputNodeAtom, svgInputDocumentAtom, svg
 import { svgPathInputAtom } from "../0-atoms/1-1-svg-path-input";
 import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } from "../0-atoms/1-2-history";
 import { doAsyncExecuteConfirmDialogAtom, isOpenConfirmDialogAtom } from "../../components/4-dialogs/8-1-confirmation/9-types-confirmation";
+import { doAsyncExecuteUpdateViewBoxDialogAtom, isOpenUpdateViewBoxDialogAtom } from "../../components/4-dialogs/9-update-view-box/9-types-update-view-box";
 import { doOpenNamedPathAtom, doSaveNamedPathAtom } from "../0-atoms/2-6-stored-paths-actions";
 import { doSetPathViewBoxAtom, pathViewBoxAtom } from "../0-atoms/2-2-path-viewbox";
 import { doScaleSelectedSegmentsIntoViewBoxFromDraftAtom, scaleToViewBoxMarginDraftAtom } from "../../components/4-dialogs/7-scale-to-viewbox/1-scale-to-viewbox-atoms";
@@ -18,6 +19,7 @@ import { normalizeStoredSettings } from "@/store/1-ui-settings-normalize";
 import { DEFAULT_DIALOGS_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS } from "@/store/9-ui-settings-types-and-defaults";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
 import { doCenterSelectedSegmentsIntoViewBoxAtom } from "../1-atoms-commands/1-center-selected";
+import { doUpdateViewBoxAtom } from "../1-atoms-commands/3-update-view-box";
 
 function getSelectionBounds(model: SvgPathModel, selectionIndices: number[]) {
     let xmin = Infinity;
@@ -453,6 +455,48 @@ describe("svg path state atoms", () => {
         await expect(cancelPromise).resolves.toBe(false);
     });
 
+    it("opens and resolves the update view box dialog promise", async () => {
+        const store = createStore();
+
+        const applyPromise = store.set(doAsyncExecuteUpdateViewBoxDialogAtom, {
+            title: "Update View Box",
+            description: "Change the stored viewBox.",
+            buttonApply: "Apply",
+            buttonCancel: "Cancel",
+            initialViewBox: [0, 0, 24, 24],
+            initialScaleSvgElements: true,
+        }) as Promise<{ viewBox: readonly [number, number, number, number]; scaleSvgElements: boolean; } | null>;
+
+        const openDialog = store.get(isOpenUpdateViewBoxDialogAtom);
+        expect(openDialog?.ui.initialViewBox).toEqual([0, 0, 24, 24]);
+
+        openDialog?.resolve({
+            viewBox: [1, 2, 30, 40],
+            scaleSvgElements: false,
+        });
+        store.set(isOpenUpdateViewBoxDialogAtom, undefined);
+
+        await expect(applyPromise).resolves.toEqual({
+            viewBox: [1, 2, 30, 40],
+            scaleSvgElements: false,
+        });
+
+        const cancelPromise = store.set(doAsyncExecuteUpdateViewBoxDialogAtom, {
+            title: "Update View Box",
+            description: "Change the stored viewBox.",
+            buttonApply: "Apply",
+            buttonCancel: "Cancel",
+            initialViewBox: [0, 0, 24, 24],
+            initialScaleSvgElements: true,
+        }) as Promise<{ viewBox: readonly [number, number, number, number]; scaleSvgElements: boolean; } | null>;
+
+        const cancelDialog = store.get(isOpenUpdateViewBoxDialogAtom);
+        cancelDialog?.resolve(null);
+        store.set(isOpenUpdateViewBoxDialogAtom, undefined);
+
+        await expect(cancelPromise).resolves.toBeNull();
+    });
+
     it("loads standalone path data through the SVG input atom", () => {
         const store = createStore();
 
@@ -564,6 +608,69 @@ describe("svg path state atoms", () => {
         expect(store.get(svgPathInputAtom)).toBe("M 1 1 L 20 30");
         expect(pathNode?.pathData).toBe("M 1 1 L 20 30");
         expect(pathNode?.attributes.find((attribute) => attribute.name === "d")?.value).toBe("M 1 1 L 20 30");
+    });
+
+    it("updates the stored viewBox without scaling SVG elements when disabled", () => {
+        const store = createStore();
+
+        store.set(doPasteSvgTextAtom, `
+            <svg viewBox="0 0 10 10">
+                <path d="M 1 1 L 2 2" />
+                <rect x="3" y="4" width="5" height="6" stroke-width="1" />
+            </svg>
+        `);
+        store.set(doSelectSvgInputNodeAtom, "0.0");
+
+        const applied = store.set(doUpdateViewBoxAtom, {
+            nextViewBox: [10, 20, 20, 40],
+            scaleSvgElements: false,
+        });
+
+        expect(applied).toBe(true);
+        expect(store.get(pathViewBoxAtom)).toEqual([10, 20, 20, 40]);
+        expect(store.get(svgPathInputAtom)).toBe("M 1 1 L 2 2");
+
+        const root = store.get(svgInputDocumentAtom)?.root;
+        const pathNode = root ? findSvgInputNodeById(root, "0.0") : null;
+        const rectNode = root ? findSvgInputNodeById(root, "0.1") : null;
+
+        expect(root?.attributes.find((attribute) => attribute.name === "viewBox")?.value).toBe("10 20 20 40");
+        expect(pathNode?.attributes.find((attribute) => attribute.name === "d")?.value).toBe("M 1 1 L 2 2");
+        expect(rectNode?.attributes.find((attribute) => attribute.name === "x")?.value).toBe("3");
+        expect(rectNode?.attributes.find((attribute) => attribute.name === "stroke-width")?.value).toBe("1");
+    });
+
+    it("updates the stored viewBox and scales bound SVG content when enabled", () => {
+        const store = createStore();
+
+        store.set(doPasteSvgTextAtom, `
+            <svg viewBox="0 0 10 10">
+                <path d="M 1 1 L 2 2" />
+                <rect x="3" y="4" width="5" height="6" stroke-width="1" />
+            </svg>
+        `);
+        store.set(doSelectSvgInputNodeAtom, "0.0");
+
+        const applied = store.set(doUpdateViewBoxAtom, {
+            nextViewBox: [10, 20, 20, 40],
+            scaleSvgElements: true,
+        });
+
+        expect(applied).toBe(true);
+        expect(store.get(pathViewBoxAtom)).toEqual([10, 20, 20, 40]);
+        expect(store.get(svgPathInputAtom)).toBe("M 12 24 L 14 28");
+
+        const root = store.get(svgInputDocumentAtom)?.root;
+        const pathNode = root ? findSvgInputNodeById(root, "0.0") : null;
+        const rectNode = root ? findSvgInputNodeById(root, "0.1") : null;
+
+        expect(root?.attributes.find((attribute) => attribute.name === "viewBox")?.value).toBe("10 20 20 40");
+        expect(pathNode?.attributes.find((attribute) => attribute.name === "d")?.value).toBe("M 12 24 L 14 28");
+        expect(rectNode?.attributes.find((attribute) => attribute.name === "x")?.value).toBe("16");
+        expect(rectNode?.attributes.find((attribute) => attribute.name === "y")?.value).toBe("36");
+        expect(rectNode?.attributes.find((attribute) => attribute.name === "width")?.value).toBe("10");
+        expect(rectNode?.attributes.find((attribute) => attribute.name === "height")?.value).toBe("24");
+        expect(rectNode?.attributes.find((attribute) => attribute.name === "stroke-width")?.value).toBe("2");
     });
 
     it("migrates legacy canvas settings into the nested canvas branch", () => {
