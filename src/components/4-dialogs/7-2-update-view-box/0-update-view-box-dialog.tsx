@@ -31,7 +31,7 @@ export function UpdateViewBoxDialog() {
         return null;
     }
 
-    const currentDialogData = dialogData;
+    const currentDialogData = dialogData; // This variable is used to keep the reference of dialogData in the closure of event handlers, to avoid issues when dialogData changes while the dialog is open.
 
     function close(result: UpdateViewBoxResult | null) {
         setDialogData(undefined);
