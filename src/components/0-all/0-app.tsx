@@ -6,11 +6,11 @@ import { SavePathDialog } from "../4-dialogs/2-saved-saved/0-saved-path-save-dia
 import { OpenPathDialog } from "../4-dialogs/1-open-saved/0-saved-path-open-dialog";
 import { ExportSvgDialog } from "../4-dialogs/5-export-path/0-export-svg-dialog";
 import { AddImageDialog } from "../4-dialogs/6-add-image/0-add-image-dialog";
-import { ScaleToViewBoxDialog } from "../4-dialogs/7-scale-to-viewbox/0-scale-to-viewbox-dialog";
+import { ScaleToViewBoxDialog } from "../4-dialogs/7-1-scale-to-viewbox/0-scale-to-viewbox-dialog";
 import { AboutDialog } from "../4-dialogs/8-2-about/0-about-dialog";
 import { OptionsDialog } from "../4-dialogs/8-3-options/0-options-dialog";
 import { ConfirmationDialog } from "../4-dialogs/8-1-confirmation/0-confirmation-dialog";
-import { UpdateViewBoxDialog } from "../4-dialogs/9-update-view-box/0-update-view-box-dialog";
+import { UpdateViewBoxDialog } from "../4-dialogs/7-2-update-view-box/0-update-view-box-dialog";
 import { Toaster as SonnerToaster } from "sonner";
 
 export function App() {

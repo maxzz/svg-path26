@@ -6,7 +6,7 @@ import { commandRowsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { doClearPathAtom, doNormalizePathAtom, doSetAbsoluteAtom, doSetRelativeAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { doSelectAllCommandsAtom } from "@/store/1-atoms-commands/2-select-all";
-import { scaleToViewBoxDialogOpenAtom } from "@/components/4-dialogs/7-scale-to-viewbox/1-scale-to-viewbox-atoms";
+import { scaleToViewBoxDialogOpenAtom } from "@/components/4-dialogs/7-1-scale-to-viewbox/1-scale-to-viewbox-atoms";
 import { appSettings } from "@/store/0-ui-settings";
 import { doCenterSelectedSegmentsIntoViewBoxAtom } from "@/store/1-atoms-commands/1-center-selected";
 import { doAsyncOpenUpdateViewBoxDialogAndApplyAtom } from "@/store/1-atoms-commands/3-update-view-box";

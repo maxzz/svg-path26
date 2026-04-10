@@ -1,18 +1,6 @@
 import { Input } from "@/components/ui/shadcn/input";
 
-export function NumberField({
-    label,
-    value,
-    onChange,
-    min,
-    step = "any",
-}: {
-    label: string;
-    value: number;
-    onChange: (value: number) => void;
-    min?: number;
-    step?: number | "any";
-}) {
+export function NumberField({ label, value, onChange, min, max, step = "any" }: { label: string; value: number; onChange: (value: number) => void; min?: number; max?: number; step?: number | "any"; }) {
     return (
         <label className="space-y-1">
             <span className="text-muted-foreground">{label}</span>
@@ -20,6 +8,7 @@ export function NumberField({
                 type="number"
                 value={value}
                 min={min}
+                max={max}
                 step={step}
                 onChange={(event) => onChange(Number(event.target.value))}
             />

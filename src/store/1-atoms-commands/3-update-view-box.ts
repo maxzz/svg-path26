@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { doAsyncExecuteUpdateViewBoxDialogAtom } from "@/components/4-dialogs/9-update-view-box/9-types-update-view-box";
+import { doAsyncExecuteUpdateViewBoxDialogAtom } from "@/components/4-dialogs/7-2-update-view-box/9-types-update-view-box";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
 import { type SvgInputAttribute, type SvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-input";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
