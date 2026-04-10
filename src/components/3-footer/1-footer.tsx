@@ -68,9 +68,10 @@ export function Footer() {
                         className="px-1 pb-px h-4 text-[10px] border rounded"
                         onClick={() => { appSettings.canvas.showViewBoxFrame = !showViewBoxFrame; }}
                         aria-pressed={showViewBoxFrame}
+                        title="Toggle viewBox frame visibility"
                         type="button"
                     >
-                        {showViewBoxFrame ? "viewBox frame on" : "viewBox frame off"}
+                        {showViewBoxFrame ? "ViewBox on" : "ViewBox off"}
                     </Button>
                 )}
 
@@ -81,9 +82,10 @@ export function Footer() {
                         className="px-1 pb-px h-4 text-[10px] border rounded"
                         onClick={() => { appSettings.canvas.showHelpers = !showHelpers; }}
                         aria-pressed={showHelpers}
+                        title="Toggle control points visibility"
                         type="button"
                     >
-                        {showHelpers ? "Point controls on" : "Point controls off"}
+                        {showHelpers ? "Controls on" : "Controls off"}
                     </Button>
                 )}
 
@@ -94,9 +96,10 @@ export function Footer() {
                         className="px-1 pb-px h-4 text-[10px] border rounded"
                         onClick={() => { appSettings.canvas.fillPreview = !fillPreview; }}
                         aria-pressed={fillPreview}
+                        title="Toggle fill preview visibility"
                         type="button"
                     >
-                        {fillPreview ? "Fill preview on" : "Fill preview off"}
+                        {fillPreview ? "Fill on" : "Fill off"}
                     </Button>
                 )}
 
@@ -125,11 +128,11 @@ function FooterButtonsPopover() {
             </PopoverTrigger>
 
             <PopoverContent className="p-3 pt-0 w-auto max-w-56 overflow-hidden" align="end">
-                <h4 className="px-1 py-2 text-xs font-semibold">
+                <h4 className="-mx-3 mb-2 px-3 py-2 text-xs font-semibold border-b">
                     Footer buttons
                 </h4>
 
-                <div className="grid gap-2 pb-1">
+                <div className="grid gap-2">
                     <label className="flex items-center gap-2 text-[11px] select-none cursor-pointer">
                         <Checkbox
                             checked={buttons.showTicksToggle}
@@ -175,7 +178,7 @@ function FooterButtonsPopover() {
                             checked={buttons.showShowHelpersToggle}
                             onCheckedChange={(checked) => { appSettings.footer.buttons.showShowHelpersToggle = Boolean(checked); }}
                         />
-                        <span>Point controls</span>
+                        <span>Control points</span>
                     </label>
 
                     <label className="flex items-center gap-2 text-[11px] select-none cursor-pointer">
