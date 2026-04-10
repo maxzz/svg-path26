@@ -44,17 +44,13 @@ export function UpdateViewBoxDialog() {
             notice.info("Enter a valid viewBox with positive width and height.");
             return;
         }
-
-        close({
-            viewBox: nextViewBox,
-            scaleSvgElements,
-        });
+        close({ viewBox: nextViewBox, scaleSvgElements });
     }
 
     return (
         <Dialog open={!!currentDialogData} onOpenChange={() => close(null)}>
             <DialogContent className="max-w-xs!" modal showCloseButton={false} aria-describedby={DESCRIPTION_ID}>
-                <form className="space-y-4" onSubmit={(event) => { event.preventDefault(); apply(); }}>
+                <form className="space-y-4 select-none" onSubmit={(event) => { event.preventDefault(); apply(); }}>
 
                     <DialogHeader>
                         <DialogTitle>
@@ -66,7 +62,7 @@ export function UpdateViewBoxDialog() {
                     </DialogHeader>
 
                     <div className="text-xs flex items-center gap-2">
-                        <NumberField label="x" value={draftViewBox[ 0]} onChange={(value) => updateDraftValue(setDraftViewBox, 0, value)} />
+                        <NumberField label="x" value={draftViewBox[0]} onChange={(value) => updateDraftValue(setDraftViewBox, 0, value)} />
                         <NumberField label="y" value={draftViewBox[1]} onChange={(value) => updateDraftValue(setDraftViewBox, 1, value)} />
                         <NumberField label="width" min={1e-3} value={draftViewBox[2]} onChange={(value) => updateDraftValue(setDraftViewBox, 2, value)} />
                         <NumberField label="height" min={1e-3} value={draftViewBox[3]} onChange={(value) => updateDraftValue(setDraftViewBox, 3, value)} />
@@ -100,11 +96,7 @@ export function UpdateViewBoxDialog() {
     );
 }
 
-function updateDraftValue(
-    setDraftViewBox: Dispatch<SetStateAction<ViewBox>>,
-    index: 0 | 1 | 2 | 3,
-    value: number,
-) {
+function updateDraftValue(setDraftViewBox: Dispatch<SetStateAction<ViewBox>>, index: 0 | 1 | 2 | 3, value: number,) {
     setDraftViewBox((previous) => {
         const next = [...previous] as [number, number, number, number];
         next[index] = value;
