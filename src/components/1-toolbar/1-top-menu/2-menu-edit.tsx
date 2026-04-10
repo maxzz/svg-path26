@@ -51,18 +51,18 @@ export function EditMenu() {
             </MenubarTrigger>
 
             <MenubarContent>
-                <MenubarItem disabled={!canUndo} onClick={() => doUndo()}>
+                <MenubarItem disabled={!canUndo} onClick={doUndo}>
                     Undo
                     <MenubarShortcut>Ctrl+Z</MenubarShortcut>
                 </MenubarItem>
-                <MenubarItem disabled={!canRedo} onClick={() => doRedo()}>
+                <MenubarItem disabled={!canRedo} onClick={doRedo}>
                     Redo
                     <MenubarShortcut>Ctrl+Shift+Z</MenubarShortcut>
                 </MenubarItem>
 
                 <MenubarSeparator />
 
-                <MenubarItem disabled={!canSelectAll} onClick={() => doSelectAll()}>
+                <MenubarItem disabled={!canSelectAll} onClick={doSelectAll}>
                     Select All
                     <MenubarShortcut>Ctrl+A</MenubarShortcut>
                 </MenubarItem>
@@ -86,19 +86,19 @@ export function EditMenu() {
                     Scale to viewBox...
                 </MenubarItem>
 
-                <MenubarItem onClick={() => { void openUpdateViewBoxDialog(); }}>
+                <MenubarItem onClick={openUpdateViewBoxDialog}>
                     Update View Box...
                 </MenubarItem>
 
-                <MenubarItem disabled={!hasPath} onClick={() => doNormalize()}>
+                <MenubarItem disabled={!hasPath} onClick={doNormalize}>
                     Normalize
                     <MenubarShortcut>Alt+N</MenubarShortcut>
                 </MenubarItem>
-                <MenubarItem disabled={!hasPath} onClick={() => doSetAbsolute()}>
+                <MenubarItem disabled={!hasPath} onClick={doSetAbsolute}>
                     Convert to Absolute
                     <MenubarShortcut>Alt+A</MenubarShortcut>
                 </MenubarItem>
-                <MenubarItem disabled={!hasPath} onClick={() => doSetRelative()}>
+                <MenubarItem disabled={!hasPath} onClick={doSetRelative}>
                     Convert to Relative
                     <MenubarShortcut>Alt+R</MenubarShortcut>
                 </MenubarItem>
@@ -109,11 +109,11 @@ export function EditMenu() {
 
                 <MenubarSeparator />
 
-                <MenubarItem disabled={!hasPath} onClick={() => void copyPath()}>
+                <MenubarItem disabled={!hasPath} onClick={copyPath}>
                     Copy Path
                     <MenubarShortcut>Alt+C</MenubarShortcut>
                 </MenubarItem>
-                <MenubarItem disabled={!hasPath} onClick={() => doClear()}>
+                <MenubarItem disabled={!hasPath} onClick={doClear}>
                     Clear Path
                     <MenubarShortcut>Alt+X</MenubarShortcut>
                 </MenubarItem>
