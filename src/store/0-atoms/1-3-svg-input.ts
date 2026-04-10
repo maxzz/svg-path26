@@ -24,7 +24,9 @@ export const svgInputSelectedNodeAtom = atom<SvgInputNode | null>(
     },
 );
 
-export const doApplySvgInputTextAtom = atom(
+// Actions
+
+export const doPasteSvgTextAtom = atom(
     null,
     (get, set, text: string) => {
         if (!text.trim()) return;
@@ -64,17 +66,10 @@ export const doSelectSvgInputNodeAtom = atom(
 
         if (node.pathData !== null) {
             if (state.selectedNodeId !== nodeId || state.boundPathNodeId !== nodeId) {
-                set(svgInputStateAtom, {
-                    ...state,
-                    selectedNodeId: nodeId,
-                    boundPathNodeId: nodeId,
-                });
+                set(svgInputStateAtom, { ...state, selectedNodeId: nodeId, boundPathNodeId: nodeId });
             }
         } else if (state.selectedNodeId !== nodeId) {
-            set(svgInputStateAtom, {
-                ...state,
-                selectedNodeId: nodeId,
-            });
+            set(svgInputStateAtom, { ...state, selectedNodeId: nodeId });
         }
 
         if (node.pathData !== null && node.pathData !== get(rawPathAtom)) {

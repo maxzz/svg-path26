@@ -6,7 +6,7 @@ import { doScaleSelectedSegmentsIntoViewBoxAtom } from "../../components/4-dialo
 import { commandRowsAtom, svgModelAtom, pathPointsAtom } from "../0-atoms/2-0-svg-model";
 import { canvasViewPortAtom, doFitViewPortAtom, doFitViewPortToPathViewBoxAtom, doPanViewPortAtom, doSetViewPortAtom, doZoomViewPortAtom, rootSvgElementSizeAtom } from "../0-atoms/2-3-canvas-viewport";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "../0-atoms/1-2-history";
-import { doApplySvgInputTextAtom, doSelectSvgInputNodeAtom, svgInputDocumentAtom, svgInputSelectedNodeIdAtom } from "../0-atoms/1-3-svg-input";
+import { doPasteSvgTextAtom, doSelectSvgInputNodeAtom, svgInputDocumentAtom, svgInputSelectedNodeIdAtom } from "../0-atoms/1-3-svg-input";
 import { svgPathInputAtom } from "../0-atoms/1-1-svg-path-input";
 import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } from "../0-atoms/1-2-history";
 import { doAsyncExecuteConfirmDialogAtom, isOpenConfirmDialogAtom } from "../../components/4-dialogs/8-1-confirmation/9-types-confirmation";
@@ -456,7 +456,7 @@ describe("svg path state atoms", () => {
     it("loads standalone path data through the SVG input atom", () => {
         const store = createStore();
 
-        store.set(doApplySvgInputTextAtom, `d="M 1 1 L 2 2"`);
+        store.set(doPasteSvgTextAtom, `d="M 1 1 L 2 2"`);
 
         expect(store.get(svgInputDocumentAtom)?.root.tagName).toBe("path");
         expect(store.get(svgInputSelectedNodeIdAtom)).toBe("0");
@@ -467,7 +467,7 @@ describe("svg path state atoms", () => {
         const store = createStore();
         store.set(svgPathInputAtom, "M 0 0 L 9 9");
 
-        store.set(doApplySvgInputTextAtom, `
+        store.set(doPasteSvgTextAtom, `
             <svg viewBox="0 0 10 10">
                 <g>
                     <path d="M 1 1 L 2 2" />
@@ -506,7 +506,7 @@ describe("svg path state atoms", () => {
     it("syncs the bound SVG input path when command edits change the current path", () => {
         const store = createStore();
 
-        store.set(doApplySvgInputTextAtom, `
+        store.set(doPasteSvgTextAtom, `
             <svg viewBox="0 0 10 10">
                 <g>
                     <path d="M 1 1 L 2 2" />
@@ -532,7 +532,7 @@ describe("svg path state atoms", () => {
     it("syncs the bound SVG input path while dragging points on the canvas", () => {
         const store = createStore();
 
-        store.set(doApplySvgInputTextAtom, `
+        store.set(doPasteSvgTextAtom, `
             <svg viewBox="0 0 10 10">
                 <g>
                     <path d="M 1 1 L 2 2" />

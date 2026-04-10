@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ClipboardEvent } from "react";
+import { cn } from "@/utils";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { type SvgInputNode } from "@/svg-core/3-svg-input";
-import { cn } from "@/utils";
 
 const INDENT_PX = 18;
 
@@ -34,12 +34,12 @@ export function SvgTreeView(props: SvgTreeViewProps) {
     }
 
     return (
-        <div className={cn("relative rounded border bg-muted/20 font-mono text-[11px] outline-none focus-within:ring-1 focus-within:ring-ring", className)}>
+        <div className={cn("relative text-[11px] font-mono bg-muted/20 outline-none rounded border focus-within:ring-1 focus-within:ring-ring", className)}>
 
             <textarea
                 ref={pasteTargetRef}
                 tabIndex={-1}
-                className="pointer-events-none absolute left-0 top-0 h-px w-px opacity-0"
+                className="absolute left-0 top-0 w-px h-px opacity-0 pointer-events-none"
                 onPaste={(event) => handlePaste(event, onPasteText)}
                 aria-hidden="true"
             />
@@ -87,11 +87,11 @@ export function SvgTreeView(props: SvgTreeViewProps) {
                     )}
             </div>
 
-            {parseError ? (
-                <div className="border-t border-destructive/20 bg-destructive/5 px-3 py-2 text-[11px] text-destructive">
+            {parseError && (
+                <div className="px-3 py-2 text-[11px] text-destructive bg-destructive/5 border-t border-destructive/20">
                     {parseError}
                 </div>
-            ) : null}
+            )}
         </div>
     );
 }
@@ -108,6 +108,7 @@ function SvgTreeBranch(props: {
     onToggleNode: (nodeId: string) => void;
 }) {
     const { node, depth, isLast, ancestryHasNext, expandedNodeIds, selectedNodeId, showConnectorLines, onSelectNode, onToggleNode } = props;
+
     const hasChildren = node.children.length > 0;
     const expanded = expandedNodeIds.has(node.id);
     const selected = selectedNodeId === node.id;
@@ -120,11 +121,11 @@ function SvgTreeBranch(props: {
                 aria-selected={selected}
                 aria-expanded={hasChildren ? expanded : undefined}
             >
-                {showConnectorLines ? (
+                {showConnectorLines && (
                     <TreeConnectors depth={depth} isLast={isLast} ancestryHasNext={ancestryHasNext} />
-                ) : null}
+                )}
 
-                <div className="flex items-center gap-0.5 pr-1" style={{ paddingLeft: depth * INDENT_PX }}>
+                <div className="pr-1 flex items-center gap-0.5" style={{ paddingLeft: depth * INDENT_PX }}>
                     {hasChildren
                         ? (
                             <button
@@ -144,7 +145,7 @@ function SvgTreeBranch(props: {
                     }
 
                     <button
-                        className={cn("min-w-0 flex-1 overflow-hidden rounded px-1 py-0.5 text-left leading-5 transition-colors hover:bg-slate-400/20", selected ? "bg-blue-300 text-slate-950" : "text-foreground/90",)}
+                        className={cn("flex-1 min-w-0 overflow-hidden px-1 py-0.5 text-left leading-5 transition-colors hover:bg-slate-400/20 rounded", selected ? "bg-blue-300 text-slate-950" : "text-foreground/90",)}
                         onClick={() => onSelectNode(node.id)}
                         title={formatNodeLabel(node, false)}
                         type="button"
@@ -156,7 +157,7 @@ function SvgTreeBranch(props: {
                 </div>
             </div>
 
-            {hasChildren && expanded ? (
+            {hasChildren && expanded && (
                 <ul role="group">
                     {node.children.map((child, index) => (
                         <SvgTreeBranch
@@ -173,46 +174,37 @@ function SvgTreeBranch(props: {
                         />
                     ))}
                 </ul>
-            ) : null}
+            )}
         </li>
     );
 }
 
 function TreeConnectors(props: { depth: number; isLast: boolean; ancestryHasNext: boolean[]; }) {
     const { depth, isLast, ancestryHasNext } = props;
-
     return (<>
-        {ancestryHasNext.map((hasNext, index) => hasNext ? (
+        {ancestryHasNext.map(
+            (hasNext, index) => hasNext && (
+                <span
+                    className="absolute top-0 bottom-0 w-px bg-border/70 pointer-events-none"
+                    style={{ left: index * INDENT_PX + Math.floor(INDENT_PX / 2) }}
+                    aria-hidden="true"
+                    key={`ancestor:${index}`}
+                />
+            ))
+        }
+
+        {depth > 0 && (<>
             <span
-                key={`ancestor:${index}`}
-                className="pointer-events-none absolute top-0 bottom-0 w-px bg-border/70"
-                style={{ left: index * INDENT_PX + Math.floor(INDENT_PX / 2) }}
+                className="absolute w-px bg-border/70 pointer-events-none"
+                style={{ left: depth * INDENT_PX - Math.floor(INDENT_PX / 2), top: 0, bottom: isLast ? "50%" : 0 }}
                 aria-hidden="true"
             />
-        ) : null)}
-
-        {depth > 0 ? (
-            <>
-                <span
-                    className="pointer-events-none absolute w-px bg-border/70"
-                    style={{
-                        left: depth * INDENT_PX - Math.floor(INDENT_PX / 2),
-                        top: 0,
-                        bottom: isLast ? "50%" : 0,
-                    }}
-                    aria-hidden="true"
-                />
-                <span
-                    className="pointer-events-none absolute h-px bg-border/70"
-                    style={{
-                        left: depth * INDENT_PX - Math.floor(INDENT_PX / 2),
-                        top: "50%",
-                        width: Math.floor(INDENT_PX / 2),
-                    }}
-                    aria-hidden="true"
-                />
-            </>
-        ) : null}
+            <span
+                className="absolute h-px bg-border/70 pointer-events-none"
+                style={{ left: depth * INDENT_PX - Math.floor(INDENT_PX / 2), top: "50%", width: Math.floor(INDENT_PX / 2) }}
+                aria-hidden="true"
+            />
+        </>)}
     </>);
 }
 
