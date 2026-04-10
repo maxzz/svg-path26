@@ -1,8 +1,9 @@
 import { atom } from "jotai";
-import { doClearPathAtom, doNormalizePathAtom, doSetAbsoluteAtom, doSetRelativeAtom } from "@/store/0-atoms/2-4-0-editor-actions";
+import { doClearPathAtom, doNormalizePathAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { aboutDialogOpenAtom, exportSvgDialogOpenAtom, openPathDialogOpenAtom, optionsDialogOpenAtom, savePathDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 import { isImageEditModeAtom } from "@/store/0-atoms/2-8-images";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
+import { doAsyncOpenUpdateViewBoxDialogAndApplyAtom } from "@/store/1-atoms-commands/3-update-view-box";
 import { appSettings } from "@/store/0-ui-settings";
 import { toggleTheme } from "@/utils";
 
@@ -45,22 +46,9 @@ export const doHandleTopMenuKeyDownAtom = atom(
             set(optionsDialogOpenAtom, true);
             return;
         }
-        if (key === "n") {
-            if (!hasPath) return;
+        if (key === "v") {
             event.preventDefault();
-            set(doNormalizePathAtom);
-            return;
-        }
-        if (key === "a") {
-            if (!hasPath) return;
-            event.preventDefault();
-            set(doSetAbsoluteAtom);
-            return;
-        }
-        if (key === "r") {
-            if (!hasPath) return;
-            event.preventDefault();
-            set(doSetRelativeAtom);
+            void set(doAsyncOpenUpdateViewBoxDialogAndApplyAtom);
             return;
         }
         if (key === "m") {

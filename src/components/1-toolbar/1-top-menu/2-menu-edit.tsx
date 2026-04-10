@@ -88,19 +88,17 @@ export function EditMenu() {
 
                 <MenubarItem onClick={openUpdateViewBoxDialog}>
                     Update View Box...
+                    <MenubarShortcut>Alt+V</MenubarShortcut>
                 </MenubarItem>
 
                 <MenubarItem disabled={!hasPath} onClick={doNormalize}>
                     Normalize
-                    <MenubarShortcut>Alt+N</MenubarShortcut>
                 </MenubarItem>
                 <MenubarItem disabled={!hasPath} onClick={doSetAbsolute}>
                     Convert to Absolute
-                    <MenubarShortcut>Alt+A</MenubarShortcut>
                 </MenubarItem>
                 <MenubarItem disabled={!hasPath} onClick={doSetRelative}>
                     Convert to Relative
-                    <MenubarShortcut>Alt+R</MenubarShortcut>
                 </MenubarItem>
                 <MenubarCheckboxItem checked={minifyOutput} disabled={!hasPath} onCheckedChange={toggleMinify}>
                     Minify Path
