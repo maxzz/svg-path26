@@ -28,7 +28,7 @@ export function SectionPanel({ sectionKey, label, children, triggerClassName, co
         >
             <AccordionItem value={sectionKey} className="border-none">
                 <div className="relative">
-                    <AccordionTrigger className={classNames("px-3 py-1.5 text-base font-ui bg-muted border-b hover:no-underline select-none", triggerClassName)}>
+                    <AccordionTrigger className={classNames("px-3 py-1.5 text-base font-ui bg-foreground/3 border-b hover:no-underline select-none", triggerClassName)}>
                         {label}
                     </AccordionTrigger>
 
