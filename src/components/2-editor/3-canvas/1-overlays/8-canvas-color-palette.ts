@@ -1,6 +1,6 @@
 import { classNames } from "@/utils";
 
-const DARK_CANVAS_COLORS = {
+const DARK_THEME_CANVAS_COLORS = {
     segmentActive: "#009cff",
     segmentHover: "#ff4343",
     editorStroke: "#9c00ff63",
@@ -14,7 +14,7 @@ const DARK_CANVAS_COLORS = {
     targetPointStroke: "#ffffff38",
 } as const;
 
-const LIGHT_CANVAS_COLORS = {
+const LIGHT_THEME_CANVAS_COLORS = {
     segmentActive: "#009cff",
     segmentHover: "#ff4343",
     editorStroke: "#7c3aed3d",
@@ -28,59 +28,59 @@ const LIGHT_CANVAS_COLORS = {
     targetPointStroke: "#0f172a29",
 } as const;
 
-export function getCanvasColors(darkCanvas: boolean) {
-    return darkCanvas ? DARK_CANVAS_COLORS : LIGHT_CANVAS_COLORS;
+export function getCanvasColors(isDarkTheme: boolean) {
+    return isDarkTheme ? DARK_THEME_CANVAS_COLORS : LIGHT_THEME_CANVAS_COLORS;
 }
 
-export function getEditorStroke(darkCanvas: boolean): string {
-    return getCanvasColors(darkCanvas).editorStroke;
+export function getEditorStroke(isDarkTheme: boolean): string {
+    return getCanvasColors(isDarkTheme).editorStroke;
 }
 
-export function getControlHaloFill(selected: boolean, darkCanvas: boolean): string {
-    const colors = getCanvasColors(darkCanvas);
+export function getControlHaloFill(selected: boolean, isDarkTheme: boolean): string {
+    const colors = getCanvasColors(isDarkTheme);
     return selected ? colors.controlActive : colors.controlHover;
 }
 
-export function getControlLineStroke(selected: boolean, hovered: boolean, darkCanvas: boolean): string {
-    const colors = getCanvasColors(darkCanvas);
+export function getControlLineStroke(selected: boolean, hovered: boolean, isDarkTheme: boolean): string {
+    const colors = getCanvasColors(isDarkTheme);
     if (selected) return colors.handleActive;
     if (hovered) return colors.handleHover;
     return colors.handleIdle;
 }
 
-export function getControlPointFill(selected: boolean, hovered: boolean, darkCanvas: boolean): string {
-    const colors = getCanvasColors(darkCanvas);
+export function getControlPointFill(selected: boolean, hovered: boolean, isDarkTheme: boolean): string {
+    const colors = getCanvasColors(isDarkTheme);
     if (selected) return colors.segmentActive;
     if (hovered) return colors.segmentHover;
     return colors.controlPointIdle;
 }
 
-export function getTargetPointFill(selected: boolean, hovered: boolean, darkCanvas: boolean): string {
-    const colors = getCanvasColors(darkCanvas);
+export function getTargetPointFill(selected: boolean, hovered: boolean, isDarkTheme: boolean): string {
+    const colors = getCanvasColors(isDarkTheme);
     if (selected) return colors.segmentActive;
     if (hovered) return colors.segmentHover;
     return colors.targetPointIdle;
 }
 
-export function getTargetPointStroke(selected: boolean, darkCanvas: boolean): string {
+export function getTargetPointStroke(selected: boolean, isDarkTheme: boolean): string {
     if (!selected) return "transparent";
-    return getCanvasColors(darkCanvas).targetPointStroke;
+    return getCanvasColors(isDarkTheme).targetPointStroke;
 }
 
-export function getSegmentActiveStroke(darkCanvas: boolean): string {
-    return getCanvasColors(darkCanvas).segmentActive;
+export function getSegmentActiveStroke(isDarkTheme: boolean): string {
+    return getCanvasColors(isDarkTheme).segmentActive;
 }
 
-export function getSegmentHoverStroke(darkCanvas: boolean): string {
-    return getCanvasColors(darkCanvas).segmentHover;
+export function getSegmentHoverStroke(isDarkTheme: boolean): string {
+    return getCanvasColors(isDarkTheme).segmentHover;
 }
 
 //
 
-export function getCanvasPathClasses(canvasPreview: boolean, fillPreview: boolean, darkCanvas: boolean): string {
+export function getCanvasPathClasses(canvasPreview: boolean, fillPreview: boolean): string {
     return classNames(
         !fillPreview ? "fill-none" : (canvasPreview ? "fill-black/20" : "fill-blue-500/25"),
-        canvasPreview ? "stroke-black" : (darkCanvas ? "stroke-white" : "stroke-blue-700")
+        canvasPreview ? "stroke-black" : "stroke-blue-700 dark:stroke-white"
     );
 }
 

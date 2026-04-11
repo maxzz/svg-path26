@@ -8,30 +8,32 @@ import { commandHoveredAtom, commandSelectedAtom, doFocusPointCommandAtom, doSel
 import { getCommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils";
 import { pathPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
+import { isThemeDark } from "@/utils";
 import { doStartPointDragAtom, doStartSelectedSegmentsDragAtom } from "../3-canvas-drag";
 import { getControlHaloFill, getEditorStroke, getPointInteractionClassName, getTargetPointFill } from "./8-canvas-color-palette";
 
 export function CanvasPathPoints() {
     const pathPoints = useAtomValue(pathPointsAtom);
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
-    const { darkCanvas } = useSnapshot(appSettings.canvas);
+    const { theme } = useSnapshot(appSettings);
+    const isDarkTheme = isThemeDark(theme);
 
     return pathPoints.map(
         (point: SvgCanvasPoint) => (
             <CanvasPathPoint
                 key={point.id}
                 point={point}
-                darkCanvas={darkCanvas}
+                isDarkTheme={isDarkTheme}
                 unitsPerPixel={unitsPerPixel}
             />
         )
     );
     }
 
-function CanvasPathPoint({ point, darkCanvas, unitsPerPixel }: { point: SvgCanvasPoint; darkCanvas: boolean; unitsPerPixel: number; }) {
+function CanvasPathPoint({ point, isDarkTheme, unitsPerPixel }: { point: SvgCanvasPoint; isDarkTheme: boolean; unitsPerPixel: number; }) {
     const selected = useAtomValue(commandSelectedAtom(point.segmentIndex));
     const hovered = useAtomValue(commandHoveredAtom(point.segmentIndex));
-    const targetPointColor = getTargetPointFill(selected, hovered, darkCanvas);
+    const targetPointColor = getTargetPointFill(selected, hovered, isDarkTheme);
     const haloRadius = unitsPerPixel * 8;
     const pointRadius = unitsPerPixel * (selected ? 5 : 4);
 
@@ -46,8 +48,8 @@ function CanvasPathPoint({ point, darkCanvas, unitsPerPixel }: { point: SvgCanva
                     cx={point.x}
                     cy={point.y}
                     r={haloRadius}
-                    fill={selected ? getControlHaloFill(selected, darkCanvas) : "none"}
-                    stroke={getEditorStroke(darkCanvas)}
+                    fill={selected ? getControlHaloFill(selected, isDarkTheme) : "none"}
+                    stroke={getEditorStroke(isDarkTheme)}
                     strokeWidth={unitsPerPixel * 6}
                     pointerEvents="none"
                 />

@@ -8,13 +8,15 @@ import { commandHoveredAtom, commandSelectedAtom, doFocusPointCommandAtom, doSel
 import { getCommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils";
 import { controlPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
+import { isThemeDark } from "@/utils";
 import { doStartPointDragAtom, doStartSelectedSegmentsDragAtom } from "../3-canvas-drag";
 import { getControlHaloFill, getControlLineStroke, getControlPointFill, getEditorStroke, getPointInteractionClassName } from "./8-canvas-color-palette";
 
 // Control lines
 
 export function CanvasControlLines() {
-    const { darkCanvas } = useSnapshot(appSettings.canvas);
+    const { theme } = useSnapshot(appSettings);
+    const isDarkTheme = isThemeDark(theme);
     const controlPoints = useAtomValue(controlPointsAtom);
     const strokeWidth = useAtomValue(canvasStrokeWidthAtom);
 
@@ -24,7 +26,7 @@ export function CanvasControlLines() {
                 <CanvasControlLine
                     point={point}
                     relation={relation}
-                    darkCanvas={darkCanvas}
+                    isDarkTheme={isDarkTheme}
                     strokeWidth={strokeWidth}
                     key={`line:${pointIndex}:${relationIndex}`}
                 />
@@ -33,7 +35,7 @@ export function CanvasControlLines() {
     );
 }
 
-function CanvasControlLine({ point, relation, darkCanvas, strokeWidth }: { point: SvgCanvasPoint; relation: { x: number; y: number; }; darkCanvas: boolean; strokeWidth: number; }) {
+function CanvasControlLine({ point, relation, isDarkTheme, strokeWidth }: { point: SvgCanvasPoint; relation: { x: number; y: number; }; isDarkTheme: boolean; strokeWidth: number; }) {
     const selected = useAtomValue(commandSelectedAtom(point.segmentIndex));
     const hovered = useAtomValue(commandHoveredAtom(point.segmentIndex));
 
@@ -43,7 +45,7 @@ function CanvasControlLine({ point, relation, darkCanvas, strokeWidth }: { point
             y1={point.y}
             x2={relation.x}
             y2={relation.y}
-            stroke={getControlLineStroke(selected, hovered, darkCanvas)}
+            stroke={getControlLineStroke(selected, hovered, isDarkTheme)}
             strokeWidth={strokeWidth}
             strokeDasharray={`${strokeWidth * 3} ${strokeWidth * 5}`}
             pointerEvents="none"
@@ -54,21 +56,22 @@ function CanvasControlLine({ point, relation, darkCanvas, strokeWidth }: { point
 // Control points
 
 export function CanvasControlPoints() {
-    const { darkCanvas } = useSnapshot(appSettings.canvas);
+    const { theme } = useSnapshot(appSettings);
+    const isDarkTheme = isThemeDark(theme);
     const controlPoints = useAtomValue(controlPointsAtom);
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
 
     return controlPoints.map(
         (point: SvgCanvasPoint) => (
-            <CanvasControlPoint point={point} darkCanvas={darkCanvas} unitsPerPixel={unitsPerPixel} key={point.id} />
+            <CanvasControlPoint point={point} isDarkTheme={isDarkTheme} unitsPerPixel={unitsPerPixel} key={point.id} />
         )
     );
 }
 
-function CanvasControlPoint({ point, darkCanvas, unitsPerPixel }: { point: SvgCanvasPoint; darkCanvas: boolean; unitsPerPixel: number; }) {
+function CanvasControlPoint({ point, isDarkTheme, unitsPerPixel }: { point: SvgCanvasPoint; isDarkTheme: boolean; unitsPerPixel: number; }) {
     const selected = useAtomValue(commandSelectedAtom(point.segmentIndex));
     const hovered = useAtomValue(commandHoveredAtom(point.segmentIndex));
-    const controlPointColor = getControlPointFill(selected, hovered, darkCanvas);
+    const controlPointColor = getControlPointFill(selected, hovered, isDarkTheme);
 
     const doCanvasControlPointPointerDown = useSetAtom(doCanvasControlPointPointerDownAtom);
     const doCanvasControlPointMouseEnter = useSetAtom(doCanvasControlPointMouseEnterAtom);
@@ -87,9 +90,9 @@ function CanvasControlPoint({ point, darkCanvas, unitsPerPixel }: { point: SvgCa
                     y={point.y - haloOffset}
                     width={haloSize}
                     height={haloSize}
-                    stroke={getEditorStroke(darkCanvas)}
+                    stroke={getEditorStroke(isDarkTheme)}
                     strokeWidth={unitsPerPixel * 6}
-                    fill={selected ? getControlHaloFill(selected, darkCanvas) : "none"}
+                    fill={selected ? getControlHaloFill(selected, isDarkTheme) : "none"}
                     pointerEvents="none"
                 />
             )}
