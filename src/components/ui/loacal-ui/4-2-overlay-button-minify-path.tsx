@@ -5,7 +5,7 @@ import { IconSizeBigger, IconSizeSmaller } from "@/components/ui/icons/app-speci
 import { Button } from "@/components/ui/shadcn/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 
-export function MinifyPathOverlayButton() {
+export function OverlayButton_MinifyPath() {
     const { minifyOutput } = useSnapshot(appSettings.pathEditor);
     const label = `Now ${minifyOutput ? "Minifying" : "Expanding"}. Set ${minifyOutput ? "Expanding" : "Minifying"}`;
     

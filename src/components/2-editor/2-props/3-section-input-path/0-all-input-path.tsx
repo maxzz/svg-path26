@@ -1,9 +1,9 @@
 import { useAtom } from "jotai";
 import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
-import { CopyClipboardOverlayButton } from "../../../ui/loacal-ui/4-copy-clipboard-overlay-button";
+import { CopyClipboardOverlayButton } from "../../../ui/loacal-ui/4-1-overlay-button-copy-clipboard";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
-import { MinifyPathOverlayButton } from "./1-minify-path-overlay-button";
+import { OverlayButton_MinifyPath } from "../../../ui/loacal-ui/4-2-overlay-button-minify-path";
 
 export function Section_PathInput() {
     const [pathValue, setPathValue] = useAtom(svgPathInputAtom);
@@ -24,10 +24,9 @@ export function Section_PathInput() {
 
 function PathInputOverlay({ pathValue }: { pathValue: string; }) {
     const hasPath = pathValue.trim().length > 0;
-
     return (
         <div className="flex items-center">
-            <MinifyPathOverlayButton />
+            <OverlayButton_MinifyPath />
 
             <CopyClipboardOverlayButton
                 copyText={pathValue}
