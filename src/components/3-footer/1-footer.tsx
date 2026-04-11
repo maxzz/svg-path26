@@ -2,7 +2,7 @@ import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
 import { appSettings } from "@/store/0-ui-settings";
-import { IconGrid, IconSnapToGrid, IconSnapToGrid2, IconAxis } from "../ui/icons";
+import { IconGrid, IconSnapToGrid, IconSnapToGrid2, IconAxis, IconFrame } from "../ui/icons";
 import { Checkbox } from "@/components/ui/shadcn/checkbox";
 import { Button } from "@/components/ui/shadcn/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
@@ -58,7 +58,7 @@ export function Footer() {
                         title="Toggle viewBox frame visibility"
                         type="button"
                     >
-                        {showViewBoxFrame ? "ViewBox on" : "ViewBox off"}
+                        <IconFrame className={classNames("size-3", showViewBoxFrame ? "text-emerald-700 dark:text-emerald-300" : "text-muted-foreground")} />
                     </Button>
                 )}
 

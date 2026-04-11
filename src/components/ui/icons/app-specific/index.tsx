@@ -6,3 +6,4 @@ export * from "./05-1-size-more";
 export * from "./05-2-size-less";
 export * from "./05-3-size-smaller";
 export * from "./05-4-size-bigger";
+export * from "./06-frame";
