@@ -1,78 +1,44 @@
 import { classNames } from "@/utils";
 
-const DARK_THEME_CANVAS_COLORS = {
-    segmentActive: "#009cff",
-    segmentHover: "#ff4343",
-    editorStroke: "#9c00ff63",
-    controlActive: "#9c00ffa0",
-    controlHover: "#ffad40",
-    handleActive: "#9c00ffa0",
-    handleHover: "#ffad40",
-    handleIdle: "#ffffff54",
-    controlPointIdle: "#ffffff",
-    targetPointIdle: "#ffffff",
-    targetPointStroke: "#ffffff38",
-} as const;
-
-const LIGHT_THEME_CANVAS_COLORS = {
-    segmentActive: "#009cff",
-    segmentHover: "#ff4343",
-    editorStroke: "#7c3aed3d",
-    controlActive: "#7c3aed38",
-    controlHover: "#d977063d",
-    handleActive: "#7c3aed",
-    handleHover: "#d97706",
-    handleIdle: "#64748bad",
-    controlPointIdle: "#64748b",
-    targetPointIdle: "#334155",
-    targetPointStroke: "#0f172a29",
-} as const;
-
-export function getCanvasColors(isDarkTheme: boolean) {
-    return isDarkTheme ? DARK_THEME_CANVAS_COLORS : LIGHT_THEME_CANVAS_COLORS;
+export function getEditorStroke(): string {
+    return "stroke-canvas-editor-stroke dark:stroke-canvas-editor-stroke-dark";
 }
 
-export function getEditorStroke(isDarkTheme: boolean): string {
-    return getCanvasColors(isDarkTheme).editorStroke;
+export function getControlHaloFill(selected: boolean): string {
+    return selected
+        ? "fill-canvas-control-active dark:fill-canvas-control-active-dark"
+        : "fill-canvas-control-hover dark:fill-canvas-control-hover-dark";
 }
 
-export function getControlHaloFill(selected: boolean, isDarkTheme: boolean): string {
-    const colors = getCanvasColors(isDarkTheme);
-    return selected ? colors.controlActive : colors.controlHover;
+export function getControlLineStroke(selected: boolean, hovered: boolean): string {
+    if (selected) return "stroke-canvas-handle-active dark:stroke-canvas-handle-active-dark";
+    if (hovered) return "stroke-canvas-handle-hover dark:stroke-canvas-handle-hover-dark";
+    return "stroke-canvas-handle-idle dark:stroke-canvas-handle-idle-dark";
 }
 
-export function getControlLineStroke(selected: boolean, hovered: boolean, isDarkTheme: boolean): string {
-    const colors = getCanvasColors(isDarkTheme);
-    if (selected) return colors.handleActive;
-    if (hovered) return colors.handleHover;
-    return colors.handleIdle;
+export function getControlPointFill(selected: boolean, hovered: boolean): string {
+    if (selected) return "stroke-canvas-segment-active fill-canvas-segment-active";
+    if (hovered) return "stroke-canvas-segment-hover fill-none";
+    return "stroke-canvas-control-point-idle dark:stroke-canvas-control-point-idle-dark fill-none";
 }
 
-export function getControlPointFill(selected: boolean, hovered: boolean, isDarkTheme: boolean): string {
-    const colors = getCanvasColors(isDarkTheme);
-    if (selected) return colors.segmentActive;
-    if (hovered) return colors.segmentHover;
-    return colors.controlPointIdle;
+export function getTargetPointFill(selected: boolean, hovered: boolean): string {
+    if (selected) return "stroke-canvas-segment-active fill-canvas-segment-active";
+    if (hovered) return "stroke-canvas-segment-hover fill-none";
+    return "stroke-canvas-target-point-idle dark:stroke-canvas-target-point-idle-dark fill-none";
 }
 
-export function getTargetPointFill(selected: boolean, hovered: boolean, isDarkTheme: boolean): string {
-    const colors = getCanvasColors(isDarkTheme);
-    if (selected) return colors.segmentActive;
-    if (hovered) return colors.segmentHover;
-    return colors.targetPointIdle;
+export function getTargetPointStroke(selected: boolean): string {
+    if (!selected) return "stroke-transparent";
+    return "stroke-canvas-target-point-stroke dark:stroke-canvas-target-point-stroke-dark";
 }
 
-export function getTargetPointStroke(selected: boolean, isDarkTheme: boolean): string {
-    if (!selected) return "transparent";
-    return getCanvasColors(isDarkTheme).targetPointStroke;
+export function getSegmentActiveStroke(): string {
+    return "stroke-canvas-segment-active";
 }
 
-export function getSegmentActiveStroke(isDarkTheme: boolean): string {
-    return getCanvasColors(isDarkTheme).segmentActive;
-}
-
-export function getSegmentHoverStroke(isDarkTheme: boolean): string {
-    return getCanvasColors(isDarkTheme).segmentHover;
+export function getSegmentHoverStroke(): string {
+    return "stroke-canvas-segment-hover";
 }
 
 //

@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "./components/2-editor/3-canvas/1-overlays/8-canvas-color-palette.css";
 
 @custom-variant dark (&:is(.dark *));
 

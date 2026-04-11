@@ -1,21 +1,16 @@
 import { type PointerEvent } from "react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
-import { useSnapshot } from "valtio";
 import { canvasStrokeWidthAtom, hoveredSegmentStrokeWidthAtom, selectedSegmentStrokeWidthAtom } from "../../../../store/0-atoms/2-3-canvas-viewport-derives";
 import { doRegisterCanvasSegmentHitAreaAtom, doSelectCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, hoveredStandaloneSegmentPathAtom, selectedCommandIndicesAtom, selectedStandaloneSegmentPathsAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { getCommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils";
 import { standaloneSegmentPathsAtom } from "@/store/0-atoms/2-0-svg-model";
-import { appSettings } from "@/store/0-ui-settings";
-import { isThemeDark } from "@/utils";
 import { doStartSelectedSegmentsDragAtom } from "../3-canvas-drag";
 import { getSegmentActiveStroke, getSegmentHoverStroke } from "./8-canvas-color-palette";
 
 // Selected segment overlay
 
 export function CanvasSelectedSegmentOverlay() {
-    const { theme } = useSnapshot(appSettings);
-    const isDarkTheme = isThemeDark(theme);
     const selectedSegmentPaths = useAtomValue(selectedStandaloneSegmentPathsAtom);
     const selectedSegmentStrokeWidth = useAtomValue(selectedSegmentStrokeWidthAtom);
     if (!selectedSegmentPaths.length) return null;
@@ -23,9 +18,9 @@ export function CanvasSelectedSegmentOverlay() {
     return selectedSegmentPaths.map(
         (selectedSegmentPath, index) => (
             <path
+                className={getSegmentActiveStroke()}
                 d={selectedSegmentPath}
                 strokeWidth={selectedSegmentStrokeWidth}
-                stroke={getSegmentActiveStroke(isDarkTheme)}
                 fill="none"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -108,16 +103,14 @@ const doCanvasSegmentHitAreaMouseLeaveAtom = atom(
 // Hovered segment overlay
 
 export function CanvasHoveredSegmentOverlay() {
-    const { theme } = useSnapshot(appSettings);
-    const isDarkTheme = isThemeDark(theme);
     const hoveredSegmentPath = useAtomValue(hoveredStandaloneSegmentPathAtom);
     const hoveredSegmentStrokeWidth = useAtomValue(hoveredSegmentStrokeWidthAtom);
     if (!hoveredSegmentPath) return null;
 
     return (
         <path
+            className={getSegmentHoverStroke()}
             d={hoveredSegmentPath}
-            stroke={getSegmentHoverStroke(isDarkTheme)}
             strokeWidth={hoveredSegmentStrokeWidth}
             fill="none"
             strokeLinecap="round"
