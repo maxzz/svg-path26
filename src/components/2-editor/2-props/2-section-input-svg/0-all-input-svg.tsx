@@ -1,7 +1,7 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
-import { CopyClipboardOverlayButton } from "../../../ui/loacal-ui/4-1-overlay-button-copy-clipboard";
+import { CopyClipboardOverlayButton } from "../../../ui/loacal-ui/5-section-overlay-buttons/4-1-copy-clipboard";
 import { doPasteSvgTextAtom, doSelectSvgInputNodeAtom, svgInputDocumentAtom, svgInputErrorAtom, svgInputSelectedNodeIdAtom } from "@/store/0-atoms/1-3-svg-input";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
 import { SvgTreeView } from "@/components/ui/loacal-ui/2-svg-tree-view";

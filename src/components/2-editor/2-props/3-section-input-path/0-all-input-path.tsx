@@ -1,9 +1,9 @@
 import { useAtom } from "jotai";
 import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
-import { CopyClipboardOverlayButton } from "../../../ui/loacal-ui/4-1-overlay-button-copy-clipboard";
+import { CopyClipboardOverlayButton } from "../../../ui/loacal-ui/5-section-overlay-buttons/4-1-copy-clipboard";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
-import { OverlayButton_MinifyPath } from "../../../ui/loacal-ui/4-2-overlay-button-minify-path";
+import { OverlayButton_MinifyPath } from "../../../ui/loacal-ui/5-section-overlay-buttons/4-2-minify-path";
 
 export function Section_PathInput() {
     const [pathValue, setPathValue] = useAtom(svgPathInputAtom);
