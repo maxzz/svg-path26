@@ -2,28 +2,20 @@
     --color-canvas-segment-active: var(--canvas-segment-active);
     --color-canvas-segment-hover: var(--canvas-segment-hover);
     --color-canvas-editor-stroke: var(--canvas-editor-stroke);
-    --color-canvas-editor-stroke-dark: var(--canvas-editor-stroke-dark);
     --color-canvas-control-active: var(--canvas-control-active);
-    --color-canvas-control-active-dark: var(--canvas-control-active-dark);
     --color-canvas-control-hover: var(--canvas-control-hover);
-    --color-canvas-control-hover-dark: var(--canvas-control-hover-dark);
     --color-canvas-handle-active: var(--canvas-handle-active);
-    --color-canvas-handle-active-dark: var(--canvas-handle-active-dark);
     --color-canvas-handle-hover: var(--canvas-handle-hover);
-    --color-canvas-handle-hover-dark: var(--canvas-handle-hover-dark);
     --color-canvas-handle-idle: var(--canvas-handle-idle);
-    --color-canvas-handle-idle-dark: var(--canvas-handle-idle-dark);
     --color-canvas-control-point-idle: var(--canvas-control-point-idle);
-    --color-canvas-control-point-idle-dark: var(--canvas-control-point-idle-dark);
     --color-canvas-target-point-idle: var(--canvas-target-point-idle);
-    --color-canvas-target-point-idle-dark: var(--canvas-target-point-idle-dark);
     --color-canvas-target-point-stroke: var(--canvas-target-point-stroke);
-    --color-canvas-target-point-stroke-dark: var(--canvas-target-point-stroke-dark);
 }
 
 :root {
     --canvas-segment-active: #009cff;
     --canvas-segment-hover: #ff4343;
+    
     --canvas-editor-stroke: #7c3aed3d;
     --canvas-control-active: #7c3aed38;
     --canvas-control-hover: #d977063d;
@@ -36,13 +28,16 @@
 }
 
 .dark {
-    --canvas-editor-stroke-dark: #9c00ff63;
-    --canvas-control-active-dark: #9c00ffa0;
-    --canvas-control-hover-dark: #ffad40;
-    --canvas-handle-active-dark: #9c00ffa0;
-    --canvas-handle-hover-dark: #ffad40;
-    --canvas-handle-idle-dark: #ffffff54;
-    --canvas-control-point-idle-dark: #ffffff;
-    --canvas-target-point-idle-dark: #ffffff;
-    --canvas-target-point-stroke-dark: #ffffff38;
+    --canvas-segment-active: #009cff;
+    --canvas-segment-hover: #ff4343;
+
+    --canvas-editor-stroke: #9c00ff63;
+    --canvas-control-active: #9c00ffa0;
+    --canvas-control-hover: #ffad40;
+    --canvas-handle-active: #9c00ffa0;
+    --canvas-handle-hover: #ffad40;
+    --canvas-handle-idle: #ffffff54;
+    --canvas-control-point-idle: #ffffff;
+    --canvas-target-point-idle: #ffffff;
+    --canvas-target-point-stroke: #ffffff38;
 }

@@ -1,36 +1,36 @@
 import { classNames } from "@/utils";
 
 export function getEditorStroke(): string {
-    return "stroke-canvas-editor-stroke dark:stroke-canvas-editor-stroke-dark";
+    return "stroke-canvas-editor-stroke";
 }
 
 export function getControlHaloFill(selected: boolean): string {
     return selected
-        ? "fill-canvas-control-active dark:fill-canvas-control-active-dark"
-        : "fill-canvas-control-hover dark:fill-canvas-control-hover-dark";
+        ? "fill-canvas-control-active"
+        : "fill-canvas-control-hover";
 }
 
 export function getControlLineStroke(selected: boolean, hovered: boolean): string {
-    if (selected) return "stroke-canvas-handle-active dark:stroke-canvas-handle-active-dark";
-    if (hovered) return "stroke-canvas-handle-hover dark:stroke-canvas-handle-hover-dark";
-    return "stroke-canvas-handle-idle dark:stroke-canvas-handle-idle-dark";
+    if (selected) return "stroke-canvas-handle-active";
+    if (hovered) return "stroke-canvas-handle-hover";
+    return "stroke-canvas-handle-idle";
 }
 
 export function getControlPointFill(selected: boolean, hovered: boolean): string {
     if (selected) return "stroke-canvas-segment-active fill-canvas-segment-active";
     if (hovered) return "stroke-canvas-segment-hover fill-none";
-    return "stroke-canvas-control-point-idle dark:stroke-canvas-control-point-idle-dark fill-none";
+    return "stroke-canvas-control-point-idle fill-none";
 }
 
 export function getTargetPointFill(selected: boolean, hovered: boolean): string {
     if (selected) return "stroke-canvas-segment-active fill-canvas-segment-active";
     if (hovered) return "stroke-canvas-segment-hover fill-none";
-    return "stroke-canvas-target-point-idle dark:stroke-canvas-target-point-idle-dark fill-none";
+    return "stroke-canvas-target-point-idle fill-none";
 }
 
 export function getTargetPointStroke(selected: boolean): string {
     if (!selected) return "stroke-transparent";
-    return "stroke-canvas-target-point-stroke dark:stroke-canvas-target-point-stroke-dark";
+    return "stroke-canvas-target-point-stroke";
 }
 
 export function getSegmentActiveStroke(): string {
