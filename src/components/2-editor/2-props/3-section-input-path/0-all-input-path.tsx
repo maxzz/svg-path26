@@ -26,8 +26,8 @@ function PathInputOverlay({ pathValue }: { pathValue: string; }) {
     const hasPath = pathValue.trim().length > 0;
 
     return (
-        <div className="flex items-center 1gap-1">
-            <MinifyPathOverlayButton canToggle={hasPath} />
+        <div className="flex items-center">
+            <MinifyPathOverlayButton />
 
             <CopyClipboardOverlayButton
                 copyText={pathValue}
