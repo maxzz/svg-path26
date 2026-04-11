@@ -43,15 +43,18 @@ function OptionsControls() {
     const doNormalizePath = useSetAtom(doNormalizePathAtom);
 
     return (
-        <div className="pl-2.5 pr-2 max-w-[320px] text-[11px] space-y-2.5">
-            <ViewBoxControls />
+        <div className="pl-2.5 pr-2 text-[11px] space-y-2.5">
+
+            <ViewBoxControls className="max-w-[320px]" />
 
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5">
-                <CheckboxRow label="Toggle Theme" className="col-start-1" checked={isDarkTheme} onCheckedChange={() => toggleTheme(theme)} />
+                <Separator />
+                <CheckboxRow label="Toggle dark theme" className="col-start-1" checked={isDarkTheme} onCheckedChange={() => toggleTheme(theme)} />
+                <Separator />
+
                 <CheckboxRow label="Show grid" className="col-start-1" checked={showGrid} onCheckedChange={(checked) => appSettings.canvas.showGrid = checked} />
-                <NumberRow label="Drag precision" className="col-start-2" value={dragPrecision} min={0} max={8} step={1} onValueChange={(value) => appSettings.pathEditor.dragPrecision = value} />
                 <CheckboxRow label="Snap to grid" className="col-start-1" checked={snapToGrid} onCheckedChange={(checked) => appSettings.canvas.snapToGrid = checked} />
-                <CheckboxRow label="Scroll on hover" className="col-start-1" checked={scrollOnHover} onCheckedChange={(checked) => appSettings.canvas.scrollOnHover = checked} />
+                <NumberRow label="Drag precision" className="col-start-2" value={dragPrecision} min={0} max={8} step={1} onValueChange={(value) => appSettings.pathEditor.dragPrecision = value} />
 
                 <div className="col-start-1 flex items-center gap-2">
                     <CheckboxRow label="Show ticks" checked={showTicks} onCheckedChange={(checked) => appSettings.canvas.showTicks = checked} />
@@ -68,17 +71,28 @@ function OptionsControls() {
 
                 <CheckboxRow label="Show point controls" className="col-start-1" checked={showHelpers} onCheckedChange={(checked) => appSettings.canvas.showHelpers = checked} />
                 <CheckboxRow label="Fill path" className="col-start-1" checked={fillPreview} onCheckedChange={(checked) => appSettings.canvas.fillPreview = checked} />
-                <CheckboxRow label="Minify output" checked={minifyOutput} className="col-start-1" onCheckedChange={(checked) => { appSettings.pathEditor.minifyOutput = checked; doNormalizePath(); }} />
-                
                 <CheckboxRow label="Show viewBox frame" checked={showViewBoxFrame} className="col-start-1" onCheckedChange={(checked) => { appSettings.canvas.showViewBoxFrame = checked; }} />
                 <CheckboxRow label="Preview mode" checked={canvasPreview} className="col-start-1" onCheckedChange={(checked) => { appSettings.canvas.canvasPreview = checked; }} />
+                <Separator />
 
-{/* TODO: separator */}
+                <CheckboxRow label="Minify output" checked={minifyOutput} className="col-start-1" onCheckedChange={(checked) => { appSettings.pathEditor.minifyOutput = checked; doNormalizePath(); }} />
+                <Separator />
+
+                <CheckboxRow label="Scroll on hover" className="col-start-1" checked={scrollOnHover} onCheckedChange={(checked) => appSettings.canvas.scrollOnHover = checked} />
+                <Separator />
+                
                 <CheckboxRow label="Show SVG tree lines" className="col-start-1" checked={showSvgTreeConnectorLines} onCheckedChange={(checked) => appSettings.pathEditor.showSvgTreeConnectorLines = checked} />
+                <Separator />
 
-{/* TODO: separator */}
                 <CheckboxRow label="SVG preview section" className="col-start-1" checked={showSvgPreviewSection} onCheckedChange={(checked) => appSettings.showSvgPreviewSection = checked} />
+                <Separator />
             </div>
         </div>
+    );
+}
+
+function Separator() {
+    return (
+        <div aria-hidden="true" className="-mx-1 my-1 h-[0.1px] col-span-2 bg-foreground" />
     );
 }

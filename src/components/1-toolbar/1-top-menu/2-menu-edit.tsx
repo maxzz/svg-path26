@@ -68,7 +68,9 @@ export function EditMenu() {
                 </MenubarItem>
 
                 <MenubarSub>
-                    <MenubarSubTrigger>Center</MenubarSubTrigger>
+                    <MenubarSubTrigger>
+                        Center selected
+                    </MenubarSubTrigger>
                     <MenubarSubContent>
                         <MenubarItem disabled={!hasSelection} onClick={() => doCenter({ axis: "both" })}>
                             Center X+Y

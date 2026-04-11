@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/shadcn/button";
 import { pathViewBoxHeightAtom, pathViewBoxWidthAtom, pathViewBoxXAtom, pathViewBoxYAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { compactInputClasses, compactLabelClasses } from "../../2-editor/2-props/8-shared-classes/0-classes";
 
-export function ViewBoxControls() {
+export function ViewBoxControls({ className }: { className?: string }) {
     const { showViewBoxFrame } = useSnapshot(appSettings.canvas);
     return (
-        <div className="space-y-1.5">
+        <div className={classNames("space-y-1.5", className)}>
             <span className="text-[11px] text-muted-foreground select-none">
                 viewBox
             </span>
