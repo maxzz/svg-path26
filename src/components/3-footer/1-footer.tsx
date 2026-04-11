@@ -2,7 +2,7 @@ import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
 import { appSettings } from "@/store/0-ui-settings";
-import { IconGrid, IconSnapToGrid, IconSnapToGrid2, IconAxis, IconFrame, IconControlPoints } from "../ui/icons";
+import { IconGrid, IconSnapToGrid2, IconAxis, IconFrame, IconControlPoints, IconFillSvg } from "../ui/icons";
 import { Checkbox } from "@/components/ui/shadcn/checkbox";
 import { Button } from "@/components/ui/shadcn/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
@@ -24,10 +24,10 @@ export function Footer() {
                     <Button
                         variant="outline"
                         size="xs"
-                        className="px-1 pb-px h-4 text-[10px] border rounded"
+                        className="px-0.5! h-4 text-[10px] border rounded"
                         onClick={() => { appSettings.canvas.snapToGrid = !snapToGrid; }}
                         aria-pressed={snapToGrid}
-                        title={snapToGrid ? "Snap to grid on" : "Snap to grid off"}
+                        title={snapToGrid ? "Snap to grid is on" : "Snap to grid is off"}
                         type="button"
                     >
                         <IconSnapToGrid2 className={classNames("size-3", snapToGrid ? "text-emerald-700 dark:text-emerald-300" : "text-muted-foreground")} />
@@ -38,10 +38,10 @@ export function Footer() {
                     <Button
                         variant="outline"
                         size="xs"
-                        className="px-1 pb-px h-4 text-[10px] border rounded"
+                        className="px-0.5! h-4 text-[10px] border rounded"
                         onClick={() => { appSettings.canvas.showGrid = !showGrid; }}
                         aria-pressed={showGrid}
-                        title={showGrid ? "Grid on" : "Grid off"}
+                        title={showGrid ? "Grid is on" : "Grid is off"}
                         type="button"
                     >
                         <IconGrid className={classNames("size-3", showGrid ? "stroke-3! text-emerald-700 dark:text-emerald-300" : "text-muted-foreground")} />
@@ -52,10 +52,10 @@ export function Footer() {
                     <Button
                         variant="outline"
                         size="xs"
-                        className="px-1 pb-px h-4 text-[10px] border rounded"
+                        className="px-0.5! h-4 text-[10px] border rounded"
                         onClick={() => { appSettings.canvas.showViewBoxFrame = !showViewBoxFrame; }}
                         aria-pressed={showViewBoxFrame}
-                        title="Toggle viewBox frame visibility"
+                        title={showViewBoxFrame ? "ViewBox frame on" : "ViewBox frame off"}
                         type="button"
                     >
                         <IconFrame className={classNames("size-3", showViewBoxFrame ? "text-emerald-700 dark:text-emerald-300" : "text-muted-foreground")} />
@@ -66,10 +66,10 @@ export function Footer() {
                     <Button
                         variant="outline"
                         size="xs"
-                        className="px-1 pb-px h-4 text-[10px] border rounded"
+                        className="px-0.5! h-4 text-[10px] border rounded"
                         onClick={() => { appSettings.canvas.showHelpers = !showHelpers; }}
                         aria-pressed={showHelpers}
-                        title="Toggle control points visibility"
+                        title={showHelpers ? "Control points on" : "Control points off"}
                         type="button"
                     >
                         <IconControlPoints className={classNames("size-3", showHelpers ? "text-emerald-700 dark:text-emerald-300" : "text-muted-foreground")} />
@@ -83,10 +83,10 @@ export function Footer() {
                         className="px-1 pb-px h-4 text-[10px] border rounded"
                         onClick={() => { appSettings.canvas.fillPreview = !fillPreview; }}
                         aria-pressed={fillPreview}
-                        title="Toggle fill preview visibility"
+                        title={!fillPreview ? "Fill is on" : "Fill is off"}
                         type="button"
                     >
-                        {fillPreview ? "Fill on" : "Fill off"}
+                        <IconFillSvg className={classNames("size-3", fillPreview ? "text-emerald-700 dark:text-emerald-300" : "text-muted-foreground")} />
                     </Button>
                 )}
 
@@ -217,7 +217,7 @@ function TicksToggleInput() {
             <Button
                 variant="outline"
                 size="xs"
-                className="-ml-0.75 px-1 pb-px h-4 text-[10px] border rounded"
+                className="-ml-0.75 px-0.5! h-4 text-[10px] border rounded"
                 onClick={() => { appSettings.canvas.showTicks = !showTicks; }}
                 aria-pressed={showTicks}
                 type="button"
