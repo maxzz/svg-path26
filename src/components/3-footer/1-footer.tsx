@@ -2,7 +2,7 @@ import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
 import { appSettings } from "@/store/0-ui-settings";
-import { IconGrid, IconSnapToGrid, IconSnapToGrid2, IconAxis, IconFrame } from "../ui/icons";
+import { IconGrid, IconSnapToGrid, IconSnapToGrid2, IconAxis, IconFrame, IconControlPoints } from "../ui/icons";
 import { Checkbox } from "@/components/ui/shadcn/checkbox";
 import { Button } from "@/components/ui/shadcn/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
@@ -72,7 +72,7 @@ export function Footer() {
                         title="Toggle control points visibility"
                         type="button"
                     >
-                        {showHelpers ? "Controls on" : "Controls off"}
+                        <IconControlPoints className={classNames("size-3", showHelpers ? "text-emerald-700 dark:text-emerald-300" : "text-muted-foreground")} />
                     </Button>
                 )}
 
