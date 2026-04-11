@@ -1,8 +1,12 @@
 import { useAtom } from "jotai";
+import { useSnapshot } from "valtio";
+import { appSettings } from "@/store/0-ui-settings";
 import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
 import { CopyClipboardOverlayButton } from "../../../ui/loacal-ui/4-copy-clipboard-overlay-button";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
+import { IconSizeMore, IconSizeLess } from "@/components/ui/icons/app-specific";
+import { Button } from "@/components/ui/shadcn/button";
 
 export function Section_PathInput() {
     const [pathValue, setPathValue] = useAtom(svgPathInputAtom);
@@ -23,13 +27,26 @@ export function Section_PathInput() {
 
 function CopyPathOverlay({ pathValue }: { pathValue: string; }) {
     const hasPath = pathValue.trim().length > 0;
+    const { minifyOutput } = useSnapshot(appSettings.pathEditor);
 
     return (
-        <CopyClipboardOverlayButton
-            copyText={pathValue}
-            canCopy={hasPath}
-            idleLabel="Copy path"
-            successLabel="Path copied"
-        />
+        <>
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => appSettings.pathEditor.minifyOutput = !minifyOutput}
+                disabled={!hasPath}
+                aria-label="Copy path"
+            >
+                {minifyOutput ? <IconSizeLess className="size-3" /> : <IconSizeMore className="size-4" />}
+            </Button>
+
+            <CopyClipboardOverlayButton
+                copyText={pathValue}
+                canCopy={hasPath}
+                idleLabel="Copy path"
+                successLabel="Path copied"
+            />
+        </>
     );
 }
