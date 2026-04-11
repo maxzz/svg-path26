@@ -58,11 +58,6 @@ export const doHandleTopMenuKeyDownAtom = atom(
             set(doNormalizePathAtom);
             return;
         }
-        if (key === "d") {
-            event.preventDefault();
-            appSettings.canvas.darkCanvas = !appSettings.canvas.darkCanvas;
-            return;
-        }
         if (key === "i") {
             event.preventDefault();
             set(isImageEditModeAtom, !get(isImageEditModeAtom));

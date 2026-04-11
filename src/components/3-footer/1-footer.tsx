@@ -10,7 +10,7 @@ import { IconAdjustmentsHorizontal } from "@/components/ui/icons/normal";
 import { commandCountAtom, parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
 
 export function Footer() {
-    const { showGrid, darkCanvas, showViewBoxFrame, snapToGrid, showHelpers, fillPreview } = useSnapshot(appSettings.canvas);
+    const { showGrid, showViewBoxFrame, snapToGrid, showHelpers, fillPreview } = useSnapshot(appSettings.canvas);
     const { buttons: footerButtons } = useSnapshot(appSettings.footer);
 
     return (
@@ -45,19 +45,6 @@ export function Footer() {
                         type="button"
                     >
                         <IconGrid className={classNames("size-3", showGrid ? "stroke-3! text-emerald-700 dark:text-emerald-300" : "text-muted-foreground")} />
-                    </Button>
-                )}
-
-                {footerButtons.showDarkCanvasToggle && (
-                    <Button
-                        variant="outline"
-                        size="xs"
-                        className="px-1 pb-px h-4 text-[10px] border rounded"
-                        onClick={() => { appSettings.canvas.darkCanvas = !darkCanvas; }}
-                        aria-pressed={darkCanvas}
-                        type="button"
-                    >
-                        {darkCanvas ? "Dark canvas" : "Light canvas"}
                     </Button>
                 )}
 
@@ -155,14 +142,6 @@ function FooterButtonsPopover() {
                             onCheckedChange={(checked) => { appSettings.footer.buttons.showGridToggle = Boolean(checked); }}
                         />
                         <span>Grid</span>
-                    </label>
-
-                    <label className="flex items-center gap-2 text-[11px] select-none cursor-pointer">
-                        <Checkbox
-                            checked={buttons.showDarkCanvasToggle}
-                            onCheckedChange={(checked) => { appSettings.footer.buttons.showDarkCanvasToggle = Boolean(checked); }}
-                        />
-                        <span>Dark canvas</span>
                     </label>
 
                     <label className="flex items-center gap-2 text-[11px] select-none cursor-pointer">

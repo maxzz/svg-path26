@@ -66,7 +66,6 @@ describe("svg path state atoms", () => {
         appSettings.canvas.fillPreview = false;
         appSettings.canvas.showGrid = true;
         appSettings.canvas.showHelpers = true;
-        appSettings.canvas.darkCanvas = false;
         appSettings.canvas.snapToGrid = true;
         appSettings.canvas.showTicks = false;
         appSettings.dialogs.scaleToViewBox.margin = DEFAULT_DIALOGS_SETTINGS.scaleToViewBox.margin;
@@ -673,7 +672,7 @@ describe("svg path state atoms", () => {
         expect(rectNode?.attributes.find((attribute) => attribute.name === "stroke-width")?.value).toBe("2");
     });
 
-    it("migrates legacy canvas settings into the nested canvas branch", () => {
+    it("migrates legacy canvas settings into the nested canvas branch and drops obsolete darkCanvas data", () => {
         const settings = normalizeStoredSettings({
             theme: "dark",
             showGrid: false,
@@ -691,13 +690,13 @@ describe("svg path state atoms", () => {
         expect(settings.canvas).toMatchObject({
             showGrid: false,
             showHelpers: false,
-            darkCanvas: true,
             snapToGrid: false,
             showTicks: true,
             fillPreview: true,
             canvasPreview: true,
             showViewBoxFrame: true,
         });
+        expect(Object.hasOwn(settings.canvas, "darkCanvas")).toBe(false);
     });
 
     it("merges new section defaults and SVG tree settings into stored settings", () => {

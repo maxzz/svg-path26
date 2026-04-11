@@ -94,7 +94,6 @@ function createCanvasSettingsSchema(defaultSettings: CanvasSettings) {
         z.object({
             showGrid: z.boolean().catch(defaultSettings.showGrid),
             showHelpers: z.boolean().catch(defaultSettings.showHelpers),
-            darkCanvas: z.boolean().catch(defaultSettings.darkCanvas),
             snapToGrid: z.boolean().catch(defaultSettings.snapToGrid),
             scrollOnHover: z.boolean().catch(defaultSettings.scrollOnHover),
             showTicks: z.boolean().catch(defaultSettings.showTicks),
@@ -133,7 +132,6 @@ function createFooterSettingsSchema(defaultSettings: FooterSettings) {
                 showSnapToGridToggle: z.boolean().catch(defaultButtons.showSnapToGridToggle),
                 showShowHelpersToggle: z.boolean().catch(defaultButtons.showShowHelpersToggle),
                 showFillPreviewToggle: z.boolean().catch(defaultButtons.showFillPreviewToggle),
-                showDarkCanvasToggle: z.boolean().catch(defaultButtons.showDarkCanvasToggle),
                 showViewBoxFrameToggle: z.boolean().catch(defaultButtons.showViewBoxFrameToggle),
             }).catch(defaultButtons),
         })
@@ -181,7 +179,6 @@ function toUiSettingsRecord(value: unknown, defaultSettings: UiSettings): Record
         canvas: {
             showGrid: canvasRecord.showGrid ?? record.showGrid ?? pathEditorRecord.showGrid ?? defaultCanvasSettings.showGrid,
             showHelpers: canvasRecord.showHelpers ?? record.showHelpers ?? pathEditorRecord.showHelpers ?? defaultCanvasSettings.showHelpers,
-            darkCanvas: canvasRecord.darkCanvas ?? record.darkCanvas ?? pathEditorRecord.darkCanvas ?? defaultCanvasSettings.darkCanvas,
             snapToGrid: canvasRecord.snapToGrid ?? record.snapToGrid ?? pathEditorRecord.snapToGrid ?? defaultCanvasSettings.snapToGrid,
             scrollOnHover: canvasRecord.scrollOnHover ?? record.scrollOnHover ?? pathEditorRecord.scrollOnHover ?? defaultCanvasSettings.scrollOnHover,
             showTicks: canvasRecord.showTicks ?? record.showTicks ?? pathEditorRecord.showTicks ?? defaultCanvasSettings.showTicks,

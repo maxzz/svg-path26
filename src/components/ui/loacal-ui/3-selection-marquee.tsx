@@ -1,11 +1,8 @@
 import { useAtomValue } from "jotai";
-import { useSnapshot } from "valtio";
-import { appSettings } from "@/store/0-ui-settings";
 import { canvasUnitsPerPixelAtom } from "../../../store/0-atoms/2-3-canvas-viewport-derives";
 import { canvasDragStateAtom } from "../../2-editor/3-canvas/3-canvas-drag";
 
 export function CanvasSelectionMarquee() {
-    const { darkCanvas } = useSnapshot(appSettings.canvas);
     const dragState = useAtomValue(canvasDragStateAtom);
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
 
@@ -19,7 +16,6 @@ export function CanvasSelectionMarquee() {
     const height = Math.abs(dragState.current.y - dragState.start.y);
     const strokeWidth = Math.max(unitsPerPixel * 1.5, unitsPerPixel);
     const dash = unitsPerPixel * 6;
-    const fill = darkCanvas ? "#94a3b81f" : "#3b82f61a";
 
     return (
         <g pointerEvents="none">
@@ -28,8 +24,7 @@ export function CanvasSelectionMarquee() {
                 y={y}
                 width={width}
                 height={height}
-                fill={fill}
-                stroke={darkCanvas ? "white" : "black"}
+                className="fill-[#3b82f61a] stroke-black dark:fill-[#94a3b81f] dark:stroke-white"
                 strokeWidth={strokeWidth}
                 strokeDasharray={`${dash} ${dash}`}
             >
@@ -41,8 +36,7 @@ export function CanvasSelectionMarquee() {
                 y={y}
                 width={width}
                 height={height}
-                fill="none"
-                stroke={darkCanvas ? "black" : "white"}
+                className="fill-none stroke-white dark:stroke-black"
                 strokeWidth={strokeWidth}
                 strokeDasharray={`${dash} ${dash}`}
                 strokeDashoffset={dash}

@@ -28,7 +28,7 @@ export function PathCanvas() {
 }
 
 export function PathCanvasElement({ children }: { children: ReactNode; }) {
-    const { darkCanvas, canvasPreview } = useSnapshot(appSettings.canvas);
+    const { canvasPreview } = useSnapshot(appSettings.canvas);
     const hasNonEmptyPathRef = useRef(false);
 
     const canvasRootSvgElement = useAtomValue(canvasRootSvgElementAtom);
@@ -75,7 +75,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
         [canvasRootSvgElement, doWheelZoomViewPort]);
 
     return (
-        <div className={classNames("absolute w-full h-full overflow-hidden", canvasPreview ? "bg-white" : (darkCanvas ? "bg-[#040d1c]" : "bg-white"))}>
+        <div className={classNames("absolute w-full h-full overflow-hidden", canvasPreview ? "bg-white" : "bg-white dark:bg-[#040d1c]")}>
             <CanvasRootSvg>
                 {children}
             </CanvasRootSvg>
@@ -147,11 +147,10 @@ function CanvasViewPortSync() {
 }
 
 function ViewportZoomControls() {
-    const { darkCanvas } = useSnapshot(appSettings.canvas);
     const doFitViewPort = useSetAtom(doFitViewPortAtom);
     const doFitViewPortToPathViewBox = useSetAtom(doFitViewPortToPathViewBoxAtom);
     const doZoomViewPort = useSetAtom(doZoomViewPortAtom);
-    const buttonClasses = classNames("size-7 rounded-full", darkCanvas ? "text-slate-500 bg-slate-100/10! border-slate-100/10!" : "text-slate-500 bg-slate-500/10! border-slate-500/10!");
+    const buttonClasses = "size-7 rounded-full text-slate-500 bg-slate-500/10! border-slate-500/10! dark:bg-slate-100/10! dark:border-slate-100/10!";
     return (
         <div className="absolute bottom-3 right-3 flex items-center gap-0.5 z-10">
             <Button variant="outline" size="icon" className={buttonClasses} title="Zoom to viewBox" onClick={() => doFitViewPortToPathViewBox()}>

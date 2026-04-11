@@ -28,7 +28,6 @@ export interface PathEditorSettings {
 export interface CanvasSettings {
     showGrid: boolean;                    // Show grid or not
     showHelpers: boolean;                 // Show helpers or not
-    darkCanvas: boolean;                  // Dark canvas or not
     snapToGrid: boolean;                  // Snap to grid or not (when enabled, the path will be snapped to the grid)
     scrollOnHover: boolean;               // Scroll commands list while hovering canvas points or segments
     showTicks: boolean;                   // Show ticks or not (when enabled, the ticks will be shown on the axis)
@@ -43,7 +42,6 @@ export interface FooterButtonsSettings {
     showSnapToGridToggle: boolean;
     showShowHelpersToggle: boolean;
     showFillPreviewToggle: boolean;
-    showDarkCanvasToggle: boolean;
     showViewBoxFrameToggle: boolean;
 }
 
@@ -100,7 +98,6 @@ export const DEFAULT_PATH_EDITOR_SETTINGS: PathEditorSettings = {
 export const DEFAULT_CANVAS_SETTINGS: CanvasSettings = {
     showGrid: true,
     showHelpers: true,
-    darkCanvas: false,
     snapToGrid: true,
     scrollOnHover: true,
     showTicks: false,
@@ -116,7 +113,6 @@ export const DEFAULT_FOOTER_SETTINGS: FooterSettings = {
         showSnapToGridToggle: true,
         showShowHelpersToggle: true,
         showFillPreviewToggle: true,
-        showDarkCanvasToggle: true,
         showViewBoxFrameToggle: true,
     },
 };
