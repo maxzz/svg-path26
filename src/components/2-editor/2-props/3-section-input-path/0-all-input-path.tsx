@@ -1,10 +1,11 @@
 import { useAtom } from "jotai";
-import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 import { CopyClipboardOverlayButton } from "../../../ui/loacal-ui/5-section-overlay-buttons/4-1-copy-clipboard";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
 import { OverlayButton_MinifyPath } from "../../../ui/loacal-ui/5-section-overlay-buttons/4-2-minify-path";
 import { IconHomeToCloud } from "@/components/ui/icons/app-specific";
+import { Button } from "@/components/ui/shadcn/button";
 
 export function Section_PathInput() {
     const [pathValue, setPathValue] = useAtom(svgPathInputAtom);
@@ -28,8 +29,8 @@ function PathInputOverlay({ pathValue }: { pathValue: string; }) {
     return (
         <div className="flex items-center">
 
-            <IconHomeToCloud className="size-4" />
-            
+            <HomeToCloudOverlay />
+
             <OverlayButton_MinifyPath />
 
             <CopyClipboardOverlayButton
@@ -39,5 +40,20 @@ function PathInputOverlay({ pathValue }: { pathValue: string; }) {
                 successLabel="Path copied"
             />
         </div>
+    );
+}
+
+function HomeToCloudOverlay() {
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <Button className="size-5" variant="ghost" size="icon">
+                    <IconHomeToCloud className="size-4" />
+                </Button>
+            </TooltipTrigger>
+            <TooltipContent sideOffset={6}>
+                Home to Cloud
+            </TooltipContent>
+        </Tooltip>
     );
 }
