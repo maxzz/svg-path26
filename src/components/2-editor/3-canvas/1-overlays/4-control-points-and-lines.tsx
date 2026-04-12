@@ -3,7 +3,7 @@ import { type PointerEvent } from "react";
 import { type Point, type SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { canvasStrokeWidthAtom, canvasUnitsPerPixelAtom } from "../../../../store/0-atoms/2-3-canvas-viewport-derives";
-import { canvasPointSelectedAtom, commandHoveredAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCanvasPointIdsAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-0-editor-actions";
+import { canvasPointSelectedAtom, commandHoveredAtom, commandSelectedAtom, hasSelectedCanvasPointsAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCanvasPointIdsAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { controlPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { classNames } from "@/utils";
 import { doStartPointDragAtom } from "../3-canvas-drag";
@@ -30,7 +30,10 @@ export function CanvasLinesToControlPoints() {
 }
 
 function CanvasControlLine({ point, relation, strokeWidth }: { point: SvgCanvasPoint; relation: { x: number; y: number; }; strokeWidth: number; }) {
-    const selected = useAtomValue(canvasPointSelectedAtom(point.id));
+    const hasSelectedCanvasPoints = useAtomValue(hasSelectedCanvasPointsAtom);
+    const pointSelected = useAtomValue(canvasPointSelectedAtom(point.id));
+    const segmentSelected = useAtomValue(commandSelectedAtom(point.segmentIndex));
+    const selected = hasSelectedCanvasPoints ? pointSelected : segmentSelected;
     const hovered = useAtomValue(commandHoveredAtom(point.segmentIndex));
 
     return (
@@ -61,7 +64,10 @@ export function CanvasControlPoints() {
 }
 
 function CanvasControlPoint({ point, unitsPerPixel }: { point: SvgCanvasPoint; unitsPerPixel: number; }) {
-    const selected = useAtomValue(canvasPointSelectedAtom(point.id));
+    const hasSelectedCanvasPoints = useAtomValue(hasSelectedCanvasPointsAtom);
+    const pointSelected = useAtomValue(canvasPointSelectedAtom(point.id));
+    const segmentSelected = useAtomValue(commandSelectedAtom(point.segmentIndex));
+    const selected = hasSelectedCanvasPoints ? pointSelected : segmentSelected;
     const hovered = useAtomValue(commandHoveredAtom(point.segmentIndex));
     const controlPointClasses = getControlPointFill(selected, hovered);
 
@@ -139,9 +145,7 @@ const doCanvasControlPointPointerDownAtom = atom(
                 : [point.id];
 
         set(selectedCanvasPointIdsAtom, nextSelectedPointIds);
-        if (!isToggleSelection && !isAlreadySelected) {
-            set(selectedCommandIndicesAtom, [point.segmentIndex]);
-        }
+        set(selectedCommandIndicesAtom, []);
 
         if (!point.movable) return;
 
