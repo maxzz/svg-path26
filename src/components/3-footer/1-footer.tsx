@@ -96,7 +96,7 @@ export function Footer() {
     );
 }
 
-const buttonClasses = "px-0.5! h-4 text-[10px] border rounded";
+const buttonClasses = "px-0.5! size-4 text-[10px] border rounded";
 const buttonIconOnClasses = "text-emerald-700 dark:text-emerald-300";
 const buttonIconOffClasses = "text-muted-foreground ";
 const buttonIconFillOnClasses = "text-emerald-700 dark:text-emerald-300 fill-emerald-200/50! dark:fill-emerald-300/30!";
@@ -110,7 +110,7 @@ function FooterButtonsPopover() {
                 <Button
                     variant="outline"
                     size="icon"
-                    className="size-4 text-[10px] border rounded flex items-center justify-center"
+                    className={buttonClasses}
                     title="Choose footer buttons"
                     aria-label="Choose footer buttons"
                     type="button"
@@ -178,30 +178,6 @@ function FooterButtonsPopover() {
     );
 }
 
-function PathStateInfo() {
-    const commandCount = useAtomValue(commandCountAtom);
-    const error = useAtomValue(parseErrorAtom);
-    return (
-        <div className="min-w-0 text-[10px] flex items-center gap-2 whitespace-nowrap">
-            <span className="shrink-0">
-                Commands parsed: {commandCount}
-            </span>
-
-            {error
-                ? (
-                    <span className="px-2 py-1 max-w-55 text-xs text-destructive bg-destructive/10 truncate rounded">
-                        {error}
-                    </span>
-                ) : (
-                    <span className="px-2 py-1 max-w-55 text-emerald-700 dark:text-emerald-300 truncate rounded">
-                        Path parsed successfully.
-                    </span>
-                )
-            }
-        </div>
-    );
-}
-
 function TicksToggleInput() {
     const { showTicks } = useSnapshot(appSettings.canvas);
     const { tickInterval } = useSnapshot(appSettings.pathEditor);
@@ -229,6 +205,30 @@ function TicksToggleInput() {
             >
                 <IconAxis className={classNames("size-3", showTicks ? "stroke-2! text-emerald-700 dark:text-emerald-300" : "text-muted-foreground")} />
             </Button>
+        </div>
+    );
+}
+
+function PathStateInfo() {
+    const commandCount = useAtomValue(commandCountAtom);
+    const error = useAtomValue(parseErrorAtom);
+    return (
+        <div className="min-w-0 text-[10px] flex items-center gap-2 whitespace-nowrap">
+            <span className="shrink-0">
+                Commands parsed: {commandCount}
+            </span>
+
+            {error
+                ? (
+                    <span className="px-2 py-1 max-w-55 text-xs text-destructive bg-destructive/10 truncate rounded">
+                        {error}
+                    </span>
+                ) : (
+                    <span className="px-2 py-1 max-w-55 text-emerald-700 dark:text-emerald-300 truncate rounded">
+                        Path parsed successfully.
+                    </span>
+                )
+            }
         </div>
     );
 }
