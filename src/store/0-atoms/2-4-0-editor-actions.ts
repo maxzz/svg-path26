@@ -178,13 +178,9 @@ export const doSetSelectedControlPointsAtom = atom(
     (get, set, pointIds: Iterable<string>) => {
         const controlPoints = get(controlPointsAtom);
         const nextIds = normalizeSelectedControlPointIds(pointIds, controlPoints);
-        const nextPoints = getSelectedControlPoints(controlPoints, nextIds);
 
         set(selectedControlPointIdsAtom, nextIds);
-        set(selectedCommandIndicesAtom, normalizeSelectedCommandIndices(
-            nextPoints.map((point) => point.segmentIndex),
-            get(commandRowsAtom).length,
-        ));
+        set(selectedCommandIndicesAtom, []);
     }
 );
 

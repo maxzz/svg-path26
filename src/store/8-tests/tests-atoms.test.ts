@@ -153,6 +153,7 @@ describe("svg path state atoms", () => {
     it("toggles explicit control-point selection without keeping sibling controls selected", () => {
         const store = createStore();
         store.set(svgPathInputAtom, "M 0 0 C 10 0 10 10 20 10");
+        store.set(selectedCommandIndicesAtom, [1]);
 
         const [firstControl, secondControl] = store.get(controlPointsAtom).filter((point) => point.segmentIndex === 1 && point.movable);
         expect(firstControl).toBeDefined();
@@ -160,15 +161,15 @@ describe("svg path state atoms", () => {
 
         store.set(doSelectControlPointAtom, { point: firstControl!, mode: "replace" });
         expect(store.get(selectedControlPointIdsAtom)).toEqual([firstControl!.id]);
-        expect(store.get(selectedCommandIndicesAtom)).toEqual([1]);
+        expect(store.get(selectedCommandIndicesAtom)).toEqual([]);
 
         store.set(doSelectControlPointAtom, { point: secondControl!, mode: "toggle" });
         expect(store.get(selectedControlPointIdsAtom)).toEqual([firstControl!.id, secondControl!.id]);
-        expect(store.get(selectedCommandIndicesAtom)).toEqual([1]);
+        expect(store.get(selectedCommandIndicesAtom)).toEqual([]);
 
         store.set(doSelectControlPointAtom, { point: firstControl!, mode: "toggle" });
         expect(store.get(selectedControlPointIdsAtom)).toEqual([secondControl!.id]);
-        expect(store.get(selectedCommandIndicesAtom)).toEqual([1]);
+        expect(store.get(selectedCommandIndicesAtom)).toEqual([]);
 
         store.set(doSelectControlPointAtom, { point: secondControl!, mode: "toggle" });
         expect(store.get(selectedControlPointIdsAtom)).toEqual([]);
