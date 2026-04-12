@@ -14,7 +14,7 @@ export function Footer() {
     const { buttons: footerButtons } = useSnapshot(appSettings.footer);
 
     return (
-        <footer className="px-4 py-2 pr-2 text-xs text-muted-foreground border-t flex items-center justify-between">
+        <footer className="px-4 pt-1 pb-1.5 pr-2 text-xs text-muted-foreground border-t flex items-center justify-between">
             <PathStateInfo />
 
             <div className="flex items-center gap-1">
@@ -96,7 +96,7 @@ export function Footer() {
     );
 }
 
-const buttonClasses = "px-0.5! size-4 text-[10px] border rounded";
+const buttonClasses = "px-0.5! size-5 text-[10px] border rounded";
 const buttonIconOnClasses = "text-emerald-700 dark:text-emerald-300";
 const buttonIconOffClasses = "text-muted-foreground ";
 const buttonIconFillOnClasses = "text-emerald-700 dark:text-emerald-300 fill-emerald-200/50! dark:fill-emerald-300/30!";
@@ -198,7 +198,7 @@ function TicksToggleInput() {
             <Button
                 variant="outline"
                 size="xs"
-                className="-ml-0.75 px-0.5! h-4 text-[10px] border rounded"
+                className={classNames(buttonClasses, "-ml-0.75")}
                 onClick={() => { appSettings.canvas.showTicks = !showTicks; }}
                 aria-pressed={showTicks}
                 type="button"
