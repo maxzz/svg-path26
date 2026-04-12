@@ -9,3 +9,4 @@ export * from "./05-4-size-bigger";
 export * from "./06-frame";
 export * from "./07-control-points";
 export * from "./08-fill-svg";
+export * from "./09-home-to-cloud";

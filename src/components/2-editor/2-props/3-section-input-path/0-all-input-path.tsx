@@ -4,6 +4,7 @@ import { CopyClipboardOverlayButton } from "../../../ui/loacal-ui/5-section-over
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
 import { OverlayButton_MinifyPath } from "../../../ui/loacal-ui/5-section-overlay-buttons/4-2-minify-path";
+import { IconHomeToCloud } from "@/components/ui/icons/app-specific";
 
 export function Section_PathInput() {
     const [pathValue, setPathValue] = useAtom(svgPathInputAtom);
@@ -26,6 +27,9 @@ function PathInputOverlay({ pathValue }: { pathValue: string; }) {
     const hasPath = pathValue.trim().length > 0;
     return (
         <div className="flex items-center">
+
+            <IconHomeToCloud className="size-4" />
+            
             <OverlayButton_MinifyPath />
 
             <CopyClipboardOverlayButton
