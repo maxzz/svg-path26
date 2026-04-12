@@ -12,7 +12,7 @@ import { getControlHaloFill, getControlLineStroke, getControlPointFill, getEdito
 
 // Control lines
 
-export function CanvasControlLines() {
+export function CanvasLinesToControlPoints() {
     const controlPoints = useAtomValue(controlPointsAtom);
     const strokeWidth = useAtomValue(canvasStrokeWidthAtom);
 

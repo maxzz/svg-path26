@@ -27,7 +27,7 @@ export function Section_PathInput() {
 function PathInputOverlay({ pathValue }: { pathValue: string; }) {
     const hasPath = pathValue.trim().length > 0;
     return (
-        <div className="flex items-center">
+        <div className="flex items-center gap-0.5">
 
             <HomeToCloudOverlay />
 
