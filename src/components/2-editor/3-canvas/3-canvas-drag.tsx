@@ -6,7 +6,7 @@ import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { controlPointsAtom, pathPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { canvasRootSvgElementAtom, canvasViewPortAtom, doPanViewPortAtom, doZoomViewPortAtom } from "@/store/0-atoms/2-3-canvas-viewport";
 import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
-import { canvasSegmentHitAreaElementsAtom, doSetPointLocationWithoutHistoryAtom, doSuppressNextCanvasFocusClearAtom, doTranslateSelectedSegmentsWithoutHistoryAtom, draggedCanvasPointAtom, isCanvasDraggingAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-0-editor-actions";
+import { canvasSegmentHitAreaElementsAtom, doSetPointLocationWithoutHistoryAtom, doSuppressNextCanvasFocusClearAtom, doTranslateCanvasPointsWithoutHistoryAtom, doTranslateSelectedSegmentsWithoutHistoryAtom, draggedCanvasPointAtom, isCanvasDraggingAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { applyCommandSelection, getMarqueeSelectionIndices, getMarqueeSelectionMode, type CommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils";
 import { doCommitCurrentPathToHistoryAtom } from "@/store/0-atoms/1-2-history";
 import { doUpdateImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-8-images";
@@ -14,6 +14,7 @@ import { notice } from "@/components/ui/loacal-ui/7-toaster/7-toaster";
 
 export type DragState =
     | { mode: "point"; pointerId: number; point: SvgCanvasPoint; startPath: string; }
+    | { mode: "control-points"; pointerId: number; points: SvgCanvasPoint[]; startPath: string; start: Point; startClientX: number; startClientY: number; moved: boolean; }
     | { mode: "selection"; pointerId: number; segmentIndices: number[]; startPath: string; startClientX: number; startClientY: number; moved: boolean; viewBox: ViewBox; }
     | { mode: "canvas"; pointerId: number; lastClientX: number; lastClientY: number; moved: boolean; }
     | { mode: "marquee"; pointerId: number; start: Point; current: Point; startClientX: number; startClientY: number; moved: boolean; selectionMode: CommandSelectionMode; initialSelection: number[]; }
@@ -135,6 +136,26 @@ export const doStartPointDragAtom = atom(
     }
 );
 
+export const doStartControlPointsDragAtom = atom(
+    null,
+    (_get, set, args: { points: SvgCanvasPoint[]; draggedPoint: SvgCanvasPoint; pointerId: number; startPath: string; start: Point; clientX: number; clientY: number; }) => {
+        if (!args.points.length) return;
+
+        set(draggedCanvasPointAtom, args.draggedPoint);
+        set(isCanvasDraggingAtom, true);
+        set(canvasDragStateAtom, {
+            mode: "control-points",
+            points: args.points,
+            pointerId: args.pointerId,
+            startPath: args.startPath,
+            start: args.start,
+            startClientX: args.clientX,
+            startClientY: args.clientY,
+            moved: false,
+        });
+    }
+);
+
 export const doStartImageDragAtom = atom(
     null,
     (_get, set, args: { pointerId: number; imageId: string; handle: ImageHandle; start: Point; initial: EditorImage; }) => {
@@ -186,6 +207,31 @@ export const doApplyActiveCanvasDragAtClientAtom = atom(
             set(doSetPointLocationWithoutHistoryAtom, {
                 point: activeDragState.point,
                 to: { x, y },
+            });
+            return;
+        }
+
+        if (activeDragState.mode === "control-points") {
+            const baseDecimals = appSettings.canvas.snapToGrid ? 0 : Math.max(0, appSettings.pathEditor.dragPrecision);
+            const dragDecimals = args.ctrlKey ? (baseDecimals ? 0 : 3) : baseDecimals;
+            const dx = next.x - activeDragState.start.x;
+            const dy = next.y - activeDragState.start.y;
+            const moved = activeDragState.moved
+                || Math.abs(args.clientX - activeDragState.startClientX) > 1
+                || Math.abs(args.clientY - activeDragState.startClientY) > 1
+                || Math.abs(dx) > 1e-6
+                || Math.abs(dy) > 1e-6;
+            if (moved !== activeDragState.moved) {
+                set(doSetCanvasDragStateAtom, { ...activeDragState, moved });
+            }
+            if (!moved) return;
+
+            set(doTranslateCanvasPointsWithoutHistoryAtom, {
+                points: activeDragState.points,
+                dx,
+                dy,
+                startPath: activeDragState.startPath,
+                dragDecimals,
             });
             return;
         }
@@ -281,6 +327,9 @@ export const doCommitActiveCanvasDragAtom = atom(
         if (activeDragState.mode === "point") {
             set(doCommitCurrentPathToHistoryAtom, activeDragState.startPath);
         }
+        else if (activeDragState.mode === "control-points" && activeDragState.moved) {
+            set(doCommitCurrentPathToHistoryAtom, activeDragState.startPath);
+        }
         else if (activeDragState.mode === "selection" && activeDragState.moved) {
             set(doCommitCurrentPathToHistoryAtom, activeDragState.startPath);
         }
@@ -304,7 +353,7 @@ export const doCancelActiveCanvasDragAtom = atom(
         const activeDragState = get(canvasDragStateAtom);
         if (!activeDragState) return;
 
-        if (activeDragState.mode === "point" || activeDragState.mode === "selection") {
+        if (activeDragState.mode === "point" || activeDragState.mode === "control-points" || activeDragState.mode === "selection") {
             set(svgPathInputAtom, activeDragState.startPath);
         }
         else if (activeDragState.mode === "marquee") {
@@ -724,7 +773,7 @@ function clientDeltaToSvgDelta(svg: SVGSVGElement | null, dxPx: number, dyPx: nu
 }
 
 function supportsEdgeAutoPan(mode: DragState["mode"]): boolean {
-    return mode === "point" || mode === "selection" || mode === "image";
+    return mode === "point" || mode === "control-points" || mode === "selection" || mode === "image";
 }
 
 function getEdgeAutoPanDirection(rect: DOMRect, clientX: number, clientY: number, activationZonePx: number): EdgeAutoPanDirection | null {

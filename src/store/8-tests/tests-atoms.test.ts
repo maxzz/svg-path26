@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createStore } from "jotai";
 import { findSvgInputNodeById } from "@/svg-core/3-svg-input";
-import { doDeleteSelectedSegmentsAtom, doSetCommandValueAtom, doSetPointLocationWithoutHistoryAtom, selectedCommandIndicesAtom } from "../0-atoms/2-4-0-editor-actions";
+import { doDeleteSelectedSegmentsAtom, doSelectControlPointAtom, doSetCommandValueAtom, doSetPointLocationWithoutHistoryAtom, selectedCommandIndicesAtom, selectedControlPointIdsAtom } from "../0-atoms/2-4-0-editor-actions";
 import { doScaleSelectedSegmentsIntoViewBoxAtom } from "../../components/4-dialogs/7-1-scale-to-viewbox/2-do-scale";
-import { commandRowsAtom, svgModelAtom, pathPointsAtom } from "../0-atoms/2-0-svg-model";
+import { commandRowsAtom, controlPointsAtom, svgModelAtom, pathPointsAtom } from "../0-atoms/2-0-svg-model";
 import { canvasViewPortAtom, doFitViewPortAtom, doFitViewPortToPathViewBoxAtom, doPanViewPortAtom, doSetViewPortAtom, doZoomViewPortAtom, rootSvgElementSizeAtom } from "../0-atoms/2-3-canvas-viewport";
 import { canRedoAtom, canUndoAtom, doRedoPathAtom, doUndoPathAtom } from "../0-atoms/1-2-history";
 import { doPasteSvgTextAtom, doSelectSvgInputNodeAtom, svgInputDocumentAtom, svgInputSelectedNodeIdAtom } from "../0-atoms/1-3-svg-input";
@@ -148,6 +148,31 @@ describe("svg path state atoms", () => {
         expect(store.get(svgPathInputAtom)).toContain("L 10 10");
         expect(store.get(svgPathInputAtom)).not.toContain("L 20 20");
         expect(store.get(svgPathInputAtom)).not.toContain("L 30 30");
+    });
+
+    it("toggles explicit control-point selection without keeping sibling controls selected", () => {
+        const store = createStore();
+        store.set(svgPathInputAtom, "M 0 0 C 10 0 10 10 20 10");
+
+        const [firstControl, secondControl] = store.get(controlPointsAtom).filter((point) => point.segmentIndex === 1 && point.movable);
+        expect(firstControl).toBeDefined();
+        expect(secondControl).toBeDefined();
+
+        store.set(doSelectControlPointAtom, { point: firstControl!, mode: "replace" });
+        expect(store.get(selectedControlPointIdsAtom)).toEqual([firstControl!.id]);
+        expect(store.get(selectedCommandIndicesAtom)).toEqual([1]);
+
+        store.set(doSelectControlPointAtom, { point: secondControl!, mode: "toggle" });
+        expect(store.get(selectedControlPointIdsAtom)).toEqual([firstControl!.id, secondControl!.id]);
+        expect(store.get(selectedCommandIndicesAtom)).toEqual([1]);
+
+        store.set(doSelectControlPointAtom, { point: firstControl!, mode: "toggle" });
+        expect(store.get(selectedControlPointIdsAtom)).toEqual([secondControl!.id]);
+        expect(store.get(selectedCommandIndicesAtom)).toEqual([1]);
+
+        store.set(doSelectControlPointAtom, { point: secondControl!, mode: "toggle" });
+        expect(store.get(selectedControlPointIdsAtom)).toEqual([]);
+        expect(store.get(selectedCommandIndicesAtom)).toEqual([]);
     });
 
     it("fits, pans and zooms viewport with lock handling", () => {

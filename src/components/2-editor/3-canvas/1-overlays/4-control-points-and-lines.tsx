@@ -2,12 +2,13 @@ import { atom, useAtomValue, useSetAtom } from "jotai";
 import { type PointerEvent } from "react";
 import { type Point, type SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
+import { canvasViewPortAtom } from "@/store/0-atoms/2-3-canvas-viewport";
 import { canvasStrokeWidthAtom, canvasUnitsPerPixelAtom } from "../../../../store/0-atoms/2-3-canvas-viewport-derives";
-import { commandHoveredAtom, commandSelectedAtom, doFocusPointCommandAtom, doSelectCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-0-editor-actions";
-import { getCommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils";
+import { commandHoveredAtom, commandSelectedAtom, controlPointSelectedAtom, doSelectControlPointAtom, doSetSelectedControlPointsAtom, hasSelectedControlPointsAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedControlPointsAtom } from "@/store/0-atoms/2-4-0-editor-actions";
+import { getCanvasPointSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils";
 import { controlPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { classNames } from "@/utils";
-import { doStartPointDragAtom, doStartSelectedSegmentsDragAtom } from "../3-canvas-drag";
+import { doStartControlPointsDragAtom, eventToSvgPoint } from "../3-canvas-drag";
 import { getControlHaloFill, getControlLineStroke, getControlPointFill, getEditorStroke, getPointInteractionClassName } from "./8-canvas-color-palette";
 
 // Control lines
@@ -31,8 +32,12 @@ export function CanvasLinesToControlPoints() {
 }
 
 function CanvasControlLine({ point, relation, strokeWidth }: { point: SvgCanvasPoint; relation: { x: number; y: number; }; strokeWidth: number; }) {
-    const selected = useAtomValue(commandSelectedAtom(point.segmentIndex));
+    const hasExplicitControlSelection = useAtomValue(hasSelectedControlPointsAtom);
+    const selectedCommand = useAtomValue(commandSelectedAtom(point.segmentIndex));
+    const selectedPoint = useAtomValue(controlPointSelectedAtom(point.id));
     const hovered = useAtomValue(commandHoveredAtom(point.segmentIndex));
+
+    const selected = hasExplicitControlSelection ? selectedPoint : selectedCommand;
 
     return (
         <line
@@ -62,8 +67,11 @@ export function CanvasControlPoints() {
 }
 
 function CanvasControlPoint({ point, unitsPerPixel }: { point: SvgCanvasPoint; unitsPerPixel: number; }) {
-    const selected = useAtomValue(commandSelectedAtom(point.segmentIndex));
+    const hasExplicitControlSelection = useAtomValue(hasSelectedControlPointsAtom);
+    const selectedCommand = useAtomValue(commandSelectedAtom(point.segmentIndex));
+    const selectedPoint = useAtomValue(controlPointSelectedAtom(point.id));
     const hovered = useAtomValue(commandHoveredAtom(point.segmentIndex));
+    const selected = hasExplicitControlSelection ? selectedPoint : selectedCommand;
     const controlPointClasses = getControlPointFill(selected, hovered);
 
     const doCanvasControlPointPointerDown = useSetAtom(doCanvasControlPointPointerDownAtom);
@@ -122,24 +130,43 @@ function CanvasControlPoint({ point, unitsPerPixel }: { point: SvgCanvasPoint; u
 const doCanvasControlPointPointerDownAtom = atom(
     null,
     (get, set, point: SvgCanvasPoint, event: PointerEvent<SVGElement>) => {
-        const selectedCommandIndices = get(selectedCommandIndicesAtom);
+        const selectedControlPoints = get(selectedControlPointsAtom);
         const pathValue = get(svgPathInputAtom);
+        const selectionMode = getCanvasPointSelectionMode(event);
+        const pointAlreadySelected = selectedControlPoints.some((item) => item.id === point.id);
+        const nextSelectedPoints = selectionMode === "replace"
+            ? (pointAlreadySelected && selectedControlPoints.length ? selectedControlPoints : [point])
+            : selectedControlPoints;
 
         set(hoveredCommandIndexAtom, point.segmentIndex);
         set(hoveredCanvasPointAtom, point);
 
-        if (selectedCommandIndices.includes(point.segmentIndex) && !event.shiftKey && !event.ctrlKey && !event.metaKey) {
-            set(doStartSelectedSegmentsDragAtom, pathValue, selectedCommandIndices, event);
+        if (selectionMode === "toggle") {
+            set(doSelectControlPointAtom, { point, mode: selectionMode });
             return;
         }
 
-        const selectionMode = getCommandSelectionMode(event);
-        set(doSelectCommandAtom, { index: point.segmentIndex, mode: selectionMode });
-        if (selectionMode !== "replace") return;
+        if (selectionMode === "add") {
+            set(doSelectControlPointAtom, { point, mode: selectionMode });
+            return;
+        }
 
-        set(doFocusPointCommandAtom, point);
+        set(doSetSelectedControlPointsAtom, nextSelectedPoints.map((item) => item.id));
         if (!point.movable) return;
-        set(doStartPointDragAtom, { point, pointerId: event.pointerId, startPath: pathValue });
+
+        const start = eventToSvgPoint(event.currentTarget.ownerSVGElement, event.clientX, event.clientY, get(canvasViewPortAtom));
+        if (!start) return;
+
+        const draggablePoints = nextSelectedPoints.filter((item) => item.movable);
+        set(doStartControlPointsDragAtom, {
+            points: draggablePoints,
+            draggedPoint: point,
+            pointerId: event.pointerId,
+            startPath: pathValue,
+            start,
+            clientX: event.clientX,
+            clientY: event.clientY,
+        });
     }
 );
 

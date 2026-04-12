@@ -1,9 +1,28 @@
 import { type Bounds, type Point, type SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
 
 export type CommandSelectionMode = "replace" | "add" | "remove";
+export type CanvasPointSelectionMode = "replace" | "add" | "toggle";
+
+function normalizeSelectedIds(ids: Iterable<string>): string[] {
+    const next: string[] = [];
+    const seen = new Set<string>();
+    for (const id of ids) {
+        if (!id) continue;
+        if (seen.has(id)) continue;
+        seen.add(id);
+        next.push(id);
+    }
+    return next;
+}
 
 export function getCommandSelectionMode(event: { shiftKey: boolean; ctrlKey: boolean; metaKey: boolean; }): CommandSelectionMode {
     if (event.ctrlKey || event.metaKey) return "remove";
+    if (event.shiftKey) return "add";
+    return "replace";
+}
+
+export function getCanvasPointSelectionMode(event: { shiftKey: boolean; ctrlKey: boolean; metaKey: boolean; }): CanvasPointSelectionMode {
+    if (event.ctrlKey || event.metaKey) return "toggle";
     if (event.shiftKey) return "add";
     return "replace";
 }
@@ -35,6 +54,24 @@ export function applyCommandSelection(current: Iterable<number>, nextIndices: It
 
     const removals = new Set(incomingIndices);
     return currentIndices.filter((index) => !removals.has(index));
+}
+
+export function applyCanvasPointSelection(current: Iterable<string>, nextIds: Iterable<string>, mode: CanvasPointSelectionMode): string[] {
+    const currentIds = normalizeSelectedIds(current);
+    const incomingIds = normalizeSelectedIds(nextIds);
+    if (mode === "replace") return incomingIds;
+    if (mode === "add") return normalizeSelectedIds([...currentIds, ...incomingIds]);
+
+    const toggled = new Set(currentIds);
+    incomingIds.forEach((id) => {
+        if (toggled.has(id)) {
+            toggled.delete(id);
+            return;
+        }
+        toggled.add(id);
+    });
+
+    return normalizeSelectedIds(toggled);
 }
 
 export function remapSelectedIndicesAfterDelete(current: Iterable<number>, deletedIndices: Iterable<number>, rowCount?: number): number[] {

@@ -3,12 +3,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { appSettings } from "@/store/0-ui-settings";
 import { canUndoAtom, doUndoPathAtom } from "@/store/0-atoms/1-2-history";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { pathPointsAtom } from "@/store/0-atoms/2-0-svg-model";
+import { controlPointsAtom, pathPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { doSetPathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { canvasRootSvgElementAtom, canvasViewPortAtom, doSetViewPortAtom } from "@/store/0-atoms/2-3-canvas-viewport";
 import { isCanvasDraggingAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { imagesAtom, type EditorImage } from "@/store/0-atoms/2-8-images";
-import { canvasDragStateAtom, doApplyActiveCanvasDragAtClientAtom, doCancelActiveCanvasDragAtom, doCommitActiveCanvasDragAtom, doStartCanvasDragAtom, doStartImageDragAtom, doStartPointDragAtom, doStartSelectedSegmentsDragAtom } from "./3-canvas-drag";
+import { canvasDragStateAtom, doApplyActiveCanvasDragAtClientAtom, doCancelActiveCanvasDragAtom, doCommitActiveCanvasDragAtom, doStartCanvasDragAtom, doStartControlPointsDragAtom, doStartImageDragAtom, doStartPointDragAtom, doStartSelectedSegmentsDragAtom } from "./3-canvas-drag";
 
 describe("canvas drag atoms", () => {
     beforeEach(() => {
@@ -81,6 +81,46 @@ describe("canvas drag atoms", () => {
         expect(store.get(canvasDragStateAtom)).toBeNull();
         expect(store.get(isCanvasDraggingAtom)).toBe(false);
         expect(store.get(svgPathInputAtom)).toBe(startPath);
+    });
+
+    it("moves only explicitly selected control points instead of translating the whole segment", () => {
+        const store = createCanvasDragStore();
+        store.set(svgPathInputAtom, "M 0 0 C 10 0 10 10 20 10 Q 30 15 40 20");
+
+        const controls = store.get(controlPointsAtom).filter((point) => point.movable);
+        const draggedPoint = controls.find((point) => point.id === "1:control:1");
+        const linkedPoint = controls.find((point) => point.id === "2:control:0");
+        expect(draggedPoint).toBeDefined();
+        expect(linkedPoint).toBeDefined();
+
+        const startPath = store.get(svgPathInputAtom);
+        store.set(doStartControlPointsDragAtom, {
+            points: [draggedPoint!, linkedPoint!],
+            draggedPoint: draggedPoint!,
+            pointerId: 5,
+            startPath,
+            start: { x: draggedPoint!.x, y: draggedPoint!.y },
+            clientX: draggedPoint!.x,
+            clientY: draggedPoint!.y,
+        });
+        store.set(doApplyActiveCanvasDragAtClientAtom, {
+            clientX: draggedPoint!.x + 5,
+            clientY: draggedPoint!.y + 5,
+        });
+
+        expect(store.get(canvasDragStateAtom)).toMatchObject({
+            mode: "control-points",
+            moved: true,
+        });
+        expect(store.get(svgPathInputAtom)).toContain("C 10 0 15 15 20 10");
+        expect(store.get(svgPathInputAtom)).toContain("Q 35 20 40 20");
+        expect(store.get(svgPathInputAtom)).toContain("M 0 0");
+
+        store.set(doCancelActiveCanvasDragAtom);
+
+        expect(store.get(svgPathInputAtom)).toBe(startPath);
+        expect(store.get(canvasDragStateAtom)).toBeNull();
+        expect(store.get(isCanvasDraggingAtom)).toBe(false);
     });
 
     it("pans the viewport through the active canvas drag atom", () => {
