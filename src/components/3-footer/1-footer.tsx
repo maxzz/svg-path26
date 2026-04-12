@@ -16,7 +16,7 @@ export function Footer() {
     return (
         <footer className="px-4 py-2 pr-2 text-xs text-muted-foreground border-t flex items-center justify-between">
             <PathStateInfo />
-            
+
             <div className="flex items-center gap-1">
                 {footerButtons.showTicksToggle && <TicksToggleInput />}
 
@@ -24,13 +24,13 @@ export function Footer() {
                     <Button
                         variant="outline"
                         size="xs"
-                        className="px-0.5! h-4 text-[10px] border rounded"
+                        className={buttonClasses}
                         onClick={() => { appSettings.canvas.snapToGrid = !snapToGrid; }}
                         aria-pressed={snapToGrid}
                         title={snapToGrid ? "Snap to grid is on" : "Snap to grid is off"}
                         type="button"
                     >
-                        <IconSnapToGrid2 className={classNames("size-3", snapToGrid ? "text-emerald-700 dark:text-emerald-300" : "text-muted-foreground")} />
+                        <IconSnapToGrid2 className={classNames("size-3", snapToGrid ? buttonIconOnClasses : buttonIconOffClasses)} />
                     </Button>
                 )}
 
@@ -38,13 +38,13 @@ export function Footer() {
                     <Button
                         variant="outline"
                         size="xs"
-                        className="px-0.5! h-4 text-[10px] border rounded"
+                        className={buttonClasses}
                         onClick={() => { appSettings.canvas.showGrid = !showGrid; }}
                         aria-pressed={showGrid}
                         title={showGrid ? "Grid is on" : "Grid is off"}
                         type="button"
                     >
-                        <IconGrid className={classNames("size-3", showGrid ? "stroke-3! text-emerald-700 dark:text-emerald-300" : "text-muted-foreground")} />
+                        <IconGrid className={classNames("size-3 stroke-3!", showGrid ? buttonIconOnClasses : buttonIconOffClasses)} />
                     </Button>
                 )}
 
@@ -52,13 +52,13 @@ export function Footer() {
                     <Button
                         variant="outline"
                         size="xs"
-                        className="px-0.5! h-4 text-[10px] border rounded"
+                        className={buttonClasses}
                         onClick={() => { appSettings.canvas.showViewBoxFrame = !showViewBoxFrame; }}
                         aria-pressed={showViewBoxFrame}
                         title={showViewBoxFrame ? "ViewBox frame on" : "ViewBox frame off"}
                         type="button"
                     >
-                        <IconFrame className={classNames("size-3", showViewBoxFrame ? "text-emerald-700 dark:text-emerald-300" : "text-muted-foreground")} />
+                        <IconFrame className={classNames("size-3", showViewBoxFrame ? buttonIconOnClasses : buttonIconOffClasses)} />
                     </Button>
                 )}
 
@@ -66,13 +66,13 @@ export function Footer() {
                     <Button
                         variant="outline"
                         size="xs"
-                        className="px-0.5! h-4 text-[10px] border rounded"
+                        className={buttonClasses}
                         onClick={() => { appSettings.canvas.showHelpers = !showHelpers; }}
                         aria-pressed={showHelpers}
                         title={showHelpers ? "Control points on" : "Control points off"}
                         type="button"
                     >
-                        <IconControlPoints className={classNames("size-3", showHelpers ? "text-emerald-700 dark:text-emerald-300" : "text-muted-foreground")} />
+                        <IconControlPoints className={classNames("size-3", showHelpers ? buttonIconOnClasses : buttonIconOffClasses)} />
                     </Button>
                 )}
 
@@ -80,13 +80,13 @@ export function Footer() {
                     <Button
                         variant="outline"
                         size="xs"
-                        className="px-1 pb-px h-4 text-[10px] border rounded"
+                        className={buttonClasses}
                         onClick={() => { appSettings.canvas.fillPreview = !fillPreview; }}
                         aria-pressed={fillPreview}
                         title={!fillPreview ? "Fill is on" : "Fill is off"}
                         type="button"
                     >
-                        <IconFillSvg className={classNames("size-3", fillPreview ? "text-emerald-700 dark:text-emerald-300" : "text-muted-foreground")} />
+                        <IconFillSvg className={classNames("size-3", !fillPreview ? buttonIconOnClasses : buttonIconOffClasses, !fillPreview && buttonIconFillOnClasses)} />
                     </Button>
                 )}
 
@@ -95,6 +95,11 @@ export function Footer() {
         </footer>
     );
 }
+
+const buttonClasses = "px-0.5! h-4 text-[10px] border rounded";
+const buttonIconOnClasses = "text-emerald-700 dark:text-emerald-300";
+const buttonIconOffClasses = "text-muted-foreground ";
+const buttonIconFillOnClasses = "text-emerald-700 dark:text-emerald-300 fill-emerald-200/50! dark:fill-emerald-300/30!";
 
 function FooterButtonsPopover() {
     const { buttons } = useSnapshot(appSettings.footer);
