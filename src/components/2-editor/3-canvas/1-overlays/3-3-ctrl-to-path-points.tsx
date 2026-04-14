@@ -7,14 +7,14 @@ import { getControlLineStroke } from "./8-canvas-color-palette";
 
 // Lines from path points to their control points
 
-export function PathPtToCtrlPtLines() {
+export function CtrlPtToPathPtLines() {
     const controlPoints = useAtomValue(controlPointsAtom);
     const strokeWidth = useAtomValue(canvasStrokeWidthAtom);
 
     return controlPoints.flatMap(
         (point: SvgCanvasPoint, pointIndex: number) => point.relations.map(
             (relation: Point, relationIndex: number) => (
-                <PathPtToCtrlPtLine
+                <CtrlPtToPathPtLine
                     point={point}
                     relation={relation}
                     strokeWidth={strokeWidth}
@@ -25,7 +25,7 @@ export function PathPtToCtrlPtLines() {
     );
 }
 
-function PathPtToCtrlPtLine({ point, relation, strokeWidth }: { point: SvgCanvasPoint; relation: { x: number; y: number; }; strokeWidth: number; }) {
+function CtrlPtToPathPtLine({ point, relation, strokeWidth }: { point: SvgCanvasPoint; relation: { x: number; y: number; }; strokeWidth: number; }) {
     const hasSelectedCanvasPoints = useAtomValue(hasSelectedCanvasPointsAtom);
     const pointSelected = useAtomValue(canvasPointSelectedAtom(point.id));
     const segmentSelected = useAtomValue(commandSelectedAtom(point.segmentIndex));

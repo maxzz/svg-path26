@@ -10,7 +10,7 @@ import { getSegmentActiveStroke, getSegmentHoverStroke } from "./8-canvas-color-
 
 // Selected segment overlay
 
-export function CanvasSelectedSegmentOverlay() {
+export function SegmentSelectedOverlay() {
     const selectedSegmentPaths = useAtomValue(selectedStandaloneSegmentPathsAtom);
     const selectedSegmentStrokeWidth = useAtomValue(selectedSegmentStrokeWidthAtom);
     if (!selectedSegmentPaths.length) return null;
@@ -33,14 +33,14 @@ export function CanvasSelectedSegmentOverlay() {
 
 // Segment hit areas
 
-export function CanvasSegmentHitAreas() {
+export function SegmentHitAreas() {
     const segmentPaths = useAtomValue(standaloneSegmentPathsAtom);
     const canvasStrokeWidth = useAtomValue(canvasStrokeWidthAtom);
     const doRegisterSegmentHitArea = useSetAtom(doRegisterCanvasSegmentHitAreaAtom);
 
-    const doCanvasSegmentHitAreaPointerDown = useSetAtom(doCanvasSegmentHitAreaPointerDownAtom);
-    const doCanvasSegmentHitAreaMouseEnter = useSetAtom(doCanvasSegmentHitAreaMouseEnterAtom);
-    const doCanvasSegmentHitAreaMouseLeave = useSetAtom(doCanvasSegmentHitAreaMouseLeaveAtom);
+    const doSegmentHitArea_PointerDown = useSetAtom(doSegmentHitArea_PointerDownAtom);
+    const doSegmentHitArea_MouseEnter = useSetAtom(doSegmentHitArea_MouseEnterAtom);
+    const doSegmentHitArea_MouseLeave = useSetAtom(doSegmentHitArea_MouseLeaveAtom);
 
     return segmentPaths.map(
         (segmentPath, index) => {
@@ -54,9 +54,9 @@ export function CanvasSegmentHitAreas() {
                     fill="none"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    onPointerDown={(event) => { event.stopPropagation(); doCanvasSegmentHitAreaPointerDown(index, event); }}
-                    onMouseEnter={() => { doCanvasSegmentHitAreaMouseEnter(index); }}
-                    onMouseLeave={() => { doCanvasSegmentHitAreaMouseLeave(); }}
+                    onPointerDown={(event) => { event.stopPropagation(); doSegmentHitArea_PointerDown(index, event); }}
+                    onMouseEnter={() => { doSegmentHitArea_MouseEnter(index); }}
+                    onMouseLeave={() => { doSegmentHitArea_MouseLeave(); }}
                     data-selection-hit="true"
                     key={`segment-hit:${index}`}
                 />
@@ -65,7 +65,9 @@ export function CanvasSegmentHitAreas() {
     );
 }
 
-const doCanvasSegmentHitAreaPointerDownAtom = atom(
+// Segment hit area interaction handlers/atoms
+
+const doSegmentHitArea_PointerDownAtom = atom(
     null,
     (get, set, index: number, event: PointerEvent<SVGElement>) => {
         const selectedCommandIndices = get(selectedCommandIndicesAtom);
@@ -85,7 +87,7 @@ const doCanvasSegmentHitAreaPointerDownAtom = atom(
     }
 );
 
-const doCanvasSegmentHitAreaMouseEnterAtom = atom(
+const doSegmentHitArea_MouseEnterAtom = atom(
     null,
     (_get, set, index: number) => {
         set(hoveredCommandIndexAtom, index);
@@ -93,7 +95,7 @@ const doCanvasSegmentHitAreaMouseEnterAtom = atom(
     }
 );
 
-const doCanvasSegmentHitAreaMouseLeaveAtom = atom(
+const doSegmentHitArea_MouseLeaveAtom = atom(
     null,
     (_get, set) => {
         set(hoveredCommandIndexAtom, null);
@@ -102,7 +104,7 @@ const doCanvasSegmentHitAreaMouseLeaveAtom = atom(
 
 // Hovered segment overlay
 
-export function CanvasHoveredSegmentOverlay() {
+export function SegmentHoveredOverlay() {
     const hoveredSegmentPath = useAtomValue(hoveredStandaloneSegmentPathAtom);
     const hoveredSegmentStrokeWidth = useAtomValue(hoveredSegmentStrokeWidthAtom);
     if (!hoveredSegmentPath) return null;
