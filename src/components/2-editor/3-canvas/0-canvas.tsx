@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/shadcn/button";
 import { IconZoomIn, IconZoomNormal, IconZoomOut } from "@/components/ui/icons/normal";
 import { IconViewBox } from "@/components/ui/icons/normal/28-viewbox";
 import { CanvasGrid } from "./8-canvas-grid";
-import { CanvasHelperOverlays } from "./1-overlays/1-canvas-overlays";
+import { CanvasAllOverlays } from "./1-overlays/0-all-overlays";
 import { useCanvasDragAndDrop } from "./3-canvas-drag";
 import { PathCanvasImages } from "./1-overlays/6-images";
 import { useSyncCanvasViewportSize } from "../../../store/0-atoms/2-3-canvas-viewport-derives";
@@ -22,7 +22,7 @@ export function PathCanvas() {
         <PathCanvasElement>
             <PathCanvasImages />
             {!canvasPreview && <CanvasGrid />}
-            <CanvasHelperOverlays />
+            <CanvasAllOverlays />
         </PathCanvasElement>
     );
 }

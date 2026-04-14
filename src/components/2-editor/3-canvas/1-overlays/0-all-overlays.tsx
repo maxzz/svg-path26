@@ -11,7 +11,7 @@ import { PathCanvasImageEditOverlays } from "./6-images";
 import { CanvasViewBoxFrame } from "./7-viewbox-frame";
 import { CanvasSelectionMarquee } from "../../../ui/loacal-ui/3-selection-marquee";
 
-export function CanvasHelperOverlays() {
+export function CanvasAllOverlays() {
     const { showHelpers, canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
 
