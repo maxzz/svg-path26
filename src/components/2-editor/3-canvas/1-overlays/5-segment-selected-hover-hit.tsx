@@ -31,6 +31,26 @@ export function SegmentSelectedOverlay() {
     );
 }
 
+// Hovered segment overlay
+
+export function SegmentHoveredOverlay() {
+    const hoveredSegmentPath = useAtomValue(hoveredStandaloneSegmentPathAtom);
+    const hoveredSegmentStrokeWidth = useAtomValue(hoveredSegmentStrokeWidthAtom);
+    if (!hoveredSegmentPath) return null;
+
+    return (
+        <path
+            className={getSegmentHoverStroke()}
+            d={hoveredSegmentPath}
+            strokeWidth={hoveredSegmentStrokeWidth}
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            pointerEvents="none"
+        />
+    );
+}
+
 // Segment hit areas
 
 export function SegmentHitAreas() {
@@ -101,23 +121,3 @@ const doSegmentHitArea_MouseLeaveAtom = atom(
         set(hoveredCommandIndexAtom, null);
     }
 );
-
-// Hovered segment overlay
-
-export function SegmentHoveredOverlay() {
-    const hoveredSegmentPath = useAtomValue(hoveredStandaloneSegmentPathAtom);
-    const hoveredSegmentStrokeWidth = useAtomValue(hoveredSegmentStrokeWidthAtom);
-    if (!hoveredSegmentPath) return null;
-
-    return (
-        <path
-            className={getSegmentHoverStroke()}
-            d={hoveredSegmentPath}
-            strokeWidth={hoveredSegmentStrokeWidth}
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            pointerEvents="none"
-        />
-    );
-}

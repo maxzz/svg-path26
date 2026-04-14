@@ -6,7 +6,7 @@ import { isImageEditModeAtom } from "@/store/0-atoms/2-8-images";
 import { CanvasMainPathOverlay } from "./2-main-path";
 import { CtrlPts } from "./3-2-ctrl-points";
 import { CtrlPtToPathPtLines } from "./3-3-ctrl-to-path-points";
-import { SegmentHoveredOverlay, SegmentHitAreas, SegmentSelectedOverlay } from "./5-canvas-segment-overlays";
+import { SegmentHoveredOverlay, SegmentHitAreas, SegmentSelectedOverlay } from "./5-segment-selected-hover-hit";
 import { PathPts } from "./3-1-path-points";
 import { PathCanvasImageEditOverlays } from "./6-images";
 import { CanvasViewBoxFrame } from "./7-viewbox-frame";
