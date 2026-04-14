@@ -71,9 +71,9 @@ function CtrlPt({ point, unitsPerPixel }: { point: SvgCanvasPoint; unitsPerPixel
     const hovered = useAtomValue(commandHoveredAtom(point.segmentIndex));
     const controlPointClasses = getControlPointFill(selected, hovered);
 
-    const doCanvasControlPointPointerDown = useSetAtom(doCtrlPt_PointerDownAtom);
-    const doCanvasControlPointMouseEnter = useSetAtom(doCtrlPt_MouseEnterAtom);
-    const doCanvasControlPointMouseLeave = useSetAtom(doCtrlPt_MouseLeaveAtom);
+    const doCtrlPt_PointerDown = useSetAtom(doCtrlPt_PointerDownAtom);
+    const doCtrlPt_MouseEnter = useSetAtom(doCtrlPt_MouseEnterAtom);
+    const doCtrlPt_MouseLeave = useSetAtom(doCtrlPt_MouseLeaveAtom);
 
     const pointSize = unitsPerPixel * (point.movable ? 6 : 5);
     const pointOffset = pointSize / 2;
@@ -104,9 +104,9 @@ function CtrlPt({ point, unitsPerPixel }: { point: SvgCanvasPoint; unitsPerPixel
                 strokeWidth={unitsPerPixel * 10}
                 stroke="transparent"
                 fill="transparent"
-                onPointerDown={(event) => { event.stopPropagation(); doCanvasControlPointPointerDown(point, event); }}
-                onMouseEnter={() => { doCanvasControlPointMouseEnter(point); }}
-                onMouseLeave={() => { doCanvasControlPointMouseLeave(); }}
+                onPointerDown={(event) => { event.stopPropagation(); doCtrlPt_PointerDown(point, event); }}
+                onMouseEnter={() => { doCtrlPt_MouseEnter(point); }}
+                onMouseLeave={() => { doCtrlPt_MouseLeave(); }}
                 data-selection-hit="true"
             />
 
