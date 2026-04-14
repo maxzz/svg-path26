@@ -7,40 +7,50 @@ import { canvasUnitsPerPixelAtom } from "../../../store/0-atoms/2-3-canvas-viewp
 import { canvasViewPortAtom, rootSvgElementSizeAtom } from "@/store/0-atoms/2-3-canvas-viewport";
 
 export function CanvasGrid() {
-    const { showGrid, showTicks } = useSnapshot(appSettings.canvas);
-    const { tickInterval } = useSnapshot(appSettings.pathEditor);
-    const viewPort = useAtomValue(canvasViewPortAtom);
-    const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
-    const rootSvgElementSize = useAtomValue(rootSvgElementSizeAtom);
-
+    const { showGrid } = useSnapshot(appSettings.canvas);
     if (!showGrid) return null;
+    return (
+        <GridBody />
+    );
+}
+
+export function GridBody() {
+    const { showTicks } = useSnapshot(appSettings.canvas);
+    const { tickInterval } = useSnapshot(appSettings.pathEditor);
+
+    const viewPort = useAtomValue(canvasViewPortAtom);
+    const strokeWidth = useAtomValue(canvasUnitsPerPixelAtom); // unitsPerPixel as stroke width
+    const rootSvgElementSize = useAtomValue(rootSvgElementSizeAtom);
 
     const canvasWidth = rootSvgElementSize?.width ?? 0;
     const grid = calcGrid(viewPort, canvasWidth);
-    const canvasStroke = unitsPerPixel;
 
     return (
         <g className="svg-ticks select-none" pointerEvents="none">
 
             {/* X axis (vertical lines) */}
-            {grid.xGrid.map((v) =>
-                <line
-                    x1={v} x2={v} y1={viewPort[1]} y2={viewPort[1] + viewPort[3]} key={`x${v}`}
-                    className={`${v === 0 ? 'stroke-[#f005]' : v % tickInterval === 0 ? 'stroke-[#8888]' : 'stroke-[#8884]'}`}
-                    style={{ strokeWidth: canvasStroke }}
-                />
+            {grid.xGrid.map(
+                (v) => (
+                    <line
+                        x1={v} x2={v} y1={viewPort[1]} y2={viewPort[1] + viewPort[3]} key={`x${v}`}
+                        className={`${v === 0 ? 'stroke-[#f005]' : v % tickInterval === 0 ? 'stroke-[#8888]' : 'stroke-[#8884]'}`}
+                        style={{ strokeWidth }}
+                    />
+                )
             )}
 
             {/* Y axis (horizontal lines) */}
-            {grid.yGrid.map((v) =>
-                <line
-                    y1={v} y2={v} x1={viewPort[0]} x2={viewPort[0] + viewPort[2]} key={`y${v}`}
-                    className={`${v === 0 ? 'stroke-[#f005]' : v % tickInterval === 0 ? 'stroke-[#8888]' : 'stroke-[#8884]'}`}
-                    style={{ strokeWidth: canvasStroke }}
-                />
+            {grid.yGrid.map(
+                (v) => (
+                    <line
+                        y1={v} y2={v} x1={viewPort[0]} x2={viewPort[0] + viewPort[2]} key={`y${v}`}
+                        className={`${v === 0 ? 'stroke-[#f005]' : v % tickInterval === 0 ? 'stroke-[#8888]' : 'stroke-[#8884]'}`}
+                        style={{ strokeWidth }}
+                    />
+                )
             )}
 
-            {showTicks && <>
+            {showTicks && (<>
 
                 {/* X axis numbers */}
                 {grid.xGrid.map(
@@ -48,9 +58,9 @@ export function CanvasGrid() {
                         <Fragment key={v}>
                             {v !== 0 && v % tickInterval === 0 &&
                                 <text className="fill-[#744]"
-                                    y={-5 * canvasStroke}
-                                    x={v - 5 * canvasStroke}
-                                    style={{ fontSize: canvasStroke * 10 + 'px', stroke: "white", strokeWidth: canvasStroke * .2 }}
+                                    y={-5 * strokeWidth}
+                                    x={v - 5 * strokeWidth}
+                                    style={{ fontSize: strokeWidth * 10 + 'px', stroke: "white", strokeWidth: strokeWidth * .2 }}
                                 >
                                     {v}
                                 </text>
@@ -65,11 +75,11 @@ export function CanvasGrid() {
                         <Fragment key={v}>
                             {v % tickInterval === 0 &&
                                 <text className="fill-[#744]"
-                                    x={-5 * canvasStroke}
-                                    y={v === 0 ? -5 * canvasStroke : v}
+                                    x={-5 * strokeWidth}
+                                    y={v === 0 ? -5 * strokeWidth : v}
                                     dominantBaseline={v === 0 ? undefined : "middle"}
                                     textAnchor="end"
-                                    style={{ fontSize: canvasStroke * 10 + 'px', stroke: "white", strokeWidth: canvasStroke * .2 }}
+                                    style={{ fontSize: strokeWidth * 10 + 'px', stroke: "white", strokeWidth: strokeWidth * .2 }}
                                 >
                                     {v}
                                 </text>
@@ -78,7 +88,7 @@ export function CanvasGrid() {
                     )
                 )}
 
-            </>}
+            </>)}
         </g>
     );
 }

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, type PointerEvent as ReactPointerEvent, type TouchEvent } from "react";
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai";
 import { appSettings } from "@/store/0-ui-settings";
+import { notice } from "@/components/ui/loacal-ui/7-toaster/7-toaster";
 import { type Point, type SvgCanvasPoint, type ViewBox } from "@/svg-core/9-types-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { controlPointsAtom, pathPointsAtom } from "@/store/0-atoms/2-0-svg-model";
@@ -10,7 +11,6 @@ import { canvasSegmentHitAreaElementsAtom, doSetPointLocationsWithoutHistoryAtom
 import { applyCommandSelection, getMarqueeSelectionIndices, getMarqueeSelectionMode, type CommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils";
 import { doCommitCurrentPathToHistoryAtom } from "@/store/0-atoms/1-2-history";
 import { doUpdateImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-8-images";
-import { notice } from "@/components/ui/loacal-ui/7-toaster/7-toaster";
 
 export type DragState =
     | { mode: "point"; pointerId: number; point: SvgCanvasPoint; startPath: string; points: SvgCanvasPoint[]; startById: Record<string, Point>; }
@@ -371,7 +371,7 @@ export function useCanvasDragAndDrop() {
 
     const touchGestureRef = useRef<TouchGestureState | null>(null);
     const pointerCtrlKeyRef = useRef(false);
-    
+
     const edgeAutoPanRef = useRef<EdgeAutoPanState>({
         clientX: 0,
         clientY: 0,
