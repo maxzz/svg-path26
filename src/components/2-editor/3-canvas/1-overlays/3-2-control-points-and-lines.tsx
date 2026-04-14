@@ -1,54 +1,13 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { type PointerEvent } from "react";
-import { type Point, type SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
+import { type SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { canvasStrokeWidthAtom, canvasUnitsPerPixelAtom } from "../../../../store/0-atoms/2-3-canvas-viewport-derives";
+import { canvasUnitsPerPixelAtom } from "../../../../store/0-atoms/2-3-canvas-viewport-derives";
 import { canvasPointSelectedAtom, commandHoveredAtom, commandSelectedAtom, hasSelectedCanvasPointsAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCanvasPointIdsAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { controlPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { classNames } from "@/utils";
 import { doStartPointDragAtom } from "../3-canvas-drag";
-import { getControlHaloFill, getControlLineStroke, getControlPointFill, getEditorStroke, getPointInteractionClassName } from "./8-canvas-color-palette";
-
-// Lines from path points to their control points
-
-export function PathPtToCtrlPtLines() {
-    const controlPoints = useAtomValue(controlPointsAtom);
-    const strokeWidth = useAtomValue(canvasStrokeWidthAtom);
-
-    return controlPoints.flatMap(
-        (point: SvgCanvasPoint, pointIndex: number) => point.relations.map(
-            (relation: Point, relationIndex: number) => (
-                <PathPtToCtrlPtLine
-                    point={point}
-                    relation={relation}
-                    strokeWidth={strokeWidth}
-                    key={`line:${pointIndex}:${relationIndex}`}
-                />
-            )
-        )
-    );
-}
-
-function PathPtToCtrlPtLine({ point, relation, strokeWidth }: { point: SvgCanvasPoint; relation: { x: number; y: number; }; strokeWidth: number; }) {
-    const hasSelectedCanvasPoints = useAtomValue(hasSelectedCanvasPointsAtom);
-    const pointSelected = useAtomValue(canvasPointSelectedAtom(point.id));
-    const segmentSelected = useAtomValue(commandSelectedAtom(point.segmentIndex));
-    const selected = hasSelectedCanvasPoints ? pointSelected : segmentSelected;
-    const hovered = useAtomValue(commandHoveredAtom(point.segmentIndex));
-
-    return (
-        <line
-            className={getControlLineStroke(selected, hovered)}
-            x1={point.x}
-            y1={point.y}
-            x2={relation.x}
-            y2={relation.y}
-            strokeWidth={strokeWidth}
-            strokeDasharray={`${strokeWidth * 3} ${strokeWidth * 5}`}
-            pointerEvents="none"
-        />
-    );
-}
+import { getControlHaloFill, getControlPointFill, getEditorStroke, getPointInteractionClassName } from "./8-canvas-color-palette";
 
 // Control points
 

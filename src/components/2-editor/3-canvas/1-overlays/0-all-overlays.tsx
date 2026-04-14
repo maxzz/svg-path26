@@ -4,9 +4,10 @@ import { appSettings } from "@/store/0-ui-settings";
 import { isImageEditModeAtom } from "@/store/0-atoms/2-8-images";
 
 import { CanvasMainPathOverlay } from "./2-main-path";
-import { PathPtToCtrlPtLines, CtrlPts } from "./4-control-points-and-lines";
+import { CtrlPts } from "./3-2-control-points-and-lines";
+import { PathPtToCtrlPtLines } from "./3-3-path-to-ctrl-points";
 import { CanvasHoveredSegmentOverlay, CanvasSegmentHitAreas, CanvasSelectedSegmentOverlay } from "./5-canvas-segment-overlays";
-import { PathPts } from "./3-path-points";
+import { PathPts } from "./3-1-path-points";
 import { PathCanvasImageEditOverlays } from "./6-images";
 import { CanvasViewBoxFrame } from "./7-viewbox-frame";
 import { CanvasSelectionMarquee } from "../../../ui/loacal-ui/3-selection-marquee";
