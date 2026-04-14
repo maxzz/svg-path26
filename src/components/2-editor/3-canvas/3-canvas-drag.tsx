@@ -6,14 +6,14 @@ import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { controlPointsAtom, pathPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { canvasRootSvgElementAtom, canvasViewPortAtom, doPanViewPortAtom, doZoomViewPortAtom } from "@/store/0-atoms/2-3-canvas-viewport";
 import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
-import { canvasSegmentHitAreaElementsAtom, doSetPointLocationWithoutHistoryAtom, doSuppressNextCanvasFocusClearAtom, doTranslateSelectedSegmentsWithoutHistoryAtom, draggedCanvasPointAtom, isCanvasDraggingAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-0-editor-actions";
+import { canvasSegmentHitAreaElementsAtom, doSetPointLocationsWithoutHistoryAtom, doSuppressNextCanvasFocusClearAtom, doTranslateSelectedSegmentsWithoutHistoryAtom, draggedCanvasPointAtom, isCanvasDraggingAtom, selectedCanvasPointIdsAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { applyCommandSelection, getMarqueeSelectionIndices, getMarqueeSelectionMode, type CommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils";
 import { doCommitCurrentPathToHistoryAtom } from "@/store/0-atoms/1-2-history";
 import { doUpdateImageAtom, isImageEditModeAtom, type EditorImage } from "@/store/0-atoms/2-8-images";
 import { notice } from "@/components/ui/loacal-ui/7-toaster/7-toaster";
 
 export type DragState =
-    | { mode: "point"; pointerId: number; point: SvgCanvasPoint; startPath: string; }
+    | { mode: "point"; pointerId: number; point: SvgCanvasPoint; startPath: string; points: SvgCanvasPoint[]; startById: Record<string, Point>; }
     | { mode: "selection"; pointerId: number; segmentIndices: number[]; startPath: string; startClientX: number; startClientY: number; moved: boolean; viewBox: ViewBox; }
     | { mode: "canvas"; pointerId: number; lastClientX: number; lastClientY: number; moved: boolean; }
     | { mode: "marquee"; pointerId: number; start: Point; current: Point; startClientX: number; startClientY: number; moved: boolean; selectionMode: CommandSelectionMode; initialSelection: number[]; }
@@ -78,6 +78,7 @@ export const doStartMarqueeDragAtom = atom(
         selectionMode: CommandSelectionMode;
         initialSelection: number[];
     }) => {
+        set(selectedCanvasPointIdsAtom, []);
         set(draggedCanvasPointAtom, null);
         set(isCanvasDraggingAtom, true);
         set(canvasDragStateAtom, {
@@ -123,7 +124,18 @@ export const doStartSelectedSegmentsDragAtom = atom(
 
 export const doStartPointDragAtom = atom(
     null,
-    (_get, set, args: { point: SvgCanvasPoint; pointerId: number; startPath: string; }) => {
+    (_get, set, args: { point: SvgCanvasPoint; pointerId: number; startPath: string; points?: SvgCanvasPoint[]; }) => {
+        const pointsRaw = args.points?.length ? args.points : [args.point];
+        const uniqueById = new Map<string, SvgCanvasPoint>();
+        pointsRaw.forEach((p) => uniqueById.set(p.id, p));
+        uniqueById.set(args.point.id, args.point);
+        const points = [...uniqueById.values()];
+
+        const startById: Record<string, Point> = {};
+        points.forEach((p) => {
+            startById[p.id] = { x: p.x, y: p.y };
+        });
+
         set(draggedCanvasPointAtom, args.point);
         set(isCanvasDraggingAtom, true);
         set(canvasDragStateAtom, {
@@ -131,6 +143,8 @@ export const doStartPointDragAtom = atom(
             point: args.point,
             pointerId: args.pointerId,
             startPath: args.startPath,
+            points,
+            startById,
         });
     }
 );
@@ -183,10 +197,24 @@ export const doApplyActiveCanvasDragAtClientAtom = atom(
             const decimals = args.ctrlKey ? (baseDecimals ? 0 : 3) : baseDecimals;
             const x = Number.parseFloat(next.x.toFixed(decimals));
             const y = Number.parseFloat(next.y.toFixed(decimals));
-            set(doSetPointLocationWithoutHistoryAtom, {
-                point: activeDragState.point,
-                to: { x, y },
-            });
+
+            const primaryStart = activeDragState.startById[activeDragState.point.id] ?? { x: activeDragState.point.x, y: activeDragState.point.y };
+            const dx = x - primaryStart.x;
+            const dy = y - primaryStart.y;
+
+            set(
+                doSetPointLocationsWithoutHistoryAtom,
+                activeDragState.points.map((point) => {
+                    const start = activeDragState.startById[point.id] ?? { x: point.x, y: point.y };
+                    return {
+                        point,
+                        to: {
+                            x: Number.parseFloat((start.x + dx).toFixed(decimals)),
+                            y: Number.parseFloat((start.y + dy).toFixed(decimals)),
+                        },
+                    };
+                })
+            );
             return;
         }
 

@@ -6,7 +6,7 @@ import { type Point, type SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
 import { createAtomAppSetting } from "./8-create-atom-app-settings";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { doSetPathWithoutHistoryAtom } from "./1-2-history";
-import { commandRowsAtom, standaloneSegmentPathsAtom, svgModelAtom } from "./2-0-svg-model";
+import { commandRowsAtom, controlPointsAtom, pathPointsAtom, standaloneSegmentPathsAtom, svgModelAtom } from "./2-0-svg-model";
 import { focusedImageIdAtom } from "./2-8-images";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
 import { applyCommandSelection, normalizeSelectedCommandIndices, remapSelectedIndicesAfterDelete, type CommandSelectionMode } from "./2-5-editor-selection-utils";
@@ -18,6 +18,55 @@ export const scaleXAtom = atom(1);
 export const scaleYAtom = atom(1);
 export const translateXAtom = atom(0);
 export const translateYAtom = atom(0);
+
+function normalizeSelectedCanvasPointIds(ids: Iterable<string>, validIds?: Set<string>): string[] {
+    const next: string[] = [];
+    const seen = new Set<string>();
+    for (const idRaw of ids) {
+        if (typeof idRaw !== "string") continue;
+        const id = idRaw.trim();
+        if (!id) continue;
+        if (validIds && !validIds.has(id)) continue;
+        if (seen.has(id)) continue;
+        seen.add(id);
+        next.push(id);
+    }
+    return next;
+}
+
+const selectedCanvasPointIdsBaseAtom = atom<string[]>([]);
+export const selectedCanvasPointIdsAtom = atom(
+    (get) => {
+        const valid = new Set([
+            ...get(pathPointsAtom).map((p) => p.id),
+            ...get(controlPointsAtom).map((p) => p.id),
+        ]);
+        return normalizeSelectedCanvasPointIds(get(selectedCanvasPointIdsBaseAtom), valid);
+    },
+    (get, set, nextIds: string[]) => {
+        const valid = new Set([
+            ...get(pathPointsAtom).map((p) => p.id),
+            ...get(controlPointsAtom).map((p) => p.id),
+        ]);
+        set(selectedCanvasPointIdsBaseAtom, normalizeSelectedCanvasPointIds(nextIds, valid));
+    }
+);
+
+export const hasSelectedCanvasPointsAtom = atom(
+    (get) => get(selectedCanvasPointIdsAtom).length > 0
+);
+
+const selectedCanvasPointByIdAtomCache = new Map<string, Atom<boolean>>();
+export function canvasPointSelectedAtom(pointId: string) {
+    const cached = selectedCanvasPointByIdAtomCache.get(pointId);
+    if (cached) {
+        return cached;
+    }
+
+    const created = atom((get) => get(selectedCanvasPointIdsAtom).includes(pointId));
+    selectedCanvasPointByIdAtomCache.set(pointId, created);
+    return created;
+}
 
 const selectedCommandIndicesBaseAtom = atom<number[]>([]);
 export const selectedCommandIndicesAtom = atom(
@@ -142,6 +191,7 @@ export const doClearCanvasFocusAtom = atom(
             return;
         }
 
+        set(selectedCanvasPointIdsAtom, []);
         set(selectedCommandIndicesAtom, []);
         set(hoveredCommandIndexAtom, null);
         set(hoveredCanvasPointAtom, null);
@@ -152,6 +202,7 @@ export const doClearCanvasFocusAtom = atom(
 export const doSelectCommandAtom = atom(
     null,
     (get, set, { index, mode }: { index: number; mode: CommandSelectionMode; }) => {
+        set(selectedCanvasPointIdsAtom, []);
         set(selectedCommandIndicesAtom, applyCommandSelection(
             get(selectedCommandIndicesAtom),
             [index],
@@ -164,6 +215,7 @@ export const doSelectCommandAtom = atom(
 export const doSelectCommandsAtom = atom(
     null,
     (get, set, { indices, mode }: { indices: number[]; mode: CommandSelectionMode; }) => {
+        set(selectedCanvasPointIdsAtom, []);
         set(selectedCommandIndicesAtom, applyCommandSelection(
             get(selectedCommandIndicesAtom),
             indices,
@@ -265,6 +317,18 @@ export const doSetPointLocationWithoutHistoryAtom = atom(
     (_get, set, { point, to }: { point: SvgCanvasPoint; to: Point; }) => {
         set(doApplySvgModelWithoutHistoryAtom, (model) => {
             model.setCanvasPointLocation(point, to);
+        });
+    }
+);
+
+export const doSetPointLocationsWithoutHistoryAtom = atom(
+    null,
+    (_get, set, changes: { point: SvgCanvasPoint; to: Point; }[]) => {
+        if (!changes.length) return;
+        set(doApplySvgModelWithoutHistoryAtom, (model) => {
+            changes.forEach(({ point, to }) => {
+                model.setCanvasPointLocation(point, to);
+            });
         });
     }
 );
@@ -440,6 +504,7 @@ export const doClearPathAtom = atom(
     null,
     (_get, set) => {
         set(svgPathInputAtom, "");
+        set(selectedCanvasPointIdsAtom, []);
         set(selectedCommandIndicesAtom, []);
         set(hoveredCommandIndexAtom, null);
         set(hoveredCanvasPointAtom, null);
