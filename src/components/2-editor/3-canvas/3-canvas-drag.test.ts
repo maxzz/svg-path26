@@ -8,7 +8,7 @@ import { doSetPathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { canvasRootSvgElementAtom, canvasViewPortAtom, doSetViewPortAtom } from "@/store/0-atoms/2-3-canvas-viewport";
 import { isCanvasDraggingAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { imagesAtom, type EditorImage } from "@/store/0-atoms/2-8-images";
-import { canvasDragStateAtom, doApplyActiveCanvasDragAtClientAtom, doCancelActiveCanvasDragAtom, doCommitActiveCanvasDragAtom, doStartCanvasDragAtom, doStartImageDragAtom, doStartPointDragAtom, doStartSelectedSegmentsDragAtom } from "./3-canvas-drag";
+import { canvasDragStateAtom, doApplyActiveCanvasDragAtClientAtom, doCancelDrag_ActiveCanvasAtom, doCommitDrag_ActiveCanvasAtom, doStartDrag_CanvasAtom, doStartDrag_ImageAtom, doStartDrag_PointAtom, doStartDrag_SelectedSegmentsAtom } from "./3-canvas-drag";
 
 describe("canvas drag atoms", () => {
     beforeEach(() => {
@@ -28,7 +28,7 @@ describe("canvas drag atoms", () => {
         const point = store.get(pathPointsAtom)[1];
         expect(point).toBeDefined();
 
-        store.set(doStartPointDragAtom, {
+        store.set(doStartDrag_PointAtom, {
             point: point!,
             pointerId: 1,
             startPath,
@@ -41,7 +41,7 @@ describe("canvas drag atoms", () => {
         expect(store.get(svgPathInputAtom)).toContain("25 35");
         expect(store.get(svgPathInputAtom)).not.toBe(startPath);
 
-        store.set(doCommitActiveCanvasDragAtom);
+        store.set(doCommitDrag_ActiveCanvasAtom);
 
         expect(store.get(canvasDragStateAtom)).toBeNull();
         expect(store.get(isCanvasDraggingAtom)).toBe(false);
@@ -58,7 +58,7 @@ describe("canvas drag atoms", () => {
         store.set(selectedCommandIndicesAtom, [1]);
 
         const startPath = store.get(svgPathInputAtom);
-        store.set(doStartSelectedSegmentsDragAtom, startPath, undefined, {
+        store.set(doStartDrag_SelectedSegmentsAtom, startPath, undefined, {
             pointerId: 2,
             clientX: 10,
             clientY: 10,
@@ -76,7 +76,7 @@ describe("canvas drag atoms", () => {
         });
         expect(store.get(svgPathInputAtom)).toContain("22 23");
 
-        store.set(doCancelActiveCanvasDragAtom);
+        store.set(doCancelDrag_ActiveCanvasAtom);
 
         expect(store.get(canvasDragStateAtom)).toBeNull();
         expect(store.get(isCanvasDraggingAtom)).toBe(false);
@@ -87,7 +87,7 @@ describe("canvas drag atoms", () => {
         const store = createCanvasDragStore();
         const before = store.get(canvasViewPortAtom);
 
-        store.set(doStartCanvasDragAtom, {
+        store.set(doStartDrag_CanvasAtom, {
             pointerId: 3,
             clientX: 20,
             clientY: 30,
@@ -120,7 +120,7 @@ describe("canvas drag atoms", () => {
         };
 
         store.set(imagesAtom, [image]);
-        store.set(doStartImageDragAtom, {
+        store.set(doStartDrag_ImageAtom, {
             pointerId: 4,
             imageId: image.id,
             handle: "move",
@@ -139,7 +139,7 @@ describe("canvas drag atoms", () => {
             y2: 45,
         });
 
-        store.set(doCancelActiveCanvasDragAtom);
+        store.set(doCancelDrag_ActiveCanvasAtom);
 
         expect(store.get(imagesAtom)[0]).toEqual(image);
         expect(store.get(canvasDragStateAtom)).toBeNull();

@@ -53,7 +53,7 @@ const EDGE_AUTO_PAN_MOVEMENT_TOLERANCE_PX = 2;
 
 export const canvasDragStateAtom = atom<DragState | null>(null);
 
-export const doStartCanvasDragAtom = atom(
+export const doStartDrag_CanvasAtom = atom(
     null,
     (_get, set, args: { pointerId: number; clientX: number; clientY: number; }) => {
         set(draggedCanvasPointAtom, null);
@@ -68,7 +68,7 @@ export const doStartCanvasDragAtom = atom(
     }
 );
 
-export const doStartMarqueeDragAtom = atom(
+export const doStartDrag_MarqueeAtom = atom(
     null,
     (_get, set, args: {
         pointerId: number;
@@ -95,7 +95,7 @@ export const doStartMarqueeDragAtom = atom(
     }
 );
 
-export const doStartSelectedSegmentsDragAtom = atom(
+export const doStartDrag_SelectedSegmentsAtom = atom(
     null,
     (get, set, startPath: string, segmentIndices: number[] | undefined, event: { pointerId: number; clientX: number; clientY: number; }) => {
         const selection = segmentIndices?.length ? segmentIndices : get(selectedCommandIndicesAtom);
@@ -122,7 +122,7 @@ export const doStartSelectedSegmentsDragAtom = atom(
     }
 );
 
-export const doStartPointDragAtom = atom(
+export const doStartDrag_PointAtom = atom(
     null,
     (_get, set, args: { point: SvgCanvasPoint; pointerId: number; startPath: string; points?: SvgCanvasPoint[]; }) => {
         const pointsRaw = args.points?.length ? args.points : [args.point];
@@ -149,7 +149,7 @@ export const doStartPointDragAtom = atom(
     }
 );
 
-export const doStartImageDragAtom = atom(
+export const doStartDrag_ImageAtom = atom(
     null,
     (_get, set, args: { pointerId: number; imageId: string; handle: ImageHandle; start: Point; initial: EditorImage; }) => {
         set(draggedCanvasPointAtom, null);
@@ -165,7 +165,7 @@ export const doStartImageDragAtom = atom(
     }
 );
 
-export const doStopCanvasDragAtom = atom(
+export const doStopDrag_CanvasAtom = atom(
     null,
     (_get, set) => {
         set(canvasDragStateAtom, null);
@@ -300,7 +300,7 @@ export const doApplyActiveCanvasDragAtClientAtom = atom(
     }
 );
 
-export const doCommitActiveCanvasDragAtom = atom(
+export const doCommitDrag_ActiveCanvasAtom = atom(
     null,
     (get, set) => {
         const activeDragState = get(canvasDragStateAtom);
@@ -322,11 +322,11 @@ export const doCommitActiveCanvasDragAtom = atom(
             set(doSuppressNextCanvasFocusClearAtom);
         }
 
-        set(doStopCanvasDragAtom);
+        set(doStopDrag_CanvasAtom);
     }
 );
 
-export const doCancelActiveCanvasDragAtom = atom(
+export const doCancelDrag_ActiveCanvasAtom = atom(
     null,
     (get, set) => {
         const activeDragState = get(canvasDragStateAtom);
@@ -352,23 +352,26 @@ export const doCancelActiveCanvasDragAtom = atom(
             });
         }
 
-        set(doStopCanvasDragAtom);
+        set(doStopDrag_CanvasAtom);
     }
 );
 
 export function useCanvasDragAndDrop() {
     const store = useStore();
+
     const dragState = useAtomValue(canvasDragStateAtom);
-    const doBeginCanvasDrag = useSetAtom(doStartCanvasDragAtom);
-    const doBeginMarqueeDrag = useSetAtom(doStartMarqueeDragAtom);
+
+    const doBeginDrag_Canvas = useSetAtom(doStartDrag_CanvasAtom);
+    const doBeginDrag_Marquee = useSetAtom(doStartDrag_MarqueeAtom);
     const doApplyActiveCanvasDragAtClient = useSetAtom(doApplyActiveCanvasDragAtClientAtom);
-    const doCommitActiveCanvasDrag = useSetAtom(doCommitActiveCanvasDragAtom);
-    const doCancelActiveCanvasDrag = useSetAtom(doCancelActiveCanvasDragAtom);
+    const doCommitActiveCanvasDrag = useSetAtom(doCommitDrag_ActiveCanvasAtom);
+    const doCancelDrag_ActiveCanvas = useSetAtom(doCancelDrag_ActiveCanvasAtom);
     const doPanViewPort = useSetAtom(doPanViewPortAtom);
     const doZoomViewPort = useSetAtom(doZoomViewPortAtom);
 
     const touchGestureRef = useRef<TouchGestureState | null>(null);
     const pointerCtrlKeyRef = useRef(false);
+    
     const edgeAutoPanRef = useRef<EdgeAutoPanState>({
         clientX: 0,
         clientY: 0,
@@ -560,14 +563,14 @@ export function useCanvasDragAndDrop() {
 
                 pointerCtrlKeyRef.current = false;
                 resetEdgeAutoPan();
-                doCancelActiveCanvasDrag();
+                doCancelDrag_ActiveCanvas();
             };
 
             const controller = new AbortController();
             window.addEventListener("keydown", onKeyDown, { signal: controller.signal });
             return () => controller.abort();
         },
-        [doCancelActiveCanvasDrag, dragState?.pointerId, getActiveDragState, resetEdgeAutoPan]);
+        [doCancelDrag_ActiveCanvas, dragState?.pointerId, getActiveDragState, resetEdgeAutoPan]);
 
     function onTouchStart(event: TouchEvent<SVGSVGElement>) {
         if (store.get(isImageEditModeAtom) || appSettings.canvas.canvasPreview) return;
@@ -699,7 +702,7 @@ export function useCanvasDragAndDrop() {
             const start = eventToSvgPoint(event.currentTarget, event.clientX, event.clientY, activeViewPort);
             if (!start) return;
 
-            doBeginMarqueeDrag({
+            doBeginDrag_Marquee({
                 pointerId: event.pointerId,
                 start,
                 clientX: event.clientX,
@@ -710,7 +713,7 @@ export function useCanvasDragAndDrop() {
             return;
         }
 
-        doBeginCanvasDrag({
+        doBeginDrag_Canvas({
             pointerId: event.pointerId,
             clientX: event.clientX,
             clientY: event.clientY,

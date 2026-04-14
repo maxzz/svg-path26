@@ -6,7 +6,7 @@ import { canvasUnitsPerPixelAtom } from "../../../../store/0-atoms/2-3-canvas-vi
 import { canvasPointSelectedAtom, commandHoveredAtom, commandSelectedAtom, hasSelectedCanvasPointsAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCanvasPointIdsAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { controlPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { classNames } from "@/utils";
-import { doStartPointDragAtom } from "../3-canvas-drag";
+import { doStartDrag_PointAtom } from "../3-canvas-drag";
 import { getControlHaloFill, getControlPointFill, getEditorStroke, getPointInteractionClassName } from "./8-canvas-color-palette";
 
 // Control points
@@ -115,7 +115,7 @@ const doCtrlPt_PointerDownAtom = atom(
         const dragIdSet = new Set(dragPointIds);
         const dragPoints = get(controlPointsAtom).filter((p) => p.movable && dragIdSet.has(p.id));
 
-        set(doStartPointDragAtom, { point, pointerId: event.pointerId, startPath: pathValue, points: dragPoints.length ? dragPoints : [point] });
+        set(doStartDrag_PointAtom, { point, pointerId: event.pointerId, startPath: pathValue, points: dragPoints.length ? dragPoints : [point] });
     }
 );
 

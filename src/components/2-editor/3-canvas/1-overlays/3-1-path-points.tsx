@@ -7,7 +7,7 @@ import { commandHoveredAtom, commandSelectedAtom, doFocusPointCommandAtom, doSel
 import { getCommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils";
 import { pathPointsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { classNames } from "@/utils";
-import { doStartPointDragAtom, doStartSelectedSegmentsDragAtom } from "../3-canvas-drag";
+import { doStartDrag_PointAtom, doStartDrag_SelectedSegmentsAtom } from "../3-canvas-drag";
 import { getControlHaloFill, getEditorStroke, getPointInteractionClassName, getTargetPointFill } from "./8-canvas-color-palette";
 
 export function PathPts() {
@@ -88,7 +88,7 @@ const doPathPt_PointerDownAtom = atom(
         set(hoveredCanvasPointAtom, point);
 
         if (selectedCommandIndices.includes(point.segmentIndex) && !event.shiftKey && !event.ctrlKey && !event.metaKey) {
-            set(doStartSelectedSegmentsDragAtom, pathValue, selectedCommandIndices, event);
+            set(doStartDrag_SelectedSegmentsAtom, pathValue, selectedCommandIndices, event);
             return;
         }
 
@@ -98,7 +98,7 @@ const doPathPt_PointerDownAtom = atom(
 
         set(doFocusPointCommandAtom, point);
         if (!point.movable) return;
-        set(doStartPointDragAtom, { point, pointerId: event.pointerId, startPath: pathValue });
+        set(doStartDrag_PointAtom, { point, pointerId: event.pointerId, startPath: pathValue });
     }
 );
 

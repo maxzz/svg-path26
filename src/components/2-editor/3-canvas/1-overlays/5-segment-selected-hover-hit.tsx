@@ -5,7 +5,7 @@ import { doRegisterCanvasSegmentHitAreaAtom, doSelectCommandAtom, hoveredCanvasP
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { getCommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils";
 import { standaloneSegmentPathsAtom } from "@/store/0-atoms/2-0-svg-model";
-import { doStartSelectedSegmentsDragAtom } from "../3-canvas-drag";
+import { doStartDrag_SelectedSegmentsAtom } from "../3-canvas-drag";
 import { getSegmentActiveStroke, getSegmentHoverStroke } from "./8-canvas-color-palette";
 
 // Selected segment overlay
@@ -94,7 +94,7 @@ const doSegmentHitArea_PointerDownAtom = atom(
         const pathValue = get(svgPathInputAtom);
 
         if (selectedCommandIndices.includes(index) && !event.shiftKey && !event.ctrlKey && !event.metaKey) {
-            set(doStartSelectedSegmentsDragAtom, pathValue, selectedCommandIndices, event);
+            set(doStartDrag_SelectedSegmentsAtom, pathValue, selectedCommandIndices, event);
             return;
         }
 
