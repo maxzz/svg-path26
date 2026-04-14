@@ -8,7 +8,7 @@ import { IconViewBox } from "@/components/ui/icons/normal/28-viewbox";
 import { CanvasGrid } from "./8-canvas-grid";
 import { CanvasAllOverlays } from "./1-overlays/0-all-overlays";
 import { useCanvasDragAndDrop } from "./3-canvas-drag";
-import { PathCanvasImages } from "./1-overlays/6-images";
+import { PathImages } from "./1-overlays/6-images";
 import { useSyncCanvasViewportSize } from "../../../store/0-atoms/2-3-canvas-viewport-derives";
 import { appSettings } from "@/store/0-ui-settings";
 import { doClearCanvasFocusAtom } from "@/store/0-atoms/2-4-0-editor-actions";
@@ -20,7 +20,7 @@ export function PathCanvas() {
     const { canvasPreview } = useSnapshot(appSettings.canvas);
     return (
         <PathCanvasElement>
-            <PathCanvasImages />
+            <PathImages />
             {!canvasPreview && <CanvasGrid />}
             <CanvasAllOverlays />
         </PathCanvasElement>

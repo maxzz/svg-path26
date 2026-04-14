@@ -7,7 +7,7 @@ import { type EditorImage, focusedImageIdAtom, imagesAtom, isImageEditModeAtom }
 import { type ImageHandle, eventToSvgPoint, doStartDrag_ImageAtom } from "../3-canvas-drag";
 import { canvasUnitsPerPixelAtom } from "../../../../store/0-atoms/2-3-canvas-viewport-derives";
 
-export function PathCanvasImages() {
+export function PathImages() {
     const images = useAtomValue(imagesAtom);
 
     return images.map(
@@ -29,7 +29,7 @@ export function PathCanvasImages() {
     );
 }
 
-export function PathCanvasImageEditOverlays() {
+export function PathImageEditOverlays() {
     const { canvasPreview } = useSnapshot(appSettings.canvas);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
 

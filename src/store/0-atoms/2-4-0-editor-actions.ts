@@ -1,18 +1,18 @@
 import { type MouseEvent } from "react";
 import { atom, type Atom } from "jotai";
-import { rawPathAtom } from "./1-0-raw-path";
-import { SvgPathModel } from "@/svg-core/2-svg-model";
-import { type Point, type SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
+import { appSettings } from "@/store/0-ui-settings";
 import { createAtomAppSetting } from "./8-create-atom-app-settings";
+import { type Point, type SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
+import { SvgPathModel } from "@/svg-core/2-svg-model";
+import { rawPathAtom } from "./1-0-raw-path";
 import { svgPathInputAtom } from "./1-1-svg-path-input";
 import { doSetPathWithoutHistoryAtom } from "./1-2-history";
 import { commandRowsAtom, controlPointsAtom, pathPointsAtom, standaloneSegmentPathsAtom, svgModelAtom } from "./2-0-svg-model";
 import { focusedImageIdAtom } from "./2-8-images";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
 import { applyCommandSelection, normalizeSelectedCommandIndices, remapSelectedIndicesAfterDelete, type CommandSelectionMode } from "./2-5-editor-selection-utils";
-import { appSettings } from "@/store/0-ui-settings";
 
-export const strokeWidthAtom = createAtomAppSetting("strokeWidth");
+export const strokeUserWidthAtom = createAtomAppSetting("strokeWidth"); // User override for stroke width
 
 export const scaleXAtom = atom(1);
 export const scaleYAtom = atom(1);
