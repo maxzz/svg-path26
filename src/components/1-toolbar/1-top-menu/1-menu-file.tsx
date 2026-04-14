@@ -24,16 +24,13 @@ export function FileMenu() {
 
             <MenubarContent>
                 <MenubarItem onClick={() => setOpenDialogOpen(true)}>
-                    Open Saved Path...
-                    <MenubarShortcut>Ctrl+O</MenubarShortcut>
+                    Open Saved Path... <MenubarShortcut>Ctrl+O</MenubarShortcut>
                 </MenubarItem>
                 <MenubarItem disabled={!hasPath} onClick={() => setSaveDialogOpen(true)}>
-                    Save Path...
-                    <MenubarShortcut>Ctrl+S</MenubarShortcut>
+                    Save Path... <MenubarShortcut>Ctrl+S</MenubarShortcut>
                 </MenubarItem>
                 <MenubarItem disabled={!hasPath} onClick={() => setOpenExportDialog(true)}>
-                    Export SVG...
-                    <MenubarShortcut>Ctrl+E</MenubarShortcut>
+                    Export SVG... <MenubarShortcut>Ctrl+E</MenubarShortcut>
                 </MenubarItem>
                 <MenubarItem onClick={() => fileRef.current?.click()}>
                     Upload Image...
@@ -49,8 +46,10 @@ function ImageUploadInput({ fileRef }: { fileRef: React.RefObject<HTMLInputEleme
 
     const handleFileInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
+
         if (!file) return;
         if (!file.type.startsWith("image/")) return;
+
         const data = await fileToDataUrl(file);
         setPendingImage({
             data,
@@ -77,10 +76,12 @@ function ImageUploadInput({ fileRef }: { fileRef: React.RefObject<HTMLInputEleme
 }
 
 function fileToDataUrl(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result ?? ""));
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(file);
-    });
+    return new Promise(
+        (resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result ?? ""));
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(file);
+        }
+    );
 }

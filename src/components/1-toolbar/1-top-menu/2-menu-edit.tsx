@@ -13,6 +13,7 @@ import { doAsyncOpenUpdateViewBoxDialogAndApplyAtom } from "@/store/1-atoms-comm
 
 export function EditMenu() {
     const { minifyOutput } = useSnapshot(appSettings.pathEditor);
+
     const pathValue = useAtomValue(svgPathInputAtom);
     const commandRows = useAtomValue(commandRowsAtom);
     const selectedCommandIndices = useAtomValue(selectedCommandIndicesAtom);
@@ -51,26 +52,19 @@ export function EditMenu() {
             </MenubarTrigger>
 
             <MenubarContent>
-                <MenubarItem disabled={!canUndo} onClick={doUndo}>
-                    Undo
-                    <MenubarShortcut>Ctrl+Z</MenubarShortcut>
-                </MenubarItem>
-                <MenubarItem disabled={!canRedo} onClick={doRedo}>
-                    Redo
-                    <MenubarShortcut>Ctrl+Shift+Z</MenubarShortcut>
+                <MenubarItem disabled={!hasSelection} onClick={() => setScaleToViewBoxDialogOpen(true)}>
+                    Scale to viewBox...
                 </MenubarItem>
 
-                <MenubarSeparator />
-
-                <MenubarItem disabled={!canSelectAll} onClick={doSelectAll}>
-                    Select All
-                    <MenubarShortcut>Ctrl+A</MenubarShortcut>
+                <MenubarItem onClick={openUpdateViewBoxDialog}>
+                    Update View Box... <MenubarShortcut>Alt+V</MenubarShortcut>
                 </MenubarItem>
 
                 <MenubarSub>
                     <MenubarSubTrigger>
                         Center selected
                     </MenubarSubTrigger>
+
                     <MenubarSubContent>
                         <MenubarItem disabled={!hasSelection} onClick={() => doCenter({ axis: "both" })}>
                             Center X+Y
@@ -84,38 +78,48 @@ export function EditMenu() {
                     </MenubarSubContent>
                 </MenubarSub>
 
-                <MenubarItem disabled={!hasSelection} onClick={() => setScaleToViewBoxDialogOpen(true)}>
-                    Scale to viewBox...
-                </MenubarItem>
-
-                <MenubarItem onClick={openUpdateViewBoxDialog}>
-                    Update View Box...
-                    <MenubarShortcut>Alt+V</MenubarShortcut>
-                </MenubarItem>
+                <MenubarSeparator />
 
                 <MenubarItem disabled={!hasPath} onClick={doNormalize}>
                     Normalize
                 </MenubarItem>
+
                 <MenubarItem disabled={!hasPath} onClick={doSetAbsolute}>
                     Convert to Absolute
                 </MenubarItem>
+
                 <MenubarItem disabled={!hasPath} onClick={doSetRelative}>
                     Convert to Relative
                 </MenubarItem>
+
                 <MenubarCheckboxItem checked={minifyOutput} disabled={!hasPath} onCheckedChange={toggleMinify}>
-                    Minify Path
-                    <MenubarShortcut>Alt+M</MenubarShortcut>
+                    Minify Path <MenubarShortcut>Alt+M</MenubarShortcut>
                 </MenubarCheckboxItem>
 
                 <MenubarSeparator />
 
-                <MenubarItem disabled={!hasPath} onClick={copyPath}>
-                    Copy Path
-                    <MenubarShortcut>Alt+C</MenubarShortcut>
+                <MenubarItem disabled={!canSelectAll} onClick={doSelectAll}>
+                    Select All <MenubarShortcut>Ctrl+A</MenubarShortcut>
                 </MenubarItem>
+
+                <MenubarSeparator />
+
+                <MenubarItem disabled={!canUndo} onClick={doUndo}>
+                    Undo <MenubarShortcut>Ctrl+Z</MenubarShortcut>
+                </MenubarItem>
+
+                <MenubarItem disabled={!canRedo} onClick={doRedo}>
+                    Redo <MenubarShortcut>Ctrl+Shift+Z</MenubarShortcut>
+                </MenubarItem>
+
+                <MenubarSeparator />
+
+                <MenubarItem disabled={!hasPath} onClick={copyPath}>
+                    Copy Path <MenubarShortcut>Alt+C</MenubarShortcut>
+                </MenubarItem>
+
                 <MenubarItem disabled={!hasPath} onClick={doClear}>
-                    Clear Path
-                    <MenubarShortcut>Alt+X</MenubarShortcut>
+                    Clear Path <MenubarShortcut>Alt+X</MenubarShortcut>
                 </MenubarItem>
             </MenubarContent>
         </MenubarMenu>
