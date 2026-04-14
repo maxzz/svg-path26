@@ -1,4 +1,5 @@
-import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai";
+import { atom, useAtomValue, useSetAtom } from "jotai";
+import { type PointerEvent } from "react";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
 import { canvasViewPortAtom } from "@/store/0-atoms/2-3-canvas-viewport";
@@ -31,28 +32,20 @@ export function PathCanvasImages() {
 export function PathCanvasImageEditOverlays() {
     const { canvasPreview } = useSnapshot(appSettings.canvas);
     const imageEditMode = useAtomValue(isImageEditModeAtom);
-    const store = useStore();
 
     const images = useAtomValue(imagesAtom);
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
-    const [focusedImageId, setFocusedImageId] = useAtom(focusedImageIdAtom);
+    const focusedImageId = useAtomValue(focusedImageIdAtom);
 
-    const startImageDrag = useSetAtom(doStartImageDragAtom);
+    const doImageEditRect_PointerDown = useSetAtom(doImageEditRect_PointerDownAtom);
+    const doImageEditHandle_PointerDown = useSetAtom(doImageEditHandle_PointerDownAtom);
 
     if (canvasPreview || !imageEditMode) return null;
 
     return images.map(
         (image) => (
             <g
-                onPointerDown={(event) => {
-                    event.stopPropagation();
-                    const viewPort = store.get(canvasViewPortAtom);
-                    const start = eventToSvgPoint(event.currentTarget.ownerSVGElement, event.clientX, event.clientY, viewPort);
-                    if (!start) return;
-
-                    startImageDrag({ pointerId: event.pointerId, imageId: image.id, handle: "move", start, initial: image });
-                    setFocusedImageId(image.id);
-                }}
+                onPointerDown={(event) => { doImageEditRect_PointerDown(image, event); }}
                 key={`edit:${image.id}`}
             >
                 <rect
@@ -73,14 +66,7 @@ export function PathCanvasImageEditOverlays() {
                             cx={handle.x}
                             cy={handle.y}
                             r={unitsPerPixel * 3}
-                            onPointerDown={(event) => {
-                                event.stopPropagation();
-                                const viewPort = store.get(canvasViewPortAtom);
-                                const start = eventToSvgPoint(event.currentTarget.ownerSVGElement, event.clientX, event.clientY, viewPort);
-                                if (!start) return;
-                                startImageDrag({ pointerId: event.pointerId, imageId: image.id, handle: handle.type, start, initial: image });
-                                setFocusedImageId(image.id);
-                            }}
+                            onPointerDown={(event) => { doImageEditHandle_PointerDown(image, handle.type, event); }}
                             key={`${image.id}:${handle.type}`}
                         />
                     )
@@ -89,6 +75,34 @@ export function PathCanvasImageEditOverlays() {
         )
     );
 }
+
+// Image edit interaction handlers/atoms
+
+const doImageEditRect_PointerDownAtom = atom(
+    null,
+    (get, set, image: EditorImage, event: PointerEvent<SVGElement>) => {
+        event.stopPropagation();
+        const viewPort = get(canvasViewPortAtom);
+        const start = eventToSvgPoint(event.currentTarget.ownerSVGElement, event.clientX, event.clientY, viewPort);
+        if (!start) return;
+
+        set(doStartImageDragAtom, { pointerId: event.pointerId, imageId: image.id, handle: "move", start, initial: image });
+        set(focusedImageIdAtom, image.id);
+    }
+);
+
+const doImageEditHandle_PointerDownAtom = atom(
+    null,
+    (get, set, image: EditorImage, handle: ImageHandle, event: PointerEvent<SVGElement>) => {
+        event.stopPropagation();
+        const viewPort = get(canvasViewPortAtom);
+        const start = eventToSvgPoint(event.currentTarget.ownerSVGElement, event.clientX, event.clientY, viewPort);
+        if (!start) return;
+
+        set(doStartImageDragAtom, { pointerId: event.pointerId, imageId: image.id, handle, start, initial: image });
+        set(focusedImageIdAtom, image.id);
+    }
+);
 
 // Image Edit Rect Classes
 
