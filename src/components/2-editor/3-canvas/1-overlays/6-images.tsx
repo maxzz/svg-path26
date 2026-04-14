@@ -44,7 +44,6 @@ export function PathCanvasImageEditOverlays() {
     return images.map(
         (image) => (
             <g
-                key={`edit:${image.id}`}
                 onPointerDown={(event) => {
                     event.stopPropagation();
                     const viewPort = store.get(canvasViewPortAtom);
@@ -54,6 +53,7 @@ export function PathCanvasImageEditOverlays() {
                     startImageDrag({ pointerId: event.pointerId, imageId: image.id, handle: "move", start, initial: image });
                     setFocusedImageId(image.id);
                 }}
+                key={`edit:${image.id}`}
             >
                 <rect
                     className={getImageEditRectClasses(image.id === focusedImageId)}
