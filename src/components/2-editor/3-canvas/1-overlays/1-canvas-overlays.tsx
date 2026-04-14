@@ -4,7 +4,7 @@ import { appSettings } from "@/store/0-ui-settings";
 import { isImageEditModeAtom } from "@/store/0-atoms/2-8-images";
 
 import { CanvasMainPathOverlay } from "./2-main-path";
-import { CanvasLinesToControlPoints, CanvasControlPoints } from "./4-control-points-and-lines";
+import { PathPtToCtrlPtLines, CtrlPts } from "./4-control-points-and-lines";
 import { CanvasHoveredSegmentOverlay, CanvasSegmentHitAreas, CanvasSelectedSegmentOverlay } from "./5-canvas-segment-overlays";
 import { CanvasPathPoints } from "./3-path-points";
 import { PathCanvasImageEditOverlays } from "./6-images";
@@ -28,8 +28,8 @@ export function CanvasHelperOverlays() {
 
                 {!imageEditMode && showHelpers && (
                     <>
-                        <CanvasLinesToControlPoints />
-                        <CanvasControlPoints />
+                        <PathPtToCtrlPtLines />
+                        <CtrlPts />
                         <CanvasPathPoints />
                     </>
                 )}

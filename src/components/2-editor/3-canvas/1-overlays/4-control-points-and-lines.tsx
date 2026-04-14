@@ -9,16 +9,16 @@ import { classNames } from "@/utils";
 import { doStartPointDragAtom } from "../3-canvas-drag";
 import { getControlHaloFill, getControlLineStroke, getControlPointFill, getEditorStroke, getPointInteractionClassName } from "./8-canvas-color-palette";
 
-// Control lines
+// Lines from path points to their control points
 
-export function CanvasLinesToControlPoints() {
+export function PathPtToCtrlPtLines() {
     const controlPoints = useAtomValue(controlPointsAtom);
     const strokeWidth = useAtomValue(canvasStrokeWidthAtom);
 
     return controlPoints.flatMap(
         (point: SvgCanvasPoint, pointIndex: number) => point.relations.map(
             (relation: Point, relationIndex: number) => (
-                <CanvasControlLine
+                <PathPtToCtrlPtLine
                     point={point}
                     relation={relation}
                     strokeWidth={strokeWidth}
@@ -29,7 +29,7 @@ export function CanvasLinesToControlPoints() {
     );
 }
 
-function CanvasControlLine({ point, relation, strokeWidth }: { point: SvgCanvasPoint; relation: { x: number; y: number; }; strokeWidth: number; }) {
+function PathPtToCtrlPtLine({ point, relation, strokeWidth }: { point: SvgCanvasPoint; relation: { x: number; y: number; }; strokeWidth: number; }) {
     const hasSelectedCanvasPoints = useAtomValue(hasSelectedCanvasPointsAtom);
     const pointSelected = useAtomValue(canvasPointSelectedAtom(point.id));
     const segmentSelected = useAtomValue(commandSelectedAtom(point.segmentIndex));
@@ -52,18 +52,18 @@ function CanvasControlLine({ point, relation, strokeWidth }: { point: SvgCanvasP
 
 // Control points
 
-export function CanvasControlPoints() {
+export function CtrlPts() {
     const controlPoints = useAtomValue(controlPointsAtom);
     const unitsPerPixel = useAtomValue(canvasUnitsPerPixelAtom);
 
     return controlPoints.map(
         (point: SvgCanvasPoint) => (
-            <CanvasControlPoint point={point} unitsPerPixel={unitsPerPixel} key={point.id} />
+            <CtrlPt point={point} unitsPerPixel={unitsPerPixel} key={point.id} />
         )
     );
 }
 
-function CanvasControlPoint({ point, unitsPerPixel }: { point: SvgCanvasPoint; unitsPerPixel: number; }) {
+function CtrlPt({ point, unitsPerPixel }: { point: SvgCanvasPoint; unitsPerPixel: number; }) {
     const hasSelectedCanvasPoints = useAtomValue(hasSelectedCanvasPointsAtom);
     const pointSelected = useAtomValue(canvasPointSelectedAtom(point.id));
     const segmentSelected = useAtomValue(commandSelectedAtom(point.segmentIndex));
@@ -71,9 +71,9 @@ function CanvasControlPoint({ point, unitsPerPixel }: { point: SvgCanvasPoint; u
     const hovered = useAtomValue(commandHoveredAtom(point.segmentIndex));
     const controlPointClasses = getControlPointFill(selected, hovered);
 
-    const doCanvasControlPointPointerDown = useSetAtom(doCanvasControlPointPointerDownAtom);
-    const doCanvasControlPointMouseEnter = useSetAtom(doCanvasControlPointMouseEnterAtom);
-    const doCanvasControlPointMouseLeave = useSetAtom(doCanvasControlPointMouseLeaveAtom);
+    const doCanvasControlPointPointerDown = useSetAtom(doCtrlPt_PointerDownAtom);
+    const doCanvasControlPointMouseEnter = useSetAtom(doCtrlPt_MouseEnterAtom);
+    const doCanvasControlPointMouseLeave = useSetAtom(doCtrlPt_MouseLeaveAtom);
 
     const pointSize = unitsPerPixel * (point.movable ? 6 : 5);
     const pointOffset = pointSize / 2;
@@ -124,7 +124,9 @@ function CanvasControlPoint({ point, unitsPerPixel }: { point: SvgCanvasPoint; u
     );
 }
 
-const doCanvasControlPointPointerDownAtom = atom(
+// Canvas point interaction handlers/atoms
+
+const doCtrlPt_PointerDownAtom = atom(
     null,
     (get, set, point: SvgCanvasPoint, event: PointerEvent<SVGElement>) => {
         const pathValue = get(svgPathInputAtom);
@@ -136,13 +138,14 @@ const doCanvasControlPointPointerDownAtom = atom(
         const currentSelectedPointIds = get(selectedCanvasPointIdsAtom);
         const isAlreadySelected = currentSelectedPointIds.includes(point.id);
 
-        const nextSelectedPointIds = isToggleSelection
-            ? isAlreadySelected
-                ? currentSelectedPointIds.filter((id) => id !== point.id)
-                : [...currentSelectedPointIds, point.id]
-            : isAlreadySelected
-                ? currentSelectedPointIds
-                : [point.id];
+        const nextSelectedPointIds =
+            isToggleSelection
+                ? isAlreadySelected
+                    ? currentSelectedPointIds.filter((id) => id !== point.id)
+                    : [...currentSelectedPointIds, point.id]
+                : isAlreadySelected
+                    ? currentSelectedPointIds
+                    : [point.id];
 
         set(selectedCanvasPointIdsAtom, nextSelectedPointIds);
         set(selectedCommandIndicesAtom, []);
@@ -157,7 +160,7 @@ const doCanvasControlPointPointerDownAtom = atom(
     }
 );
 
-const doCanvasControlPointMouseEnterAtom = atom(
+const doCtrlPt_MouseEnterAtom = atom(
     null,
     (_get, set, point: SvgCanvasPoint) => {
         set(hoveredCommandIndexAtom, point.segmentIndex);
@@ -165,7 +168,7 @@ const doCanvasControlPointMouseEnterAtom = atom(
     }
 );
 
-const doCanvasControlPointMouseLeaveAtom = atom(
+const doCtrlPt_MouseLeaveAtom = atom(
     null,
     (_get, set) => {
         set(hoveredCommandIndexAtom, null);
