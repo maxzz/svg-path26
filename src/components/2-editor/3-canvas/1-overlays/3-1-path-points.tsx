@@ -5,7 +5,7 @@ import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { canvasUnitsPerPixelAtom } from "../../../../store/0-atoms/2-3-canvas-viewport-derives";
 import { commandHoveredAtom, commandSelectedAtom, doFocusPointCommandAtom, doSelectCommandAtom, hoveredCanvasPointAtom, hoveredCommandIndexAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { getCommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils";
-import { pathPointsAtom } from "@/store/0-atoms/2-0-svg-model";
+import { pathPointsAtom, segmentSubPathEnabledAtom } from "@/store/0-atoms/2-0-svg-model";
 import { classNames } from "@/utils";
 import { doStartDrag_PointAtom, doStartDrag_SelectedSegmentsAtom } from "../3-canvas-drag";
 import { getControlHaloFill, getEditorStroke, getPointInteractionClassName, getTargetPointFill } from "./8-canvas-color-palette";
@@ -26,6 +26,7 @@ export function PathPts() {
 }
 
 function PathPt({ point, unitsPerPixel }: { point: SvgCanvasPoint; unitsPerPixel: number; }) {
+    const segmentEnabled = useAtomValue(segmentSubPathEnabledAtom(point.segmentIndex));
     const selected = useAtomValue(commandSelectedAtom(point.segmentIndex));
     const hovered = useAtomValue(commandHoveredAtom(point.segmentIndex));
     const targetPointClasses = getTargetPointFill(selected, hovered);
@@ -35,6 +36,10 @@ function PathPt({ point, unitsPerPixel }: { point: SvgCanvasPoint; unitsPerPixel
     const doPathPt_PointerDown = useSetAtom(doPathPt_PointerDownAtom);
     const doPathPt_MouseEnter = useSetAtom(doPathPt_MouseEnterAtom);
     const doPathPt_MouseLeave = useSetAtom(doPathPt_MouseLeaveAtom);
+
+    if (!segmentEnabled) {
+        return null;
+    }
 
     return (
         <g>

@@ -1,6 +1,6 @@
-import { atom } from "jotai";
+import { atom, type Atom, type WritableAtom } from "jotai";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
-import type { SvgCanvasLine, SvgCanvasPoint, SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
+import type { SvgCanvasLine, SvgCanvasPoint, SvgSegmentSummary, SvgSubPath } from "@/svg-core/9-types-svg-model";
 import { rawPathAtom } from "./1-0-raw-path";
 
 export const svgModelAtom = atom<{ model: SvgPathModel | null; error: string | null; }>(
@@ -30,6 +30,106 @@ export const commandRowsAtom = atom<SvgSegmentSummary[]>(
         return model ? model.getSummaries() : [];
     }
 );
+
+export const subPathsAtom = atom<SvgSubPath[]>(
+    (get) => {
+        const model = get(svgModelAtom).model;
+        return model ? model.subPaths : [];
+    }
+);
+
+export const hasCompoundSubPathsAtom = atom(
+    (get) => get(subPathsAtom).length > 1
+);
+
+const subPathToggleStateAtom = atom<{ key: string; states: boolean[]; }>({
+    key: "",
+    states: [],
+});
+
+export const subPathEnabledStatesAtom = atom(
+    (get) => {
+        const subPaths = get(subPathsAtom);
+        const pathKey = get(rawPathAtom);
+        const current = get(subPathToggleStateAtom);
+        if (current.key !== pathKey || current.states.length !== subPaths.length) {
+            return subPaths.map(() => true);
+        }
+        return current.states;
+    },
+    (get, set, update: SetStateAction<boolean[]>) => {
+        const subPaths = get(subPathsAtom);
+        const pathKey = get(rawPathAtom);
+        const current = get(subPathEnabledStatesAtom);
+        const next = typeof update === "function" ? update(current) : update;
+        const normalized = subPaths.map((_, index) => Boolean(next[index] ?? true));
+        set(subPathToggleStateAtom, { key: pathKey, states: normalized });
+    }
+);
+
+const subPathEnabledAtomCache = new Map<number, WritableAtom<boolean, [SetStateAction<boolean>], void>>();
+
+export function subPathEnabledAtom(subPathIndex: number): WritableAtom<boolean, [SetStateAction<boolean>], void> {
+    const cached = subPathEnabledAtomCache.get(subPathIndex);
+    if (cached) {
+        return cached;
+    }
+
+    const created = atom(
+        (get) => get(subPathEnabledStatesAtom)[subPathIndex] ?? true,
+        (get, set, update: SetStateAction<boolean>) => {
+            const current = get(subPathEnabledStatesAtom);
+            const existing = current[subPathIndex] ?? true;
+            const nextValue = typeof update === "function" ? update(existing) : update;
+            const next = [...current];
+            next[subPathIndex] = nextValue;
+            set(subPathEnabledStatesAtom, next);
+        }
+    );
+    subPathEnabledAtomCache.set(subPathIndex, created);
+    return created;
+}
+
+export const allSubPathsEnabledAtom = atom(
+    (get) => {
+        const states = get(subPathEnabledStatesAtom);
+        return states.length ? states.every(Boolean) : true;
+    },
+    (get, set, update: SetStateAction<boolean>) => {
+        const states = get(subPathEnabledStatesAtom);
+        const currentValue = states.length ? states.every(Boolean) : true;
+        const nextValue = typeof update === "function" ? update(currentValue) : update;
+        set(subPathEnabledStatesAtom, states.map(() => nextValue));
+    }
+);
+
+const segmentSubPathEnabledAtomCache = new Map<number, Atom<boolean>>();
+
+export function segmentSubPathEnabledAtom(segmentIndex: number): Atom<boolean> {
+    const cached = segmentSubPathEnabledAtomCache.get(segmentIndex);
+    if (cached) {
+        return cached;
+    }
+
+    const created = atom((get) => {
+        const subPaths = get(subPathsAtom);
+        if (subPaths.length <= 1) {
+            return true;
+        }
+
+        const subPath = subPaths.find(
+            (entry) => segmentIndex >= entry.startIndex && segmentIndex <= entry.endIndex
+        );
+        if (!subPath) {
+            return true;
+        }
+
+        return get(subPathEnabledStatesAtom)[subPath.index] ?? true;
+    });
+
+    segmentSubPathEnabledAtomCache.set(segmentIndex, created);
+    return created;
+}
 
 export const canvasGeometryAtom = atom(
     (get) => get(svgModelAtom).model?.getCanvasGeometry() ?? EMPTY_GEOMETRY

@@ -1,23 +1,16 @@
 import { parseSvgPath } from "./1-parser";
-import type {
-    AbsoluteSegment,
-    Bounds,
-    Point,
-    SvgCanvasGeometry,
-    SvgCanvasLine,
-    SvgCanvasPoint,
-    SvgSegment,
-    SvgSegmentSummary,
-} from "@/svg-core/9-types-svg-model";
+import type { AbsoluteSegment, Bounds, Point, SvgCanvasGeometry, SvgCanvasLine, SvgCanvasPoint, SvgSegment, SvgSegmentSummary, SvgSubPath, } from "@/svg-core/9-types-svg-model";
 
 export class SvgPathModel {
     readonly segments: SvgSegment[];
 
     constructor(path: string) {
-        this.segments = parseSvgPath(path).map(([command, ...values]) => ({
-            command,
-            values: values.map((it) => Number.parseFloat(it)),
-        }));
+        this.segments = parseSvgPath(path).map(
+            ([command, ...values]) => ({
+                command,
+                values: values.map((it) => Number.parseFloat(it)),
+            })
+        );
         this.validateFirstCommand();
     }
 
@@ -34,19 +27,7 @@ export class SvgPathModel {
     }
 
     toString(decimals = 3, minify = false): string {
-        const chunked = this.segments.map((segment) => {
-            const formatted = segment.values.map((v) => formatNumber(v, decimals, minify));
-            if (!formatted.length) return segment.command;
-            return [segment.command, ...formatted].join(" ");
-        });
-
-        const joined = chunked.join(minify ? "" : " ");
-        if (!minify) return joined;
-
-        return joined
-            .replace(/ -/g, "-")
-            .replace(/([a-zA-Z]) /g, "$1")
-            .replace(/(\.[0-9]+) (?=\.)/g, "$1");
+        return formatSegments(this.segments, decimals, minify);
     }
 
     getCommandCount(): number {
@@ -77,12 +58,62 @@ export class SvgPathModel {
     }
 
     getSummaries(): SvgSegmentSummary[] {
-        return this.computeAbsoluteSegments().map((item) => ({
-            index: item.index,
-            command: item.segment.command,
-            values: [...item.segment.values],
-            target: { ...item.end },
-        }));
+        return this.computeAbsoluteSegments().map(
+            (item) => ({
+                index: item.index,
+                command: item.segment.command,
+                values: [...item.segment.values],
+                target: { ...item.end },
+            })
+        );
+    }
+
+    getSubPaths(decimals = 3, minify = false): SvgSubPath[] {
+        if (!this.segments.length) {
+            return [];
+        }
+
+        const absoluteSegments = this.computeAbsoluteSegments();
+        const subPaths: SvgSubPath[] = [];
+        let startIndex = absoluteSegments[0]?.index ?? 0;
+        let currentSegments: SvgSegment[] = [];
+
+        absoluteSegments.forEach(
+            (segmentData, index) => {
+                const startsNewSubpath = index > 0 && segmentData.command === "M";
+                if (startsNewSubpath) {
+                    const lastIndex = absoluteSegments[index - 1]?.index ?? startIndex;
+                    subPaths.push({
+                        index: subPaths.length,
+                        startIndex,
+                        endIndex: lastIndex,
+                        path: formatSegments(currentSegments, decimals, minify),
+                    });
+                    startIndex = segmentData.index;
+                    currentSegments = [];
+                }
+
+                currentSegments.push({
+                    command: segmentData.command,
+                    values: segmentData.command === "Z" ? [] : [...segmentData.values],
+                });
+            }
+        );
+
+        if (currentSegments.length) {
+            subPaths.push({
+                index: subPaths.length,
+                startIndex,
+                endIndex: absoluteSegments[absoluteSegments.length - 1]?.index ?? startIndex,
+                path: formatSegments(currentSegments, decimals, minify),
+            });
+        }
+
+        return subPaths;
+    }
+
+    get subPaths(): SvgSubPath[] {
+        return this.getSubPaths();
     }
 
     getCanvasGeometry(): SvgCanvasGeometry {
@@ -109,40 +140,41 @@ export class SvgPathModel {
 
         const segment = this.segments[segmentIndex];
         const cmd = upper(segment.command);
-        if (cmd === "Z") return;
 
-        if (cmd === "H") {
-            segment.values[0] = isRelative(segment.command)
-                ? target.x - segmentData.start.x
-                : target.x;
-            return;
-        }
-        if (cmd === "V") {
-            segment.values[0] = isRelative(segment.command)
-                ? target.y - segmentData.start.y
-                : target.y;
-            return;
-        }
-        if (cmd === "A") {
-            if (isRelative(segment.command)) {
-                segment.values[5] = target.x - segmentData.start.x;
-                segment.values[6] = target.y - segmentData.start.y;
-            } else {
-                segment.values[5] = target.x;
-                segment.values[6] = target.y;
+        switch (cmd) {
+            case "Z":
+                return;
+            case "H":
+                segment.values[0] = isRelative(segment.command)
+                    ? target.x - segmentData.start.x
+                    : target.x;
+                return;
+            case "V":
+                segment.values[0] = isRelative(segment.command)
+                    ? target.y - segmentData.start.y
+                    : target.y;
+                return;
+            case "A":
+                if (isRelative(segment.command)) {
+                    segment.values[5] = target.x - segmentData.start.x;
+                    segment.values[6] = target.y - segmentData.start.y;
+                } else {
+                    segment.values[5] = target.x;
+                    segment.values[6] = target.y;
+                }
+                return;
+            default: {
+                const valueCount = segment.values.length;
+                if (valueCount < 2) return;
+
+                if (isRelative(segment.command)) {
+                    segment.values[valueCount - 2] = target.x - segmentData.start.x;
+                    segment.values[valueCount - 1] = target.y - segmentData.start.y;
+                } else {
+                    segment.values[valueCount - 2] = target.x;
+                    segment.values[valueCount - 1] = target.y;
+                }
             }
-            return;
-        }
-
-        const valueCount = segment.values.length;
-        if (valueCount < 2) return;
-
-        if (isRelative(segment.command)) {
-            segment.values[valueCount - 2] = target.x - segmentData.start.x;
-            segment.values[valueCount - 1] = target.y - segmentData.start.y;
-        } else {
-            segment.values[valueCount - 2] = target.x;
-            segment.values[valueCount - 1] = target.y;
         }
     }
 
@@ -155,7 +187,7 @@ export class SvgPathModel {
         const cmd = upper(segment.command);
         const relative = isRelative(segment.command);
 
-        const setXY = (xIndex: number, yIndex: number) => {
+        function setXY(xIndex: number, yIndex: number) {
             if (relative) {
                 segment.values[xIndex] = next.x - segmentData.start.x;
                 segment.values[yIndex] = next.y - segmentData.start.y;
@@ -163,7 +195,7 @@ export class SvgPathModel {
                 segment.values[xIndex] = next.x;
                 segment.values[yIndex] = next.y;
             }
-        };
+        }
 
         if (cmd === "C") {
             if (controlIndex === 0) setXY(0, 1);
@@ -338,76 +370,80 @@ export class SvgPathModel {
     }
 
     scale(scaleX: number, scaleY: number) {
-        this.segments.forEach((segment) => {
-            const cmd = upper(segment.command);
-            switch (cmd) {
-                case "M":
-                case "L":
-                case "T":
-                case "C":
-                case "S":
-                case "Q":
-                    for (let i = 0; i < segment.values.length; i += 2) {
-                        segment.values[i] *= scaleX;
-                        segment.values[i + 1] *= scaleY;
-                    }
-                    break;
-                case "H":
-                    segment.values[0] *= scaleX;
-                    break;
-                case "V":
-                    segment.values[0] *= scaleY;
-                    break;
-                case "A":
-                    segment.values[0] = Math.abs(segment.values[0] * scaleX);
-                    segment.values[1] = Math.abs(segment.values[1] * scaleY);
-                    segment.values[5] *= scaleX;
-                    segment.values[6] *= scaleY;
-                    break;
-                case "Z":
-                    break;
-                default:
-                    break;
+        this.segments.forEach(
+            (segment) => {
+                const cmd = upper(segment.command);
+                switch (cmd) {
+                    case "M":
+                    case "L":
+                    case "T":
+                    case "C":
+                    case "S":
+                    case "Q":
+                        for (let i = 0; i < segment.values.length; i += 2) {
+                            segment.values[i] *= scaleX;
+                            segment.values[i + 1] *= scaleY;
+                        }
+                        break;
+                    case "H":
+                        segment.values[0] *= scaleX;
+                        break;
+                    case "V":
+                        segment.values[0] *= scaleY;
+                        break;
+                    case "A":
+                        segment.values[0] = Math.abs(segment.values[0] * scaleX);
+                        segment.values[1] = Math.abs(segment.values[1] * scaleY);
+                        segment.values[5] *= scaleX;
+                        segment.values[6] *= scaleY;
+                        break;
+                    case "Z":
+                        break;
+                    default:
+                        break;
+                }
             }
-        });
+        );
     }
 
     translate(deltaX: number, deltaY: number) {
-        this.segments.forEach((segment, index) => {
-            const cmd = upper(segment.command);
-            const relative = isRelative(segment.command);
-            const forceTranslate = relative && index === 0 && cmd === "M";
+        this.segments.forEach(
+            (segment, index) => {
+                const cmd = upper(segment.command);
+                const relative = isRelative(segment.command);
+                const forceTranslate = relative && index === 0 && cmd === "M";
 
-            if (relative && !forceTranslate) return;
+                if (relative && !forceTranslate) return;
 
-            switch (cmd) {
-                case "M":
-                case "L":
-                case "T":
-                case "C":
-                case "S":
-                case "Q":
-                    for (let i = 0; i < segment.values.length; i += 2) {
-                        segment.values[i] += deltaX;
-                        segment.values[i + 1] += deltaY;
-                    }
-                    break;
-                case "H":
-                    segment.values[0] += deltaX;
-                    break;
-                case "V":
-                    segment.values[0] += deltaY;
-                    break;
-                case "A":
-                    segment.values[5] += deltaX;
-                    segment.values[6] += deltaY;
-                    break;
-                case "Z":
-                    break;
-                default:
-                    break;
+                switch (cmd) {
+                    case "M":
+                    case "L":
+                    case "T":
+                    case "C":
+                    case "S":
+                    case "Q":
+                        for (let i = 0; i < segment.values.length; i += 2) {
+                            segment.values[i] += deltaX;
+                            segment.values[i + 1] += deltaY;
+                        }
+                        break;
+                    case "H":
+                        segment.values[0] += deltaX;
+                        break;
+                    case "V":
+                        segment.values[0] += deltaY;
+                        break;
+                    case "A":
+                        segment.values[5] += deltaX;
+                        segment.values[6] += deltaY;
+                        break;
+                    case "Z":
+                        break;
+                    default:
+                        break;
+                }
             }
-        });
+        );
     }
 
     translateSegments(segmentIndices: number[], deltaX: number, deltaY: number) {
@@ -415,65 +451,75 @@ export class SvgPathModel {
         if (deltaX === 0 && deltaY === 0) return;
 
         const absolute = this.computeAbsoluteSegments();
-        const selected = new Set(segmentIndices.filter((index) => index >= 0 && index < absolute.length));
+        const selected = new Set(segmentIndices.filter(
+            (index) => index >= 0 && index < absolute.length)
+        );
         if (!selected.size) return;
 
         const subpathStartSegmentByIndex = new Map<number, number>();
         let currentSubpathStartIndex = 0;
-        absolute.forEach((segmentData) => {
-            if (segmentData.command === "M") {
-                currentSubpathStartIndex = segmentData.index;
+        absolute.forEach(
+            (segmentData) => {
+                if (segmentData.command === "M") {
+                    currentSubpathStartIndex = segmentData.index;
+                }
+                subpathStartSegmentByIndex.set(segmentData.index, currentSubpathStartIndex);
             }
-            subpathStartSegmentByIndex.set(segmentData.index, currentSubpathStartIndex);
-        });
+        );
 
         const targetTranslated = new Set<number>();
-        absolute.forEach((segmentData) => {
-            if (!selected.has(segmentData.index)) return;
+        absolute.forEach(
+            (segmentData) => {
+                if (!selected.has(segmentData.index)) return;
 
-            if (segmentData.command === "Z") {
+                if (segmentData.command === "Z") {
+                    const previousIndex = segmentData.index - 1;
+                    if (previousIndex >= 0) {
+                        targetTranslated.add(previousIndex);
+                    }
+                    targetTranslated.add(subpathStartSegmentByIndex.get(segmentData.index) ?? 0);
+                    return;
+                }
+
+                targetTranslated.add(segmentData.index);
+
                 const previousIndex = segmentData.index - 1;
-                if (previousIndex >= 0) {
+                if (previousIndex >= 0 && !selected.has(previousIndex)) {
                     targetTranslated.add(previousIndex);
                 }
-                targetTranslated.add(subpathStartSegmentByIndex.get(segmentData.index) ?? 0);
-                return;
             }
+        );
 
-            targetTranslated.add(segmentData.index);
-
-            const previousIndex = segmentData.index - 1;
-            if (previousIndex >= 0 && !selected.has(previousIndex)) {
-                targetTranslated.add(previousIndex);
+        const translatedAbsoluteValues = absolute.map(
+            (segmentData) => {
+                const nextValues = [...segmentData.values];
+                if (selected.has(segmentData.index)) {
+                    translateAbsoluteSegmentValues(segmentData.command, nextValues, deltaX, deltaY);
+                } else if (targetTranslated.has(segmentData.index)) {
+                    translateAbsoluteSegmentTarget(segmentData.command, nextValues, deltaX, deltaY);
+                }
+                return nextValues;
             }
-        });
-
-        const translatedAbsoluteValues = absolute.map((segmentData) => {
-            const nextValues = [...segmentData.values];
-            if (selected.has(segmentData.index)) {
-                translateAbsoluteSegmentValues(segmentData.command, nextValues, deltaX, deltaY);
-            } else if (targetTranslated.has(segmentData.index)) {
-                translateAbsoluteSegmentTarget(segmentData.command, nextValues, deltaX, deltaY);
-            }
-            return nextValues;
-        });
+        );
 
         let current: Point = { x: 0, y: 0 };
         let subpathStart: Point = { x: 0, y: 0 };
 
-        this.segments.forEach((segment, index) => {
-            const command = upper(segment.command);
-            const absoluteValues = translatedAbsoluteValues[index] ?? [];
-            segment.values = isRelative(segment.command)
-                ? this.absoluteToRelativeValues(command, absoluteValues, current)
-                : absoluteValues;
+        this.segments.forEach(
+            (segment, index) => {
+                const command = upper(segment.command);
+                const absoluteValues = translatedAbsoluteValues[index] ?? [];
+                segment.values = isRelative(segment.command)
+                    ? this.absoluteToRelativeValues(command, absoluteValues, current)
+                    : absoluteValues;
 
-            const target = getSegmentTargetFromAbsolute(command, absoluteValues, current, subpathStart);
-            if (command === "M") {
-                subpathStart = clonePoint(target);
+                const target = getSegmentTargetFromAbsolute(command, absoluteValues, current, subpathStart);
+                if (command === "M") {
+                    subpathStart = clonePoint(target);
+                }
+                current = command === "Z" ? clonePoint(subpathStart) : clonePoint(target);
             }
-            current = command === "Z" ? clonePoint(subpathStart) : clonePoint(target);
-        });
+        );
     }
 
     scaleSegments(segmentIndices: number[], scaleX: number, scaleY: number, pivot: Point) {
@@ -487,73 +533,83 @@ export class SvgPathModel {
 
         const subpathStartSegmentByIndex = new Map<number, number>();
         let currentSubpathStartIndex = 0;
-        absolute.forEach((segmentData) => {
-            if (segmentData.command === "M") {
-                currentSubpathStartIndex = segmentData.index;
+        absolute.forEach(
+            (segmentData) => {
+                if (segmentData.command === "M") {
+                    currentSubpathStartIndex = segmentData.index;
+                }
+                subpathStartSegmentByIndex.set(segmentData.index, currentSubpathStartIndex);
             }
-            subpathStartSegmentByIndex.set(segmentData.index, currentSubpathStartIndex);
-        });
+        );
 
         const targetScaled = new Set<number>();
-        absolute.forEach((segmentData) => {
-            if (!selected.has(segmentData.index)) return;
+        absolute.forEach(
+            (segmentData) => {
+                if (!selected.has(segmentData.index)) return;
 
-            if (segmentData.command === "Z") {
+                if (segmentData.command === "Z") {
+                    const previousIndex = segmentData.index - 1;
+                    if (previousIndex >= 0) {
+                        targetScaled.add(previousIndex);
+                    }
+                    targetScaled.add(subpathStartSegmentByIndex.get(segmentData.index) ?? 0);
+                    return;
+                }
+
+                targetScaled.add(segmentData.index);
+
                 const previousIndex = segmentData.index - 1;
-                if (previousIndex >= 0) {
+                if (previousIndex >= 0 && !selected.has(previousIndex)) {
                     targetScaled.add(previousIndex);
                 }
-                targetScaled.add(subpathStartSegmentByIndex.get(segmentData.index) ?? 0);
-                return;
             }
+        );
 
-            targetScaled.add(segmentData.index);
-
-            const previousIndex = segmentData.index - 1;
-            if (previousIndex >= 0 && !selected.has(previousIndex)) {
-                targetScaled.add(previousIndex);
+        const scaledAbsoluteValues = absolute.map(
+            (segmentData) => {
+                const nextValues = [...segmentData.values];
+                if (selected.has(segmentData.index)) {
+                    scaleAbsoluteSegmentValues(segmentData.command, nextValues, scaleX, scaleY, pivot.x, pivot.y);
+                } else if (targetScaled.has(segmentData.index)) {
+                    scaleAbsoluteSegmentTarget(segmentData.command, nextValues, scaleX, scaleY, pivot.x, pivot.y);
+                }
+                return nextValues;
             }
-        });
-
-        const scaledAbsoluteValues = absolute.map((segmentData) => {
-            const nextValues = [...segmentData.values];
-            if (selected.has(segmentData.index)) {
-                scaleAbsoluteSegmentValues(segmentData.command, nextValues, scaleX, scaleY, pivot.x, pivot.y);
-            } else if (targetScaled.has(segmentData.index)) {
-                scaleAbsoluteSegmentTarget(segmentData.command, nextValues, scaleX, scaleY, pivot.x, pivot.y);
-            }
-            return nextValues;
-        });
+        );
 
         let current: Point = { x: 0, y: 0 };
         let subpathStart: Point = { x: 0, y: 0 };
 
-        this.segments.forEach((segment, index) => {
-            const command = upper(segment.command);
-            const absoluteValues = scaledAbsoluteValues[index] ?? [];
-            segment.values = isRelative(segment.command)
-                ? this.absoluteToRelativeValues(command, absoluteValues, current)
-                : absoluteValues;
+        this.segments.forEach(
+            (segment, index) => {
+                const command = upper(segment.command);
+                const absoluteValues = scaledAbsoluteValues[index] ?? [];
+                segment.values = isRelative(segment.command)
+                    ? this.absoluteToRelativeValues(command, absoluteValues, current)
+                    : absoluteValues;
 
-            const target = getSegmentTargetFromAbsolute(command, absoluteValues, current, subpathStart);
-            if (command === "M") {
-                subpathStart = clonePoint(target);
+                const target = getSegmentTargetFromAbsolute(command, absoluteValues, current, subpathStart);
+                if (command === "M") {
+                    subpathStart = clonePoint(target);
+                }
+                current = command === "Z" ? clonePoint(subpathStart) : clonePoint(target);
             }
-            current = command === "Z" ? clonePoint(subpathStart) : clonePoint(target);
-        });
+        );
     }
 
     setRelative(makeRelative: boolean) {
         const absolute = this.computeAbsoluteSegments();
-        absolute.forEach((entry) => {
-            if (makeRelative) {
-                entry.segment.command = entry.command.toLowerCase();
-                entry.segment.values = this.absoluteToRelativeValues(entry.command, entry.values, entry.start);
-            } else {
-                entry.segment.command = entry.command;
-                entry.segment.values = [...entry.values];
+        absolute.forEach(
+            (entry) => {
+                if (makeRelative) {
+                    entry.segment.command = entry.command.toLowerCase();
+                    entry.segment.values = this.absoluteToRelativeValues(entry.command, entry.values, entry.start);
+                } else {
+                    entry.segment.command = entry.command;
+                    entry.segment.values = [...entry.values];
+                }
             }
-        });
+        );
     }
 
     private createSegmentForType(type: string, anchor: Point): SvgSegment {
@@ -661,12 +717,15 @@ export class SvgPathModel {
                 movable: args.movable,
                 relations: args.relations.map((it) => ({ ...it })),
             });
-            args.relations.forEach((relation) => {
-                relationLines.push({
-                    from: { x: args.x, y: args.y },
-                    to: { ...relation },
-                });
-            });
+
+            args.relations.forEach(
+                (relation) => {
+                    relationLines.push({
+                        from: { x: args.x, y: args.y },
+                        to: { ...relation },
+                    });
+                }
+            );
         };
 
         absolute.forEach((segmentData) => {
@@ -748,6 +807,41 @@ export class SvgPathModel {
                 });
             }
 
+            if (command === "A") {
+                const [rx, ry, xAxisRotation, largeArcFlag, sweepFlag] = values;
+                const arcSegments = arcToCubicSegments({
+                    start,
+                    end,
+                    rx,
+                    ry,
+                    xAxisRotation,
+                    largeArcFlag,
+                    sweepFlag,
+                });
+
+                arcSegments.forEach((segment, arcIndex) => {
+                    const baseIndex = arcIndex * 2;
+                    addControl({
+                        id: `${index}:arc:${baseIndex}`,
+                        segmentIndex: index,
+                        controlIndex: baseIndex,
+                        x: segment.c1.x,
+                        y: segment.c1.y,
+                        movable: false,
+                        relations: [segment.start],
+                    });
+                    addControl({
+                        id: `${index}:arc:${baseIndex + 1}`,
+                        segmentIndex: index,
+                        controlIndex: baseIndex + 1,
+                        x: segment.c2.x,
+                        y: segment.c2.y,
+                        movable: false,
+                        relations: [segment.end],
+                    });
+                });
+            }
+
             standaloneBySegment[index] = this.makeStandaloneSegmentPath(segmentData);
         });
 
@@ -762,24 +856,25 @@ export class SvgPathModel {
     private makeStandaloneSegmentPath(segment: AbsoluteSegment): string {
         const start = `${formatNumber(segment.start.x, 4, false)} ${formatNumber(segment.start.y, 4, false)}`;
         const cmd = segment.command;
+
         if (cmd === "Z") {
             const end = `${formatNumber(segment.end.x, 4, false)} ${formatNumber(segment.end.y, 4, false)}`;
             return `M ${start} L ${end}`;
         }
-        if (cmd === "S") {
+        else if (cmd === "S") {
             const c1 = `${formatNumber(segment.reflectedCubicControl.x, 4, false)} ${formatNumber(segment.reflectedCubicControl.y, 4, false)}`;
             const c2 = `${formatNumber(segment.values[0], 4, false)} ${formatNumber(segment.values[1], 4, false)}`;
             const end = `${formatNumber(segment.end.x, 4, false)} ${formatNumber(segment.end.y, 4, false)}`;
             return `M ${start} C ${c1} ${c2} ${end}`;
         }
-        if (cmd === "T") {
+        else if (cmd === "T") {
             const c1 = `${formatNumber(segment.reflectedQuadraticControl.x, 4, false)} ${formatNumber(segment.reflectedQuadraticControl.y, 4, false)}`;
             const end = `${formatNumber(segment.end.x, 4, false)} ${formatNumber(segment.end.y, 4, false)}`;
             return `M ${start} Q ${c1} ${end}`;
+        } else {
+            const values = segment.values.map((value) => formatNumber(value, 4, false)).join(" ");
+            return `M ${start} ${cmd}${values ? ` ${values}` : ""}`;
         }
-
-        const values = segment.values.map((value) => formatNumber(value, 4, false)).join(" ");
-        return `M ${start} ${cmd}${values ? ` ${values}` : ""}`;
     }
 
     private toAbsoluteSegment(segment: SvgSegment, current: Point, subpathStart: Point) {
@@ -828,14 +923,17 @@ export class SvgPathModel {
         }
 
         const absValues = [...values];
+
         for (let i = 0; i < absValues.length; i += 2) {
             absValues[i] = toAbsX(absValues[i]);
             absValues[i + 1] = toAbsY(absValues[i + 1]);
         }
+
         const end = {
             x: absValues[absValues.length - 2],
             y: absValues[absValues.length - 1],
         };
+
         return {
             command: cmd,
             values: absValues,
@@ -871,6 +969,154 @@ export class SvgPathModel {
             }
         }
     }
+}
+
+function formatSegments(segments: SvgSegment[], decimals: number, minify: boolean): string {
+    const chunked = segments.map(
+        (segment) => {
+            const formatted = segment.values.map((v) => formatNumber(v, decimals, minify));
+            if (!formatted.length) return segment.command;
+            return [segment.command, ...formatted].join(" ");
+        }
+    );
+
+    const joined = chunked.join(minify ? "" : " ");
+    if (!minify) return joined;
+
+    return joined
+        .replace(/ -/g, "-")
+        .replace(/([a-zA-Z]) /g, "$1")
+        .replace(/(\.[0-9]+) (?=\.)/g, "$1");
+}
+
+type ArcToCubicArgs = {
+    start: Point;
+    end: Point;
+    rx: number;
+    ry: number;
+    xAxisRotation: number;
+    largeArcFlag: number;
+    sweepFlag: number;
+};
+
+type ArcCubicSegment = {
+    start: Point;
+    c1: Point;
+    c2: Point;
+    end: Point;
+};
+
+function arcToCubicSegments(args: ArcToCubicArgs): ArcCubicSegment[] {
+    const { start, end } = args;
+    let rx = Math.abs(args.rx);
+    let ry = Math.abs(args.ry);
+
+    if (!Number.isFinite(rx) || !Number.isFinite(ry) || rx === 0 || ry === 0) {
+        return [];
+    }
+
+    const angleRad = (args.xAxisRotation * Math.PI) / 180;
+    const sinPhi = Math.sin(angleRad);
+    const cosPhi = Math.cos(angleRad);
+
+    const dx = (start.x - end.x) / 2;
+    const dy = (start.y - end.y) / 2;
+
+    const x1p = cosPhi * dx + sinPhi * dy;
+    const y1p = -sinPhi * dx + cosPhi * dy;
+
+    const lambda = (x1p * x1p) / (rx * rx) + (y1p * y1p) / (ry * ry);
+    if (lambda > 1) {
+        const scale = Math.sqrt(lambda);
+        rx *= scale;
+        ry *= scale;
+    }
+
+    const rxSq = rx * rx;
+    const rySq = ry * ry;
+    const x1pSq = x1p * x1p;
+    const y1pSq = y1p * y1p;
+
+    const sign = args.largeArcFlag === args.sweepFlag ? -1 : 1;
+    const numerator = rxSq * rySq - rxSq * y1pSq - rySq * x1pSq;
+    const denom = rxSq * y1pSq + rySq * x1pSq;
+    const factor = denom === 0 ? 0 : Math.sqrt(Math.max(0, numerator / denom));
+
+    const cxp = sign * factor * ((rx * y1p) / ry);
+    const cyp = sign * factor * ((-ry * x1p) / rx);
+
+    const cx = cosPhi * cxp - sinPhi * cyp + (start.x + end.x) / 2;
+    const cy = sinPhi * cxp + cosPhi * cyp + (start.y + end.y) / 2;
+
+    const vectorAngle = (ux: number, uy: number, vx: number, vy: number) => {
+        const dot = ux * vx + uy * vy;
+        const len = Math.hypot(ux, uy) * Math.hypot(vx, vy);
+        const ratio = len === 0 ? 0 : Math.min(Math.max(dot / len, -1), 1);
+        const direction = ux * vy - uy * vx < 0 ? -1 : 1;
+        return direction * Math.acos(ratio);
+    };
+
+    const v1x = (x1p - cxp) / rx;
+    const v1y = (y1p - cyp) / ry;
+    const v2x = (-x1p - cxp) / rx;
+    const v2y = (-y1p - cyp) / ry;
+
+    const theta1 = vectorAngle(1, 0, v1x, v1y);
+    let delta = vectorAngle(v1x, v1y, v2x, v2y);
+
+    if (!args.sweepFlag && delta > 0) {
+        delta -= Math.PI * 2;
+    } else if (args.sweepFlag && delta < 0) {
+        delta += Math.PI * 2;
+    }
+
+    const segments = Math.max(1, Math.ceil(Math.abs(delta) / (Math.PI / 2)));
+    const deltaSegment = delta / segments;
+
+    const segmentsOut: ArcCubicSegment[] = [];
+    let prevEnd: Point = { x: start.x, y: start.y };
+
+    for (let i = 0; i < segments; i += 1) {
+        const t1 = theta1 + i * deltaSegment;
+        const t2 = t1 + deltaSegment;
+        const arc = approxUnitArc(t1, t2);
+
+        const mapPoint = (pt: Point): Point => ({
+            x: cosPhi * pt.x * rx - sinPhi * pt.y * ry + cx,
+            y: sinPhi * pt.x * rx + cosPhi * pt.y * ry + cy,
+        });
+
+        const c1 = mapPoint(arc.c1);
+        const c2 = mapPoint(arc.c2);
+        const arcEnd = mapPoint(arc.end);
+
+        segmentsOut.push({
+            start: prevEnd,
+            c1,
+            c2,
+            end: arcEnd,
+        });
+
+        prevEnd = arcEnd;
+    }
+
+    return segmentsOut;
+}
+
+function approxUnitArc(t1: number, t2: number): { c1: Point; c2: Point; end: Point; } {
+    const delta = t2 - t1;
+    const alpha = (4 / 3) * Math.tan(delta / 4);
+
+    const x1 = Math.cos(t1);
+    const y1 = Math.sin(t1);
+    const x2 = Math.cos(t2);
+    const y2 = Math.sin(t2);
+
+    return {
+        c1: { x: x1 - alpha * y1, y: y1 + alpha * x1 },
+        c2: { x: x2 + alpha * y2, y: y2 - alpha * x2 },
+        end: { x: x2, y: y2 },
+    };
 }
 
 function formatNumber(value: number, decimals: number, minify: boolean): string {

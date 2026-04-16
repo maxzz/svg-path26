@@ -63,18 +63,32 @@ export function getSegmentHoverStroke(): string {
 
 //
 
+export function getCanvasPathFillClasses(canvasPreview: boolean, fillPreview: boolean): string {
+    return fillPreview
+        ? "fill-none"
+        : canvasPreview
+            ? "fill-black/20"
+            : "fill-blue-500/25";
+}
+
+export function getCanvasPathStrokeClasses(canvasPreview: boolean): string {
+    return canvasPreview
+        ? "stroke-black"
+        : "stroke-blue-700 dark:stroke-white";
+}
+
 export function getCanvasPathClasses(canvasPreview: boolean, fillPreview: boolean): string {
-    const fillClasses =
-        fillPreview
-            ? "fill-none"
-            : canvasPreview
-                ? "fill-black/20"
-                : "fill-blue-500/25";
-    const strokeClasses =
-        canvasPreview
-            ? "stroke-black"
-            : "stroke-blue-700 dark:stroke-white";
-    return classNames(fillClasses, strokeClasses);
+    return classNames(
+        getCanvasPathFillClasses(canvasPreview, fillPreview),
+        getCanvasPathStrokeClasses(canvasPreview)
+    );
+}
+
+export function getCanvasSubPathStrokeClasses(canvasPreview: boolean, muted: boolean): string {
+    return classNames(
+        getCanvasPathStrokeClasses(canvasPreview),
+        muted && "opacity-40"
+    );
 }
 
 //
