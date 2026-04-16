@@ -8,6 +8,7 @@ import type {
     SvgCanvasPoint,
     SvgSegment,
     SvgSegmentSummary,
+    SvgSubPath,
 } from "@/svg-core/9-types-svg-model";
 
 export class SvgPathModel {
@@ -34,19 +35,7 @@ export class SvgPathModel {
     }
 
     toString(decimals = 3, minify = false): string {
-        const chunked = this.segments.map((segment) => {
-            const formatted = segment.values.map((v) => formatNumber(v, decimals, minify));
-            if (!formatted.length) return segment.command;
-            return [segment.command, ...formatted].join(" ");
-        });
-
-        const joined = chunked.join(minify ? "" : " ");
-        if (!minify) return joined;
-
-        return joined
-            .replace(/ -/g, "-")
-            .replace(/([a-zA-Z]) /g, "$1")
-            .replace(/(\.[0-9]+) (?=\.)/g, "$1");
+        return formatSegments(this.segments, decimals, minify);
     }
 
     getCommandCount(): number {
@@ -83,6 +72,44 @@ export class SvgPathModel {
             values: [...item.segment.values],
             target: { ...item.end },
         }));
+    }
+
+    getSubPaths(decimals = 3, minify = false): SvgSubPath[] {
+        if (!this.segments.length) return [];
+
+        const subPaths: SvgSubPath[] = [];
+        let startIndex = 0;
+        let currentSegments: SvgSegment[] = [];
+
+        this.segments.forEach((segment, index) => {
+            const startsNewSubpath = index > 0 && upper(segment.command) === "M";
+            if (startsNewSubpath) {
+                subPaths.push({
+                    index: subPaths.length,
+                    startIndex,
+                    endIndex: index - 1,
+                    path: formatSegments(currentSegments, decimals, minify),
+                });
+                startIndex = index;
+                currentSegments = [];
+            }
+            currentSegments.push(segment);
+        });
+
+        if (currentSegments.length) {
+            subPaths.push({
+                index: subPaths.length,
+                startIndex,
+                endIndex: this.segments.length - 1,
+                path: formatSegments(currentSegments, decimals, minify),
+            });
+        }
+
+        return subPaths;
+    }
+
+    get subPaths(): SvgSubPath[] {
+        return this.getSubPaths();
     }
 
     getCanvasGeometry(): SvgCanvasGeometry {
@@ -871,6 +898,22 @@ export class SvgPathModel {
             }
         }
     }
+}
+
+function formatSegments(segments: SvgSegment[], decimals: number, minify: boolean): string {
+    const chunked = segments.map((segment) => {
+        const formatted = segment.values.map((v) => formatNumber(v, decimals, minify));
+        if (!formatted.length) return segment.command;
+        return [segment.command, ...formatted].join(" ");
+    });
+
+    const joined = chunked.join(minify ? "" : " ");
+    if (!minify) return joined;
+
+    return joined
+        .replace(/ -/g, "-")
+        .replace(/([a-zA-Z]) /g, "$1")
+        .replace(/(\.[0-9]+) (?=\.)/g, "$1");
 }
 
 function formatNumber(value: number, decimals: number, minify: boolean): string {

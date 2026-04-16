@@ -1,14 +1,15 @@
-import { useCallback, useEffect, useRef } from "react";
-import { useAtomValue, useSetAtom } from "jotai";
+import { Fragment, useCallback, useEffect, useRef } from "react";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { ArrowLeftRight } from "lucide-react";
 import { cn } from "@/utils";
 import { Button } from "@/components/ui/shadcn/button";
+import { Switch } from "@/components/ui/shadcn/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel.tsx";
 import { commandSummaryTooltip, isCommandCellLinkedToPoint, isCommandValueLinkedToPoint } from "./8-helpers.tsx";
 import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
-import { commandRowsAtom } from "@/store/0-atoms/2-0-svg-model";
+import { allSubPathsEnabledAtom, commandRowsAtom, subPathEnabledAtom, subPathsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { CommandSelectionMenu } from "./2-commands-list-row-menu.tsx";
 import { commandHoveredAtom, commandSelectedAtom, doSelectCommandAtom, doToggleSegmentRelativeAtom, highlightedCanvasPointAtomForSegment, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions.ts";
 import { getCommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils.ts";
@@ -60,12 +61,14 @@ function ScrollOnHoverToggleOverlay() {
 
 export function CommandsList() {
     const rows = useAtomValue(commandRowsAtom);
+    const subPaths = useAtomValue(subPathsAtom);
     const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
     const doSelectCommand = useSetAtom(doSelectCommandAtom);
     const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
     const doToggleRelative = useSetAtom(doToggleSegmentRelativeAtom);
     const rowRefs = useRef<Record<number, HTMLDivElement | null>>({});
     const fieldRefs = useRef<Record<string, HTMLInputElement | null>>({});
+    const hasCompoundSubPaths = subPaths.length > 1;
 
     const moveVertical = useCallback((rowIndex: number, valueIndex: number, direction: "up" | "down") => {
         const nextRowIndex = direction === "up" ? rowIndex - 1 : rowIndex + 1;
@@ -91,24 +94,38 @@ export function CommandsList() {
         return <p className="text-muted-foreground">No commands to show.</p>;
     }
 
+    const renderRow = (row: SvgSegmentSummary) => (
+        <CommandRow
+            key={row.index}
+            row={row}
+            setRowRef={setRowRef}
+            doSelectCommand={doSelectCommand}
+            setHoveredCommandIndex={setHoveredCommandIndex}
+            doToggleRelative={doToggleRelative}
+            focusCommandCell={focusCommandCell}
+            moveVertical={moveVertical}
+            registerFieldRef={registerFieldRef}
+        />
+    );
+
     return (
         <>
             <CommandsListScrollEffects rowRefs={rowRefs} rowsLength={rows.length} />
-            {rows.map(
-                (row: SvgSegmentSummary) => (
-                    <CommandRow
-                        key={row.index}
-                        row={row}
-                        setRowRef={setRowRef}
-                        doSelectCommand={doSelectCommand}
-                        setHoveredCommandIndex={setHoveredCommandIndex}
-                        doToggleRelative={doToggleRelative}
-                        focusCommandCell={focusCommandCell}
-                        moveVertical={moveVertical}
-                        registerFieldRef={registerFieldRef}
-                    />
+            {hasCompoundSubPaths
+                ? (
+                    <>
+                        <CompoundPathToggleRow />
+                        {subPaths.map((subPath) => (
+                            <Fragment key={`subpath:${subPath.index}`}>
+                                <SubPathToggleRow subPathIndex={subPath.index} />
+                                {rows
+                                    .filter((row) => row.index >= subPath.startIndex && row.index <= subPath.endIndex)
+                                    .map(renderRow)}
+                            </Fragment>
+                        ))}
+                    </>
                 )
-            )}
+                : rows.map(renderRow)}
         </>
     );
 }
@@ -137,6 +154,36 @@ function CommandsListScrollEffects(props: { rowRefs: React.RefObject<Record<numb
         [hoveredCommandIndex, rowRefs, rowsLength, scrollOnHover, selectedCommandIndex]);
 
     return null;
+}
+
+function CompoundPathToggleRow() {
+    const [allEnabled, setAllEnabled] = useAtom(allSubPathsEnabledAtom);
+    return (
+        <div className="px-1.5 py-1 flex items-center justify-between text-[10px] text-muted-foreground">
+            <span>Toggle all</span>
+            <Switch
+                className="scale-75"
+                checked={allEnabled}
+                onCheckedChange={(checked) => setAllEnabled(Boolean(checked))}
+                aria-label={allEnabled ? "Mute all subpaths" : "Enable all subpaths"}
+            />
+        </div>
+    );
+}
+
+function SubPathToggleRow({ subPathIndex }: { subPathIndex: number; }) {
+    const [enabled, setEnabled] = useAtom(subPathEnabledAtom(subPathIndex));
+    return (
+        <div className="px-1.5 py-1 flex items-center justify-between text-[10px] text-muted-foreground">
+            <span>Subpath {subPathIndex + 1}</span>
+            <Switch
+                className="scale-75"
+                checked={enabled}
+                onCheckedChange={(checked) => setEnabled(Boolean(checked))}
+                aria-label={enabled ? `Mute subpath ${subPathIndex + 1}` : `Enable subpath ${subPathIndex + 1}`}
+            />
+        </div>
+    );
 }
 
 function CommandRow(props: {

@@ -10,6 +10,13 @@ export type SvgSegmentSummary = {
     target: Point;
 };
 
+export type SvgSubPath = {
+    index: number;
+    startIndex: number;
+    endIndex: number;
+    path: string;
+};
+
 export type SvgCanvasPoint = {
     id: string;
     segmentIndex: number;
