@@ -27,10 +27,6 @@ export function PathPts() {
 
 function PathPt({ point, unitsPerPixel }: { point: SvgCanvasPoint; unitsPerPixel: number; }) {
     const segmentEnabled = useAtomValue(segmentSubPathEnabledAtom(point.segmentIndex));
-    if (!segmentEnabled) {
-        return null;
-    }
-
     const selected = useAtomValue(commandSelectedAtom(point.segmentIndex));
     const hovered = useAtomValue(commandHoveredAtom(point.segmentIndex));
     const targetPointClasses = getTargetPointFill(selected, hovered);
@@ -40,6 +36,10 @@ function PathPt({ point, unitsPerPixel }: { point: SvgCanvasPoint; unitsPerPixel
     const doPathPt_PointerDown = useSetAtom(doPathPt_PointerDownAtom);
     const doPathPt_MouseEnter = useSetAtom(doPathPt_MouseEnterAtom);
     const doPathPt_MouseLeave = useSetAtom(doPathPt_MouseLeaveAtom);
+
+    if (!segmentEnabled) {
+        return null;
+    }
 
     return (
         <g>

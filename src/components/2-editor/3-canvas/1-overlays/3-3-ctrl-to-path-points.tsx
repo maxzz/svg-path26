@@ -27,15 +27,15 @@ export function CtrlPtToPathPtLines() {
 
 function CtrlPtToPathPtLine({ point, relation, strokeWidth }: { point: SvgCanvasPoint; relation: { x: number; y: number; }; strokeWidth: number; }) {
     const segmentEnabled = useAtomValue(segmentSubPathEnabledAtom(point.segmentIndex));
-    if (!segmentEnabled) {
-        return null;
-    }
-
     const hasSelectedCanvasPoints = useAtomValue(hasSelectedCanvasPointsAtom);
     const pointSelected = useAtomValue(canvasPointSelectedAtom(point.id));
     const segmentSelected = useAtomValue(commandSelectedAtom(point.segmentIndex));
     const selected = hasSelectedCanvasPoints ? pointSelected : segmentSelected;
     const hovered = useAtomValue(commandHoveredAtom(point.segmentIndex));
+
+    if (!segmentEnabled) {
+        return null;
+    }
 
     return (
         <line
