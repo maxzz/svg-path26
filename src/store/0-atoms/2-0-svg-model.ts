@@ -103,24 +103,6 @@ export const allSubPathsEnabledAtom = atom(
     }
 );
 
-const subPathIndexBySegmentAtom = atom<number[]>(
-    (get) => {
-        const subPaths = get(subPathsAtom);
-        const commandCount = get(commandCountAtom);
-        if (!subPaths.length || commandCount === 0) {
-            return [];
-        }
-
-        const mapping = Array.from({ length: commandCount }, () => -1);
-        subPaths.forEach((subPath) => {
-            for (let index = subPath.startIndex; index <= subPath.endIndex; index += 1) {
-                mapping[index] = subPath.index;
-            }
-        });
-        return mapping;
-    }
-);
-
 const segmentSubPathEnabledAtomCache = new Map<number, Atom<boolean>>();
 
 export function segmentSubPathEnabledAtom(segmentIndex: number): Atom<boolean> {
@@ -135,13 +117,14 @@ export function segmentSubPathEnabledAtom(segmentIndex: number): Atom<boolean> {
             return true;
         }
 
-        const subPathIndexBySegment = get(subPathIndexBySegmentAtom);
-        const subPathIndex = subPathIndexBySegment[segmentIndex];
-        if (subPathIndex === undefined || subPathIndex < 0) {
+        const subPath = subPaths.find(
+            (entry) => segmentIndex >= entry.startIndex && segmentIndex <= entry.endIndex
+        );
+        if (!subPath) {
             return true;
         }
 
-        return get(subPathEnabledStatesAtom)[subPathIndex] ?? true;
+        return get(subPathEnabledStatesAtom)[subPath.index] ?? true;
     });
 
     segmentSubPathEnabledAtomCache.set(segmentIndex, created);
