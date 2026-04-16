@@ -141,38 +141,39 @@ export class SvgPathModel {
         const segment = this.segments[segmentIndex];
         const cmd = upper(segment.command);
 
-        if (cmd === "Z") {
-            return;
-        }
-        else if (cmd === "H") {
-            segment.values[0] = isRelative(segment.command)
-                ? target.x - segmentData.start.x
-                : target.x;
-            return;
-        } else if (cmd === "V") {
-            segment.values[0] = isRelative(segment.command)
-                ? target.y - segmentData.start.y
-                : target.y;
-            return;
-        } else if (cmd === "A") {
-            if (isRelative(segment.command)) {
-                segment.values[5] = target.x - segmentData.start.x;
-                segment.values[6] = target.y - segmentData.start.y;
-            } else {
-                segment.values[5] = target.x;
-                segment.values[6] = target.y;
-            }
-            return;
-        } else {
-            const valueCount = segment.values.length;
-            if (valueCount < 2) return;
+        switch (cmd) {
+            case "Z":
+                return;
+            case "H":
+                segment.values[0] = isRelative(segment.command)
+                    ? target.x - segmentData.start.x
+                    : target.x;
+                return;
+            case "V":
+                segment.values[0] = isRelative(segment.command)
+                    ? target.y - segmentData.start.y
+                    : target.y;
+                return;
+            case "A":
+                if (isRelative(segment.command)) {
+                    segment.values[5] = target.x - segmentData.start.x;
+                    segment.values[6] = target.y - segmentData.start.y;
+                } else {
+                    segment.values[5] = target.x;
+                    segment.values[6] = target.y;
+                }
+                return;
+            default: {
+                const valueCount = segment.values.length;
+                if (valueCount < 2) return;
 
-            if (isRelative(segment.command)) {
-                segment.values[valueCount - 2] = target.x - segmentData.start.x;
-                segment.values[valueCount - 1] = target.y - segmentData.start.y;
-            } else {
-                segment.values[valueCount - 2] = target.x;
-                segment.values[valueCount - 1] = target.y;
+                if (isRelative(segment.command)) {
+                    segment.values[valueCount - 2] = target.x - segmentData.start.x;
+                    segment.values[valueCount - 1] = target.y - segmentData.start.y;
+                } else {
+                    segment.values[valueCount - 2] = target.x;
+                    segment.values[valueCount - 1] = target.y;
+                }
             }
         }
     }
@@ -186,7 +187,7 @@ export class SvgPathModel {
         const cmd = upper(segment.command);
         const relative = isRelative(segment.command);
 
-        const setXY = (xIndex: number, yIndex: number) => {
+        function setXY(xIndex: number, yIndex: number) {
             if (relative) {
                 segment.values[xIndex] = next.x - segmentData.start.x;
                 segment.values[yIndex] = next.y - segmentData.start.y;
@@ -194,7 +195,7 @@ export class SvgPathModel {
                 segment.values[xIndex] = next.x;
                 segment.values[yIndex] = next.y;
             }
-        };
+        }
 
         if (cmd === "C") {
             if (controlIndex === 0) setXY(0, 1);
@@ -369,76 +370,80 @@ export class SvgPathModel {
     }
 
     scale(scaleX: number, scaleY: number) {
-        this.segments.forEach((segment) => {
-            const cmd = upper(segment.command);
-            switch (cmd) {
-                case "M":
-                case "L":
-                case "T":
-                case "C":
-                case "S":
-                case "Q":
-                    for (let i = 0; i < segment.values.length; i += 2) {
-                        segment.values[i] *= scaleX;
-                        segment.values[i + 1] *= scaleY;
-                    }
-                    break;
-                case "H":
-                    segment.values[0] *= scaleX;
-                    break;
-                case "V":
-                    segment.values[0] *= scaleY;
-                    break;
-                case "A":
-                    segment.values[0] = Math.abs(segment.values[0] * scaleX);
-                    segment.values[1] = Math.abs(segment.values[1] * scaleY);
-                    segment.values[5] *= scaleX;
-                    segment.values[6] *= scaleY;
-                    break;
-                case "Z":
-                    break;
-                default:
-                    break;
+        this.segments.forEach(
+            (segment) => {
+                const cmd = upper(segment.command);
+                switch (cmd) {
+                    case "M":
+                    case "L":
+                    case "T":
+                    case "C":
+                    case "S":
+                    case "Q":
+                        for (let i = 0; i < segment.values.length; i += 2) {
+                            segment.values[i] *= scaleX;
+                            segment.values[i + 1] *= scaleY;
+                        }
+                        break;
+                    case "H":
+                        segment.values[0] *= scaleX;
+                        break;
+                    case "V":
+                        segment.values[0] *= scaleY;
+                        break;
+                    case "A":
+                        segment.values[0] = Math.abs(segment.values[0] * scaleX);
+                        segment.values[1] = Math.abs(segment.values[1] * scaleY);
+                        segment.values[5] *= scaleX;
+                        segment.values[6] *= scaleY;
+                        break;
+                    case "Z":
+                        break;
+                    default:
+                        break;
+                }
             }
-        });
+        );
     }
 
     translate(deltaX: number, deltaY: number) {
-        this.segments.forEach((segment, index) => {
-            const cmd = upper(segment.command);
-            const relative = isRelative(segment.command);
-            const forceTranslate = relative && index === 0 && cmd === "M";
+        this.segments.forEach(
+            (segment, index) => {
+                const cmd = upper(segment.command);
+                const relative = isRelative(segment.command);
+                const forceTranslate = relative && index === 0 && cmd === "M";
 
-            if (relative && !forceTranslate) return;
+                if (relative && !forceTranslate) return;
 
-            switch (cmd) {
-                case "M":
-                case "L":
-                case "T":
-                case "C":
-                case "S":
-                case "Q":
-                    for (let i = 0; i < segment.values.length; i += 2) {
-                        segment.values[i] += deltaX;
-                        segment.values[i + 1] += deltaY;
-                    }
-                    break;
-                case "H":
-                    segment.values[0] += deltaX;
-                    break;
-                case "V":
-                    segment.values[0] += deltaY;
-                    break;
-                case "A":
-                    segment.values[5] += deltaX;
-                    segment.values[6] += deltaY;
-                    break;
-                case "Z":
-                    break;
-                default:
-                    break;
+                switch (cmd) {
+                    case "M":
+                    case "L":
+                    case "T":
+                    case "C":
+                    case "S":
+                    case "Q":
+                        for (let i = 0; i < segment.values.length; i += 2) {
+                            segment.values[i] += deltaX;
+                            segment.values[i + 1] += deltaY;
+                        }
+                        break;
+                    case "H":
+                        segment.values[0] += deltaX;
+                        break;
+                    case "V":
+                        segment.values[0] += deltaY;
+                        break;
+                    case "A":
+                        segment.values[5] += deltaX;
+                        segment.values[6] += deltaY;
+                        break;
+                    case "Z":
+                        break;
+                    default:
+                        break;
+                }
             }
-        });
+        );
     }
 
     translateSegments(segmentIndices: number[], deltaX: number, deltaY: number) {
@@ -446,65 +451,75 @@ export class SvgPathModel {
         if (deltaX === 0 && deltaY === 0) return;
 
         const absolute = this.computeAbsoluteSegments();
-        const selected = new Set(segmentIndices.filter((index) => index >= 0 && index < absolute.length));
+        const selected = new Set(segmentIndices.filter(
+            (index) => index >= 0 && index < absolute.length)
+        );
         if (!selected.size) return;
 
         const subpathStartSegmentByIndex = new Map<number, number>();
         let currentSubpathStartIndex = 0;
-        absolute.forEach((segmentData) => {
-            if (segmentData.command === "M") {
-                currentSubpathStartIndex = segmentData.index;
+        absolute.forEach(
+            (segmentData) => {
+                if (segmentData.command === "M") {
+                    currentSubpathStartIndex = segmentData.index;
+                }
+                subpathStartSegmentByIndex.set(segmentData.index, currentSubpathStartIndex);
             }
-            subpathStartSegmentByIndex.set(segmentData.index, currentSubpathStartIndex);
-        });
+        );
 
         const targetTranslated = new Set<number>();
-        absolute.forEach((segmentData) => {
-            if (!selected.has(segmentData.index)) return;
+        absolute.forEach(
+            (segmentData) => {
+                if (!selected.has(segmentData.index)) return;
 
-            if (segmentData.command === "Z") {
+                if (segmentData.command === "Z") {
+                    const previousIndex = segmentData.index - 1;
+                    if (previousIndex >= 0) {
+                        targetTranslated.add(previousIndex);
+                    }
+                    targetTranslated.add(subpathStartSegmentByIndex.get(segmentData.index) ?? 0);
+                    return;
+                }
+
+                targetTranslated.add(segmentData.index);
+
                 const previousIndex = segmentData.index - 1;
-                if (previousIndex >= 0) {
+                if (previousIndex >= 0 && !selected.has(previousIndex)) {
                     targetTranslated.add(previousIndex);
                 }
-                targetTranslated.add(subpathStartSegmentByIndex.get(segmentData.index) ?? 0);
-                return;
             }
+        );
 
-            targetTranslated.add(segmentData.index);
-
-            const previousIndex = segmentData.index - 1;
-            if (previousIndex >= 0 && !selected.has(previousIndex)) {
-                targetTranslated.add(previousIndex);
+        const translatedAbsoluteValues = absolute.map(
+            (segmentData) => {
+                const nextValues = [...segmentData.values];
+                if (selected.has(segmentData.index)) {
+                    translateAbsoluteSegmentValues(segmentData.command, nextValues, deltaX, deltaY);
+                } else if (targetTranslated.has(segmentData.index)) {
+                    translateAbsoluteSegmentTarget(segmentData.command, nextValues, deltaX, deltaY);
+                }
+                return nextValues;
             }
-        });
-
-        const translatedAbsoluteValues = absolute.map((segmentData) => {
-            const nextValues = [...segmentData.values];
-            if (selected.has(segmentData.index)) {
-                translateAbsoluteSegmentValues(segmentData.command, nextValues, deltaX, deltaY);
-            } else if (targetTranslated.has(segmentData.index)) {
-                translateAbsoluteSegmentTarget(segmentData.command, nextValues, deltaX, deltaY);
-            }
-            return nextValues;
-        });
+        );
 
         let current: Point = { x: 0, y: 0 };
         let subpathStart: Point = { x: 0, y: 0 };
 
-        this.segments.forEach((segment, index) => {
-            const command = upper(segment.command);
-            const absoluteValues = translatedAbsoluteValues[index] ?? [];
-            segment.values = isRelative(segment.command)
-                ? this.absoluteToRelativeValues(command, absoluteValues, current)
-                : absoluteValues;
+        this.segments.forEach(
+            (segment, index) => {
+                const command = upper(segment.command);
+                const absoluteValues = translatedAbsoluteValues[index] ?? [];
+                segment.values = isRelative(segment.command)
+                    ? this.absoluteToRelativeValues(command, absoluteValues, current)
+                    : absoluteValues;
 
-            const target = getSegmentTargetFromAbsolute(command, absoluteValues, current, subpathStart);
-            if (command === "M") {
-                subpathStart = clonePoint(target);
+                const target = getSegmentTargetFromAbsolute(command, absoluteValues, current, subpathStart);
+                if (command === "M") {
+                    subpathStart = clonePoint(target);
+                }
+                current = command === "Z" ? clonePoint(subpathStart) : clonePoint(target);
             }
-            current = command === "Z" ? clonePoint(subpathStart) : clonePoint(target);
-        });
+        );
     }
 
     scaleSegments(segmentIndices: number[], scaleX: number, scaleY: number, pivot: Point) {
