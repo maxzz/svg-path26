@@ -77,30 +77,36 @@ export class SvgPathModel {
     getSubPaths(decimals = 3, minify = false): SvgSubPath[] {
         if (!this.segments.length) return [];
 
+        const absoluteSegments = this.computeAbsoluteSegments();
         const subPaths: SvgSubPath[] = [];
-        let startIndex = 0;
+        let startIndex = absoluteSegments[0]?.index ?? 0;
         let currentSegments: SvgSegment[] = [];
 
-        this.segments.forEach((segment, index) => {
-            const startsNewSubpath = index > 0 && upper(segment.command) === "M";
+        absoluteSegments.forEach((segmentData, index) => {
+            const startsNewSubpath = index > 0 && segmentData.command === "M";
             if (startsNewSubpath) {
+                const lastIndex = absoluteSegments[index - 1]?.index ?? startIndex;
                 subPaths.push({
                     index: subPaths.length,
                     startIndex,
-                    endIndex: index - 1,
+                    endIndex: lastIndex,
                     path: formatSegments(currentSegments, decimals, minify),
                 });
-                startIndex = index;
+                startIndex = segmentData.index;
                 currentSegments = [];
             }
-            currentSegments.push(segment);
+
+            currentSegments.push({
+                command: segmentData.command,
+                values: segmentData.command === "Z" ? [] : [...segmentData.values],
+            });
         });
 
         if (currentSegments.length) {
             subPaths.push({
                 index: subPaths.length,
                 startIndex,
-                endIndex: this.segments.length - 1,
+                endIndex: absoluteSegments[absoluteSegments.length - 1]?.index ?? startIndex,
                 path: formatSegments(currentSegments, decimals, minify),
             });
         }
