@@ -9,9 +9,12 @@ export function createAtomAppSetting<Key extends keyof PathEditorSettings>(key: 
     baseAtom.onMount = (setValue) => {
         setValue(appSettings.pathEditor[key]);
 
-        return subscribe(appSettings, () => {
-            setValue(appSettings.pathEditor[key]);
-        });
+        //TODO: optimize this by subscribing only to the specific property instead of the whole appSettings object. use subscribeKey() from valtio/utils when valtio updates to 2.0, which supports subscribeKey().
+        return subscribe(appSettings,
+            () => {
+                setValue(appSettings.pathEditor[key]);
+            }
+        );
     };
 
     return atom(
