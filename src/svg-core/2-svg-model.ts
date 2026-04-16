@@ -888,7 +888,7 @@ export class SvgPathModel {
         }
 
         const absValues = [...values];
-        
+
         for (let i = 0; i < absValues.length; i += 2) {
             absValues[i] = toAbsX(absValues[i]);
             absValues[i + 1] = toAbsY(absValues[i + 1]);
@@ -937,11 +937,13 @@ export class SvgPathModel {
 }
 
 function formatSegments(segments: SvgSegment[], decimals: number, minify: boolean): string {
-    const chunked = segments.map((segment) => {
-        const formatted = segment.values.map((v) => formatNumber(v, decimals, minify));
-        if (!formatted.length) return segment.command;
-        return [segment.command, ...formatted].join(" ");
-    });
+    const chunked = segments.map(
+        (segment) => {
+            const formatted = segment.values.map((v) => formatNumber(v, decimals, minify));
+            if (!formatted.length) return segment.command;
+            return [segment.command, ...formatted].join(" ");
+        }
+    );
 
     const joined = chunked.join(minify ? "" : " ");
     if (!minify) return joined;
