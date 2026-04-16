@@ -807,6 +807,41 @@ export class SvgPathModel {
                 });
             }
 
+            if (command === "A") {
+                const [rx, ry, xAxisRotation, largeArcFlag, sweepFlag] = values;
+                const arcSegments = arcToCubicSegments({
+                    start,
+                    end,
+                    rx,
+                    ry,
+                    xAxisRotation,
+                    largeArcFlag,
+                    sweepFlag,
+                });
+
+                arcSegments.forEach((segment, arcIndex) => {
+                    const baseIndex = arcIndex * 2;
+                    addControl({
+                        id: `${index}:arc:${baseIndex}`,
+                        segmentIndex: index,
+                        controlIndex: baseIndex,
+                        x: segment.c1.x,
+                        y: segment.c1.y,
+                        movable: false,
+                        relations: [segment.start],
+                    });
+                    addControl({
+                        id: `${index}:arc:${baseIndex + 1}`,
+                        segmentIndex: index,
+                        controlIndex: baseIndex + 1,
+                        x: segment.c2.x,
+                        y: segment.c2.y,
+                        movable: false,
+                        relations: [segment.end],
+                    });
+                });
+            }
+
             standaloneBySegment[index] = this.makeStandaloneSegmentPath(segmentData);
         });
 
@@ -952,6 +987,136 @@ function formatSegments(segments: SvgSegment[], decimals: number, minify: boolea
         .replace(/ -/g, "-")
         .replace(/([a-zA-Z]) /g, "$1")
         .replace(/(\.[0-9]+) (?=\.)/g, "$1");
+}
+
+type ArcToCubicArgs = {
+    start: Point;
+    end: Point;
+    rx: number;
+    ry: number;
+    xAxisRotation: number;
+    largeArcFlag: number;
+    sweepFlag: number;
+};
+
+type ArcCubicSegment = {
+    start: Point;
+    c1: Point;
+    c2: Point;
+    end: Point;
+};
+
+function arcToCubicSegments(args: ArcToCubicArgs): ArcCubicSegment[] {
+    const { start, end } = args;
+    let rx = Math.abs(args.rx);
+    let ry = Math.abs(args.ry);
+
+    if (!Number.isFinite(rx) || !Number.isFinite(ry) || rx === 0 || ry === 0) {
+        return [];
+    }
+
+    const angleRad = (args.xAxisRotation * Math.PI) / 180;
+    const sinPhi = Math.sin(angleRad);
+    const cosPhi = Math.cos(angleRad);
+
+    const dx = (start.x - end.x) / 2;
+    const dy = (start.y - end.y) / 2;
+
+    const x1p = cosPhi * dx + sinPhi * dy;
+    const y1p = -sinPhi * dx + cosPhi * dy;
+
+    const lambda = (x1p * x1p) / (rx * rx) + (y1p * y1p) / (ry * ry);
+    if (lambda > 1) {
+        const scale = Math.sqrt(lambda);
+        rx *= scale;
+        ry *= scale;
+    }
+
+    const rxSq = rx * rx;
+    const rySq = ry * ry;
+    const x1pSq = x1p * x1p;
+    const y1pSq = y1p * y1p;
+
+    const sign = args.largeArcFlag === args.sweepFlag ? -1 : 1;
+    const numerator = rxSq * rySq - rxSq * y1pSq - rySq * x1pSq;
+    const denom = rxSq * y1pSq + rySq * x1pSq;
+    const factor = denom === 0 ? 0 : Math.sqrt(Math.max(0, numerator / denom));
+
+    const cxp = sign * factor * ((rx * y1p) / ry);
+    const cyp = sign * factor * ((-ry * x1p) / rx);
+
+    const cx = cosPhi * cxp - sinPhi * cyp + (start.x + end.x) / 2;
+    const cy = sinPhi * cxp + cosPhi * cyp + (start.y + end.y) / 2;
+
+    const vectorAngle = (ux: number, uy: number, vx: number, vy: number) => {
+        const dot = ux * vx + uy * vy;
+        const len = Math.hypot(ux, uy) * Math.hypot(vx, vy);
+        const ratio = len === 0 ? 0 : Math.min(Math.max(dot / len, -1), 1);
+        const direction = ux * vy - uy * vx < 0 ? -1 : 1;
+        return direction * Math.acos(ratio);
+    };
+
+    const v1x = (x1p - cxp) / rx;
+    const v1y = (y1p - cyp) / ry;
+    const v2x = (-x1p - cxp) / rx;
+    const v2y = (-y1p - cyp) / ry;
+
+    const theta1 = vectorAngle(1, 0, v1x, v1y);
+    let delta = vectorAngle(v1x, v1y, v2x, v2y);
+
+    if (!args.sweepFlag && delta > 0) {
+        delta -= Math.PI * 2;
+    } else if (args.sweepFlag && delta < 0) {
+        delta += Math.PI * 2;
+    }
+
+    const segments = Math.max(1, Math.ceil(Math.abs(delta) / (Math.PI / 2)));
+    const deltaSegment = delta / segments;
+
+    const segmentsOut: ArcCubicSegment[] = [];
+    let prevEnd: Point = { x: start.x, y: start.y };
+
+    for (let i = 0; i < segments; i += 1) {
+        const t1 = theta1 + i * deltaSegment;
+        const t2 = t1 + deltaSegment;
+        const arc = approxUnitArc(t1, t2);
+
+        const mapPoint = (pt: Point): Point => ({
+            x: cosPhi * pt.x * rx - sinPhi * pt.y * ry + cx,
+            y: sinPhi * pt.x * rx + cosPhi * pt.y * ry + cy,
+        });
+
+        const c1 = mapPoint(arc.c1);
+        const c2 = mapPoint(arc.c2);
+        const arcEnd = mapPoint(arc.end);
+
+        segmentsOut.push({
+            start: prevEnd,
+            c1,
+            c2,
+            end: arcEnd,
+        });
+
+        prevEnd = arcEnd;
+    }
+
+    return segmentsOut;
+}
+
+function approxUnitArc(t1: number, t2: number): { c1: Point; c2: Point; end: Point; } {
+    const delta = t2 - t1;
+    const alpha = (4 / 3) * Math.tan(delta / 4);
+
+    const x1 = Math.cos(t1);
+    const y1 = Math.sin(t1);
+    const x2 = Math.cos(t2);
+    const y2 = Math.sin(t2);
+
+    return {
+        c1: { x: x1 - alpha * y1, y: y1 + alpha * x1 },
+        c2: { x: x2 + alpha * y2, y: y2 - alpha * x2 },
+        end: { x: x2, y: y2 },
+    };
 }
 
 function formatNumber(value: number, decimals: number, minify: boolean): string {
