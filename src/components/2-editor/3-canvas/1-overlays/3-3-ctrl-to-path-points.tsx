@@ -2,7 +2,7 @@ import { useAtomValue } from "jotai";
 import { type Point, type SvgCanvasPoint } from "@/svg-core/9-types-svg-model";
 import { canvasStrokeWidthAtom } from "../../../../store/0-atoms/2-3-canvas-viewport-derives";
 import { canvasPointSelectedAtom, commandHoveredAtom, commandSelectedAtom, hasSelectedCanvasPointsAtom } from "@/store/0-atoms/2-4-0-editor-actions";
-import { controlPointsAtom } from "@/store/0-atoms/2-0-svg-model";
+import { controlPointsAtom, segmentSubPathEnabledAtom } from "@/store/0-atoms/2-0-svg-model";
 import { getControlLineStroke } from "./8-canvas-color-palette";
 
 // Lines from path points to their control points
@@ -26,6 +26,11 @@ export function CtrlPtToPathPtLines() {
 }
 
 function CtrlPtToPathPtLine({ point, relation, strokeWidth }: { point: SvgCanvasPoint; relation: { x: number; y: number; }; strokeWidth: number; }) {
+    const segmentEnabled = useAtomValue(segmentSubPathEnabledAtom(point.segmentIndex));
+    if (!segmentEnabled) {
+        return null;
+    }
+
     const hasSelectedCanvasPoints = useAtomValue(hasSelectedCanvasPointsAtom);
     const pointSelected = useAtomValue(canvasPointSelectedAtom(point.id));
     const segmentSelected = useAtomValue(commandSelectedAtom(point.segmentIndex));

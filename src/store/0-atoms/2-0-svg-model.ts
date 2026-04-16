@@ -1,4 +1,4 @@
-import { atom, type WritableAtom } from "jotai";
+import { atom, type Atom, type WritableAtom } from "jotai";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
 import type { SvgCanvasLine, SvgCanvasPoint, SvgSegmentSummary, SvgSubPath } from "@/svg-core/9-types-svg-model";
 import { rawPathAtom } from "./1-0-raw-path";
@@ -121,48 +121,43 @@ const subPathIndexBySegmentAtom = atom<number[]>(
     }
 );
 
+const segmentSubPathEnabledAtomCache = new Map<number, Atom<boolean>>();
+
+export function segmentSubPathEnabledAtom(segmentIndex: number): Atom<boolean> {
+    const cached = segmentSubPathEnabledAtomCache.get(segmentIndex);
+    if (cached) {
+        return cached;
+    }
+
+    const created = atom((get) => {
+        const subPaths = get(subPathsAtom);
+        if (subPaths.length <= 1) {
+            return true;
+        }
+
+        const subPathIndexBySegment = get(subPathIndexBySegmentAtom);
+        const subPathIndex = subPathIndexBySegment[segmentIndex];
+        if (subPathIndex === undefined || subPathIndex < 0) {
+            return true;
+        }
+
+        return get(subPathEnabledStatesAtom)[subPathIndex] ?? true;
+    });
+
+    segmentSubPathEnabledAtomCache.set(segmentIndex, created);
+    return created;
+}
+
 export const canvasGeometryAtom = atom(
     (get) => get(svgModelAtom).model?.getCanvasGeometry() ?? EMPTY_GEOMETRY
 );
 
 export const pathPointsAtom = atom<SvgCanvasPoint[]>(
-    (get) => {
-        const points = get(canvasGeometryAtom).targets;
-        const subPaths = get(subPathsAtom);
-        if (subPaths.length <= 1) {
-            return points;
-        }
-
-        const enabledStates = get(subPathEnabledStatesAtom);
-        const subPathIndexBySegment = get(subPathIndexBySegmentAtom);
-        return points.filter((point) => {
-            const subPathIndex = subPathIndexBySegment[point.segmentIndex];
-            if (subPathIndex === undefined || subPathIndex < 0) {
-                return true;
-            }
-            return enabledStates[subPathIndex] ?? true;
-        });
-    }
+    (get) => get(canvasGeometryAtom).targets
 );
 
 export const controlPointsAtom = atom<SvgCanvasPoint[]>(
-    (get) => {
-        const points = get(canvasGeometryAtom).controls;
-        const subPaths = get(subPathsAtom);
-        if (subPaths.length <= 1) {
-            return points;
-        }
-
-        const enabledStates = get(subPathEnabledStatesAtom);
-        const subPathIndexBySegment = get(subPathIndexBySegmentAtom);
-        return points.filter((point) => {
-            const subPathIndex = subPathIndexBySegment[point.segmentIndex];
-            if (subPathIndex === undefined || subPathIndex < 0) {
-                return true;
-            }
-            return enabledStates[subPathIndex] ?? true;
-        });
-    }
+    (get) => get(canvasGeometryAtom).controls
 );
 
 export const controlLinesAtom = atom<SvgCanvasLine[]>(
