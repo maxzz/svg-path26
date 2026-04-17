@@ -1,21 +1,21 @@
-import { Fragment, useCallback, useEffect, useRef } from "react";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useCallback, useEffect, useRef } from "react";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
-import { ArrowLeftRight } from "lucide-react";
 import { cn } from "@/utils";
-import { Button } from "@/components/ui/shadcn/button";
-import { Switch } from "@/components/ui/shadcn/switch";
+import { Accordion } from "@/components/ui/shadcn/accordion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel.tsx";
 import { commandSummaryTooltip, isCommandCellLinkedToPoint, isCommandValueLinkedToPoint } from "./8-helpers.tsx";
 import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
-import { allSubPathsEnabledAtom, commandRowsAtom, subPathEnabledAtom, subPathsAtom } from "@/store/0-atoms/2-0-svg-model";
+import { commandRowsAtom, subPathsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { CommandSelectionMenu } from "./2-commands-list-row-menu.tsx";
 import { commandHoveredAtom, commandSelectedAtom, doSelectCommandAtom, doToggleSegmentRelativeAtom, highlightedCanvasPointAtomForSegment, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions.ts";
 import { getCommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils.ts";
 import { appSettings } from "@/store/0-ui-settings";
 import { type CommandProps, CommandArcFlagsInput, CommandCellInput } from "./1-commands-list-cells.tsx";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
+import { ScrollOnHoverToggleOverlay } from "./7-1-overlay-buttons.tsx";
+import { CompoundPathToggleRow, SubPathToggleRow } from "./7-2-subpath-headers.tsx";
 
 export function Section_PathCommands() {
     return (
@@ -34,31 +34,6 @@ export function Section_PathCommands() {
     );
 }
 
-function ScrollOnHoverToggleOverlay() {
-    const { scrollOnHover } = useSnapshot(appSettings.canvas);
-    return (
-        <Tooltip>
-            <TooltipTrigger asChild>
-                <Button
-                    className={cn("mr-1 size-6 rounded-sm text-muted-foreground hover:text-foreground", scrollOnHover && "bg-background/80 text-foreground")}
-                    onClick={() => appSettings.canvas.scrollOnHover = !scrollOnHover}
-                    variant="ghost"
-                    size="icon"
-                    type="button"
-                    aria-label={scrollOnHover ? "Disable scroll on hover" : "Enable scroll on hover"}
-                    aria-pressed={scrollOnHover}
-                >
-                    <ArrowLeftRight className="size-3" />
-                </Button>
-            </TooltipTrigger>
-
-            <TooltipContent sideOffset={6}>
-                {scrollOnHover ? "Disable scroll on hover" : "Enable scroll on hover"}
-            </TooltipContent>
-        </Tooltip>
-    );
-}
-
 export function CommandsList() {
     const rows = useAtomValue(commandRowsAtom);
     const subPaths = useAtomValue(subPathsAtom);
@@ -70,64 +45,77 @@ export function CommandsList() {
     const fieldRefs = useRef<Record<string, HTMLInputElement | null>>({});
     const hasCompoundSubPaths = subPaths.length > 1;
 
-    const moveVertical = useCallback((rowIndex: number, valueIndex: number, direction: "up" | "down") => {
-        const nextRowIndex = direction === "up" ? rowIndex - 1 : rowIndex + 1;
-        if (nextRowIndex < 0 || nextRowIndex >= rows.length) return;
+    const moveVertical = useCallback(
+        (rowIndex: number, valueIndex: number, direction: "up" | "down") => {
+            const nextRowIndex = direction === "up" ? rowIndex - 1 : rowIndex + 1;
+            if (nextRowIndex < 0 || nextRowIndex >= rows.length) return;
 
-        setSelectedCommandIndex(nextRowIndex);
-        focusCommandCell(nextRowIndex, valueIndex);
-    }, [rows.length, setSelectedCommandIndex]);
+            setSelectedCommandIndex(nextRowIndex);
+            focusCommandCell(nextRowIndex, valueIndex);
+        },
+        [rows.length, setSelectedCommandIndex]);
 
-    const focusCommandCell = useCallback((nextRowIndex: number, nextValueIndex: number) => {
-        focusField(rows, rowRefs.current, fieldRefs.current, nextRowIndex, nextValueIndex, setSelectedCommandIndex);
-    }, [rows, setSelectedCommandIndex]);
+    const focusCommandCell = useCallback(
+        (nextRowIndex: number, nextValueIndex: number) => {
+            focusField(rows, rowRefs.current, fieldRefs.current, nextRowIndex, nextValueIndex, setSelectedCommandIndex);
+        },
+        [rows, setSelectedCommandIndex]);
 
-    const registerFieldRef = useCallback((rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => {
-        fieldRefs.current[`${rowIndex}:${valueIndex}`] = element;
-    }, []);
+    const registerFieldRef = useCallback(
+        (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => {
+            fieldRefs.current[`${rowIndex}:${valueIndex}`] = element;
+        },
+        []);
 
-    const setRowRef = useCallback((rowIndex: number, element: HTMLDivElement | null) => {
-        rowRefs.current[rowIndex] = element;
-    }, []);
+    const setRowRef = useCallback(
+        (rowIndex: number, element: HTMLDivElement | null) => {
+            rowRefs.current[rowIndex] = element;
+        },
+        []);
 
     if (rows.length === 0) {
         return <p className="text-muted-foreground">No commands to show.</p>;
     }
 
-    const renderRow = (row: SvgSegmentSummary) => (
-        <CommandRow
-            key={row.index}
-            row={row}
-            setRowRef={setRowRef}
-            doSelectCommand={doSelectCommand}
-            setHoveredCommandIndex={setHoveredCommandIndex}
-            doToggleRelative={doToggleRelative}
-            focusCommandCell={focusCommandCell}
-            moveVertical={moveVertical}
-            registerFieldRef={registerFieldRef}
-        />
-    );
+    function renderRow(row: SvgSegmentSummary) {
+        return (
+            <CommandRow
+                key={row.index}
+                row={row}
+                setRowRef={setRowRef}
+                doSelectCommand={doSelectCommand}
+                setHoveredCommandIndex={setHoveredCommandIndex}
+                doToggleRelative={doToggleRelative}
+                focusCommandCell={focusCommandCell}
+                moveVertical={moveVertical}
+                registerFieldRef={registerFieldRef} />
+        );
+    }
 
-    return (
-        <>
-            <CommandsListScrollEffects rowRefs={rowRefs} rowsLength={rows.length} />
-            {hasCompoundSubPaths
-                ? (
-                    <>
-                        <CompoundPathToggleRow />
-                        {subPaths.map((subPath) => (
-                            <Fragment key={`subpath:${subPath.index}`}>
-                                <SubPathToggleRow subPathIndex={subPath.index} />
+    return (<>
+        <CommandsListScrollEffects rowRefs={rowRefs} rowsLength={rows.length} />
+        {hasCompoundSubPaths
+            ? (<>
+                <CompoundPathToggleRow />
+                <Accordion
+                    type="multiple"
+                    defaultValue={subPaths.map((subPath) => `subpath-${subPath.index}`)}
+                >
+                    {subPaths.map(
+                        (subPath) => (
+                            <SubPathToggleRow key={`subpath:${subPath.index}`} subPathIndex={subPath.index}>
                                 {rows
                                     .filter((row) => row.index >= subPath.startIndex && row.index <= subPath.endIndex)
-                                    .map(renderRow)}
-                            </Fragment>
-                        ))}
-                    </>
-                )
-                : rows.map(renderRow)}
-        </>
-    );
+                                    .map(renderRow)
+                                }
+                            </SubPathToggleRow>
+                        )
+                    )}
+                </Accordion>
+            </>)
+            : rows.map(renderRow)
+        }
+    </>);
 }
 
 function CommandsListScrollEffects(props: { rowRefs: React.RefObject<Record<number, HTMLDivElement | null>>; rowsLength: number; }) {
@@ -154,36 +142,6 @@ function CommandsListScrollEffects(props: { rowRefs: React.RefObject<Record<numb
         [hoveredCommandIndex, rowRefs, rowsLength, scrollOnHover, selectedCommandIndex]);
 
     return null;
-}
-
-function CompoundPathToggleRow() {
-    const [allEnabled, setAllEnabled] = useAtom(allSubPathsEnabledAtom);
-    return (
-        <div className="px-1.5 py-1 flex items-center justify-between text-[10px] text-muted-foreground">
-            <span>Toggle all</span>
-            <Switch
-                className="scale-75"
-                checked={allEnabled}
-                onCheckedChange={(checked) => setAllEnabled(Boolean(checked))}
-                aria-label={allEnabled ? "Mute all subpaths" : "Enable all subpaths"}
-            />
-        </div>
-    );
-}
-
-function SubPathToggleRow({ subPathIndex }: { subPathIndex: number; }) {
-    const [enabled, setEnabled] = useAtom(subPathEnabledAtom(subPathIndex));
-    return (
-        <div className="px-1.5 py-1 flex items-center justify-between text-[10px] text-muted-foreground">
-            <span>Subpath {subPathIndex + 1}</span>
-            <Switch
-                className="scale-75"
-                checked={enabled}
-                onCheckedChange={(checked) => setEnabled(Boolean(checked))}
-                aria-label={enabled ? `Mute subpath ${subPathIndex + 1}` : `Enable subpath ${subPathIndex + 1}`}
-            />
-        </div>
-    );
 }
 
 function CommandRow(props: {
