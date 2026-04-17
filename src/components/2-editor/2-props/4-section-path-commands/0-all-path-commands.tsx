@@ -1,13 +1,12 @@
 import { Fragment, useCallback, useEffect, useRef } from "react";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { cn } from "@/utils";
-import { Switch } from "@/components/ui/shadcn/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel.tsx";
 import { commandSummaryTooltip, isCommandCellLinkedToPoint, isCommandValueLinkedToPoint } from "./8-helpers.tsx";
 import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
-import { allSubPathsEnabledAtom, commandRowsAtom, subPathEnabledAtom, subPathsAtom } from "@/store/0-atoms/2-0-svg-model";
+import { commandRowsAtom, subPathsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { CommandSelectionMenu } from "./2-commands-list-row-menu.tsx";
 import { commandHoveredAtom, commandSelectedAtom, doSelectCommandAtom, doToggleSegmentRelativeAtom, highlightedCanvasPointAtomForSegment, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions.ts";
 import { getCommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils.ts";
@@ -15,6 +14,7 @@ import { appSettings } from "@/store/0-ui-settings";
 import { type CommandProps, CommandArcFlagsInput, CommandCellInput } from "./1-commands-list-cells.tsx";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
 import { ScrollOnHoverToggleOverlay } from "./7-overlay-buttons.tsx";
+import { CompoundPathToggleRow, SubPathToggleRow } from "./7-2-subpath-headers.tsx";
 
 export function Section_PathCommands() {
     return (
@@ -135,37 +135,6 @@ function CommandsListScrollEffects(props: { rowRefs: React.RefObject<Record<numb
         [hoveredCommandIndex, rowRefs, rowsLength, scrollOnHover, selectedCommandIndex]);
 
     return null;
-}
-
-function CompoundPathToggleRow() {
-    const [allEnabled, setAllEnabled] = useAtom(allSubPathsEnabledAtom);
-    return (
-        <div className="px-1.5 py-1 flex items-center justify-between text-[10px] text-muted-foreground">
-            <span>Toggle all</span>
-            <Switch
-                className="scale-75"
-                checked={allEnabled}
-                onCheckedChange={(checked) => setAllEnabled(Boolean(checked))}
-                aria-label={allEnabled ? "Mute all subpaths" : "Enable all subpaths"}
-            />
-        </div>
-    );
-}
-
-function SubPathToggleRow({ subPathIndex }: { subPathIndex: number; }) {
-    const [enabled, setEnabled] = useAtom(subPathEnabledAtom(subPathIndex));
-    return (
-        <div className="px-1.5 py-1 flex items-center justify-between gap-x-2 text-[10px] text-muted-foreground">
-            <span>Subpath {subPathIndex + 1}</span>
-            <div className="flex-1 h-px bg-linear-to-r from-slate-500/10 via-slate-500/50 to-slate-500/10" />
-            <Switch
-                className="scale-75"
-                checked={enabled}
-                onCheckedChange={(checked) => setEnabled(Boolean(checked))}
-                aria-label={enabled ? `Mute subpath ${subPathIndex + 1}` : `Enable subpath ${subPathIndex + 1}`}
-            />
-        </div>
-    );
 }
 
 function CommandRow(props: {
