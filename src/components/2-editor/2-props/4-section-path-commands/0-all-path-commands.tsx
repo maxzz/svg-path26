@@ -13,7 +13,7 @@ import { getCommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-ut
 import { appSettings } from "@/store/0-ui-settings";
 import { type CommandProps, CommandArcFlagsInput, CommandCellInput } from "./1-commands-list-cells.tsx";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
-import { ScrollOnHoverToggleOverlay } from "./7-overlay-buttons.tsx";
+import { ScrollOnHoverToggleOverlay } from "./7-1-overlay-buttons.tsx";
 import { CompoundPathToggleRow, SubPathToggleRow } from "./7-2-subpath-headers.tsx";
 
 export function Section_PathCommands() {
@@ -76,19 +76,20 @@ export function CommandsList() {
         return <p className="text-muted-foreground">No commands to show.</p>;
     }
 
-    const renderRow = (row: SvgSegmentSummary) => (
-        <CommandRow
-            key={row.index}
-            row={row}
-            setRowRef={setRowRef}
-            doSelectCommand={doSelectCommand}
-            setHoveredCommandIndex={setHoveredCommandIndex}
-            doToggleRelative={doToggleRelative}
-            focusCommandCell={focusCommandCell}
-            moveVertical={moveVertical}
-            registerFieldRef={registerFieldRef}
-        />
-    );
+    function renderRow(row: SvgSegmentSummary) {
+        return (
+            <CommandRow
+                key={row.index}
+                row={row}
+                setRowRef={setRowRef}
+                doSelectCommand={doSelectCommand}
+                setHoveredCommandIndex={setHoveredCommandIndex}
+                doToggleRelative={doToggleRelative}
+                focusCommandCell={focusCommandCell}
+                moveVertical={moveVertical}
+                registerFieldRef={registerFieldRef} />
+        );
+    }
 
     return (<>
         <CommandsListScrollEffects rowRefs={rowRefs} rowsLength={rows.length} />
@@ -101,7 +102,8 @@ export function CommandsList() {
                             <SubPathToggleRow subPathIndex={subPath.index} />
                             {rows
                                 .filter((row) => row.index >= subPath.startIndex && row.index <= subPath.endIndex)
-                                .map(renderRow)}
+                                .map(renderRow)
+                            }
                         </Fragment>
                     )
                 )}
