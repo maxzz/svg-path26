@@ -34,19 +34,22 @@ export function SubPathToggleRow({ subPathIndex, children }: { subPathIndex: num
                         <span className="shrink-0">Subpath {subPathIndex + 1}</span>
                         <div className="flex-1 h-px bg-linear-to-r from-slate-500/10 via-slate-500/50 to-slate-500/10" />
                     </div>
+
+                    <span className="shrink-0" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}>
+                        <Switch
+                            className="scale-50"
+                            checked={enabled}
+                            onCheckedChange={(checked) => setEnabled(Boolean(checked))}
+                            aria-label={enabled ? `Mute subpath ${subPathIndex + 1}` : `Enable subpath ${subPathIndex + 1}`}
+                        />
+                    </span>
                 </AccordionTrigger>
 
-                <span className="shrink-0" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}>
-                    <Switch
-                        className="scale-50"
-                        checked={enabled}
-                        onCheckedChange={(checked) => setEnabled(Boolean(checked))}
-                        aria-label={enabled ? `Mute subpath ${subPathIndex + 1}` : `Enable subpath ${subPathIndex + 1}`}
-                    />
-                </span>
-
             </div>
-            <AccordionContent className="py-0">{children}</AccordionContent>
+
+            <AccordionContent className="py-0">
+                {children}
+            </AccordionContent>
         </AccordionItem>
     );
 }
