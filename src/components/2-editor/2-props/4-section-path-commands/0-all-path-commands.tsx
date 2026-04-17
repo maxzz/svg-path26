@@ -174,8 +174,9 @@ function CompoundPathToggleRow() {
 function SubPathToggleRow({ subPathIndex }: { subPathIndex: number; }) {
     const [enabled, setEnabled] = useAtom(subPathEnabledAtom(subPathIndex));
     return (
-        <div className="px-1.5 py-1 flex items-center justify-between text-[10px] text-muted-foreground">
+        <div className="px-1.5 py-1 flex items-center justify-between gap-x-2 text-[10px] text-muted-foreground">
             <span>Subpath {subPathIndex + 1}</span>
+            <div className="flex-1 h-px bg-linear-to-r from-slate-500/10 via-slate-500/50 to-slate-500/10" />
             <Switch
                 className="scale-75"
                 checked={enabled}
