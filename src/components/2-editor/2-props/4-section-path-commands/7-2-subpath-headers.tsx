@@ -1,5 +1,8 @@
+import { type ReactNode } from "react";
 import { useAtom } from "jotai";
+import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/shadcn/accordion";
 import { Switch } from "@/components/ui/shadcn/switch";
+import { cn } from "@/utils";
 import { allSubPathsEnabledAtom, subPathEnabledAtom } from "@/store/0-atoms/2-0-svg-model";
 
 export function CompoundPathToggleRow() {
@@ -17,18 +20,39 @@ export function CompoundPathToggleRow() {
     );
 }
 
-export function SubPathToggleRow({ subPathIndex }: { subPathIndex: number; }) {
+/** Subpath header row (label, rule, mute switch) plus optional accordion body for command rows. */
+export function SubPathToggleRow({ subPathIndex, children }: { subPathIndex: number; children: ReactNode; }) {
     const [enabled, setEnabled] = useAtom(subPathEnabledAtom(subPathIndex));
+    const value = `subpath-${subPathIndex}`;
+
     return (
-        <div className="px-1.5 py-1 flex items-center justify-between gap-x-2 text-[10px] text-muted-foreground">
-            <span>Subpath {subPathIndex + 1}</span>
-            <div className="flex-1 h-px bg-linear-to-r from-slate-500/10 via-slate-500/50 to-slate-500/10" />
-            <Switch
-                className="scale-75"
-                checked={enabled}
-                onCheckedChange={(checked) => setEnabled(Boolean(checked))}
-                aria-label={enabled ? `Mute subpath ${subPathIndex + 1}` : `Enable subpath ${subPathIndex + 1}`}
-            />
-        </div>
+        <AccordionItem value={value} className="border-none">
+            <div className="px-1.5 py-1 flex items-center justify-between gap-x-2 text-[10px] text-muted-foreground">
+                <AccordionTrigger
+                    className={cn(
+                        "min-w-0 flex-1 py-0 px-0 h-auto text-[10px] text-muted-foreground",
+                        "hover:no-underline cursor-pointer [&[data-state=open]>svg]:rotate-180",
+                    )}
+                >
+                    <div className="flex min-w-0 flex-1 items-center gap-x-2">
+                        <span className="shrink-0">Subpath {subPathIndex + 1}</span>
+                        <div className="flex-1 h-px bg-linear-to-r from-slate-500/10 via-slate-500/50 to-slate-500/10" />
+                    </div>
+                </AccordionTrigger>
+                <span
+                    className="shrink-0"
+                    onClick={(event) => event.stopPropagation()}
+                    onPointerDown={(event) => event.stopPropagation()}
+                >
+                    <Switch
+                        className="scale-75"
+                        checked={enabled}
+                        onCheckedChange={(checked) => setEnabled(Boolean(checked))}
+                        aria-label={enabled ? `Mute subpath ${subPathIndex + 1}` : `Enable subpath ${subPathIndex + 1}`}
+                    />
+                </span>
+            </div>
+            <AccordionContent className="pb-0 pt-0">{children}</AccordionContent>
+        </AccordionItem>
     );
 }

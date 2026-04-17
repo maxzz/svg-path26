@@ -1,7 +1,8 @@
-import { Fragment, useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { cn } from "@/utils";
+import { Accordion } from "@/components/ui/shadcn/accordion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel.tsx";
 import { commandSummaryTooltip, isCommandCellLinkedToPoint, isCommandValueLinkedToPoint } from "./8-helpers.tsx";
@@ -96,17 +97,21 @@ export function CommandsList() {
         {hasCompoundSubPaths
             ? (<>
                 <CompoundPathToggleRow />
-                {subPaths.map(
-                    (subPath) => (
-                        <Fragment key={`subpath:${subPath.index}`}>
-                            <SubPathToggleRow subPathIndex={subPath.index} />
-                            {rows
-                                .filter((row) => row.index >= subPath.startIndex && row.index <= subPath.endIndex)
-                                .map(renderRow)
-                            }
-                        </Fragment>
-                    )
-                )}
+                <Accordion
+                    type="multiple"
+                    defaultValue={subPaths.map((subPath) => `subpath-${subPath.index}`)}
+                >
+                    {subPaths.map(
+                        (subPath) => (
+                            <SubPathToggleRow key={`subpath:${subPath.index}`} subPathIndex={subPath.index}>
+                                {rows
+                                    .filter((row) => row.index >= subPath.startIndex && row.index <= subPath.endIndex)
+                                    .map(renderRow)
+                                }
+                            </SubPathToggleRow>
+                        )
+                    )}
+                </Accordion>
             </>)
             : rows.map(renderRow)
         }
