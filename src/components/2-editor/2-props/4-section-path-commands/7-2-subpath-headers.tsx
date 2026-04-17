@@ -8,10 +8,10 @@ import { allSubPathsEnabledAtom, subPathEnabledAtom } from "@/store/0-atoms/2-0-
 export function CompoundPathToggleRow() {
     const [allEnabled, setAllEnabled] = useAtom(allSubPathsEnabledAtom);
     return (
-        <div className="px-1.5 py-1 flex items-center justify-between text-[10px] text-muted-foreground">
+        <div className="px-1.5 py-1 text-[10px] text-muted-foreground flex items-center justify-between">
             <span>Toggle all</span>
             <Switch
-                className="scale-75"
+                className="scale-50"
                 checked={allEnabled}
                 onCheckedChange={(checked) => setAllEnabled(Boolean(checked))}
                 aria-label={allEnabled ? "Mute all subpaths" : "Enable all subpaths"}
@@ -27,32 +27,31 @@ export function SubPathToggleRow({ subPathIndex, children }: { subPathIndex: num
 
     return (
         <AccordionItem value={value} className="border-none">
-            <div className="px-1.5 py-1 flex items-center justify-between gap-x-2 text-[10px] text-muted-foreground">
+            <div className="px-1.5 py-1 text-[10px] text-muted-foreground flex items-center justify-between gap-x-2">
+
                 <AccordionTrigger
                     className={cn(
                         "min-w-0 flex-1 py-0 px-0 h-auto text-[10px] text-muted-foreground",
                         "hover:no-underline cursor-pointer [&[data-state=open]>svg]:rotate-180",
                     )}
                 >
-                    <div className="flex min-w-0 flex-1 items-center gap-x-2">
+                    <div className="flex-1 min-w-0 flex items-center gap-x-2">
                         <span className="shrink-0">Subpath {subPathIndex + 1}</span>
                         <div className="flex-1 h-px bg-linear-to-r from-slate-500/10 via-slate-500/50 to-slate-500/10" />
                     </div>
                 </AccordionTrigger>
-                <span
-                    className="shrink-0"
-                    onClick={(event) => event.stopPropagation()}
-                    onPointerDown={(event) => event.stopPropagation()}
-                >
+
+                <span className="shrink-0" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}>
                     <Switch
-                        className="scale-75"
+                        className="scale-50"
                         checked={enabled}
                         onCheckedChange={(checked) => setEnabled(Boolean(checked))}
                         aria-label={enabled ? `Mute subpath ${subPathIndex + 1}` : `Enable subpath ${subPathIndex + 1}`}
                     />
                 </span>
+
             </div>
-            <AccordionContent className="pb-0 pt-0">{children}</AccordionContent>
+            <AccordionContent className="py-0">{children}</AccordionContent>
         </AccordionItem>
     );
 }
