@@ -29,12 +29,7 @@ export function SubPathToggleRow({ subPathIndex, children }: { subPathIndex: num
         <AccordionItem value={value} className="border-none">
             <div className="px-1.5 py-1 text-[10px] text-muted-foreground flex items-center justify-between gap-x-2">
 
-                <AccordionTrigger
-                    className={cn(
-                        "min-w-0 flex-1 py-0 px-0 h-auto text-[10px] text-muted-foreground",
-                        "hover:no-underline cursor-pointer [&[data-state=open]>svg]:rotate-180",
-                    )}
-                >
+                <AccordionTrigger className={triggerClasses}>
                     <div className="flex-1 min-w-0 flex items-center gap-x-2">
                         <span className="shrink-0">Subpath {subPathIndex + 1}</span>
                         <div className="flex-1 h-px bg-linear-to-r from-slate-500/10 via-slate-500/50 to-slate-500/10" />
@@ -55,3 +50,5 @@ export function SubPathToggleRow({ subPathIndex, children }: { subPathIndex: num
         </AccordionItem>
     );
 }
+
+const triggerClasses = "flex-1 min-w-0 py-0 px-0 h-auto text-[10px] text-muted-foreground hover:no-underline cursor-pointer [&[data-state=open]>svg]:rotate-180";
