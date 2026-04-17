@@ -70,25 +70,33 @@ export function CommandsList() {
     const fieldRefs = useRef<Record<string, HTMLInputElement | null>>({});
     const hasCompoundSubPaths = subPaths.length > 1;
 
-    const moveVertical = useCallback((rowIndex: number, valueIndex: number, direction: "up" | "down") => {
-        const nextRowIndex = direction === "up" ? rowIndex - 1 : rowIndex + 1;
-        if (nextRowIndex < 0 || nextRowIndex >= rows.length) return;
+    const moveVertical = useCallback(
+        (rowIndex: number, valueIndex: number, direction: "up" | "down") => {
+            const nextRowIndex = direction === "up" ? rowIndex - 1 : rowIndex + 1;
+            if (nextRowIndex < 0 || nextRowIndex >= rows.length) return;
 
-        setSelectedCommandIndex(nextRowIndex);
-        focusCommandCell(nextRowIndex, valueIndex);
-    }, [rows.length, setSelectedCommandIndex]);
+            setSelectedCommandIndex(nextRowIndex);
+            focusCommandCell(nextRowIndex, valueIndex);
+        },
+        [rows.length, setSelectedCommandIndex]);
 
-    const focusCommandCell = useCallback((nextRowIndex: number, nextValueIndex: number) => {
-        focusField(rows, rowRefs.current, fieldRefs.current, nextRowIndex, nextValueIndex, setSelectedCommandIndex);
-    }, [rows, setSelectedCommandIndex]);
+    const focusCommandCell = useCallback(
+        (nextRowIndex: number, nextValueIndex: number) => {
+            focusField(rows, rowRefs.current, fieldRefs.current, nextRowIndex, nextValueIndex, setSelectedCommandIndex);
+        },
+        [rows, setSelectedCommandIndex]);
 
-    const registerFieldRef = useCallback((rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => {
-        fieldRefs.current[`${rowIndex}:${valueIndex}`] = element;
-    }, []);
+    const registerFieldRef = useCallback(
+        (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => {
+            fieldRefs.current[`${rowIndex}:${valueIndex}`] = element;
+        },
+        []);
 
-    const setRowRef = useCallback((rowIndex: number, element: HTMLDivElement | null) => {
-        rowRefs.current[rowIndex] = element;
-    }, []);
+    const setRowRef = useCallback(
+        (rowIndex: number, element: HTMLDivElement | null) => {
+            rowRefs.current[rowIndex] = element;
+        },
+        []);
 
     if (rows.length === 0) {
         return <p className="text-muted-foreground">No commands to show.</p>;
@@ -108,26 +116,25 @@ export function CommandsList() {
         />
     );
 
-    return (
-        <>
-            <CommandsListScrollEffects rowRefs={rowRefs} rowsLength={rows.length} />
-            {hasCompoundSubPaths
-                ? (
-                    <>
-                        <CompoundPathToggleRow />
-                        {subPaths.map((subPath) => (
-                            <Fragment key={`subpath:${subPath.index}`}>
-                                <SubPathToggleRow subPathIndex={subPath.index} />
-                                {rows
-                                    .filter((row) => row.index >= subPath.startIndex && row.index <= subPath.endIndex)
-                                    .map(renderRow)}
-                            </Fragment>
-                        ))}
-                    </>
-                )
-                : rows.map(renderRow)}
-        </>
-    );
+    return (<>
+        <CommandsListScrollEffects rowRefs={rowRefs} rowsLength={rows.length} />
+        {hasCompoundSubPaths
+            ? (<>
+                <CompoundPathToggleRow />
+                {subPaths.map(
+                    (subPath) => (
+                        <Fragment key={`subpath:${subPath.index}`}>
+                            <SubPathToggleRow subPathIndex={subPath.index} />
+                            {rows
+                                .filter((row) => row.index >= subPath.startIndex && row.index <= subPath.endIndex)
+                                .map(renderRow)}
+                        </Fragment>
+                    )
+                )}
+            </>)
+            : rows.map(renderRow)
+        }
+    </>);
 }
 
 function CommandsListScrollEffects(props: { rowRefs: React.RefObject<Record<number, HTMLDivElement | null>>; rowsLength: number; }) {
