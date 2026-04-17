@@ -1,9 +1,7 @@
 import { Fragment, useCallback, useEffect, useRef } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
-import { ArrowLeftRight } from "lucide-react";
 import { cn } from "@/utils";
-import { Button } from "@/components/ui/shadcn/button";
 import { Switch } from "@/components/ui/shadcn/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel.tsx";
@@ -16,6 +14,7 @@ import { getCommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-ut
 import { appSettings } from "@/store/0-ui-settings";
 import { type CommandProps, CommandArcFlagsInput, CommandCellInput } from "./1-commands-list-cells.tsx";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
+import { ScrollOnHoverToggleOverlay } from "./7-overlay-buttons.tsx";
 
 export function Section_PathCommands() {
     return (
@@ -31,31 +30,6 @@ export function Section_PathCommands() {
                 </div>
             </SectionPanel>
         </TooltipProvider>
-    );
-}
-
-function ScrollOnHoverToggleOverlay() {
-    const { scrollOnHover } = useSnapshot(appSettings.canvas);
-    return (
-        <Tooltip>
-            <TooltipTrigger asChild>
-                <Button
-                    className={cn("mr-1 size-6 rounded-sm text-muted-foreground hover:text-foreground", scrollOnHover && "bg-background/80 text-foreground")}
-                    onClick={() => appSettings.canvas.scrollOnHover = !scrollOnHover}
-                    variant="ghost"
-                    size="icon"
-                    type="button"
-                    aria-label={scrollOnHover ? "Disable scroll on hover" : "Enable scroll on hover"}
-                    aria-pressed={scrollOnHover}
-                >
-                    <ArrowLeftRight className="size-3" />
-                </Button>
-            </TooltipTrigger>
-
-            <TooltipContent sideOffset={6}>
-                {scrollOnHover ? "Disable scroll on hover" : "Enable scroll on hover"}
-            </TooltipContent>
-        </Tooltip>
     );
 }
 
