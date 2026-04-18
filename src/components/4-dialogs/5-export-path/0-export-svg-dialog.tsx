@@ -7,46 +7,60 @@ import { Switch } from "@/components/ui/shadcn/switch";
 import { NumberField } from "@/components/ui/loacal-ui/2-number-field";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { exportSvgDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
-import { doResetExportViewBoxDraftAtom, exportViewBoxDraftAtom } from "@/store/0-atoms/4-1-dialog-export-atoms";
+import { type ExportViewBoxDraft, doResetExportViewBoxDraftAtom, exportViewBoxDraftAtom } from "@/store/0-atoms/4-1-dialog-export-atoms";
 import { appSettings } from "@/store/0-ui-settings";
 
+type ExportSvgPayload = {
+    pathValue: string;
+    exportViewBoxDraft: ExportViewBoxDraft;
+    onComplete: () => void;
+};
+
+function exportSvgToFile(payload: ExportSvgPayload) {
+    const { pathValue, exportViewBoxDraft, onComplete } = payload;
+    const { pathName } = appSettings.pathEditor;
+    const { exportFill, exportFillColor, exportStroke, exportStrokeColor, exportStrokeWidth } = appSettings.export;
+    if (!pathValue.trim()) {
+        return;
+    }
+
+    const width = Math.max(1e-6, exportViewBoxDraft[2]);
+    const height = Math.max(1e-6, exportViewBoxDraft[3]);
+    const fillPart = exportFill ? ` fill="${exportFillColor}"` : " fill=\"none\"";
+    const strokePart = exportStroke
+        ? ` stroke="${exportStrokeColor}" stroke-width="${exportStrokeWidth}"`
+        : "";
+    const svgData = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${exportViewBoxDraft[0]} ${exportViewBoxDraft[1]} ${width} ${height}"><path d="${pathValue}"${strokePart}${fillPart} /></svg>`;
+    const blob = new Blob([svgData], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${(pathName || "svg-path").replace(/\s+/g, "-")}.svg`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 200);
+
+    onComplete();
+}
+
 export function ExportSvgDialog() {
+    const { pathName } = useSnapshot(appSettings.pathEditor);
+    const { exportFill, exportFillColor, exportStroke, exportStrokeColor, exportStrokeWidth, } = useSnapshot(appSettings.export);
+
     const pathValue = useAtomValue(svgPathInputAtom);
     const [openExportDialog, setOpenExportDialog] = useAtom(exportSvgDialogOpenAtom);
     const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
     const resetExportViewBox = useSetAtom(doResetExportViewBoxDraftAtom);
-    const { pathName } = useSnapshot(appSettings.pathEditor);
-    const {
-        exportFill,
-        exportFillColor,
-        exportStroke,
-        exportStrokeColor,
-        exportStrokeWidth,
-    } = useSnapshot(appSettings.export);
 
-    const handleExport = () => {
-        if (!pathValue.trim()) return;
-
-        const width = Math.max(1e-6, exportViewBoxDraft[2]);
-        const height = Math.max(1e-6, exportViewBoxDraft[3]);
-        const fillPart = exportFill ? ` fill="${exportFillColor}"` : " fill=\"none\"";
-        const strokePart = exportStroke
-            ? ` stroke="${exportStrokeColor}" stroke-width="${exportStrokeWidth}"`
-            : "";
-        const svgData = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${exportViewBoxDraft[0]} ${exportViewBoxDraft[1]} ${width} ${height}"><path d="${pathValue}"${strokePart}${fillPart} /></svg>`;
-        const blob = new Blob([svgData], { type: "image/svg+xml" });
-        const url = URL.createObjectURL(blob);
-
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${(pathName || "svg-path").replace(/\s+/g, "-")}.svg`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 200);
-
-        setOpenExportDialog(false);
-    };
+    function handleExport() {
+        exportSvgToFile({
+            pathValue,
+            exportViewBoxDraft,
+            onComplete: () => setOpenExportDialog(false),
+        });
+    }
 
     return (
         <Dialog open={openExportDialog} onOpenChange={setOpenExportDialog}>
