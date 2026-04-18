@@ -11,7 +11,10 @@ export const svgModelAtom = atom<{ model: SvgPathModel | null; error: string | n
         }
 
         try {
-            return { model: new SvgPathModel(path), error: null };
+            return {
+                model: new SvgPathModel(path),
+                error: null
+            };
         } catch (error) {
             return {
                 model: null,
