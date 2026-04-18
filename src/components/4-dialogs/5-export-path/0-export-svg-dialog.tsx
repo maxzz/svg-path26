@@ -39,6 +39,7 @@ function exportSvgToFile(payload: ExportSvgPayload): boolean {
     document.body.appendChild(link);
     link.click();
     link.remove();
+
     setTimeout(() => URL.revokeObjectURL(url), 200);
     return true;
 }
@@ -53,10 +54,7 @@ export function ExportSvgDialog() {
     const resetExportViewBox = useSetAtom(doResetExportViewBoxDraftAtom);
 
     function handleExport() {
-        const didExport = exportSvgToFile({
-            pathValue,
-            exportViewBoxDraft,
-        });
+        const didExport = exportSvgToFile({ pathValue, exportViewBoxDraft, });
         if (didExport) {
             setOpenExportDialog(false);
         }
@@ -70,8 +68,9 @@ export function ExportSvgDialog() {
                     <DialogDescription>Export current path with chosen styling.</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-3 text-xs">
-                    <div className="grid grid-cols-2 gap-2">
-                        <label className="flex items-center justify-between rounded border px-2 py-1.5">
+                    <div className="flex items-center gap-2">
+
+                        <label className="px-2 py-1.5 flex items-center justify-between">
                             <span>Fill</span>
                             <Switch
                                 checked={exportFill}
@@ -80,8 +79,26 @@ export function ExportSvgDialog() {
                                 }}
                             />
                         </label>
-                        <label className="flex items-center justify-between rounded border px-2 py-1.5">
-                            <span>Stroke</span>
+
+                        <label className="space-y-1">
+                            <span className="text-muted-foreground">
+                                Fill color
+                            </span>
+                            <Input
+                                type="color"
+                                value={exportFillColor}
+                                onChange={(event) => appSettings.export.exportFillColor = event.target.value}
+                            />
+                        </label>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+
+
+                        <label className="px-2 py-1.5 flex items-center justify-between">
+                            <span>
+                                Stroke
+                            </span>
                             <Switch
                                 checked={exportStroke}
                                 onCheckedChange={(checked) => {
@@ -89,26 +106,16 @@ export function ExportSvgDialog() {
                                 }}
                             />
                         </label>
-                        <label className="space-y-1">
-                            <span className="text-muted-foreground">Fill color</span>
-                            <Input
-                                type="color"
-                                value={exportFillColor}
-                                onChange={(event) => {
-                                    appSettings.export.exportFillColor = event.target.value;
-                                }}
-                            />
-                        </label>
+
                         <label className="space-y-1">
                             <span className="text-muted-foreground">Stroke color</span>
                             <Input
                                 type="color"
                                 value={exportStrokeColor}
-                                onChange={(event) => {
-                                    appSettings.export.exportStrokeColor = event.target.value;
-                                }}
+                                onChange={(event) => appSettings.export.exportStrokeColor = event.target.value}
                             />
                         </label>
+
                         <label className="space-y-1">
                             <span className="text-muted-foreground">Stroke width</span>
                             <Input
@@ -116,11 +123,12 @@ export function ExportSvgDialog() {
                                 min={0}
                                 step={0.05}
                                 value={exportStrokeWidth}
-                                onChange={(event) => {
-                                    appSettings.export.exportStrokeWidth = Number(event.target.value);
-                                }}
+                                onChange={(event) => appSettings.export.exportStrokeWidth = Number(event.target.value)}
                             />
                         </label>
+                    </div>
+
+                    <div className="">
                         <div className="col-span-2 grid grid-cols-4 gap-2 rounded border px-2 py-2">
                             <NumberField
                                 label="x"
@@ -145,6 +153,7 @@ export function ExportSvgDialog() {
                                 onChange={(value) => setExportViewBoxDraft((previous) => [previous[0], previous[1], previous[2], value])}
                             />
                         </div>
+                        
                         <Button
                             variant="outline"
                             className="col-span-2 h-7 px-2"
