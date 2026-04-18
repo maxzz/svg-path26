@@ -24,7 +24,7 @@ export function ExportSvgDialog() {
 
     return (
         <Dialog open={openExportDialog} onOpenChange={setOpenExportDialog}>
-            <DialogContent className="max-w-lg">
+            <DialogContent className="max-w-sm!">
                 <DialogHeader>
                     <DialogTitle>Export SVG</DialogTitle>
                     <DialogDescription>Export current path with chosen styling.</DialogDescription>
@@ -32,9 +32,7 @@ export function ExportSvgDialog() {
 
                 <div className="space-y-3 text-xs">
                     <ExportStyleControls />
-
                     <ExportViewBoxEditor />
-
                     <ExportSvgPreview />
                 </div>
 
@@ -51,60 +49,59 @@ export function ExportSvgDialog() {
 function ExportStyleControls() {
     const { exportFill, exportFillColor, exportStroke, exportStrokeColor, exportStrokeWidth } = useSnapshot(appSettings.export);
     return (
-        <>
-            <div className="flex items-center gap-2">
+        <div className="grid grid-cols-[auto_auto_minmax(0,1fr)] gap-y-2">
+            <div className="grid grid-cols-subgrid col-span-3 items-center gap-x-2">
                 <label className="flex items-center justify-between px-2 py-1.5">
-                    <span>Fill</span>
+                    <span className="w-10">
+                        Fill
+                    </span>
                     <Switch
                         checked={exportFill}
-                        onCheckedChange={(checked) => {
-                            appSettings.export.exportFill = Boolean(checked);
-                        }}
+                        onCheckedChange={(checked) => appSettings.export.exportFill = Boolean(checked)}
                     />
                 </label>
 
-                <label className="space-y-1">
-                    <span className="text-muted-foreground">Fill color</span>
-                    <Input
-                        type="color"
-                        value={exportFillColor}
-                        onChange={(event) => appSettings.export.exportFillColor = event.target.value}
-                    />
-                </label>
+                <Input
+                    className="w-16 px-1 py-0.5"
+                    type="color"
+                    value={exportFillColor}
+                    onChange={(event) => appSettings.export.exportFillColor = event.target.value}
+                />
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="grid grid-cols-subgrid col-span-3 items-center gap-x-2">
                 <label className="flex items-center justify-between px-2 py-1.5">
-                    <span>Stroke</span>
+                    <span className="w-10">
+                        Stroke
+                    </span>
                     <Switch
                         checked={exportStroke}
-                        onCheckedChange={(checked) => {
-                            appSettings.export.exportStroke = Boolean(checked);
-                        }}
+                        onCheckedChange={(checked) => appSettings.export.exportStroke = Boolean(checked)}
                     />
                 </label>
 
-                <label className="space-y-1">
-                    <span className="text-muted-foreground">Stroke color</span>
-                    <Input
-                        type="color"
-                        value={exportStrokeColor}
-                        onChange={(event) => appSettings.export.exportStrokeColor = event.target.value}
-                    />
-                </label>
+                <Input
+                    className="w-16 px-1 py-0.5"
+                    type="color"
+                    value={exportStrokeColor}
+                    onChange={(event) => appSettings.export.exportStrokeColor = event.target.value}
+                />
 
-                <label className="space-y-1">
-                    <span className="text-muted-foreground">Stroke width</span>
+                <label className="flex items-center gap-x-2">
+                    <span className="whitespace-nowrap">
+                        Stroke width
+                    </span>
                     <Input
+                        className="w-16"
                         type="number"
-                        min={0}
+                        min={0.1}
                         step={0.05}
                         value={exportStrokeWidth}
                         onChange={(event) => appSettings.export.exportStrokeWidth = Number(event.target.value)}
                     />
                 </label>
             </div>
-        </>
+        </div>
     );
 }
 
@@ -151,9 +148,10 @@ function ExportViewBoxEditor() {
 }
 
 function ExportSvgPreview() {
+    const { exportFill, exportFillColor, exportStroke, exportStrokeColor, exportStrokeWidth } = useSnapshot(appSettings.export);
+
     const exportViewBoxDraft = useAtomValue(exportViewBoxDraftAtom);
     const pathValue = useAtomValue(svgPathInputAtom);
-    const { exportFill, exportFillColor, exportStroke, exportStrokeColor, exportStrokeWidth } = useSnapshot(appSettings.export);
     const previewWidth = Math.max(1e-6, exportViewBoxDraft[2]);
     const previewHeight = Math.max(1e-6, exportViewBoxDraft[3]);
     return (
