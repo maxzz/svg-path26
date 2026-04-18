@@ -1,24 +1,20 @@
 import { type ViewBox, type SvgCanvasPoint, type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
 
-export function isCommandCellLinkedToPoint(
-    row: SvgSegmentSummary,
-    point: SvgCanvasPoint | null,
-): boolean {
-    if (!point || point.segmentIndex !== row.index || point.kind !== "control") return false;
+export function isCommandCellLinkedToPoint(row: SvgSegmentSummary, point: SvgCanvasPoint | null,): boolean {
+    if (!point || point.segmentIndex !== row.index || point.kind !== "control") {
+        return false;
+    }
     const command = row.command.toUpperCase();
     return (
-        (command === "S" && point.controlIndex === 0)
-        || (command === "T" && point.controlIndex === 0)
+        (command === "S" && point.controlIndex === 0) || (command === "T" && point.controlIndex === 0)
     );
 }
 
-export function isCommandValueLinkedToPoint(
-    row: SvgSegmentSummary,
-    valueIndex: number,
-    point: SvgCanvasPoint | null,
-): boolean {
-    if (!point || point.segmentIndex !== row.index) return false;
+export function isCommandValueLinkedToPoint(row: SvgSegmentSummary, valueIndex: number, point: SvgCanvasPoint | null,): boolean {
+    if (!point || point.segmentIndex !== row.index) {
+        return false;
+    }
     const command = row.command.toUpperCase();
 
     if (point.kind === "control") {
@@ -42,6 +38,7 @@ export function isCommandValueLinkedToPoint(
     if (command === "A") return valueIndex === 5 || valueIndex === 6;
     if (row.values.length === 0) return false;
     if (row.values.length === 1) return valueIndex === 0;
+
     return valueIndex >= row.values.length - 2;
 }
 
@@ -50,6 +47,7 @@ export function commandSummaryTooltip(command: string): string {
     const relative = command === command.toLowerCase();
     const modeText = relative ? "Relative coordinates." : "Absolute coordinates.";
     const cells = commandCellNames(command);
+    
     const cellsText = cells.length
         ? `Cells: ${cells.join(", ")}.`
         : "No value cells.";
@@ -85,28 +83,29 @@ export function commandLabel(type: string): string {
     }
 }
 
+const commandCellLabelMap: Record<string, string[]> = {
+    M: ["x", "y"],
+    m: ["dx", "dy"],
+    L: ["x", "y"],
+    l: ["dx", "dy"],
+    V: ["y"],
+    v: ["dy"],
+    H: ["x"],
+    h: ["dx"],
+    C: ["x1", "y1", "x2", "y2", "x", "y"],
+    c: ["dx1", "dy1", "dx2", "dy2", "dx", "dy"],
+    S: ["x2", "y2", "x", "y"],
+    s: ["dx2", "dy2", "dx", "dy"],
+    Q: ["x1", "y1", "x", "y"],
+    q: ["dx1", "dy1", "dx", "dy"],
+    T: ["x", "y"],
+    t: ["dx", "dy"],
+    A: ["rx", "ry", "x-axis-rotation", "large-arc-flag", "sweep-flag", "x", "y"],
+    a: ["rx", "ry", "x-axis-rotation", "large-arc-flag", "sweep-flag", "dx", "dy"],
+};
+
 function commandCellNames(command: string): string[] {
-    const labels: Record<string, string[]> = {
-        M: ["x", "y"],
-        m: ["dx", "dy"],
-        L: ["x", "y"],
-        l: ["dx", "dy"],
-        V: ["y"],
-        v: ["dy"],
-        H: ["x"],
-        h: ["dx"],
-        C: ["x1", "y1", "x2", "y2", "x", "y"],
-        c: ["dx1", "dy1", "dx2", "dy2", "dx", "dy"],
-        S: ["x2", "y2", "x", "y"],
-        s: ["dx2", "dy2", "dx", "dy"],
-        Q: ["x1", "y1", "x", "y"],
-        q: ["dx1", "dy1", "dx", "dy"],
-        T: ["x", "y"],
-        t: ["dx", "dy"],
-        A: ["rx", "ry", "x-axis-rotation", "large-arc-flag", "sweep-flag", "x", "y"],
-        a: ["rx", "ry", "x-axis-rotation", "large-arc-flag", "sweep-flag", "dx", "dy"],
-    };
-    return labels[command] ?? [];
+    return commandCellLabelMap[command] ?? [];
 }
 
 export function commandValueTooltip(command: string, valueIndex: number): string {
