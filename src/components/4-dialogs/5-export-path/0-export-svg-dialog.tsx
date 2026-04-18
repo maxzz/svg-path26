@@ -10,18 +10,189 @@ import { exportSvgDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 import { type ExportViewBoxDraft, doResetExportViewBoxDraftAtom, exportViewBoxDraftAtom } from "@/store/0-atoms/4-1-dialog-export-atoms";
 import { appSettings } from "@/store/0-ui-settings";
 
-type ExportSvgPayload = {
-    pathValue: string;
-    exportViewBoxDraft: ExportViewBoxDraft;
-};
+export function ExportSvgDialog() {
+    const pathValue = useAtomValue(svgPathInputAtom);
+    const [openExportDialog, setOpenExportDialog] = useAtom(exportSvgDialogOpenAtom);
+    const exportViewBoxDraft = useAtomValue(exportViewBoxDraftAtom);
 
-function exportSvgToFile(payload: ExportSvgPayload): boolean {
-    const { pathValue, exportViewBoxDraft } = payload;
-    const { pathName } = appSettings.pathEditor;
-    const { exportFill, exportFillColor, exportStroke, exportStrokeColor, exportStrokeWidth } = appSettings.export;
+    function handleExport() {
+        const didExport = exportSvgToFile({ pathValue, exportViewBoxDraft, });
+        if (didExport) {
+            setOpenExportDialog(false);
+        }
+    }
+
+    return (
+        <Dialog open={openExportDialog} onOpenChange={setOpenExportDialog}>
+            <DialogContent className="max-w-lg">
+                <DialogHeader>
+                    <DialogTitle>Export SVG</DialogTitle>
+                    <DialogDescription>Export current path with chosen styling.</DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-3 text-xs">
+                    <ExportStyleControls />
+
+                    <ExportViewBoxEditor />
+
+                    <ExportSvgPreview />
+                </div>
+
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => setOpenExportDialog(false)}>Cancel</Button>
+                    <Button onClick={handleExport}>Export</Button>
+                </DialogFooter>
+
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+function ExportStyleControls() {
+    const { exportFill, exportFillColor, exportStroke, exportStrokeColor, exportStrokeWidth } = useSnapshot(appSettings.export);
+    return (
+        <>
+            <div className="flex items-center gap-2">
+                <label className="flex items-center justify-between px-2 py-1.5">
+                    <span>Fill</span>
+                    <Switch
+                        checked={exportFill}
+                        onCheckedChange={(checked) => {
+                            appSettings.export.exportFill = Boolean(checked);
+                        }}
+                    />
+                </label>
+
+                <label className="space-y-1">
+                    <span className="text-muted-foreground">Fill color</span>
+                    <Input
+                        type="color"
+                        value={exportFillColor}
+                        onChange={(event) => appSettings.export.exportFillColor = event.target.value}
+                    />
+                </label>
+            </div>
+
+            <div className="flex items-center gap-2">
+                <label className="flex items-center justify-between px-2 py-1.5">
+                    <span>Stroke</span>
+                    <Switch
+                        checked={exportStroke}
+                        onCheckedChange={(checked) => {
+                            appSettings.export.exportStroke = Boolean(checked);
+                        }}
+                    />
+                </label>
+
+                <label className="space-y-1">
+                    <span className="text-muted-foreground">Stroke color</span>
+                    <Input
+                        type="color"
+                        value={exportStrokeColor}
+                        onChange={(event) => appSettings.export.exportStrokeColor = event.target.value}
+                    />
+                </label>
+
+                <label className="space-y-1">
+                    <span className="text-muted-foreground">Stroke width</span>
+                    <Input
+                        type="number"
+                        min={0}
+                        step={0.05}
+                        value={exportStrokeWidth}
+                        onChange={(event) => appSettings.export.exportStrokeWidth = Number(event.target.value)}
+                    />
+                </label>
+            </div>
+        </>
+    );
+}
+
+function ExportViewBoxEditor() {
+    const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
+    const resetExportViewBox = useSetAtom(doResetExportViewBoxDraftAtom);
+
+    return (
+        <div>
+            <div className="col-span-2 grid grid-cols-4 gap-2 rounded border px-2 py-2">
+                <NumberField
+                    label="x"
+                    value={exportViewBoxDraft[0]}
+                    onChange={(value) => setExportViewBoxDraft((previous) => [value, previous[1], previous[2], previous[3]])}
+                />
+                <NumberField
+                    label="y"
+                    value={exportViewBoxDraft[1]}
+                    onChange={(value) => setExportViewBoxDraft((previous) => [previous[0], value, previous[2], previous[3]])}
+                />
+                <NumberField
+                    label="width"
+                    min={0.000001}
+                    value={exportViewBoxDraft[2]}
+                    onChange={(value) => setExportViewBoxDraft((previous) => [previous[0], previous[1], value, previous[3]])}
+                />
+                <NumberField
+                    label="height"
+                    min={0.000001}
+                    value={exportViewBoxDraft[3]}
+                    onChange={(value) => setExportViewBoxDraft((previous) => [previous[0], previous[1], previous[2], value])}
+                />
+            </div>
+
+            <Button
+                variant="outline"
+                className="col-span-2 h-7 px-2"
+                onClick={() => resetExportViewBox()}
+            >
+                Reset viewBox from path bounds
+            </Button>
+        </div>
+    );
+}
+
+function ExportSvgPreview() {
+    const exportViewBoxDraft = useAtomValue(exportViewBoxDraftAtom);
+    const pathValue = useAtomValue(svgPathInputAtom);
+    const { exportFill, exportFillColor, exportStroke, exportStrokeColor, exportStrokeWidth } = useSnapshot(appSettings.export);
+    const previewWidth = Math.max(1e-6, exportViewBoxDraft[2]);
+    const previewHeight = Math.max(1e-6, exportViewBoxDraft[3]);
+    return (
+        <div className="rounded border p-2">
+            <p className="mb-2 text-[11px] text-muted-foreground">Live preview</p>
+            <svg
+                className="h-40 w-full rounded bg-muted/20"
+                viewBox={`${exportViewBoxDraft[0]} ${exportViewBoxDraft[1]} ${previewWidth} ${previewHeight}`}
+            >
+                <defs>
+                    <pattern id="export-preview-grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                        <path d="M 10 0 L 0 0 0 10" fill="none" stroke="oklch(0.7 0 0 / 0.25)" strokeWidth="0.3" />
+                    </pattern>
+                </defs>
+                <rect
+                    x={exportViewBoxDraft[0]}
+                    y={exportViewBoxDraft[1]}
+                    width={previewWidth}
+                    height={previewHeight}
+                    fill="url(#export-preview-grid)"
+                />
+                <path
+                    d={pathValue || "M 0 0"}
+                    fill={exportFill ? exportFillColor : "none"}
+                    stroke={exportStroke ? exportStrokeColor : "none"}
+                    strokeWidth={exportStroke ? exportStrokeWidth : 0}
+                />
+            </svg>
+        </div>
+    );
+}
+
+function exportSvgToFile({ pathValue, exportViewBoxDraft }: { pathValue: string; exportViewBoxDraft: ExportViewBoxDraft; }): boolean {
     if (!pathValue.trim()) {
         return false;
     }
+
+    const { pathName } = appSettings.pathEditor;
+    const { exportFill, exportFillColor, exportStroke, exportStrokeColor, exportStrokeWidth } = appSettings.export;
 
     const width = Math.max(1e-6, exportViewBoxDraft[2]);
     const height = Math.max(1e-6, exportViewBoxDraft[3]);
@@ -42,159 +213,4 @@ function exportSvgToFile(payload: ExportSvgPayload): boolean {
 
     setTimeout(() => URL.revokeObjectURL(url), 200);
     return true;
-}
-
-export function ExportSvgDialog() {
-    const { pathName } = useSnapshot(appSettings.pathEditor);
-    const { exportFill, exportFillColor, exportStroke, exportStrokeColor, exportStrokeWidth, } = useSnapshot(appSettings.export);
-
-    const pathValue = useAtomValue(svgPathInputAtom);
-    const [openExportDialog, setOpenExportDialog] = useAtom(exportSvgDialogOpenAtom);
-    const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
-    const resetExportViewBox = useSetAtom(doResetExportViewBoxDraftAtom);
-
-    function handleExport() {
-        const didExport = exportSvgToFile({ pathValue, exportViewBoxDraft, });
-        if (didExport) {
-            setOpenExportDialog(false);
-        }
-    }
-
-    return (
-        <Dialog open={openExportDialog} onOpenChange={setOpenExportDialog}>
-            <DialogContent className="max-w-lg">
-                <DialogHeader>
-                    <DialogTitle>Export SVG</DialogTitle>
-                    <DialogDescription>Export current path with chosen styling.</DialogDescription>
-                </DialogHeader>
-                <div className="space-y-3 text-xs">
-                    <div className="flex items-center gap-2">
-
-                        <label className="px-2 py-1.5 flex items-center justify-between">
-                            <span>Fill</span>
-                            <Switch
-                                checked={exportFill}
-                                onCheckedChange={(checked) => {
-                                    appSettings.export.exportFill = Boolean(checked);
-                                }}
-                            />
-                        </label>
-
-                        <label className="space-y-1">
-                            <span className="text-muted-foreground">
-                                Fill color
-                            </span>
-                            <Input
-                                type="color"
-                                value={exportFillColor}
-                                onChange={(event) => appSettings.export.exportFillColor = event.target.value}
-                            />
-                        </label>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-
-
-                        <label className="px-2 py-1.5 flex items-center justify-between">
-                            <span>
-                                Stroke
-                            </span>
-                            <Switch
-                                checked={exportStroke}
-                                onCheckedChange={(checked) => {
-                                    appSettings.export.exportStroke = Boolean(checked);
-                                }}
-                            />
-                        </label>
-
-                        <label className="space-y-1">
-                            <span className="text-muted-foreground">Stroke color</span>
-                            <Input
-                                type="color"
-                                value={exportStrokeColor}
-                                onChange={(event) => appSettings.export.exportStrokeColor = event.target.value}
-                            />
-                        </label>
-
-                        <label className="space-y-1">
-                            <span className="text-muted-foreground">Stroke width</span>
-                            <Input
-                                type="number"
-                                min={0}
-                                step={0.05}
-                                value={exportStrokeWidth}
-                                onChange={(event) => appSettings.export.exportStrokeWidth = Number(event.target.value)}
-                            />
-                        </label>
-                    </div>
-
-                    <div className="">
-                        <div className="col-span-2 grid grid-cols-4 gap-2 rounded border px-2 py-2">
-                            <NumberField
-                                label="x"
-                                value={exportViewBoxDraft[0]}
-                                onChange={(value) => setExportViewBoxDraft((previous) => [value, previous[1], previous[2], previous[3]])}
-                            />
-                            <NumberField
-                                label="y"
-                                value={exportViewBoxDraft[1]}
-                                onChange={(value) => setExportViewBoxDraft((previous) => [previous[0], value, previous[2], previous[3]])}
-                            />
-                            <NumberField
-                                label="width"
-                                min={0.000001}
-                                value={exportViewBoxDraft[2]}
-                                onChange={(value) => setExportViewBoxDraft((previous) => [previous[0], previous[1], value, previous[3]])}
-                            />
-                            <NumberField
-                                label="height"
-                                min={0.000001}
-                                value={exportViewBoxDraft[3]}
-                                onChange={(value) => setExportViewBoxDraft((previous) => [previous[0], previous[1], previous[2], value])}
-                            />
-                        </div>
-                        
-                        <Button
-                            variant="outline"
-                            className="col-span-2 h-7 px-2"
-                            onClick={() => resetExportViewBox()}
-                        >
-                            Reset viewBox from path bounds
-                        </Button>
-                    </div>
-
-                    <div className="rounded border p-2">
-                        <p className="mb-2 text-[11px] text-muted-foreground">Live preview</p>
-                        <svg
-                            className="h-40 w-full rounded bg-muted/20"
-                            viewBox={`${exportViewBoxDraft[0]} ${exportViewBoxDraft[1]} ${Math.max(1e-6, exportViewBoxDraft[2])} ${Math.max(1e-6, exportViewBoxDraft[3])}`}
-                        >
-                            <defs>
-                                <pattern id="export-preview-grid" width="10" height="10" patternUnits="userSpaceOnUse">
-                                    <path d="M 10 0 L 0 0 0 10" fill="none" stroke="oklch(0.7 0 0 / 0.25)" strokeWidth="0.3" />
-                                </pattern>
-                            </defs>
-                            <rect
-                                x={exportViewBoxDraft[0]}
-                                y={exportViewBoxDraft[1]}
-                                width={Math.max(1e-6, exportViewBoxDraft[2])}
-                                height={Math.max(1e-6, exportViewBoxDraft[3])}
-                                fill="url(#export-preview-grid)"
-                            />
-                            <path
-                                d={pathValue || "M 0 0"}
-                                fill={exportFill ? exportFillColor : "none"}
-                                stroke={exportStroke ? exportStrokeColor : "none"}
-                                strokeWidth={exportStroke ? exportStrokeWidth : 0}
-                            />
-                        </svg>
-                    </div>
-                </div>
-                <DialogFooter>
-                    <Button variant="outline" onClick={() => setOpenExportDialog(false)}>Cancel</Button>
-                    <Button onClick={handleExport}>Export</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    );
 }
