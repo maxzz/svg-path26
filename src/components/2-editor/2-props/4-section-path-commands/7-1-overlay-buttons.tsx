@@ -7,46 +7,16 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/shadcn/
 import { allSubPathsEnabledAtom, hasCompoundSubPathsAtom, subPathAccordionValuesAtom, subPathsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
 
-const overlayButtonClasses = "size-6 rounded-sm text-muted-foreground hover:text-foreground";
-const overlayButtonActiveClasses = "bg-background/80 text-foreground";
-
 export function PathCommandsOverlay() {
     const hasCompoundSubPaths = useAtomValue(hasCompoundSubPathsAtom);
-    return (
-        <>
-            {hasCompoundSubPaths && <ToggleAllSubPathsOverlay />}
-            {hasCompoundSubPaths && <SubPathAccordionToggleOverlay />}
-            <ScrollOnHoverToggleOverlay />
-        </>
-    );
+    return (<>
+        {hasCompoundSubPaths && <BtnAllSubPaths />}
+        {hasCompoundSubPaths && <BtnSubPathAllAccordions />}
+        <BtnScrollOnHover />
+    </>);
 }
 
-export function ScrollOnHoverToggleOverlay() {
-    const { scrollOnHover } = useSnapshot(appSettings.canvas);
-    return (
-        <Tooltip>
-            <TooltipTrigger asChild>
-                <Button
-                    className={cn(overlayButtonClasses, scrollOnHover && overlayButtonActiveClasses)}
-                    onClick={() => appSettings.canvas.scrollOnHover = !scrollOnHover}
-                    variant="ghost"
-                    size="icon"
-                    type="button"
-                    aria-label={scrollOnHover ? "Disable scroll on hover" : "Enable scroll on hover"}
-                    aria-pressed={scrollOnHover}
-                >
-                    <ArrowLeftRight className="size-3" />
-                </Button>
-            </TooltipTrigger>
-
-            <TooltipContent sideOffset={6}>
-                {scrollOnHover ? "Disable scroll on hover" : "Enable scroll on hover"}
-            </TooltipContent>
-        </Tooltip>
-    );
-}
-
-function ToggleAllSubPathsOverlay() {
+function BtnAllSubPaths() {
     const [allEnabled, setAllEnabled] = useAtom(allSubPathsEnabledAtom);
     const label = allEnabled ? "Mute all subpaths" : "Enable all subpaths";
     return (
@@ -72,7 +42,7 @@ function ToggleAllSubPathsOverlay() {
     );
 }
 
-function SubPathAccordionToggleOverlay() {
+function BtnSubPathAllAccordions() {
     const subPaths = useAtomValue(subPathsAtom);
     const [openSubPaths, setOpenSubPaths] = useAtom(subPathAccordionValuesAtom);
     const allValues = subPaths.map((subPath) => `subpath-${subPath.index}`);
@@ -101,3 +71,31 @@ function SubPathAccordionToggleOverlay() {
         </Tooltip>
     );
 }
+
+function BtnScrollOnHover() {
+    const { scrollOnHover } = useSnapshot(appSettings.canvas);
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <Button
+                    className={cn(overlayButtonClasses, scrollOnHover && overlayButtonActiveClasses)}
+                    onClick={() => appSettings.canvas.scrollOnHover = !scrollOnHover}
+                    variant="ghost"
+                    size="icon"
+                    type="button"
+                    aria-label={scrollOnHover ? "Disable scroll on hover" : "Enable scroll on hover"}
+                    aria-pressed={scrollOnHover}
+                >
+                    <ArrowLeftRight className="size-3" />
+                </Button>
+            </TooltipTrigger>
+
+            <TooltipContent sideOffset={6}>
+                {scrollOnHover ? "Disable scroll on hover" : "Enable scroll on hover"}
+            </TooltipContent>
+        </Tooltip>
+    );
+}
+
+const overlayButtonClasses = "size-6 rounded-sm text-muted-foreground hover:text-foreground";
+const overlayButtonActiveClasses = "bg-background/80 text-foreground";
