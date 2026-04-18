@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeExportViewBox } from "./4-section-path-commands/8-helpers";
+import { computeExportViewBox } from "./4-section-path-commands/8-svg-utils";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
 
 describe("computeExportViewBox", () => {

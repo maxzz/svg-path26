@@ -2,7 +2,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/shadcn/dropdown-menu";
 import { Button } from "@/components/ui/shadcn/button";
 import { IconRadix_DotsHorizontal } from "@/components/ui/icons/normal";
-import { commandLabel } from "./8-helpers";
+import { commandLabel } from "./8-svg-utils";
 import { svgModelAtom } from "@/store/0-atoms/2-0-svg-model";
 import { doConvertSegmentAtom, doDeleteSegmentAtom, doInsertSegmentAtom, doToggleSegmentRelativeAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 
@@ -25,7 +25,9 @@ export function CommandSelectionMenu({ rowIndex, command }: { rowIndex: number; 
 
             <DropdownMenuContent align="end" onClick={(event) => event.stopPropagation()}>
                 <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>Insert After</DropdownMenuSubTrigger>
+                    <DropdownMenuSubTrigger>
+                        Insert After
+                    </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent>
                         {COMMAND_TYPES.map(
                             (type) => (
@@ -42,7 +44,9 @@ export function CommandSelectionMenu({ rowIndex, command }: { rowIndex: number; 
                 </DropdownMenuSub>
 
                 <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>Convert To</DropdownMenuSubTrigger>
+                    <DropdownMenuSubTrigger>
+                        Convert To
+                    </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent>
                         {COMMAND_TYPES.map(
                             (type) => {
@@ -64,10 +68,12 @@ export function CommandSelectionMenu({ rowIndex, command }: { rowIndex: number; 
                 <DropdownMenuItem onSelect={() => doToggleRelative(rowIndex)}>
                     {command === command.toLowerCase() ? "Set Absolute" : "Set Relative"}
                 </DropdownMenuItem>
+
                 <DropdownMenuSeparator />
                 <DropdownMenuItem disabled={rowIndex === 0} onSelect={() => doDeleteSegment(rowIndex)}>
                     Delete
                 </DropdownMenuItem>
+
             </DropdownMenuContent>
         </DropdownMenu>
     );

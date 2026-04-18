@@ -4,9 +4,9 @@ import { cn } from "@/utils";
 import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 import { commandHoveredAtom, commandSelectedAtom, highlightedCanvasPointAtomForSegment } from "@/store/0-atoms/2-4-0-editor-actions.ts";
 import { getCommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils.ts";
-import { CommandSelectionMenu } from "./2-commands-list-row-menu.tsx";
-import { type CommandProps, CommandArcFlagsInput, CommandCellInput } from "./1-commands-list-cells.tsx";
-import { commandSummaryTooltip, isCommandCellLinkedToPoint, isCommandValueLinkedToPoint } from "./8-helpers.tsx";
+import { CommandSelectionMenu } from "./6-commands-list-row-menu.tsx";
+import { type CommandProps, CommandArcFlagsInput, CommandCellInput } from "./2-commands-list-cells.tsx";
+import { commandSummaryTooltip, isCommandCellLinkedToPoint, isCommandValueLinkedToPoint } from "./8-svg-utils.tsx";
 
 export function CommandRow(props: {
     row: SvgSegmentSummary;

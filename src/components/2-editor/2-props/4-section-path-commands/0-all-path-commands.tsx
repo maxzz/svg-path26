@@ -10,8 +10,8 @@ import { doSelectCommandAtom, doToggleSegmentRelativeAtom, hoveredCommandIndexAt
 import { appSettings } from "@/store/0-ui-settings";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
 import { PathCommandsOverlay } from "./7-1-overlay-buttons.tsx";
-import { SubPathToggleRow } from "./7-2-subpath-headers.tsx";
-import { CommandRow, focusField } from "./1-commands-list-rows.tsx";
+import { SubPathToggleRow } from "./7-2-subpath-header.tsx";
+import { CommandRow, focusField } from "./1-commands-list-row.tsx";
 
 export function Section_PathCommands() {
     return (

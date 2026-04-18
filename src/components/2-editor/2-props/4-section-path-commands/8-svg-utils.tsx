@@ -55,28 +55,17 @@ export function commandSummaryTooltip(command: string): string {
         : "No value cells.";
 
     switch (upper) {
-        case "M":
-            return `Move command starts a new subpath at a point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
-        case "L":
-            return `Line command draws a straight segment to the end point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
-        case "H":
-            return `Horizontal line command changes only X. ${modeText} ${cellsText} Click to toggle abs/rel.`;
-        case "V":
-            return `Vertical line command changes only Y. ${modeText} ${cellsText} Click to toggle abs/rel.`;
-        case "C":
-            return `Cubic Bezier command with two control points and an end point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
-        case "S":
-            return `Smooth cubic Bezier command; first control is reflected from previous segment. ${modeText} ${cellsText} Click to toggle abs/rel.`;
-        case "Q":
-            return `Quadratic Bezier command with one control point and an end point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
-        case "T":
-            return `Smooth quadratic Bezier command; control is reflected from previous segment. ${modeText} ${cellsText} Click to toggle abs/rel.`;
-        case "A":
-            return `Arc command draws an elliptical arc to an end point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
-        case "Z":
-            return "Close command draws a straight segment back to the subpath start. No value cells.";
-        default:
-            return `${command} command. ${modeText} ${cellsText}`;
+        case "M": return `Move command starts a new subpath at a point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
+        case "L": return `Line command draws a straight segment to the end point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
+        case "H": return `Horizontal line command changes only X. ${modeText} ${cellsText} Click to toggle abs/rel.`;
+        case "V": return `Vertical line command changes only Y. ${modeText} ${cellsText} Click to toggle abs/rel.`;
+        case "C": return `Cubic Bezier command with two control points and an end point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
+        case "S": return `Smooth cubic Bezier command; first control is reflected from previous segment. ${modeText} ${cellsText} Click to toggle abs/rel.`;
+        case "Q": return `Quadratic Bezier command with one control point and an end point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
+        case "T": return `Smooth quadratic Bezier command; control is reflected from previous segment. ${modeText} ${cellsText} Click to toggle abs/rel.`;
+        case "A": return `Arc command draws an elliptical arc to an end point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
+        case "Z": return "Close command draws a straight segment back to the subpath start. No value cells.";
+        default: return `${command} command. ${modeText} ${cellsText}`;
     }
 }
 
