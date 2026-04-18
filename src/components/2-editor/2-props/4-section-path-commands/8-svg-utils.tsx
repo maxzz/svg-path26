@@ -18,19 +18,21 @@ export function isCommandValueLinkedToPoint(row: SvgSegmentSummary, valueIndex: 
     const command = row.command.toUpperCase();
 
     if (point.kind === "control") {
-        if (command === "C") {
-            if (point.controlIndex === 0) {
-                return valueIndex === 0 || valueIndex === 1;
-            }
-            return point.controlIndex === 1 && (valueIndex === 2 || valueIndex === 3);
+        const isFirstControlValue = valueIndex === 0 || valueIndex === 1;
+        const isSecondControlValue = valueIndex === 2 || valueIndex === 3;
+
+        switch (command) {
+            case "C":
+                if (point.controlIndex === 0) return isFirstControlValue;
+                if (point.controlIndex === 1) return isSecondControlValue;
+                return false;
+            case "S":
+                return point.controlIndex === 1 && isFirstControlValue;
+            case "Q":
+                return point.controlIndex === 0 && isFirstControlValue;
+            default:
+                return false;
         }
-        if (command === "S" && point.controlIndex === 1) {
-            return valueIndex === 0 || valueIndex === 1;
-        }
-        if (command === "Q" && point.controlIndex === 0) {
-            return valueIndex === 0 || valueIndex === 1;
-        }
-        return false;
     }
 
     if (command === "Z") return false;
@@ -41,8 +43,6 @@ export function isCommandValueLinkedToPoint(row: SvgSegmentSummary, valueIndex: 
 
     return valueIndex >= row.values.length - 2;
 }
-
-const commandSummaryToggleHint = "Click to toggle abs/rel.";
 
 const commandSummaryTextMap: Record<string, string> = {
     M: "Move command starts a new subpath at a point.",
@@ -75,8 +75,8 @@ export function commandSummaryTooltip(command: string): string {
     if (upper === "Z") {
         return `${baseText} ${cellsText}`;
     }
-    
-    return `${baseText} ${modeText} ${cellsText} ${commandSummaryToggleHint}`;
+
+    return `${baseText} ${modeText} ${cellsText} Click to toggle abs/rel.`;
 }
 
 const commandLabelMap: Record<string, string> = {
