@@ -13,15 +13,14 @@ import { appSettings } from "@/store/0-ui-settings";
 type ExportSvgPayload = {
     pathValue: string;
     exportViewBoxDraft: ExportViewBoxDraft;
-    onComplete: () => void;
 };
 
-function exportSvgToFile(payload: ExportSvgPayload) {
-    const { pathValue, exportViewBoxDraft, onComplete } = payload;
+function exportSvgToFile(payload: ExportSvgPayload): boolean {
+    const { pathValue, exportViewBoxDraft } = payload;
     const { pathName } = appSettings.pathEditor;
     const { exportFill, exportFillColor, exportStroke, exportStrokeColor, exportStrokeWidth } = appSettings.export;
     if (!pathValue.trim()) {
-        return;
+        return false;
     }
 
     const width = Math.max(1e-6, exportViewBoxDraft[2]);
@@ -41,8 +40,7 @@ function exportSvgToFile(payload: ExportSvgPayload) {
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 200);
-
-    onComplete();
+    return true;
 }
 
 export function ExportSvgDialog() {
@@ -55,11 +53,13 @@ export function ExportSvgDialog() {
     const resetExportViewBox = useSetAtom(doResetExportViewBoxDraftAtom);
 
     function handleExport() {
-        exportSvgToFile({
+        const didExport = exportSvgToFile({
             pathValue,
             exportViewBoxDraft,
-            onComplete: () => setOpenExportDialog(false),
         });
+        if (didExport) {
+            setOpenExportDialog(false);
+        }
     }
 
     return (
