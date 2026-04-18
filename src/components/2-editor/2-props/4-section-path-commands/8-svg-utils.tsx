@@ -42,6 +42,21 @@ export function isCommandValueLinkedToPoint(row: SvgSegmentSummary, valueIndex: 
     return valueIndex >= row.values.length - 2;
 }
 
+const commandSummaryToggleHint = "Click to toggle abs/rel.";
+
+const commandSummaryTextMap: Record<string, string> = {
+    M: "Move command starts a new subpath at a point.",
+    L: "Line command draws a straight segment to the end point.",
+    H: "Horizontal line command changes only X.",
+    V: "Vertical line command changes only Y.",
+    C: "Cubic Bezier command with two control points and an end point.",
+    S: "Smooth cubic Bezier command; first control is reflected from previous segment.",
+    Q: "Quadratic Bezier command with one control point and an end point.",
+    T: "Smooth quadratic Bezier command; control is reflected from previous segment.",
+    A: "Arc command draws an elliptical arc to an end point.",
+    Z: "Close command draws a straight segment back to the subpath start.",
+};
+
 export function commandSummaryTooltip(command: string): string {
     const upper = command.toUpperCase();
     const relative = command === command.toLowerCase();
@@ -52,35 +67,33 @@ export function commandSummaryTooltip(command: string): string {
         ? `Cells: ${cells.join(", ")}.`
         : "No value cells.";
 
-    switch (upper) {
-        case "M": return `Move command starts a new subpath at a point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
-        case "L": return `Line command draws a straight segment to the end point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
-        case "H": return `Horizontal line command changes only X. ${modeText} ${cellsText} Click to toggle abs/rel.`;
-        case "V": return `Vertical line command changes only Y. ${modeText} ${cellsText} Click to toggle abs/rel.`;
-        case "C": return `Cubic Bezier command with two control points and an end point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
-        case "S": return `Smooth cubic Bezier command; first control is reflected from previous segment. ${modeText} ${cellsText} Click to toggle abs/rel.`;
-        case "Q": return `Quadratic Bezier command with one control point and an end point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
-        case "T": return `Smooth quadratic Bezier command; control is reflected from previous segment. ${modeText} ${cellsText} Click to toggle abs/rel.`;
-        case "A": return `Arc command draws an elliptical arc to an end point. ${modeText} ${cellsText} Click to toggle abs/rel.`;
-        case "Z": return "Close command draws a straight segment back to the subpath start. No value cells.";
-        default: return `${command} command. ${modeText} ${cellsText}`;
+    const baseText = commandSummaryTextMap[upper];
+    if (!baseText) {
+        return `${command} command. ${modeText} ${cellsText}`;
     }
+
+    if (upper === "Z") {
+        return `${baseText} ${cellsText}`;
+    }
+    
+    return `${baseText} ${modeText} ${cellsText} ${commandSummaryToggleHint}`;
 }
 
+const commandLabelMap: Record<string, string> = {
+    M: "Move",
+    L: "Line",
+    H: "Horizontal",
+    V: "Vertical",
+    C: "Cubic",
+    S: "Smooth Cubic",
+    Q: "Quadratic",
+    T: "Smooth Quadratic",
+    A: "Arc",
+    Z: "Close",
+};
+
 export function commandLabel(type: string): string {
-    switch (type) {
-        case "M": return "Move";
-        case "L": return "Line";
-        case "H": return "Horizontal";
-        case "V": return "Vertical";
-        case "C": return "Cubic";
-        case "S": return "Smooth Cubic";
-        case "Q": return "Quadratic";
-        case "T": return "Smooth Quadratic";
-        case "A": return "Arc";
-        case "Z": return "Close";
-        default: return type;
-    }
+    return commandLabelMap[type] ?? type;
 }
 
 const commandCellLabelMap: Record<string, string[]> = {
