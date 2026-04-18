@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { Accordion } from "@/components/ui/shadcn/accordion";
 import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel.tsx";
 import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
-import { commandRowsAtom, subPathsAtom } from "@/store/0-atoms/2-0-svg-model";
+import { commandRowsAtom, subPathAccordionValuesAtom, subPathsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { doSelectCommandAtom, doToggleSegmentRelativeAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions.ts";
 import { appSettings } from "@/store/0-ui-settings";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
-import { ScrollOnHoverToggleOverlay } from "./7-1-overlay-buttons.tsx";
-import { CompoundPathToggleRow, SubPathToggleRow } from "./7-2-subpath-headers.tsx";
+import { PathCommandsOverlay } from "./7-1-overlay-buttons.tsx";
+import { SubPathToggleRow } from "./7-2-subpath-headers.tsx";
 import { CommandRow, focusField } from "./1-commands-list-rows.tsx";
 
 export function Section_PathCommands() {
@@ -20,7 +20,7 @@ export function Section_PathCommands() {
                 sectionKey="commands"
                 label="Path Commands"
                 contentClassName="px-0 pt-0.5 pb-4"
-                overlay={<ScrollOnHoverToggleOverlay />}
+                overlay={<PathCommandsOverlay />}
             >
                 <div className="px-1 py-2 max-h-64 text-xs font-ui border bg-muted/20 rounded overflow-auto">
                     <CommandsList />
@@ -39,6 +39,7 @@ export function CommandsList() {
     const doToggleRelative = useSetAtom(doToggleSegmentRelativeAtom);
     const rowRefs = useRef<Record<number, HTMLDivElement | null>>({});
     const fieldRefs = useRef<Record<string, HTMLInputElement | null>>({});
+    const [openSubPaths, setOpenSubPaths] = useAtom(subPathAccordionValuesAtom);
     const hasCompoundSubPaths = subPaths.length > 1;
 
     const moveVertical = useCallback(
@@ -92,10 +93,10 @@ export function CommandsList() {
         <CommandsListScrollEffects rowRefs={rowRefs} rowsLength={rows.length} />
         {hasCompoundSubPaths
             ? (<>
-                <CompoundPathToggleRow />
                 <Accordion
                     type="multiple"
-                    defaultValue={subPaths.map((subPath) => `subpath-${subPath.index}`)}
+                    value={openSubPaths}
+                    onValueChange={setOpenSubPaths}
                 >
                     {subPaths.map(
                         (subPath) => (

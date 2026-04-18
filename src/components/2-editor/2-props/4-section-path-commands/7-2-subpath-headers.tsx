@@ -2,23 +2,8 @@ import { type ReactNode } from "react";
 import { useAtom } from "jotai";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/shadcn/accordion";
 import { Switch } from "@/components/ui/shadcn/switch";
-import { allSubPathsEnabledAtom, subPathEnabledAtom } from "@/store/0-atoms/2-0-svg-model";
+import { subPathEnabledAtom } from "@/store/0-atoms/2-0-svg-model";
 import { ChevronDown } from "lucide-react";
-
-export function CompoundPathToggleRow() {
-    const [allEnabled, setAllEnabled] = useAtom(allSubPathsEnabledAtom);
-    return (
-        <div className="px-1.5 py-1 text-[10px] text-muted-foreground flex items-center justify-between">
-            <span>Toggle all</span>
-            <Switch
-                className="scale-50"
-                checked={allEnabled}
-                onCheckedChange={(checked) => setAllEnabled(Boolean(checked))}
-                aria-label={allEnabled ? "Mute all subpaths" : "Enable all subpaths"}
-            />
-        </div>
-    );
-}
 
 /** Subpath header row (label, rule, mute switch) plus optional accordion body for command rows. */
 export function SubPathToggleRow({ subPathIndex, children }: { subPathIndex: number; children: ReactNode; }) {

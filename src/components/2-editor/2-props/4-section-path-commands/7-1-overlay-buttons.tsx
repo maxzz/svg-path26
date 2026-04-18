@@ -1,9 +1,25 @@
+import { useAtom, useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
-import { ArrowLeftRight } from "lucide-react";
+import { ArrowLeftRight, ChevronDown, ChevronUp, ToggleLeft, ToggleRight } from "lucide-react";
 import { cn } from "@/utils";
 import { Button } from "@/components/ui/shadcn/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
+import { allSubPathsEnabledAtom, hasCompoundSubPathsAtom, subPathAccordionValuesAtom, subPathsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
+
+const overlayButtonClasses = "size-6 rounded-sm text-muted-foreground hover:text-foreground";
+const overlayButtonActiveClasses = "bg-background/80 text-foreground";
+
+export function PathCommandsOverlay() {
+    const hasCompoundSubPaths = useAtomValue(hasCompoundSubPathsAtom);
+    return (
+        <>
+            {hasCompoundSubPaths && <ToggleAllSubPathsOverlay />}
+            {hasCompoundSubPaths && <SubPathAccordionToggleOverlay />}
+            <ScrollOnHoverToggleOverlay />
+        </>
+    );
+}
 
 export function ScrollOnHoverToggleOverlay() {
     const { scrollOnHover } = useSnapshot(appSettings.canvas);
@@ -11,7 +27,7 @@ export function ScrollOnHoverToggleOverlay() {
         <Tooltip>
             <TooltipTrigger asChild>
                 <Button
-                    className={cn("mr-1 size-6 rounded-sm text-muted-foreground hover:text-foreground", scrollOnHover && "bg-background/80 text-foreground")}
+                    className={cn(overlayButtonClasses, scrollOnHover && overlayButtonActiveClasses)}
                     onClick={() => appSettings.canvas.scrollOnHover = !scrollOnHover}
                     variant="ghost"
                     size="icon"
@@ -25,6 +41,62 @@ export function ScrollOnHoverToggleOverlay() {
 
             <TooltipContent sideOffset={6}>
                 {scrollOnHover ? "Disable scroll on hover" : "Enable scroll on hover"}
+            </TooltipContent>
+        </Tooltip>
+    );
+}
+
+function ToggleAllSubPathsOverlay() {
+    const [allEnabled, setAllEnabled] = useAtom(allSubPathsEnabledAtom);
+    const label = allEnabled ? "Mute all subpaths" : "Enable all subpaths";
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <Button
+                    className={cn(overlayButtonClasses, allEnabled && overlayButtonActiveClasses)}
+                    onClick={() => setAllEnabled((current) => !current)}
+                    variant="ghost"
+                    size="icon"
+                    type="button"
+                    aria-label={label}
+                    aria-pressed={allEnabled}
+                >
+                    {allEnabled ? <ToggleRight className="size-3.5" /> : <ToggleLeft className="size-3.5" />}
+                </Button>
+            </TooltipTrigger>
+
+            <TooltipContent sideOffset={6}>
+                {label}
+            </TooltipContent>
+        </Tooltip>
+    );
+}
+
+function SubPathAccordionToggleOverlay() {
+    const subPaths = useAtomValue(subPathsAtom);
+    const [openSubPaths, setOpenSubPaths] = useAtom(subPathAccordionValuesAtom);
+    const allValues = subPaths.map((subPath) => `subpath-${subPath.index}`);
+    const allExpanded = allValues.length > 0 && openSubPaths.length === allValues.length;
+    const label = allExpanded ? "Collapse all subpaths" : "Expand all subpaths";
+
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <Button
+                    className={cn(overlayButtonClasses, allExpanded && overlayButtonActiveClasses)}
+                    onClick={() => setOpenSubPaths(allExpanded ? [] : allValues)}
+                    variant="ghost"
+                    size="icon"
+                    type="button"
+                    aria-label={label}
+                    aria-pressed={allExpanded}
+                >
+                    {allExpanded ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+                </Button>
+            </TooltipTrigger>
+
+            <TooltipContent sideOffset={6}>
+                {label}
             </TooltipContent>
         </Tooltip>
     );

@@ -1,4 +1,4 @@
-import { atom, type Atom, type WritableAtom } from "jotai";
+import { atom, type Atom, type SetStateAction, type WritableAtom } from "jotai";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
 import type { SvgCanvasLine, SvgCanvasPoint, SvgSegmentSummary, SvgSubPath } from "@/svg-core/9-types-svg-model";
 import { rawPathAtom } from "./1-0-raw-path";
@@ -43,6 +43,33 @@ export const subPathsAtom = atom<SvgSubPath[]>(
 
 export const hasCompoundSubPathsAtom = atom(
     (get) => get(subPathsAtom).length > 1
+);
+
+const subPathAccordionStateAtom = atom<{ key: string; values: string[]; }>({
+    key: "",
+    values: [],
+});
+
+export const subPathAccordionValuesAtom = atom(
+    (get) => {
+        const subPaths = get(subPathsAtom);
+        const pathKey = get(rawPathAtom);
+        const current = get(subPathAccordionStateAtom);
+        const values = subPaths.map((subPath) => `subpath-${subPath.index}`);
+        if (current.key !== pathKey) {
+            return values;
+        }
+        return values.filter((value) => current.values.includes(value));
+    },
+    (get, set, update: SetStateAction<string[]>) => {
+        const subPaths = get(subPathsAtom);
+        const pathKey = get(rawPathAtom);
+        const current = get(subPathAccordionValuesAtom);
+        const next = typeof update === "function" ? update(current) : update;
+        const values = subPaths.map((subPath) => `subpath-${subPath.index}`);
+        const normalized = values.filter((value) => next.includes(value));
+        set(subPathAccordionStateAtom, { key: pathKey, values: normalized });
+    }
 );
 
 const subPathToggleStateAtom = atom<{ key: string; states: boolean[]; }>({
