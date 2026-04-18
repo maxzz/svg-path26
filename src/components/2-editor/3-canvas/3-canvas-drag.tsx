@@ -4,7 +4,7 @@ import { appSettings } from "@/store/0-ui-settings";
 import { notice } from "@/components/ui/loacal-ui/7-toaster/7-toaster";
 import { type Point, type SvgCanvasPoint, type ViewBox } from "@/svg-core/9-types-svg-model";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { controlPointsAtom, pathPointsAtom } from "@/store/0-atoms/2-0-svg-model";
+import { controlPointsAtom, pathPointsAtom, segmentSubPathEnabledAtom } from "@/store/0-atoms/2-0-svg-model";
 import { canvasRootSvgElementAtom, canvasViewPortAtom, doPanViewPortAtom, doZoomViewPortAtom } from "@/store/0-atoms/2-3-canvas-viewport";
 import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { canvasSegmentHitAreaElementsAtom, doSetPointLocationsWithoutHistoryAtom, doSuppressNextCanvasFocusClearAtom, doTranslateSelectedSegmentsWithoutHistoryAtom, draggedCanvasPointAtom, isCanvasDraggingAtom, selectedCanvasPointIdsAtom, selectedCommandIndicesAtom } from "@/store/0-atoms/2-4-0-editor-actions";
@@ -275,14 +275,17 @@ export const doApplyActiveCanvasDragAtClientAtom = atom(
             });
             if (!moved) return;
 
+            const segmentEnabled = (segmentIndex: number) => get(segmentSubPathEnabledAtom(segmentIndex));
+            const enabledInitialSelection = activeDragState.initialSelection.filter(segmentEnabled);
             const nextSelection = applyCommandSelection(
-                activeDragState.initialSelection,
+                enabledInitialSelection,
                 getMarqueeSelectionIndices({
                     start: activeDragState.start,
                     current: next,
                     targetPoints: get(pathPointsAtom),
                     controlPoints: get(controlPointsAtom),
                     pathElements: get(canvasSegmentHitAreaElementsAtom),
+                    segmentEnabled,
                 }),
                 activeDragState.selectionMode,
             );

@@ -57,12 +57,17 @@ export function getMarqueeSelectionIndices(args: {
     targetPoints: SvgCanvasPoint[];
     controlPoints: SvgCanvasPoint[];
     pathElements: Record<number, SVGPathElement | null>;
+    segmentEnabled?: (segmentIndex: number) => boolean;
 }): number[] {
     const selectionBounds = normalizeBounds(args.start, args.current);
     const selected = new Set<number>();
+    const segmentEnabled = args.segmentEnabled ?? (() => true);
 
     [...args.targetPoints, ...args.controlPoints].forEach(
         (point) => {
+            if (!segmentEnabled(point.segmentIndex)) {
+                return;
+            }
             if (isPointInsideBounds(point, selectionBounds)) {
                 selected.add(point.segmentIndex);
             }
@@ -72,7 +77,7 @@ export function getMarqueeSelectionIndices(args: {
     Object.entries(args.pathElements).forEach(
         ([key, element]) => {
             const index = Number.parseInt(key, 10);
-            if (!element || !Number.isInteger(index) || selected.has(index)) return;
+            if (!element || !Number.isInteger(index) || selected.has(index) || !segmentEnabled(index)) return;
             if (doesPathIntersectBounds(element, selectionBounds)) {
                 selected.add(index);
             }
