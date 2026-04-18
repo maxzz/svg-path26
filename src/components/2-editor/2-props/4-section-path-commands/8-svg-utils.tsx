@@ -18,18 +18,18 @@ export function isCommandValueLinkedToPoint(row: SvgSegmentSummary, valueIndex: 
     const command = row.command.toUpperCase();
 
     if (point.kind === "control") {
+        const controlIndex = point.controlIndex;
         const isFirstControlValue = valueIndex === 0 || valueIndex === 1;
         const isSecondControlValue = valueIndex === 2 || valueIndex === 3;
-
         switch (command) {
             case "C":
-                if (point.controlIndex === 0) return isFirstControlValue;
-                if (point.controlIndex === 1) return isSecondControlValue;
+                if (controlIndex === 0) return isFirstControlValue;
+                if (controlIndex === 1) return isSecondControlValue;
                 return false;
             case "S":
-                return point.controlIndex === 1 && isFirstControlValue;
+                return controlIndex === 1 && isFirstControlValue;
             case "Q":
-                return point.controlIndex === 0 && isFirstControlValue;
+                return controlIndex === 0 && isFirstControlValue;
             default:
                 return false;
         }
