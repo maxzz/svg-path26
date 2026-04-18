@@ -9,7 +9,7 @@ import { commandRowsAtom, subPathAccordionValuesAtom, subPathsAtom } from "@/sto
 import { doSelectCommandAtom, doToggleSegmentRelativeAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions.ts";
 import { appSettings } from "@/store/0-ui-settings";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
-import { PathCommandsOverlay } from "./7-1-overlay-buttons.tsx";
+import { PathCommandsOverlay } from "./7-1-header-overlay.tsx";
 import { SubPathToggleRow } from "./7-2-subpath-header.tsx";
 import { CommandRow, focusField } from "./1-commands-list-row.tsx";
 

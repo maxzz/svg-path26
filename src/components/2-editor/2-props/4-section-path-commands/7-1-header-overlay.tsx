@@ -9,11 +9,13 @@ import { appSettings } from "@/store/0-ui-settings";
 
 export function PathCommandsOverlay() {
     const hasCompoundSubPaths = useAtomValue(hasCompoundSubPathsAtom);
-    return (<>
-        {hasCompoundSubPaths && <BtnAllSubPaths />}
-        {hasCompoundSubPaths && <BtnSubPathAllAccordions />}
-        <BtnScrollOnHover />
-    </>);
+    return (
+        <div className="mr-1 flex items-center gap-0.5">
+            {hasCompoundSubPaths && <BtnAllSubPaths />}
+            {hasCompoundSubPaths && <BtnSubPathAllAccordions />}
+            <BtnScrollOnHover />
+        </div>
+    );
 }
 
 function BtnAllSubPaths() {
@@ -97,5 +99,5 @@ function BtnScrollOnHover() {
     );
 }
 
-const overlayButtonClasses = "size-6 rounded-sm text-muted-foreground hover:text-foreground";
+const overlayButtonClasses = "size-5 rounded-sm text-muted-foreground hover:text-foreground";
 const overlayButtonActiveClasses = "bg-background/80 text-foreground";

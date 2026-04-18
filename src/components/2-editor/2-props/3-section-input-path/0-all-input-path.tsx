@@ -27,9 +27,9 @@ export function Section_PathInput() {
 function PathInputOverlay({ pathValue }: { pathValue: string; }) {
     const hasPath = pathValue.trim().length > 0;
     return (
-        <div className="flex items-center gap-0.5">
+        <div className="mr-1 flex items-center gap-0.5">
 
-            <HomeToCloudOverlay />
+            <BtnHomeToCloud />
 
             <OverlayButton_MinifyPath />
 
@@ -43,7 +43,7 @@ function PathInputOverlay({ pathValue }: { pathValue: string; }) {
     );
 }
 
-function HomeToCloudOverlay() {
+function BtnHomeToCloud() {
     return (
         <Tooltip>
             <TooltipTrigger asChild>
@@ -51,6 +51,7 @@ function HomeToCloudOverlay() {
                     <IconHomeToCloud className="size-4" />
                 </Button>
             </TooltipTrigger>
+
             <TooltipContent sideOffset={6}>
                 Home to Cloud
             </TooltipContent>

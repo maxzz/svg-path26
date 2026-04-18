@@ -35,11 +35,13 @@ export function Section_SvgInput() {
 
 export function CopySvgOverlay({ document }: { document: SvgInputDocument | null; }) {
     return (
-        <CopyClipboardOverlayButton
-            copyText={document ? serializeSvgInputDocument(document) : ""}
-            canCopy={Boolean(document)}
-            idleLabel="Copy SVG"
-            successLabel="SVG copied"
-        />
+        <div className="mr-1 flex items-center gap-0.5">
+            <CopyClipboardOverlayButton
+                copyText={document ? serializeSvgInputDocument(document) : ""}
+                canCopy={Boolean(document)}
+                idleLabel="Copy SVG"
+                successLabel="SVG copied"
+            />
+        </div>
     );
 }

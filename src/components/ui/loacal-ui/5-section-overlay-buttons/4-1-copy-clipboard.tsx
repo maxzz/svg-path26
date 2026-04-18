@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import { cn } from "@/utils";
 import { Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/shadcn/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 
-export function CopyClipboardOverlayButton(props: { copyText: string; canCopy: boolean; idleLabel: string; successLabel: string; }) {
-    const { copyText, canCopy, idleLabel, successLabel } = props;
+export function CopyClipboardOverlayButton(props: { copyText: string; canCopy: boolean; idleLabel: string; successLabel: string; className?: string; btnClasses?: string; }) {
+    const { copyText, canCopy, idleLabel, successLabel, className, btnClasses } = props;
+
     const [copied, setCopied] = useState(false);
     const resetCopiedTimerRef = useRef<number | null>(null);
 
@@ -38,7 +40,13 @@ export function CopyClipboardOverlayButton(props: { copyText: string; canCopy: b
         <Tooltip>
             <TooltipTrigger asChild>
                 <Button
-                    className={copied ? "mr-1 size-6 rounded-sm bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 hover:text-emerald-700 dark:text-emerald-300" : "mr-1 size-6 rounded-sm text-muted-foreground hover:text-foreground"}
+                    className={cn(
+                        "size-5 rounded-sm",
+                        copied
+                            ? " bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 hover:text-emerald-700 dark:text-emerald-300"
+                            : " text-muted-foreground hover:text-foreground",
+                        className)
+                    }
                     disabled={!canCopy}
                     onClick={() => void copyValue()}
                     variant="ghost"
@@ -56,7 +64,7 @@ export function CopyClipboardOverlayButton(props: { copyText: string; canCopy: b
                                 transition={{ duration: 0.16 }}
                                 className="flex items-center justify-center"
                             >
-                                <Check className="size-3.5" />
+                                <Check className={cn("size-4", btnClasses)} />
                             </motion.span>
                         ) : (
                             <motion.span
@@ -67,7 +75,7 @@ export function CopyClipboardOverlayButton(props: { copyText: string; canCopy: b
                                 transition={{ duration: 0.14 }}
                                 className="flex items-center justify-center"
                             >
-                                <Copy className="size-3.5" />
+                                <Copy className={cn("size-4", btnClasses)} />
                             </motion.span>
                         )}
                     </AnimatePresence>
@@ -80,4 +88,3 @@ export function CopyClipboardOverlayButton(props: { copyText: string; canCopy: b
         </Tooltip>
     );
 }
-
