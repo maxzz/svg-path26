@@ -49,7 +49,7 @@ export interface FooterSettings {
     buttons: FooterButtonsSettings;
 }
 
-export type ExportViewBoxPreset = "16x16" | "20x20" | "24x24" | "bounds" | "current viewBox" | "Custom";
+export type ExportViewBoxPreset = string;
 
 export interface ExportSettings {
     exportFill: boolean;                  // Export fill or not
@@ -57,7 +57,7 @@ export interface ExportSettings {
     exportStroke: boolean;                // Export stroke or not
     exportStrokeColor: string;            // Export stroke color
     exportStrokeWidth: number;            // Export stroke width
-    exportViewBoxPreset: ExportViewBoxPreset; // Selected export viewBox preset
+    exportViewBoxPreset: ExportViewBoxPreset; // Selected export viewBox preset value
 }
 
 export interface ScaleToViewBoxDialogSettings {
@@ -126,7 +126,7 @@ export const DEFAULT_EXPORT_SETTINGS: ExportSettings = {
     exportStroke: false,
     exportStrokeColor: "#ff0000",
     exportStrokeWidth: 0.1,
-    exportViewBoxPreset: "bounds",
+    exportViewBoxPreset: DEFAULT_VIEWBOX_SETTINGS.join(","),
 };
 
 export const DEFAULT_DIALOGS_SETTINGS: DialogSettings = {

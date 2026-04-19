@@ -14,9 +14,9 @@ import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-pa
 import { appSettings } from "@/store/0-ui-settings";
 import { type ExportViewBoxPreset } from "@/store/9-ui-settings-types-and-defaults";
 
-const CUSTOM_VIEWBOX_PRESET: ExportViewBoxPreset = "Custom";
+const CUSTOM_VIEWBOX_LABEL = "Custom";
 
-type ViewBoxPreset = [ExportViewBoxPreset, string];
+type ViewBoxPreset = [string, ExportViewBoxPreset];
 
 const STATIC_VIEWBOX_PRESETS: ViewBoxPreset[] = [
     ["16x16", "0,0,16,16"],
@@ -40,10 +40,10 @@ function parseViewBoxString(viewBox: string): ExportViewBoxDraft {
     return [x, y, width, height];
 }
 
-function resolveViewBoxPreset(viewBox: ExportViewBoxDraft, presets: ViewBoxPreset[]): ExportViewBoxPreset {
+function resolveViewBoxPresetLabel(viewBox: ExportViewBoxDraft, presets: ViewBoxPreset[]): string {
     const viewBoxKey = viewBoxToString(viewBox);
     const match = presets.find(([, presetViewBox]) => presetViewBox === viewBoxKey);
-    return match?.[0] ?? CUSTOM_VIEWBOX_PRESET;
+    return match?.[0] ?? CUSTOM_VIEWBOX_LABEL;
 }
 
 export function ExportSvgDialog() {
@@ -157,34 +157,36 @@ function ViewBoxEditor() {
         ["bounds", viewBoxToString(boundsViewBox)],
         ["current viewBox", viewBoxToString(pathViewBox)],
     ];
-    const resolvedPreset = resolveViewBoxPreset(exportViewBoxDraft, viewBoxPresets);
+    const resolvedPresetLabel = resolveViewBoxPresetLabel(exportViewBoxDraft, viewBoxPresets);
     const selectItems: ViewBoxPreset[] = [
         ...viewBoxPresets,
-        [CUSTOM_VIEWBOX_PRESET, viewBoxToString(exportViewBoxDraft)],
+        [CUSTOM_VIEWBOX_LABEL, viewBoxToString(exportViewBoxDraft)],
     ];
+    const viewBoxPresetValue = viewBoxToString(exportViewBoxDraft);
 
     useEffect(() => {
-        if (exportViewBoxPreset !== resolvedPreset) {
-            appSettings.export.exportViewBoxPreset = resolvedPreset;
+        if (exportViewBoxPreset !== viewBoxPresetValue) {
+            appSettings.export.exportViewBoxPreset = viewBoxPresetValue;
         }
-    }, [exportViewBoxPreset, resolvedPreset]);
+    }, [exportViewBoxPreset, viewBoxPresetValue]);
 
-    function handlePresetChange(nextPreset: ExportViewBoxPreset) {
-        appSettings.export.exportViewBoxPreset = nextPreset;
+    function handlePresetChange(nextPresetLabel: string) {
+        const presetMatch = viewBoxPresets.find(([label]) => label === nextPresetLabel);
+        const nextValue = presetMatch?.[1] ?? viewBoxToString(exportViewBoxDraft);
+        appSettings.export.exportViewBoxPreset = nextValue;
 
-        const presetMatch = viewBoxPresets.find(([label]) => label === nextPreset);
         if (!presetMatch) {
             return;
         }
 
-        setExportViewBoxDraft(parseViewBoxString(presetMatch[1]));
+        setExportViewBoxDraft(parseViewBoxString(nextValue));
     }
 
     return (
         <div className="space-y-2">
             <label className="space-y-1">
                 <span className="text-muted-foreground">ViewBox preset</span>
-                <Select value={resolvedPreset} onValueChange={(value) => handlePresetChange(value as ExportViewBoxPreset)}>
+                <Select value={resolvedPresetLabel} onValueChange={handlePresetChange}>
                     <SelectTrigger className="w-full">
                         <SelectValue />
                     </SelectTrigger>
