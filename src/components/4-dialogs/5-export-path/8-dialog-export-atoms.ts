@@ -1,8 +1,8 @@
 import { atom } from "jotai";
 import { appSettings } from "@/store/0-ui-settings";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
-import { svgPathInputAtom } from "./1-1-svg-path-input";
-import { pathViewBoxAtom } from "./2-2-path-viewbox";
+import { svgPathInputAtom } from "../../../store/0-atoms/1-1-svg-path-input";
+import { pathViewBoxAtom } from "../../../store/0-atoms/2-2-path-viewbox";
 import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-path-commands/8-svg-utils";
 
 export type ExportViewBoxDraft = ViewBox;

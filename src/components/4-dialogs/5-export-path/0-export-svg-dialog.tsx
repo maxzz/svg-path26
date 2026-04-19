@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/shadcn/switch";
 import { NumberField } from "@/components/ui/loacal-ui/2-number-field";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { exportSvgDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
-import { type ExportViewBoxDraft, doResetExportViewBoxDraftAtom, exportViewBoxDraftAtom } from "@/store/0-atoms/4-1-dialog-export-atoms";
+import { type ExportViewBoxDraft, doResetExportViewBoxDraftAtom, exportViewBoxDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
 import { appSettings } from "@/store/0-ui-settings";
 
 export function ExportSvgDialog() {

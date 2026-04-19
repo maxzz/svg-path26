@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { doResetExportViewBoxDraftAtom } from "./4-1-dialog-export-atoms";
+import { doResetExportViewBoxDraftAtom } from "../../components/4-dialogs/5-export-path/8-dialog-export-atoms";
 
 // Dialog atoms extracted from 2-5-canvas-actions-menu
 
