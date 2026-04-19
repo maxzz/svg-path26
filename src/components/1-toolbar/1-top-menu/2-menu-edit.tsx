@@ -55,14 +55,6 @@ export function EditMenu() {
             </MenubarTrigger>
 
             <MenubarContent>
-                <MenubarItem onClick={() => setOpenDialogOpen(true)}>
-                    Open Saved Path... <MenubarShortcut>Ctrl+O</MenubarShortcut>
-                </MenubarItem>
-                <MenubarItem disabled={!hasPath} onClick={() => setSaveDialogOpen(true)}>
-                    Save Path... <MenubarShortcut>Ctrl+S</MenubarShortcut>
-                </MenubarItem>
-                <MenubarSeparator />
-
                 <MenubarItem disabled={!hasSelection} onClick={() => setScaleToViewBoxDialogOpen(true)}>
                     Scale to viewBox...
                 </MenubarItem>
@@ -91,6 +83,41 @@ export function EditMenu() {
 
                 <MenubarSeparator />
 
+                <MenubarItem onClick={() => setOpenDialogOpen(true)}>
+                    Open Saved Path... <MenubarShortcut>Ctrl+O</MenubarShortcut>
+                </MenubarItem>
+                <MenubarItem disabled={!hasPath} onClick={() => setSaveDialogOpen(true)}>
+                    Save Path... <MenubarShortcut>Ctrl+S</MenubarShortcut>
+                </MenubarItem>
+
+                <MenubarSeparator />
+
+                <MenubarItem disabled={!canSelectAll} onClick={doSelectAll}>
+                    Select All <MenubarShortcut>Ctrl+A</MenubarShortcut>
+                </MenubarItem>
+
+                <MenubarSeparator />
+
+                <MenubarItem disabled={!hasPath} onClick={copyPath}>
+                    Copy Path <MenubarShortcut>Alt+C</MenubarShortcut>
+                </MenubarItem>
+
+                <MenubarItem disabled={!hasPath} onClick={doClear}>
+                    Clear Path <MenubarShortcut>Alt+X</MenubarShortcut>
+                </MenubarItem>
+
+                <MenubarSeparator />
+
+                <MenubarItem disabled={!canUndo} onClick={doUndo}>
+                    Undo <MenubarShortcut>Ctrl+Z</MenubarShortcut>
+                </MenubarItem>
+
+                <MenubarItem disabled={!canRedo} onClick={doRedo}>
+                    Redo <MenubarShortcut>Ctrl+Shift+Z</MenubarShortcut>
+                </MenubarItem>
+                
+                <MenubarSeparator />
+
                 <MenubarItem disabled={!hasPath} onClick={doNormalize}>
                     Normalize
                 </MenubarItem>
@@ -107,31 +134,6 @@ export function EditMenu() {
                     Minify Path <MenubarShortcut>Alt+M</MenubarShortcut>
                 </MenubarCheckboxItem>
 
-                <MenubarSeparator />
-
-                <MenubarItem disabled={!canSelectAll} onClick={doSelectAll}>
-                    Select All <MenubarShortcut>Ctrl+A</MenubarShortcut>
-                </MenubarItem>
-
-                <MenubarSeparator />
-
-                <MenubarItem disabled={!canUndo} onClick={doUndo}>
-                    Undo <MenubarShortcut>Ctrl+Z</MenubarShortcut>
-                </MenubarItem>
-
-                <MenubarItem disabled={!canRedo} onClick={doRedo}>
-                    Redo <MenubarShortcut>Ctrl+Shift+Z</MenubarShortcut>
-                </MenubarItem>
-
-                <MenubarSeparator />
-
-                <MenubarItem disabled={!hasPath} onClick={copyPath}>
-                    Copy Path <MenubarShortcut>Alt+C</MenubarShortcut>
-                </MenubarItem>
-
-                <MenubarItem disabled={!hasPath} onClick={doClear}>
-                    Clear Path <MenubarShortcut>Alt+X</MenubarShortcut>
-                </MenubarItem>
             </MenubarContent>
         </MenubarMenu>
     );
