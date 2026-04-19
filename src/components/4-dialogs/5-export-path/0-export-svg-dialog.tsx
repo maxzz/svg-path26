@@ -16,23 +16,33 @@ import { type ExportViewBoxPreset } from "@/store/9-ui-settings-types-and-defaul
 
 const CUSTOM_VIEWBOX_PRESET: ExportViewBoxPreset = "Custom";
 
-type ViewBoxPreset = [ExportViewBoxPreset, ExportViewBoxDraft];
+type ViewBoxPreset = [ExportViewBoxPreset, string];
 
 const STATIC_VIEWBOX_PRESETS: ViewBoxPreset[] = [
-    ["16x16", [0, 0, 16, 16]],
-    ["20x20", [0, 0, 20, 20]],
-    ["24x24", [0, 0, 24, 24]],
+    ["16x16", "0,0,16,16"],
+    ["20x20", "0,0,20,20"],
+    ["24x24", "0,0,24,24"],
 ];
 
-function viewBoxMatches(left: ExportViewBoxDraft, right: ExportViewBoxDraft): boolean {
-    return left[0] === right[0]
-        && left[1] === right[1]
-        && left[2] === right[2]
-        && left[3] === right[3];
+function viewBoxToString(viewBox: ExportViewBoxDraft): string {
+    return `${viewBox[0]},${viewBox[1]},${viewBox[2]},${viewBox[3]}`;
+}
+
+function parseViewBoxString(viewBox: string): ExportViewBoxDraft {
+    const parsed = viewBox.split(",").map((value) => Number(value));
+    if (parsed.length !== 4) {
+        return [0, 0, 1, 1];
+    }
+    const [x, y, width, height] = parsed;
+    if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(width) || !Number.isFinite(height)) {
+        return [0, 0, 1, 1];
+    }
+    return [x, y, width, height];
 }
 
 function resolveViewBoxPreset(viewBox: ExportViewBoxDraft, presets: ViewBoxPreset[]): ExportViewBoxPreset {
-    const match = presets.find(([, presetViewBox]) => viewBoxMatches(viewBox, presetViewBox));
+    const viewBoxKey = viewBoxToString(viewBox);
+    const match = presets.find(([, presetViewBox]) => presetViewBox === viewBoxKey);
     return match?.[0] ?? CUSTOM_VIEWBOX_PRESET;
 }
 
@@ -144,13 +154,13 @@ function ViewBoxEditor() {
     const boundsViewBox = computeExportViewBox(pathValue, exportStroke ? exportStrokeWidth : 0, pathViewBox);
     const viewBoxPresets: ViewBoxPreset[] = [
         ...STATIC_VIEWBOX_PRESETS,
-        ["bounds", boundsViewBox],
-        ["current viewBox", pathViewBox],
+        ["bounds", viewBoxToString(boundsViewBox)],
+        ["current viewBox", viewBoxToString(pathViewBox)],
     ];
     const resolvedPreset = resolveViewBoxPreset(exportViewBoxDraft, viewBoxPresets);
     const selectItems: ViewBoxPreset[] = [
         ...viewBoxPresets,
-        [CUSTOM_VIEWBOX_PRESET, exportViewBoxDraft],
+        [CUSTOM_VIEWBOX_PRESET, viewBoxToString(exportViewBoxDraft)],
     ];
 
     useEffect(() => {
@@ -167,12 +177,7 @@ function ViewBoxEditor() {
             return;
         }
 
-        setExportViewBoxDraft([
-            presetMatch[1][0],
-            presetMatch[1][1],
-            presetMatch[1][2],
-            presetMatch[1][3],
-        ]);
+        setExportViewBoxDraft(parseViewBoxString(presetMatch[1]));
     }
 
     return (
