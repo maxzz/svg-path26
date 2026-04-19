@@ -10,7 +10,7 @@ import { scaleToViewBoxDialogOpenAtom } from "@/components/4-dialogs/7-1-scale-t
 import { appSettings } from "@/store/0-ui-settings";
 import { doCenterSelectedSegmentsIntoViewBoxAtom } from "@/store/1-atoms-commands/1-center-selected";
 import { doAsyncOpenUpdateViewBoxDialogAndApplyAtom } from "@/store/1-atoms-commands/3-update-view-box";
-import { exportSvgDialogOpenAtom, openPathDialogOpenAtom, savePathDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
+import { openPathDialogOpenAtom, savePathDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 
 export function EditMenu() {
     const { minifyOutput } = useSnapshot(appSettings.pathEditor);
@@ -31,7 +31,6 @@ export function EditMenu() {
     const doCenter = useSetAtom(doCenterSelectedSegmentsIntoViewBoxAtom);
     const setScaleToViewBoxDialogOpen = useSetAtom(scaleToViewBoxDialogOpenAtom);
     const openUpdateViewBoxDialog = useSetAtom(doAsyncOpenUpdateViewBoxDialogAndApplyAtom);
-    const setOpenExportDialog = useSetAtom(exportSvgDialogOpenAtom);
     const setSaveDialogOpen = useSetAtom(savePathDialogOpenAtom);
     const setOpenDialogOpen = useSetAtom(openPathDialogOpenAtom);
 
@@ -62,10 +61,6 @@ export function EditMenu() {
                 <MenubarItem disabled={!hasPath} onClick={() => setSaveDialogOpen(true)}>
                     Save Path... <MenubarShortcut>Ctrl+S</MenubarShortcut>
                 </MenubarItem>
-                <MenubarItem disabled={!hasPath} onClick={() => setOpenExportDialog(true)}>
-                    Export SVG... <MenubarShortcut>Ctrl+E</MenubarShortcut>
-                </MenubarItem>
-
                 <MenubarSeparator />
 
                 <MenubarItem disabled={!hasSelection} onClick={() => setScaleToViewBoxDialogOpen(true)}>
