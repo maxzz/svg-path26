@@ -7,6 +7,8 @@ import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-pa
 
 export type ExportViewBoxDraft = ViewBox;
 
+const exportSvgDialogOpenBaseAtom = atom(false);
+
 export const exportViewBoxDraftAtom = atom<ExportViewBoxDraft>([0, 0, 1, 1]);
 
 export const doResetExportViewBoxDraftAtom = atom(
@@ -23,5 +25,15 @@ export const doResetExportViewBoxDraftAtom = atom(
                 fallback,
             ),
         );
+    },
+);
+
+export const exportSvgDialogOpenAtom = atom(
+    (get) => get(exportSvgDialogOpenBaseAtom),
+    (_get, set, open: boolean) => {
+        if (open) {
+            set(doResetExportViewBoxDraftAtom);
+        }
+        set(exportSvgDialogOpenBaseAtom, open);
     },
 );

@@ -1,7 +1,8 @@
 import { useRef } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { MenubarContent, MenubarItem, MenubarMenu, MenubarShortcut, MenubarTrigger } from "@/components/ui/shadcn/menubar";
-import { addImageDialogOpenAtom, exportSvgDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
+import { addImageDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
+import { exportSvgDialogOpenAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
 import { pendingImageAtom } from "@/store/0-atoms/2-8-images";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 

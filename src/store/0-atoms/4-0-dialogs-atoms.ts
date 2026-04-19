@@ -1,24 +1,12 @@
 import { atom } from "jotai";
-import { doResetExportViewBoxDraftAtom } from "../../components/4-dialogs/5-export-path/8-dialog-export-atoms";
 
 // Dialog atoms extracted from 2-5-canvas-actions-menu
 
-const exportSvgDialogOpenBaseAtom = atom(false);
 const savePathDialogOpenBaseAtom = atom(false);
 const openPathDialogOpenBaseAtom = atom(false);
 const addImageDialogOpenBaseAtom = atom(false);
 const aboutDialogOpenBaseAtom = atom(false);
 const optionsDialogOpenBaseAtom = atom(false);
-
-export const exportSvgDialogOpenAtom = atom(
-    (get) => get(exportSvgDialogOpenBaseAtom),
-    (_get, set, open: boolean) => {
-        if (open) {
-            set(doResetExportViewBoxDraftAtom);
-        }
-        set(exportSvgDialogOpenBaseAtom, open);
-    },
-);
 
 export const savePathDialogOpenAtom = atom(
     (get) => get(savePathDialogOpenBaseAtom),
