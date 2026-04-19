@@ -31,9 +31,9 @@ export function ExportSvgDialog() {
                 </DialogHeader>
 
                 <div className="space-y-3 text-xs">
-                    <ExportStyleControls />
-                    <ExportViewBoxEditor />
-                    <ExportSvgPreview />
+                    <FillStrokeControls />
+                    <ViewBoxEditor />
+                    <SvgPreview />
                 </div>
 
                 <DialogFooter>
@@ -46,7 +46,7 @@ export function ExportSvgDialog() {
     );
 }
 
-function ExportStyleControls() {
+function FillStrokeControls() {
     const { exportFill, exportFillColor, exportStroke, exportStrokeColor, exportStrokeWidth } = useSnapshot(appSettings.export);
     return (
         <div className="grid grid-cols-[auto_auto_minmax(0,1fr)] gap-y-2">
@@ -108,7 +108,7 @@ function ExportStyleControls() {
     );
 }
 
-function ExportViewBoxEditor() {
+function ViewBoxEditor() {
     const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
     const resetExportViewBox = useSetAtom(doResetExportViewBoxDraftAtom);
 
@@ -150,7 +150,7 @@ function ExportViewBoxEditor() {
     );
 }
 
-function ExportSvgPreview() {
+function SvgPreview() {
     const { exportFill, exportFillColor, exportStroke, exportStrokeColor, exportStrokeWidth } = useSnapshot(appSettings.export);
 
     const exportViewBoxDraft = useAtomValue(exportViewBoxDraftAtom);
@@ -182,6 +182,16 @@ function ExportSvgPreview() {
                     stroke={exportStroke ? exportStrokeColor : "none"}
                     strokeWidth={exportStroke ? exportStrokeWidth : 0}
                 />
+            <rect
+                x={exportViewBoxDraft[0]}
+                y={exportViewBoxDraft[1]}
+                width={previewWidth}
+                height={previewHeight}
+                fill="none"
+                stroke="oklch(0.6 0 0 / 0.75)"
+                strokeWidth={0.8}
+                vectorEffect="non-scaling-stroke"
+            />
             </svg>
         </div>
     );
