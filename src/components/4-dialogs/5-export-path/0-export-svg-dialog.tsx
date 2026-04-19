@@ -1,13 +1,40 @@
+import { useEffect } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
 import { Input } from "@/components/ui/shadcn/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/shadcn/select";
 import { Switch } from "@/components/ui/shadcn/switch";
 import { NumberField } from "@/components/ui/loacal-ui/2-number-field";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { type ExportViewBoxDraft, doResetExportViewBoxDraftAtom, exportSvgDialogOpenAtom, exportViewBoxDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
+import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
+import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-path-commands/8-svg-utils";
 import { appSettings } from "@/store/0-ui-settings";
+import { type ExportViewBoxPreset } from "@/store/9-ui-settings-types-and-defaults";
+
+const CUSTOM_VIEWBOX_PRESET: ExportViewBoxPreset = "Custom";
+
+type ViewBoxPreset = [ExportViewBoxPreset, ExportViewBoxDraft];
+
+const STATIC_VIEWBOX_PRESETS: ViewBoxPreset[] = [
+    ["16x16", [0, 0, 16, 16]],
+    ["20x20", [0, 0, 20, 20]],
+    ["24x24", [0, 0, 24, 24]],
+];
+
+function viewBoxMatches(left: ExportViewBoxDraft, right: ExportViewBoxDraft): boolean {
+    return left[0] === right[0]
+        && left[1] === right[1]
+        && left[2] === right[2]
+        && left[3] === right[3];
+}
+
+function resolveViewBoxPreset(viewBox: ExportViewBoxDraft, presets: ViewBoxPreset[]): ExportViewBoxPreset {
+    const match = presets.find(([, presetViewBox]) => viewBoxMatches(viewBox, presetViewBox));
+    return match?.[0] ?? CUSTOM_VIEWBOX_PRESET;
+}
 
 export function ExportSvgDialog() {
     const pathValue = useAtomValue(svgPathInputAtom);
@@ -110,9 +137,61 @@ function FillStrokeControls() {
 function ViewBoxEditor() {
     const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
     const resetExportViewBox = useSetAtom(doResetExportViewBoxDraftAtom);
+    const pathViewBox = useAtomValue(pathViewBoxAtom);
+    const pathValue = useAtomValue(svgPathInputAtom);
+    const { exportStroke, exportStrokeWidth, exportViewBoxPreset } = useSnapshot(appSettings.export);
+
+    const boundsViewBox = computeExportViewBox(pathValue, exportStroke ? exportStrokeWidth : 0, pathViewBox);
+    const viewBoxPresets: ViewBoxPreset[] = [
+        ...STATIC_VIEWBOX_PRESETS,
+        ["bounds", boundsViewBox],
+        ["current viewBox", pathViewBox],
+    ];
+    const resolvedPreset = resolveViewBoxPreset(exportViewBoxDraft, viewBoxPresets);
+    const selectItems: ViewBoxPreset[] = [
+        ...viewBoxPresets,
+        [CUSTOM_VIEWBOX_PRESET, exportViewBoxDraft],
+    ];
+
+    useEffect(() => {
+        if (exportViewBoxPreset !== resolvedPreset) {
+            appSettings.export.exportViewBoxPreset = resolvedPreset;
+        }
+    }, [exportViewBoxPreset, resolvedPreset]);
+
+    function handlePresetChange(nextPreset: ExportViewBoxPreset) {
+        appSettings.export.exportViewBoxPreset = nextPreset;
+
+        const presetMatch = viewBoxPresets.find(([label]) => label === nextPreset);
+        if (!presetMatch) {
+            return;
+        }
+
+        setExportViewBoxDraft([
+            presetMatch[1][0],
+            presetMatch[1][1],
+            presetMatch[1][2],
+            presetMatch[1][3],
+        ]);
+    }
 
     return (
-        <div>
+        <div className="space-y-2">
+            <label className="space-y-1">
+                <span className="text-muted-foreground">ViewBox preset</span>
+                <Select value={resolvedPreset} onValueChange={(value) => handlePresetChange(value as ExportViewBoxPreset)}>
+                    <SelectTrigger className="w-full">
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {selectItems.map(([label]) => (
+                            <SelectItem key={label} value={label}>
+                                {label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </label>
             <div className="col-span-2 grid grid-cols-4 gap-2 rounded border px-2 py-2">
                 <NumberField
                     label="x"
