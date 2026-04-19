@@ -24,14 +24,10 @@ export const doResetExportViewBoxDraftAtom = atom(
     (get, set) => {
         const { exportStroke, exportStrokeWidth } = appSettings.export;
         const fallback = get(pathViewBoxAtom);
-        set(
-            exportViewBoxDraftAtom,
-            computeExportViewBox(
-                get(svgPathInputAtom),
-                exportStroke ? exportStrokeWidth : 0,
-                fallback,
-            ),
-        );
+        const pathValue = get(svgPathInputAtom);
+        const exportViewBox = computeExportViewBox(pathValue, exportStroke ? exportStrokeWidth : 0, fallback);
+        
+        set(exportViewBoxDraftAtom, exportViewBox);
     },
 );
 
