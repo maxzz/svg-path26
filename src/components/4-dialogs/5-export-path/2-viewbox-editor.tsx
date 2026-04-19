@@ -11,38 +11,6 @@ import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-pa
 import { appSettings } from "@/store/0-ui-settings";
 import { type ExportViewBoxPreset } from "@/store/9-ui-settings-types-and-defaults";
 
-const CUSTOM_VIEWBOX_LABEL = "Custom";
-
-type ViewBoxPreset = [string, ExportViewBoxPreset];
-
-const STATIC_VIEWBOX_PRESETS: ViewBoxPreset[] = [
-    ["16x16", "0,0,16,16"],
-    ["20x20", "0,0,20,20"],
-    ["24x24", "0,0,24,24"],
-];
-
-function viewBoxToString(viewBox: ExportViewBoxDraft): string {
-    return `${viewBox[0]},${viewBox[1]},${viewBox[2]},${viewBox[3]}`;
-}
-
-function parseViewBoxString(viewBox: string): ExportViewBoxDraft {
-    const parsed = viewBox.split(",").map((value) => Number(value));
-    if (parsed.length !== 4) {
-        return [0, 0, 1, 1];
-    }
-    const [x, y, width, height] = parsed;
-    if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(width) || !Number.isFinite(height)) {
-        return [0, 0, 1, 1];
-    }
-    return [x, y, width, height];
-}
-
-function resolveViewBoxPresetLabel(viewBox: ExportViewBoxDraft, presets: ViewBoxPreset[]): string {
-    const viewBoxKey = viewBoxToString(viewBox);
-    const match = presets.find(([, presetViewBox]) => presetViewBox === viewBoxKey);
-    return match?.[0] ?? CUSTOM_VIEWBOX_LABEL;
-}
-
 export function ViewBoxEditor() {
     const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
     const resetExportViewBox = useSetAtom(doResetExportViewBoxDraftAtom);
@@ -56,18 +24,22 @@ export function ViewBoxEditor() {
         ["bounds", viewBoxToString(boundsViewBox)],
         ["current viewBox", viewBoxToString(pathViewBox)],
     ];
+
     const resolvedPresetLabel = resolveViewBoxPresetLabel(exportViewBoxDraft, viewBoxPresets);
     const selectItems: ViewBoxPreset[] = [
         ...viewBoxPresets,
         [CUSTOM_VIEWBOX_LABEL, viewBoxToString(exportViewBoxDraft)],
     ];
+
     const viewBoxPresetValue = viewBoxToString(exportViewBoxDraft);
 
-    useEffect(() => {
-        if (exportViewBoxPreset !== viewBoxPresetValue) {
-            appSettings.export.exportViewBoxPreset = viewBoxPresetValue;
-        }
-    }, [exportViewBoxPreset, viewBoxPresetValue]);
+    useEffect(
+        () => {
+            if (exportViewBoxPreset !== viewBoxPresetValue) {
+                appSettings.export.exportViewBoxPreset = viewBoxPresetValue;
+            }
+        },
+        [exportViewBoxPreset, viewBoxPresetValue]);
 
     function handlePresetChange(nextPresetLabel: string) {
         const presetMatch = viewBoxPresets.find(([label]) => label === nextPresetLabel);
@@ -132,4 +104,36 @@ export function ViewBoxEditor() {
             </Button>
         </div>
     );
+}
+
+const CUSTOM_VIEWBOX_LABEL = "Custom";
+
+type ViewBoxPreset = [string, ExportViewBoxPreset];
+
+const STATIC_VIEWBOX_PRESETS: ViewBoxPreset[] = [
+    ["16x16", "0,0,16,16"],
+    ["20x20", "0,0,20,20"],
+    ["24x24", "0,0,24,24"],
+];
+
+function viewBoxToString(viewBox: ExportViewBoxDraft): string {
+    return `${viewBox[0]},${viewBox[1]},${viewBox[2]},${viewBox[3]}`;
+}
+
+function parseViewBoxString(viewBox: string): ExportViewBoxDraft {
+    const parsed = viewBox.split(",").map((value) => Number(value));
+    if (parsed.length !== 4) {
+        return [0, 0, 1, 1];
+    }
+    const [x, y, width, height] = parsed;
+    if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(width) || !Number.isFinite(height)) {
+        return [0, 0, 1, 1];
+    }
+    return [x, y, width, height];
+}
+
+function resolveViewBoxPresetLabel(viewBox: ExportViewBoxDraft, presets: ViewBoxPreset[]): string {
+    const viewBoxKey = viewBoxToString(viewBox);
+    const match = presets.find(([, presetViewBox]) => presetViewBox === viewBoxKey);
+    return match?.[0] ?? CUSTOM_VIEWBOX_LABEL;
 }
