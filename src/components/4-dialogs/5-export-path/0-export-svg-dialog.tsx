@@ -62,8 +62,9 @@ function ExportStyleControls() {
                 </label>
 
                 <Input
-                    className="w-16 px-1 py-0.5"
+                    className="w-16 px-1 py-0.5 disabled:opacity-20"
                     type="color"
+                    disabled={!exportFill}
                     value={exportFillColor}
                     onChange={(event) => appSettings.export.exportFillColor = event.target.value}
                 />
@@ -81,8 +82,9 @@ function ExportStyleControls() {
                 </label>
 
                 <Input
-                    className="w-16 px-1 py-0.5"
+                    className="w-16 px-1 py-0.5 disabled:opacity-20"
                     type="color"
+                    disabled={!exportStroke}
                     value={exportStrokeColor}
                     onChange={(event) => appSettings.export.exportStrokeColor = event.target.value}
                 />
@@ -92,7 +94,8 @@ function ExportStyleControls() {
                         Stroke width
                     </span>
                     <Input
-                        className="w-16"
+                        className="w-16 disabled:opacity-20"
+                        disabled={!exportStroke}
                         type="number"
                         min={0.1}
                         step={0.05}
