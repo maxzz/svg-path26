@@ -1,18 +1,11 @@
 import { useRef } from "react";
-import { useAtomValue, useSetAtom } from "jotai";
-import { MenubarContent, MenubarItem, MenubarMenu, MenubarShortcut, MenubarTrigger } from "@/components/ui/shadcn/menubar";
-import { addImageDialogOpenAtom, exportSvgDialogOpenAtom, openPathDialogOpenAtom, savePathDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
-import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
+import { useSetAtom } from "jotai";
+import { MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/ui/shadcn/menubar";
+import { addImageDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 import { pendingImageAtom } from "@/store/0-atoms/2-8-images";
 
 export function FileMenu() {
-    const pathValue = useAtomValue(svgPathInputAtom);
-    const setOpenExportDialog = useSetAtom(exportSvgDialogOpenAtom);
-    const setSaveDialogOpen = useSetAtom(savePathDialogOpenAtom);
-    const setOpenDialogOpen = useSetAtom(openPathDialogOpenAtom);
-
     const fileRef = useRef<HTMLInputElement | null>(null);
-    const hasPath = Boolean(pathValue.trim());
 
     return (<>
         <ImageUploadInput fileRef={fileRef} />
@@ -23,15 +16,6 @@ export function FileMenu() {
             </MenubarTrigger>
 
             <MenubarContent>
-                <MenubarItem onClick={() => setOpenDialogOpen(true)}>
-                    Open Saved Path... <MenubarShortcut>Ctrl+O</MenubarShortcut>
-                </MenubarItem>
-                <MenubarItem disabled={!hasPath} onClick={() => setSaveDialogOpen(true)}>
-                    Save Path... <MenubarShortcut>Ctrl+S</MenubarShortcut>
-                </MenubarItem>
-                <MenubarItem disabled={!hasPath} onClick={() => setOpenExportDialog(true)}>
-                    Export SVG... <MenubarShortcut>Ctrl+E</MenubarShortcut>
-                </MenubarItem>
                 <MenubarItem onClick={() => fileRef.current?.click()}>
                     Upload Image...
                 </MenubarItem>
