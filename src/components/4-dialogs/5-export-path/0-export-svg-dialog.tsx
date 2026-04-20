@@ -5,7 +5,7 @@ import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { exportSvgDialogOpenAtom, exportViewBoxDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
 import { FillStrokeControls } from "./1-fill-stroke-controls";
 import { ViewBoxEditor } from "./2-viewbox-editor";
-import { SvgPreview } from "./3-svg-preview";
+import { SvgPreview } from "./4-svg-preview";
 import { exportSvgToFile } from "./7-export-utils";
 
 export function ExportSvgDialog() {
