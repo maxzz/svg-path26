@@ -28,7 +28,7 @@ export function EditorPanels() {
 
     return (
         <aside className="h-full border-r flex flex-col justify-between">
-            <ScrollArea className="grow flex-1">
+            <ScrollArea className="flex-1 grow pr-1">
                 <Section_SvgPreview />
                 <Section_SvgInput />
                 <Section_PathInput />
