@@ -23,7 +23,12 @@ export function Section_PathCommands() {
                 contentClassName="px-0 pt-0.5 pb-4"
                 overlay={<PathCommandsOverlay />}
             >
-                <ScrollArea className="max-h-64 rounded border bg-muted/20" fixedWidth parentContentWidth>
+                <ScrollArea
+                    className="rounded border bg-muted/20"
+                    fixedWidth
+                    parentContentWidth
+                    viewportClassName="max-h-64 h-auto"
+                >
                     <div className="px-1 py-2 text-xs font-ui">
                         <CommandsList />
                     </div>
