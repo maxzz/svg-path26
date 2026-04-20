@@ -15,6 +15,7 @@ export const VIEWBOX_PRESET_KEYS = {
 } as const;
 
 const LEGACY_CUSTOM_PRESET = "custom";
+const CUSTOM_PRESET_PREFIX = "custom:";
 
 export function ViewBoxPresetSelect() {
     const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
@@ -26,8 +27,9 @@ export function ViewBoxPresetSelect() {
         () => computeExportViewBox(pathValue, exportStroke ? exportStrokeWidth : 0, pathViewBox),
         [exportStroke, exportStrokeWidth, pathValue, pathViewBox]);
 
-    const resolvedPresetId = resolvePresetId(exportViewBoxPreset, exportViewBoxDraft);
-    const selectItems = buildSelectItems(resolvedPresetId);
+    const customPresetValue = viewBoxToString(exportViewBoxDraft);
+    const resolvedPresetId = resolvePresetId(exportViewBoxPreset, customPresetValue);
+    const selectItems = buildSelectItems(customPresetValue);
 
     useEffect(
         () => {
@@ -68,6 +70,11 @@ export function ViewBoxPresetSelect() {
         [boundsViewBox, exportViewBoxDraft, exportViewBoxPreset, pathViewBox, setExportViewBoxDraft]);
 
     function handlePresetChange(nextPresetId: string) {
+        if (isCustomPresetId(nextPresetId)) {
+            appSettings.export.exportViewBoxPreset = fromCustomPresetId(nextPresetId);
+            return;
+        }
+
         appSettings.export.exportViewBoxPreset = nextPresetId;
     }
 
@@ -90,6 +97,7 @@ export function ViewBoxPresetSelect() {
     );
 }
 
+const CUSTOM_VIEWBOX_LABEL = "Custom";
 const CURRENT_VIEWBOX_LABEL = "current viewBox";
 const BOUNDS_VIEWBOX_LABEL = "bounds";
 
@@ -101,6 +109,7 @@ const STATIC_VIEWBOX_PRESETS: ViewBoxPreset[] = [
     ["24x24", "0,0,24,24"],
 ];
 
+const STATIC_VIEWBOX_PRESET_VALUES = new Set(STATIC_VIEWBOX_PRESETS.map(([, value]) => value));
 const STATIC_VIEWBOX_PRESET_ITEMS: ViewBoxPresetOption[] = STATIC_VIEWBOX_PRESETS.map(([label, value]) => ({
     id: value,
     label,
@@ -127,21 +136,24 @@ function parseViewBoxString(viewBox: string): ExportViewBoxDraft {
     return [x, y, width, height];
 }
 
-function resolvePresetId(preset: ExportViewBoxPreset, fallbackViewBox: ExportViewBoxDraft): string {
+function resolvePresetId(preset: ExportViewBoxPreset, fallbackViewBoxValue: string): string {
     if (preset === VIEWBOX_PRESET_KEYS.bounds
         || preset === VIEWBOX_PRESET_KEYS.current) {
         return preset;
     }
 
     if (preset === LEGACY_CUSTOM_PRESET) {
-        return viewBoxToString(fallbackViewBox);
+        return toCustomPresetId(fallbackViewBoxValue);
     }
 
     if (isViewBoxString(preset)) {
-        return preset;
+        if (STATIC_VIEWBOX_PRESET_VALUES.has(preset)) {
+            return preset;
+        }
+        return toCustomPresetId(preset);
     }
 
-    return viewBoxToString(fallbackViewBox);
+    return toCustomPresetId(fallbackViewBoxValue);
 }
 
 function isViewBoxString(value: ExportViewBoxPreset): boolean {
@@ -159,16 +171,29 @@ function areViewBoxesEqual(left: ExportViewBoxDraft, right: ExportViewBoxDraft):
         && left[3] === right[3];
 }
 
-function buildSelectItems(resolvedPresetId: string): ViewBoxPresetOption[] {
+function buildSelectItems(customPresetValue: string): ViewBoxPresetOption[] {
     const items: ViewBoxPresetOption[] = [
         ...STATIC_VIEWBOX_PRESET_ITEMS,
         { id: VIEWBOX_PRESET_KEYS.bounds, label: BOUNDS_VIEWBOX_LABEL },
         { id: VIEWBOX_PRESET_KEYS.current, label: CURRENT_VIEWBOX_LABEL },
     ];
 
-    if (isViewBoxString(resolvedPresetId) && !items.some((item) => item.id === resolvedPresetId)) {
-        items.push({ id: resolvedPresetId, label: resolvedPresetId });
-    }
+    items.push({
+        id: toCustomPresetId(customPresetValue),
+        label: `${CUSTOM_VIEWBOX_LABEL} ${customPresetValue}`,
+    });
 
     return items;
+}
+
+function toCustomPresetId(viewBoxValue: string): string {
+    return `${CUSTOM_PRESET_PREFIX}${viewBoxValue}`;
+}
+
+function isCustomPresetId(presetId: string): boolean {
+    return presetId.startsWith(CUSTOM_PRESET_PREFIX);
+}
+
+function fromCustomPresetId(presetId: string): string {
+    return presetId.slice(CUSTOM_PRESET_PREFIX.length);
 }
