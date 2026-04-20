@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/shadcn/select";
@@ -16,12 +16,15 @@ export const VIEWBOX_PRESET_KEYS = {
 } as const;
 
 export function ViewBoxPresetSelect() {
-    const [, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
+    const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
     const pathViewBox = useAtomValue(pathViewBoxAtom);
     const pathValue = useAtomValue(svgPathInputAtom);
     const { exportStroke, exportStrokeWidth, exportViewBoxPreset } = useSnapshot(appSettings.export);
 
-    const boundsViewBox = computeExportViewBox(pathValue, exportStroke ? exportStrokeWidth : 0, pathViewBox);
+    const boundsViewBox = useMemo(
+        () => computeExportViewBox(pathValue, exportStroke ? exportStrokeWidth : 0, pathViewBox),
+        [exportStroke, exportStrokeWidth, pathValue, pathViewBox]
+    );
     const resolvedPresetId = resolvePresetId(exportViewBoxPreset);
     const isLegacyCustomPreset = isViewBoxString(exportViewBoxPreset)
         && !STATIC_VIEWBOX_PRESET_VALUES.has(exportViewBoxPreset);
@@ -38,20 +41,27 @@ export function ViewBoxPresetSelect() {
                 return;
             }
 
-            setExportViewBoxDraft(parseViewBoxString(exportViewBoxPreset));
+            const nextDraft = parseViewBoxString(exportViewBoxPreset);
+            if (!areViewBoxesEqual(exportViewBoxDraft, nextDraft)) {
+                setExportViewBoxDraft(nextDraft);
+            }
             appSettings.export.exportViewBoxPreset = VIEWBOX_PRESET_KEYS.custom;
         },
-        [exportViewBoxPreset, isLegacyCustomPreset, setExportViewBoxDraft]);
+        [exportViewBoxDraft, exportViewBoxPreset, isLegacyCustomPreset, setExportViewBoxDraft]);
 
     useEffect(
         () => {
             if (resolvedPresetId === VIEWBOX_PRESET_KEYS.bounds) {
-                setExportViewBoxDraft(boundsViewBox);
+                if (!areViewBoxesEqual(exportViewBoxDraft, boundsViewBox)) {
+                    setExportViewBoxDraft(boundsViewBox);
+                }
                 return;
             }
 
             if (resolvedPresetId === VIEWBOX_PRESET_KEYS.current) {
-                setExportViewBoxDraft(pathViewBox);
+                if (!areViewBoxesEqual(exportViewBoxDraft, pathViewBox)) {
+                    setExportViewBoxDraft(pathViewBox);
+                }
                 return;
             }
 
@@ -60,10 +70,13 @@ export function ViewBoxPresetSelect() {
             }
 
             if (STATIC_VIEWBOX_PRESET_VALUES.has(resolvedPresetId)) {
-                setExportViewBoxDraft(parseViewBoxString(resolvedPresetId));
+                const nextDraft = parseViewBoxString(resolvedPresetId);
+                if (!areViewBoxesEqual(exportViewBoxDraft, nextDraft)) {
+                    setExportViewBoxDraft(nextDraft);
+                }
             }
         },
-        [boundsViewBox, pathViewBox, resolvedPresetId, setExportViewBoxDraft]);
+        [boundsViewBox, exportViewBoxDraft, pathViewBox, resolvedPresetId, setExportViewBoxDraft]);
 
     function handlePresetChange(nextPresetId: string) {
         appSettings.export.exportViewBoxPreset = nextPresetId;
@@ -143,4 +156,11 @@ function isViewBoxString(value: ExportViewBoxPreset): boolean {
         return false;
     }
     return parts.every((part) => Number.isFinite(Number(part)));
+}
+
+function areViewBoxesEqual(left: ExportViewBoxDraft, right: ExportViewBoxDraft): boolean {
+    return left[0] === right[0]
+        && left[1] === right[1]
+        && left[2] === right[2]
+        && left[3] === right[3];
 }
