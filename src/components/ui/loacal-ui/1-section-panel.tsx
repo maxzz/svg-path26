@@ -28,12 +28,12 @@ export function SectionPanel({ sectionKey, label, children, triggerClassName, co
         >
             <AccordionItem value={sectionKey} className="border-none">
                 <div className="relative">
-                    <AccordionTrigger className={classNames("px-3 py-1.5 text-base font-ui bg-foreground/3 border-b hover:no-underline select-none", triggerClassName)}>
+                    <AccordionTrigger className={classNames("mr-1 px-3 py-1.5 text-base font-ui bg-foreground/7 border-b hover:no-underline select-none", triggerClassName)}>
                         {label}
                     </AccordionTrigger>
 
                     {overlay && (
-                        <div className="pointer-events-none absolute inset-y-0 right-7 z-10 flex items-center">
+                        <div className="absolute inset-y-0 right-8 flex items-center pointer-events-none z-10">
                             <div className="pointer-events-auto flex items-center gap-1">
                                 {overlay}
                             </div>

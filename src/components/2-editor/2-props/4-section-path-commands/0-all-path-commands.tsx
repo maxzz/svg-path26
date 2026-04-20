@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
+import { appSettings } from "@/store/0-ui-settings";
 import { Accordion } from "@/components/ui/shadcn/accordion";
 import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
 import { ScrollArea } from "@/components/ui/shadcn/scroll-area";
@@ -8,31 +9,25 @@ import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel.tsx";
 import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 import { commandRowsAtom, subPathAccordionValuesAtom, subPathsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { doSelectCommandAtom, doToggleSegmentRelativeAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions.ts";
-import { appSettings } from "@/store/0-ui-settings";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
+import { CommandRow, focusField } from "./1-commands-list-row.tsx";
 import { PathCommandsOverlay } from "./7-1-header-overlay.tsx";
 import { SubPathToggleRow } from "./7-2-subpath-header.tsx";
-import { CommandRow, focusField } from "./1-commands-list-row.tsx";
 
 export function Section_PathCommands() {
     return (
         <TooltipProvider delayDuration={250}>
-            <SectionPanel
-                sectionKey="commands"
-                label="Path Commands"
-                contentClassName="px-0 pt-0.5 pb-4"
-                overlay={<PathCommandsOverlay />}
-            >
-                <ScrollArea
-                    className="rounded border bg-muted/20"
-                    fixedWidth
-                    parentContentWidth
-                    viewportClassName="max-h-64 h-auto"
-                >
+            <SectionPanel label="Path Commands" sectionKey="commands" contentClassName="px-0 pt-0.5 pb-4" overlay={<PathCommandsOverlay />}>
+
+                {/* The ScrollArea viewport was still using h-full, which needs a definite parent height; max-h-64 on the root doesn’t give it one, 
+                so the viewport expands with content and never overflows (no scrollbars, no wheel scroll). I moved the height constraint to the viewport and
+                overrode h-full with h-auto. This restores hover scrollbars and wheel scrolling while keeping the “auto up to max height” behavior. */}
+                <ScrollArea className="mr-1 bg-muted/20 border rounded" viewportClassName="h-auto max-h-64" fixedWidth parentContentWidth>
                     <div className="px-1 py-2 text-xs font-ui">
                         <CommandsList />
                     </div>
                 </ScrollArea>
+
             </SectionPanel>
         </TooltipProvider>
     );
@@ -99,13 +94,10 @@ export function CommandsList() {
 
     return (<>
         <CommandsListScrollEffects rowRefs={rowRefs} rowsLength={rows.length} />
+
         {hasCompoundSubPaths
             ? (<>
-                <Accordion
-                    type="multiple"
-                    value={openSubPaths}
-                    onValueChange={setOpenSubPaths}
-                >
+                <Accordion type="multiple" value={openSubPaths} onValueChange={setOpenSubPaths}>
                     {subPaths.map(
                         (subPath) => (
                             <SubPathToggleRow key={`subpath:${subPath.index}`} subPathIndex={subPath.index}>
@@ -123,12 +115,12 @@ export function CommandsList() {
     </>);
 }
 
-function CommandsListScrollEffects(props: { rowRefs: React.RefObject<Record<number, HTMLDivElement | null>>; rowsLength: number; }) {
-    const { rowRefs, rowsLength } = props;
+function CommandsListScrollEffects({ rowRefs, rowsLength }: { rowRefs: React.RefObject<Record<number, HTMLDivElement | null>>; rowsLength: number; }) {
+    const { scrollOnHover } = useSnapshot(appSettings.canvas);
+    
     const selectedCommandIndex = useAtomValue(selectedCommandIndexAtom);
     const hoveredCommandIndex = useAtomValue(hoveredCommandIndexAtom);
     const dragState = useAtomValue(canvasDragStateAtom);
-    const { scrollOnHover } = useSnapshot(appSettings.canvas);
 
     useEffect(
         () => {
@@ -148,4 +140,3 @@ function CommandsListScrollEffects(props: { rowRefs: React.RefObject<Record<numb
 
     return null;
 }
-

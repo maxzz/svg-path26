@@ -14,7 +14,7 @@ export function Section_PathInput() {
             <SectionPanel sectionKey="path-input" label="Path Input" contentClassName="px-px py-0.5" overlay={<PathInputOverlay pathValue={pathValue} />}>
                 <textarea
                     id="svg-path-input"
-                    className="pl-4 py-1 w-full min-h-8 field-sizing-content font-mono tracking-tight text-xs bg-background outline-ring/50 focus:-outline shadow-inner resize-y"
+                    className="px-3 py-1 w-full min-h-8 field-sizing-content font-mono tracking-tight text-[11px] bg-background outline-ring/50 focus:-outline shadow-inner resize-none"
                     value={pathValue}
                     onChange={(event) => setPathValue(event.target.value)}
                     placeholder="M 10 10 L 100 100"
