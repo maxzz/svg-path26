@@ -11,6 +11,7 @@ import { Section_PathCommands } from "../4-section-path-commands/0-all-path-comm
 import { Section_Operations } from "../5-section-operations/0-all-operations";
 import { Section_Options } from "../6-section-options/0-all-options";
 import { Section_Images } from "../7-section-images/0-all-images";
+import { ScrollArea } from "@/components/ui/shadcn/scroll-area";
 
 export function EditorPanels() {
     const handleEditorKeyDown = useSetAtom(doHandleEditorKeyDownAtom);
@@ -27,14 +28,14 @@ export function EditorPanels() {
 
     return (
         <aside className="h-full border-r flex flex-col justify-between">
-            <div className="grow flex-1 overflow-auto [scrollbar-gutter:stable]">
+            <ScrollArea className="grow flex-1">
                 <Section_SvgPreview />
                 <Section_SvgInput />
                 <Section_PathInput />
                 <Section_PathCommands />
                 <Section_Images />
                 <Section_Operations />
-            </div>
+            </ScrollArea>
 
             <Section_Options />
         </aside>
