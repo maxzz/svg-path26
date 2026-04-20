@@ -12,8 +12,9 @@ import { type ExportViewBoxPreset } from "@/store/9-ui-settings-types-and-defaul
 export const VIEWBOX_PRESET_KEYS = {
     bounds: "bounds",
     current: "current",
-    custom: "custom",
 } as const;
+
+const LEGACY_CUSTOM_PRESET = "custom";
 
 export function ViewBoxPresetSelect() {
     const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
@@ -23,60 +24,48 @@ export function ViewBoxPresetSelect() {
 
     const boundsViewBox = useMemo(
         () => computeExportViewBox(pathValue, exportStroke ? exportStrokeWidth : 0, pathViewBox),
-        [exportStroke, exportStrokeWidth, pathValue, pathViewBox]
-    );
-    const resolvedPresetId = resolvePresetId(exportViewBoxPreset);
-    const isLegacyCustomPreset = isViewBoxString(exportViewBoxPreset)
-        && !STATIC_VIEWBOX_PRESET_VALUES.has(exportViewBoxPreset);
-    const selectItems: ViewBoxPresetOption[] = [
-        ...STATIC_VIEWBOX_PRESET_ITEMS,
-        { id: VIEWBOX_PRESET_KEYS.bounds, label: BOUNDS_VIEWBOX_LABEL },
-        { id: VIEWBOX_PRESET_KEYS.current, label: CURRENT_VIEWBOX_LABEL },
-        { id: VIEWBOX_PRESET_KEYS.custom, label: CUSTOM_VIEWBOX_LABEL },
-    ];
+        [exportStroke, exportStrokeWidth, pathValue, pathViewBox]);
+
+    const resolvedPresetId = resolvePresetId(exportViewBoxPreset, exportViewBoxDraft);
+    const selectItems = buildSelectItems(resolvedPresetId);
 
     useEffect(
         () => {
-            if (!isLegacyCustomPreset) {
+            if (exportViewBoxPreset !== LEGACY_CUSTOM_PRESET) {
                 return;
             }
 
-            const nextDraft = parseViewBoxString(exportViewBoxPreset);
-            if (!areViewBoxesEqual(exportViewBoxDraft, nextDraft)) {
-                setExportViewBoxDraft(nextDraft);
+            const nextPreset = viewBoxToString(exportViewBoxDraft);
+            if (exportViewBoxPreset !== nextPreset) {
+                appSettings.export.exportViewBoxPreset = nextPreset;
             }
-            appSettings.export.exportViewBoxPreset = VIEWBOX_PRESET_KEYS.custom;
         },
-        [exportViewBoxDraft, exportViewBoxPreset, isLegacyCustomPreset, setExportViewBoxDraft]);
+        [exportViewBoxDraft, exportViewBoxPreset]);
 
     useEffect(
         () => {
-            if (resolvedPresetId === VIEWBOX_PRESET_KEYS.bounds) {
+            if (exportViewBoxPreset === VIEWBOX_PRESET_KEYS.bounds) {
                 if (!areViewBoxesEqual(exportViewBoxDraft, boundsViewBox)) {
                     setExportViewBoxDraft(boundsViewBox);
                 }
                 return;
             }
 
-            if (resolvedPresetId === VIEWBOX_PRESET_KEYS.current) {
+            if (exportViewBoxPreset === VIEWBOX_PRESET_KEYS.current) {
                 if (!areViewBoxesEqual(exportViewBoxDraft, pathViewBox)) {
                     setExportViewBoxDraft(pathViewBox);
                 }
                 return;
             }
 
-            if (resolvedPresetId === VIEWBOX_PRESET_KEYS.custom) {
-                return;
-            }
-
-            if (STATIC_VIEWBOX_PRESET_VALUES.has(resolvedPresetId)) {
-                const nextDraft = parseViewBoxString(resolvedPresetId);
+            if (isViewBoxString(exportViewBoxPreset)) {
+                const nextDraft = parseViewBoxString(exportViewBoxPreset);
                 if (!areViewBoxesEqual(exportViewBoxDraft, nextDraft)) {
                     setExportViewBoxDraft(nextDraft);
                 }
             }
         },
-        [boundsViewBox, exportViewBoxDraft, pathViewBox, resolvedPresetId, setExportViewBoxDraft]);
+        [boundsViewBox, exportViewBoxDraft, exportViewBoxPreset, pathViewBox, setExportViewBoxDraft]);
 
     function handlePresetChange(nextPresetId: string) {
         appSettings.export.exportViewBoxPreset = nextPresetId;
@@ -101,7 +90,6 @@ export function ViewBoxPresetSelect() {
     );
 }
 
-const CUSTOM_VIEWBOX_LABEL = "Custom";
 const CURRENT_VIEWBOX_LABEL = "current viewBox";
 const BOUNDS_VIEWBOX_LABEL = "bounds";
 
@@ -113,7 +101,6 @@ const STATIC_VIEWBOX_PRESETS: ViewBoxPreset[] = [
     ["24x24", "0,0,24,24"],
 ];
 
-const STATIC_VIEWBOX_PRESET_VALUES = new Set(STATIC_VIEWBOX_PRESETS.map(([, value]) => value));
 const STATIC_VIEWBOX_PRESET_ITEMS: ViewBoxPresetOption[] = STATIC_VIEWBOX_PRESETS.map(([label, value]) => ({
     id: value,
     label,
@@ -123,6 +110,10 @@ type ViewBoxPresetOption = {
     id: string;
     label: string;
 };
+
+export function viewBoxToString(viewBox: ExportViewBoxDraft): string {
+    return `${viewBox[0]},${viewBox[1]},${viewBox[2]},${viewBox[3]}`;
+}
 
 function parseViewBoxString(viewBox: string): ExportViewBoxDraft {
     const parsed = viewBox.split(",").map((value) => Number(value));
@@ -136,18 +127,21 @@ function parseViewBoxString(viewBox: string): ExportViewBoxDraft {
     return [x, y, width, height];
 }
 
-function resolvePresetId(preset: ExportViewBoxPreset): string {
+function resolvePresetId(preset: ExportViewBoxPreset, fallbackViewBox: ExportViewBoxDraft): string {
     if (preset === VIEWBOX_PRESET_KEYS.bounds
-        || preset === VIEWBOX_PRESET_KEYS.current
-        || preset === VIEWBOX_PRESET_KEYS.custom) {
+        || preset === VIEWBOX_PRESET_KEYS.current) {
         return preset;
     }
 
-    if (STATIC_VIEWBOX_PRESET_VALUES.has(preset)) {
+    if (preset === LEGACY_CUSTOM_PRESET) {
+        return viewBoxToString(fallbackViewBox);
+    }
+
+    if (isViewBoxString(preset)) {
         return preset;
     }
 
-    return VIEWBOX_PRESET_KEYS.custom;
+    return viewBoxToString(fallbackViewBox);
 }
 
 function isViewBoxString(value: ExportViewBoxPreset): boolean {
@@ -163,4 +157,18 @@ function areViewBoxesEqual(left: ExportViewBoxDraft, right: ExportViewBoxDraft):
         && left[1] === right[1]
         && left[2] === right[2]
         && left[3] === right[3];
+}
+
+function buildSelectItems(resolvedPresetId: string): ViewBoxPresetOption[] {
+    const items: ViewBoxPresetOption[] = [
+        ...STATIC_VIEWBOX_PRESET_ITEMS,
+        { id: VIEWBOX_PRESET_KEYS.bounds, label: BOUNDS_VIEWBOX_LABEL },
+        { id: VIEWBOX_PRESET_KEYS.current, label: CURRENT_VIEWBOX_LABEL },
+    ];
+
+    if (isViewBoxString(resolvedPresetId) && !items.some((item) => item.id === resolvedPresetId)) {
+        items.push({ id: resolvedPresetId, label: resolvedPresetId });
+    }
+
+    return items;
 }
