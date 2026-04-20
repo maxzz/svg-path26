@@ -1,21 +1,19 @@
 import { useAtom, useSetAtom } from "jotai";
 import { Button } from "@/components/ui/shadcn/button";
 import { NumberField } from "@/components/ui/loacal-ui/2-number-field";
-import { doResetExportViewBoxDraftAtom, exportViewBoxDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
+import { doResetExportViewBoxDraftAtom, exportViewBoxDraftAtom, exportViewBoxPresetDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
 import { appSettings } from "@/store/0-ui-settings";
-import { ViewBoxPresetSelect, VIEWBOX_PRESET_KEYS, viewBoxToString } from "./3-viewbox-preset";
+import { ViewBoxPresetSelect, VIEWBOX_PRESET_KEYS, toCustomPresetId, viewBoxToString } from "./3-viewbox-preset";
 
 export function ViewBoxEditor() {
     const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
     const resetExportViewBox = useSetAtom(doResetExportViewBoxDraftAtom);
+    const setExportViewBoxPresetDraft = useSetAtom(exportViewBoxPresetDraftAtom);
 
     function updateViewBoxDraft(update: (previous: typeof exportViewBoxDraft) => typeof exportViewBoxDraft) {
         setExportViewBoxDraft((previous) => {
             const nextDraft = update(previous);
-            const nextPreset = viewBoxToString(nextDraft);
-            if (appSettings.export.exportViewBoxPreset !== nextPreset) {
-                appSettings.export.exportViewBoxPreset = nextPreset;
-            }
+            setExportViewBoxPresetDraft(toCustomPresetId(viewBoxToString(nextDraft)));
             return nextDraft;
         });
     }
@@ -52,6 +50,7 @@ export function ViewBoxEditor() {
                 variant="outline"
                 className="col-span-2 h-7 px-2"
                 onClick={() => {
+                    setExportViewBoxPresetDraft(VIEWBOX_PRESET_KEYS.bounds);
                     appSettings.export.exportViewBoxPreset = VIEWBOX_PRESET_KEYS.bounds;
                     resetExportViewBox();
                 }}
