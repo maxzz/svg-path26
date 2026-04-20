@@ -3,6 +3,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { Accordion } from "@/components/ui/shadcn/accordion";
 import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
+import { ScrollArea } from "@/components/ui/shadcn/scroll-area";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel.tsx";
 import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 import { commandRowsAtom, subPathAccordionValuesAtom, subPathsAtom } from "@/store/0-atoms/2-0-svg-model";
@@ -22,9 +23,11 @@ export function Section_PathCommands() {
                 contentClassName="px-0 pt-0.5 pb-4"
                 overlay={<PathCommandsOverlay />}
             >
-                <div className="px-1 py-2 max-h-64 text-xs font-ui border bg-muted/20 rounded overflow-auto">
-                    <CommandsList />
-                </div>
+                <ScrollArea className="max-h-64 rounded border bg-muted/20" fixedWidth parentContentWidth>
+                    <div className="px-1 py-2 text-xs font-ui">
+                        <CommandsList />
+                    </div>
+                </ScrollArea>
             </SectionPanel>
         </TooltipProvider>
     );

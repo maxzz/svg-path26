@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useSetAtom } from "jotai";
-import { useSnapshot } from "valtio";
-import { appSettings } from "@/store/0-ui-settings";
+import { ScrollArea } from "@/components/ui/shadcn/scroll-area";
 import { doHandleEditorKeyDownAtom } from "./8-atoms";
 
 import { Section_SvgPreview } from "../1-section-svg-preview/0-all-svg-preview";
@@ -11,7 +10,6 @@ import { Section_PathCommands } from "../4-section-path-commands/0-all-path-comm
 import { Section_Operations } from "../5-section-operations/0-all-operations";
 import { Section_Options } from "../6-section-options/0-all-options";
 import { Section_Images } from "../7-section-images/0-all-images";
-import { ScrollArea } from "@/components/ui/shadcn/scroll-area";
 
 export function EditorPanels() {
     const handleEditorKeyDown = useSetAtom(doHandleEditorKeyDownAtom);
