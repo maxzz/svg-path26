@@ -14,52 +14,10 @@ import { type ExportViewBoxPreset } from "@/store/9-ui-settings-types-and-defaul
 export function ViewBoxEditor() {
     const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
     const resetExportViewBox = useSetAtom(doResetExportViewBoxDraftAtom);
-    const pathViewBox = useAtomValue(pathViewBoxAtom);
-    const pathValue = useAtomValue(svgPathInputAtom);
-    const { exportStroke, exportStrokeWidth, exportViewBoxPreset } = useSnapshot(appSettings.export);
-
-    const boundsViewBox = computeExportViewBox(pathValue, exportStroke ? exportStrokeWidth : 0, pathViewBox);
-    const viewBoxPresets: ViewBoxPreset[] = [
-        ...STATIC_VIEWBOX_PRESETS,
-        ["bounds", viewBoxToString(boundsViewBox)],
-        ["current viewBox", viewBoxToString(pathViewBox)],
-    ];
-
-    const resolvedPresetLabel = resolveViewBoxPresetLabel(exportViewBoxDraft, viewBoxPresets);
-    const selectItems: ViewBoxPreset[] = [
-        ...viewBoxPresets,
-        [CUSTOM_VIEWBOX_LABEL, viewBoxToString(exportViewBoxDraft)],
-    ];
-
-    const viewBoxPresetValue = viewBoxToString(exportViewBoxDraft);
-
-    useEffect(
-        () => {
-            if (exportViewBoxPreset !== viewBoxPresetValue) {
-                appSettings.export.exportViewBoxPreset = viewBoxPresetValue;
-            }
-        },
-        [exportViewBoxPreset, viewBoxPresetValue]);
-
-    function handlePresetChange(nextPresetLabel: string) {
-        const presetMatch = viewBoxPresets.find(([label]) => label === nextPresetLabel);
-        const nextValue = presetMatch?.[1] ?? viewBoxToString(exportViewBoxDraft);
-        appSettings.export.exportViewBoxPreset = nextValue;
-
-        if (!presetMatch) {
-            return;
-        }
-
-        setExportViewBoxDraft(parseViewBoxString(nextValue));
-    }
 
     return (
         <div className="space-y-2">
-            <ViewBoxPresetSelect
-                resolvedPresetLabel={resolvedPresetLabel}
-                selectItems={selectItems}
-                onPresetChange={handlePresetChange}
-            />
+            <ViewBoxPresetSelect />
             <div className="col-span-2 grid grid-cols-4 gap-2 rounded border px-2 py-2">
                 <NumberField
                     label="x"
@@ -96,19 +54,49 @@ export function ViewBoxEditor() {
     );
 }
 
-function ViewBoxPresetSelect({
-    resolvedPresetLabel,
-    selectItems,
-    onPresetChange,
-}: {
-    resolvedPresetLabel: string;
-    selectItems: ViewBoxPreset[];
-    onPresetChange: (nextPresetLabel: string) => void;
-}) {
+function ViewBoxPresetSelect() {
+    const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
+    const pathViewBox = useAtomValue(pathViewBoxAtom);
+    const pathValue = useAtomValue(svgPathInputAtom);
+    const { exportStroke, exportStrokeWidth, exportViewBoxPreset } = useSnapshot(appSettings.export);
+
+    const boundsViewBox = computeExportViewBox(pathValue, exportStroke ? exportStrokeWidth : 0, pathViewBox);
+    const viewBoxPresets: ViewBoxPreset[] = [
+        ...STATIC_VIEWBOX_PRESETS,
+        ["bounds", viewBoxToString(boundsViewBox)],
+        ["current viewBox", viewBoxToString(pathViewBox)],
+    ];
+    const viewBoxPresetValue = viewBoxToString(exportViewBoxDraft);
+    const resolvedPresetLabel = resolveViewBoxPresetLabel(exportViewBoxDraft, viewBoxPresets);
+    const selectItems: ViewBoxPreset[] = [
+        ...viewBoxPresets,
+        [CUSTOM_VIEWBOX_LABEL, viewBoxPresetValue],
+    ];
+
+    useEffect(
+        () => {
+            if (exportViewBoxPreset !== viewBoxPresetValue) {
+                appSettings.export.exportViewBoxPreset = viewBoxPresetValue;
+            }
+        },
+        [exportViewBoxPreset, viewBoxPresetValue]);
+
+    function handlePresetChange(nextPresetLabel: string) {
+        const presetMatch = viewBoxPresets.find(([label]) => label === nextPresetLabel);
+        const nextValue = presetMatch?.[1] ?? viewBoxPresetValue;
+        appSettings.export.exportViewBoxPreset = nextValue;
+
+        if (!presetMatch) {
+            return;
+        }
+
+        setExportViewBoxDraft(parseViewBoxString(nextValue));
+    }
+
     return (
         <label className="space-y-1">
             <span className="text-muted-foreground">ViewBox preset</span>
-            <Select value={resolvedPresetLabel} onValueChange={onPresetChange}>
+            <Select value={resolvedPresetLabel} onValueChange={handlePresetChange}>
                 <SelectTrigger className="w-full">
                     <SelectValue />
                 </SelectTrigger>
