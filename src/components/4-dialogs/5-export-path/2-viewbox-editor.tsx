@@ -55,21 +55,11 @@ export function ViewBoxEditor() {
 
     return (
         <div className="space-y-2">
-            <label className="space-y-1">
-                <span className="text-muted-foreground">ViewBox preset</span>
-                <Select value={resolvedPresetLabel} onValueChange={handlePresetChange}>
-                    <SelectTrigger className="w-full">
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {selectItems.map(([label]) => (
-                            <SelectItem key={label} value={label}>
-                                {label}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </label>
+            <ViewBoxPresetSelect
+                resolvedPresetLabel={resolvedPresetLabel}
+                selectItems={selectItems}
+                onPresetChange={handlePresetChange}
+            />
             <div className="col-span-2 grid grid-cols-4 gap-2 rounded border px-2 py-2">
                 <NumberField
                     label="x"
@@ -103,6 +93,34 @@ export function ViewBoxEditor() {
                 Reset viewBox from path bounds
             </Button>
         </div>
+    );
+}
+
+function ViewBoxPresetSelect({
+    resolvedPresetLabel,
+    selectItems,
+    onPresetChange,
+}: {
+    resolvedPresetLabel: string;
+    selectItems: ViewBoxPreset[];
+    onPresetChange: (nextPresetLabel: string) => void;
+}) {
+    return (
+        <label className="space-y-1">
+            <span className="text-muted-foreground">ViewBox preset</span>
+            <Select value={resolvedPresetLabel} onValueChange={onPresetChange}>
+                <SelectTrigger className="w-full">
+                    <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                    {selectItems.map(([label]) => (
+                        <SelectItem key={label} value={label}>
+                            {label}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+        </label>
     );
 }
 
