@@ -10,12 +10,13 @@ import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-pa
 import { appSettings } from "@/store/0-ui-settings";
 
 export function ViewBoxPresetSelect() {
-    const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(viewBoxDraftAtom);
-    const viewBoxCustomValueStrDraft = useAtomValue(viewBoxCustomValueStrDraftAtom);
-    const [viewBoxStrDraft, setViewBoxStrDraft] = useAtom(viewBoxStrDraftAtom);
-    const pathViewBox = useAtomValue(pathViewBoxAtom);
-    const pathValue = useAtomValue(svgPathInputAtom);
     const { exportStroke, exportStrokeWidth } = useSnapshot(appSettings.export);
+    
+    const pathValue = useAtomValue(svgPathInputAtom);
+    const pathViewBox = useAtomValue(pathViewBoxAtom);
+    const viewBoxCustomValueStrDraft = useAtomValue(viewBoxCustomValueStrDraftAtom);
+    const [viewBoxDraft, setViewBoxDraft] = useAtom(viewBoxDraftAtom);
+    const [viewBoxStrDraft, setViewBoxStrDraft] = useAtom(viewBoxStrDraftAtom);
 
     const boundsViewBox = useMemo(
         () => computeExportViewBox(pathValue, exportStroke ? exportStrokeWidth : 0, pathViewBox),
@@ -36,34 +37,34 @@ export function ViewBoxPresetSelect() {
     useEffect(
         () => {
             if (resolvedPresetId === VIEWBOX_PRESET_KEYS.bounds) {
-                if (!areViewBoxesEqual(exportViewBoxDraft, boundsViewBox)) {
-                    setExportViewBoxDraft(boundsViewBox);
+                if (!areViewBoxesEqual(viewBoxDraft, boundsViewBox)) {
+                    setViewBoxDraft(boundsViewBox);
                 }
                 return;
             }
 
             if (resolvedPresetId === VIEWBOX_PRESET_KEYS.current) {
-                if (!areViewBoxesEqual(exportViewBoxDraft, pathViewBox)) {
-                    setExportViewBoxDraft(pathViewBox);
+                if (!areViewBoxesEqual(viewBoxDraft, pathViewBox)) {
+                    setViewBoxDraft(pathViewBox);
                 }
                 return;
             }
 
             if (isViewBoxString(resolvedPresetId)) {
                 const nextDraft = parseViewBoxString(resolvedPresetId);
-                if (!areViewBoxesEqual(exportViewBoxDraft, nextDraft)) {
-                    setExportViewBoxDraft(nextDraft);
+                if (!areViewBoxesEqual(viewBoxDraft, nextDraft)) {
+                    setViewBoxDraft(nextDraft);
                 }
             }
         },
-        [boundsViewBox, exportViewBoxDraft, pathViewBox, resolvedPresetId, setExportViewBoxDraft]);
+        [boundsViewBox, viewBoxDraft, pathViewBox, resolvedPresetId, setViewBoxDraft]);
 
     function handlePresetChange(nextPresetId: string) {
         setViewBoxStrDraft(nextPresetId);
         if (isCustomPresetId(nextPresetId)) {
             const nextDraft = parseViewBoxString(fromCustomPresetId(nextPresetId));
-            if (!areViewBoxesEqual(exportViewBoxDraft, nextDraft)) {
-                setExportViewBoxDraft(nextDraft);
+            if (!areViewBoxesEqual(viewBoxDraft, nextDraft)) {
+                setViewBoxDraft(nextDraft);
             }
             return;
         }
@@ -72,18 +73,21 @@ export function ViewBoxPresetSelect() {
     }
 
     return (
-            <Select value={resolvedPresetId} onValueChange={handlePresetChange}>
-                <SelectTrigger className="w-full">
-                    <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                    {selectItems.map((item) => (
+        <Select value={resolvedPresetId} onValueChange={handlePresetChange}>
+            <SelectTrigger>
+                <SelectValue />
+            </SelectTrigger>
+
+            <SelectContent>
+                {selectItems.map(
+                    (item) => (
                         <SelectItem key={item.id} value={item.id}>
                             {item.label}
                         </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
+                    )
+                )}
+            </SelectContent>
+        </Select>
     );
 }
 
