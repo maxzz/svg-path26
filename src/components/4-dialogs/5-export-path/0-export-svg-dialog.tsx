@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { exportSvgDialogOpenAtom, viewBoxDraftAtom, viewBoxStrDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
-import { FillStrokeControls } from "./1-fill-stroke-controls";
-import { ViewBoxEditor } from "./2-viewbox-editor";
-import { isCustomPresetId, viewBoxToString } from "./3-viewbox-preset";
-import { SvgPreview } from "./4-svg-preview";
+import { FillStrokeControls } from "./3-fill-stroke-controls";
+import { ViewBoxEditor } from "./2-1-viewbox-editor";
+import { isCustomPresetId, viewBoxToString } from "./2-2-viewbox-preset";
+import { SvgPreview } from "./1-svg-preview";
 import { exportSvgToFile } from "./7-export-utils";
 
 export function ExportSvgDialog() {
@@ -38,8 +38,8 @@ export function ExportSvgDialog() {
 
                 <div className="space-y-3 text-xs">
                     <SvgPreview />
-                    <FillStrokeControls />
                     <ViewBoxEditor />
+                    <FillStrokeControls />
                 </div>
 
                 <DialogFooter>
