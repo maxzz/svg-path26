@@ -202,6 +202,7 @@ function createExportSettingsSchema(defaultSettings: ExportSettings) {
             exportStroke: z.boolean().catch(defaultSettings.exportStroke),
             exportStrokeColor: z.string().catch(defaultSettings.exportStrokeColor),
             exportStrokeWidth: z.number().catch(defaultSettings.exportStrokeWidth),
+            exportPreviewGrid: z.boolean().catch(defaultSettings.exportPreviewGrid),
             viewBoxPreset: z.string().catch(defaultSettings.viewBoxPreset),
         })
     );

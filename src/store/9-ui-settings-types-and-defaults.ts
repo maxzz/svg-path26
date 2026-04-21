@@ -57,6 +57,7 @@ export interface ExportSettings {
     exportStroke: boolean;                // Export stroke or not
     exportStrokeColor: string;            // Export stroke color
     exportStrokeWidth: number;            // Export stroke width
+    exportPreviewGrid: boolean;           // Show grid in export preview
     viewBoxPreset: ViewBoxStr;            // Selected export viewBox preset value
 }
 
@@ -126,6 +127,7 @@ export const DEFAULT_EXPORT_SETTINGS: ExportSettings = {
     exportStroke: false,
     exportStrokeColor: "#ff0000",
     exportStrokeWidth: 0.1,
+    exportPreviewGrid: true,
     viewBoxPreset: DEFAULT_VIEWBOX_SETTINGS.join(","),
 };
 
