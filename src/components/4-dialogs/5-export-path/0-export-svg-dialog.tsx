@@ -20,7 +20,7 @@ export function ExportSvgDialog() {
         const didExport = exportSvgToFile({ pathValue, exportViewBoxDraft, });
         if (didExport) {
             if (isCustomPresetId(exportViewBoxPresetDraft)) {
-                appSettings.export.exportViewBoxPreset = viewBoxToString(exportViewBoxDraft);
+                appSettings.export.viewBoxPreset = viewBoxToString(exportViewBoxDraft);
             }
             setOpenExportDialog(false);
         }

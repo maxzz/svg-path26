@@ -3,11 +3,11 @@ import { useAtom, useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/shadcn/select";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
+import { type ViewBoxStr } from "@/store/9-ui-settings-types-and-defaults";
 import { type ExportViewBoxDraft, exportViewBoxCustomValueDraftAtom, exportViewBoxDraftAtom, exportViewBoxPresetDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
 import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-path-commands/8-svg-utils";
 import { appSettings } from "@/store/0-ui-settings";
-import { type ExportViewBoxPresetStr } from "@/store/9-ui-settings-types-and-defaults";
 
 export function ViewBoxPresetSelect() {
     const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
@@ -68,7 +68,7 @@ export function ViewBoxPresetSelect() {
             return;
         }
 
-        appSettings.export.exportViewBoxPreset = nextPresetId;
+        appSettings.export.viewBoxPreset = nextPresetId;
     }
 
     return (
@@ -97,7 +97,7 @@ const VIEWBOX_PRESET_KEYS = {
     current: "current",
 } as const;
 
-const STATIC_VIEWBOX_PRESETS: [string, ExportViewBoxPresetStr][] = [
+const STATIC_VIEWBOX_PRESETS: [string, ViewBoxStr][] = [
     ["16x16", "0,0,16,16"],
     ["20x20", "0,0,20,20"],
     ["24x24", "0,0,24,24"],
@@ -118,7 +118,7 @@ function parseViewBoxString(viewBox: string): ExportViewBoxDraft {
     return isViewBox ? (parsed as unknown as ExportViewBoxDraft) : [0, 0, 1, 1];
 }
 
-function isViewBoxString(value: ExportViewBoxPresetStr): boolean {
+function isViewBoxString(value: ViewBoxStr): boolean {
     const parts = value.split(",");
     if (parts.length !== 4) {
         return false;
@@ -132,7 +132,7 @@ function areViewBoxesEqual(left: ExportViewBoxDraft, right: ExportViewBoxDraft):
 
 //
 
-function resolvePresetId(preset: ExportViewBoxPresetStr, fallbackViewBoxValue: string): string {
+function resolvePresetId(preset: ViewBoxStr, fallbackViewBoxValue: string): string {
     if (preset === VIEWBOX_PRESET_KEYS.bounds || preset === VIEWBOX_PRESET_KEYS.current) {
         return preset;
     }
