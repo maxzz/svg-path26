@@ -81,7 +81,7 @@ export function ViewBoxPresetSelect() {
 
     return (
         <label className="space-y-1">
-            <span className="text-muted-foreground">ViewBox preset</span>
+            <span className="text-muted-foreground">Preset</span>
             <Select value={resolvedPresetId} onValueChange={handlePresetChange}>
                 <SelectTrigger className="w-full">
                     <SelectValue />
@@ -99,8 +99,8 @@ export function ViewBoxPresetSelect() {
 }
 
 const CUSTOM_VIEWBOX_LABEL = "Custom";
-const CURRENT_VIEWBOX_LABEL = "current viewBox";
-const BOUNDS_VIEWBOX_LABEL = "bounds";
+const CURRENT_VIEWBOX_LABEL = "Current";
+const BOUNDS_VIEWBOX_LABEL = "Bounds";
 
 type ViewBoxPreset = [string, ExportViewBoxPreset];
 
