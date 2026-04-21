@@ -7,7 +7,7 @@ import { type ExportViewBoxDraft, exportViewBoxCustomValueDraftAtom, exportViewB
 import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-path-commands/8-svg-utils";
 import { appSettings } from "@/store/0-ui-settings";
-import { type ExportViewBoxPreset } from "@/store/9-ui-settings-types-and-defaults";
+import { type ExportViewBoxPresetStr } from "@/store/9-ui-settings-types-and-defaults";
 
 export const VIEWBOX_PRESET_KEYS = {
     bounds: "bounds",
@@ -102,7 +102,7 @@ const CUSTOM_VIEWBOX_LABEL = "Custom";
 const CURRENT_VIEWBOX_LABEL = "Current";
 const BOUNDS_VIEWBOX_LABEL = "Bounds";
 
-type ViewBoxPreset = [string, ExportViewBoxPreset];
+type ViewBoxPreset = [string, ExportViewBoxPresetStr];
 
 const STATIC_VIEWBOX_PRESETS: ViewBoxPreset[] = [
     ["16x16", "0,0,16,16"],
@@ -111,10 +111,7 @@ const STATIC_VIEWBOX_PRESETS: ViewBoxPreset[] = [
 ];
 
 const STATIC_VIEWBOX_PRESET_VALUES = new Set(STATIC_VIEWBOX_PRESETS.map(([, value]) => value));
-const STATIC_VIEWBOX_PRESET_ITEMS: ViewBoxPresetOption[] = STATIC_VIEWBOX_PRESETS.map(([label, value]) => ({
-    id: value,
-    label,
-}));
+const STATIC_VIEWBOX_PRESET_ITEMS: ViewBoxPresetOption[] = STATIC_VIEWBOX_PRESETS.map(([label, value]) => ({ id: value, label }));
 
 type ViewBoxPresetOption = {
     id: string;
@@ -127,19 +124,27 @@ export function viewBoxToString(viewBox: ExportViewBoxDraft): string {
 
 function parseViewBoxString(viewBox: string): ExportViewBoxDraft {
     const parsed = viewBox.split(",").map((value) => Number(value));
-    if (parsed.length !== 4) {
-        return [0, 0, 1, 1];
-    }
-    const [x, y, width, height] = parsed;
-    if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(width) || !Number.isFinite(height)) {
-        return [0, 0, 1, 1];
-    }
-    return [x, y, width, height];
+    const isViewBox = parsed.length === 4 && parsed.every((value) => Number.isFinite(value));
+    return isViewBox ? (parsed as unknown as ExportViewBoxDraft) : [0, 0, 1, 1];
 }
 
-function resolvePresetId(preset: ExportViewBoxPreset, fallbackViewBoxValue: string): string {
-    if (preset === VIEWBOX_PRESET_KEYS.bounds
-        || preset === VIEWBOX_PRESET_KEYS.current) {
+function isViewBoxString(value: ExportViewBoxPresetStr): boolean {
+    const parts = value.split(",");
+    if (parts.length !== 4) {
+        return false;
+    }
+    return parts.every((part) => Number.isFinite(Number(part)));
+}
+
+function areViewBoxesEqual(left: ExportViewBoxDraft, right: ExportViewBoxDraft): boolean {
+    return left[0] === right[0]
+        && left[1] === right[1]
+        && left[2] === right[2]
+        && left[3] === right[3];
+}
+
+function resolvePresetId(preset: ExportViewBoxPresetStr, fallbackViewBoxValue: string): string {
+    if (preset === VIEWBOX_PRESET_KEYS.bounds || preset === VIEWBOX_PRESET_KEYS.current) {
         return preset;
     }
 
@@ -159,21 +164,6 @@ function resolvePresetId(preset: ExportViewBoxPreset, fallbackViewBoxValue: stri
     }
 
     return toCustomPresetId(fallbackViewBoxValue);
-}
-
-function isViewBoxString(value: ExportViewBoxPreset): boolean {
-    const parts = value.split(",");
-    if (parts.length !== 4) {
-        return false;
-    }
-    return parts.every((part) => Number.isFinite(Number(part)));
-}
-
-function areViewBoxesEqual(left: ExportViewBoxDraft, right: ExportViewBoxDraft): boolean {
-    return left[0] === right[0]
-        && left[1] === right[1]
-        && left[2] === right[2]
-        && left[3] === right[3];
 }
 
 function buildSelectItems(customPresetValue: string): ViewBoxPresetOption[] {

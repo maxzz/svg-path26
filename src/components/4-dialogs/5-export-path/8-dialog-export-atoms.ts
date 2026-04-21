@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 import { appSettings } from "@/store/0-ui-settings";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
-import { type ExportViewBoxPreset } from "@/store/9-ui-settings-types-and-defaults";
+import { type ExportViewBoxPresetStr } from "@/store/9-ui-settings-types-and-defaults";
 import { svgPathInputAtom } from "../../../store/0-atoms/1-1-svg-path-input";
 import { pathViewBoxAtom } from "../../../store/0-atoms/2-2-path-viewbox";
 import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-path-commands/8-svg-utils";
@@ -56,11 +56,11 @@ export type ExportViewBoxDraft = ViewBox;
 
 export const exportViewBoxDraftAtom = atom<ExportViewBoxDraft>([0, 0, 1, 1]);
 
-export const exportViewBoxPresetDraftAtom = atom<ExportViewBoxPreset>(appSettings.export.exportViewBoxPreset);
+export const exportViewBoxPresetDraftAtom = atom<ExportViewBoxPresetStr>(appSettings.export.exportViewBoxPreset);
 
 export const exportViewBoxCustomValueDraftAtom = atom<string>(viewBoxToString([0, 0, 1, 1]));
 
-function resolveCustomPresetValue(preset: ExportViewBoxPreset, boundsViewBox: ViewBox, currentViewBox: ViewBox): string {
+function resolveCustomPresetValue(preset: ExportViewBoxPresetStr, boundsViewBox: ViewBox, currentViewBox: ViewBox): string {
     if (preset === "current") {
         return viewBoxToString(currentViewBox);
     }
