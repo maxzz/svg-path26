@@ -8,7 +8,7 @@ import { FillStrokeControls } from "./1-fill-stroke-controls";
 import { ViewBoxEditor } from "./2-viewbox-editor";
 import { SvgPreview } from "./4-svg-preview";
 import { exportSvgToFile } from "./7-export-utils";
-import { fromCustomPresetId, isCustomPresetId } from "./3-viewbox-preset";
+import { isCustomPresetId, viewBoxToString } from "./3-viewbox-preset";
 
 export function ExportSvgDialog() {
     const pathValue = useAtomValue(svgPathInputAtom);
@@ -20,7 +20,7 @@ export function ExportSvgDialog() {
         const didExport = exportSvgToFile({ pathValue, exportViewBoxDraft, });
         if (didExport) {
             if (isCustomPresetId(exportViewBoxPresetDraft)) {
-                appSettings.export.exportViewBoxPreset = fromCustomPresetId(exportViewBoxPresetDraft);
+                appSettings.export.exportViewBoxPreset = viewBoxToString(exportViewBoxDraft);
             }
             setOpenExportDialog(false);
         }

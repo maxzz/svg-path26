@@ -3,7 +3,7 @@ import { useAtom, useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/shadcn/select";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { type ExportViewBoxDraft, exportViewBoxDraftAtom, exportViewBoxPresetDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
+import { type ExportViewBoxDraft, exportViewBoxCustomValueDraftAtom, exportViewBoxDraftAtom, exportViewBoxPresetDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
 import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-path-commands/8-svg-utils";
 import { appSettings } from "@/store/0-ui-settings";
@@ -19,6 +19,7 @@ const CUSTOM_PRESET_PREFIX = "custom:";
 
 export function ViewBoxPresetSelect() {
     const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
+    const customPresetValue = useAtomValue(exportViewBoxCustomValueDraftAtom);
     const [exportViewBoxPresetDraft, setExportViewBoxPresetDraft] = useAtom(exportViewBoxPresetDraftAtom);
     const pathViewBox = useAtomValue(pathViewBoxAtom);
     const pathValue = useAtomValue(svgPathInputAtom);
@@ -28,7 +29,6 @@ export function ViewBoxPresetSelect() {
         () => computeExportViewBox(pathValue, exportStroke ? exportStrokeWidth : 0, pathViewBox),
         [exportStroke, exportStrokeWidth, pathValue, pathViewBox]);
 
-    const customPresetValue = viewBoxToString(exportViewBoxDraft);
     const resolvedPresetId = resolvePresetId(exportViewBoxPresetDraft, customPresetValue);
     const selectItems = buildSelectItems(customPresetValue);
 
@@ -57,15 +57,6 @@ export function ViewBoxPresetSelect() {
                 return;
             }
 
-            if (isCustomPresetId(resolvedPresetId)) {
-                const customValue = fromCustomPresetId(resolvedPresetId);
-                const nextDraft = parseViewBoxString(customValue);
-                if (!areViewBoxesEqual(exportViewBoxDraft, nextDraft)) {
-                    setExportViewBoxDraft(nextDraft);
-                }
-                return;
-            }
-
             if (isViewBoxString(resolvedPresetId)) {
                 const nextDraft = parseViewBoxString(resolvedPresetId);
                 if (!areViewBoxesEqual(exportViewBoxDraft, nextDraft)) {
@@ -77,9 +68,15 @@ export function ViewBoxPresetSelect() {
 
     function handlePresetChange(nextPresetId: string) {
         setExportViewBoxPresetDraft(nextPresetId);
-        if (!isCustomPresetId(nextPresetId)) {
-            appSettings.export.exportViewBoxPreset = nextPresetId;
+        if (isCustomPresetId(nextPresetId)) {
+            const nextDraft = parseViewBoxString(fromCustomPresetId(nextPresetId));
+            if (!areViewBoxesEqual(exportViewBoxDraft, nextDraft)) {
+                setExportViewBoxDraft(nextDraft);
+            }
+            return;
         }
+
+        appSettings.export.exportViewBoxPreset = nextPresetId;
     }
 
     return (

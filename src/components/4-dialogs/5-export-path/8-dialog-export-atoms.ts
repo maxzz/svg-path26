@@ -12,10 +12,27 @@ const exportSvgDialogOpenBaseAtom = atom(false);
 
 export const exportSvgDialogOpenAtom = atom(
     (get) => get(exportSvgDialogOpenBaseAtom),
-    (_get, set, open: boolean) => {
+    (get, set, open: boolean) => {
         if (open) {
-            set(exportViewBoxPresetDraftAtom, appSettings.export.exportViewBoxPreset);
-            set(doResetExportViewBoxDraftAtom);
+            const { exportStroke, exportStrokeWidth } = appSettings.export;
+            const pathViewBox = get(pathViewBoxAtom);
+            const pathValue = get(svgPathInputAtom);
+            const boundsViewBox = computeExportViewBox(pathValue, exportStroke ? exportStrokeWidth : 0, pathViewBox);
+            const preset = appSettings.export.exportViewBoxPreset;
+            const customValue = resolveCustomPresetValue(preset, boundsViewBox, pathViewBox);
+
+            set(exportViewBoxPresetDraftAtom, preset);
+            set(exportViewBoxCustomValueDraftAtom, customValue);
+
+            if (preset === "current") {
+                set(exportViewBoxDraftAtom, pathViewBox);
+            } else if (preset === "bounds") {
+                set(exportViewBoxDraftAtom, boundsViewBox);
+            } else if (isViewBoxString(preset)) {
+                set(exportViewBoxDraftAtom, parseViewBoxString(preset));
+            } else {
+                set(exportViewBoxDraftAtom, boundsViewBox);
+            }
         }
         set(exportSvgDialogOpenBaseAtom, open);
     },
@@ -40,3 +57,45 @@ export type ExportViewBoxDraft = ViewBox;
 export const exportViewBoxDraftAtom = atom<ExportViewBoxDraft>([0, 0, 1, 1]);
 
 export const exportViewBoxPresetDraftAtom = atom<ExportViewBoxPreset>(appSettings.export.exportViewBoxPreset);
+
+export const exportViewBoxCustomValueDraftAtom = atom<string>(viewBoxToString([0, 0, 1, 1]));
+
+function resolveCustomPresetValue(preset: ExportViewBoxPreset, boundsViewBox: ViewBox, currentViewBox: ViewBox): string {
+    if (preset === "current") {
+        return viewBoxToString(currentViewBox);
+    }
+
+    if (preset === "bounds") {
+        return viewBoxToString(boundsViewBox);
+    }
+
+    if (isViewBoxString(preset)) {
+        return preset;
+    }
+
+    return viewBoxToString(boundsViewBox);
+}
+
+function viewBoxToString(viewBox: ViewBox): string {
+    return `${viewBox[0]},${viewBox[1]},${viewBox[2]},${viewBox[3]}`;
+}
+
+function parseViewBoxString(viewBox: string): ViewBox {
+    const parsed = viewBox.split(",").map((value) => Number(value));
+    if (parsed.length !== 4) {
+        return [0, 0, 1, 1];
+    }
+    const [x, y, width, height] = parsed;
+    if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(width) || !Number.isFinite(height)) {
+        return [0, 0, 1, 1];
+    }
+    return [x, y, width, height];
+}
+
+function isViewBoxString(value: string): boolean {
+    const parts = value.split(",");
+    if (parts.length !== 4) {
+        return false;
+    }
+    return parts.every((part) => Number.isFinite(Number(part)));
+}

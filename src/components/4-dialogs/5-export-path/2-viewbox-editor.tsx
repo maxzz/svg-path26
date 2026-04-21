@@ -1,21 +1,20 @@
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { Button } from "@/components/ui/shadcn/button";
 import { NumberField } from "@/components/ui/loacal-ui/2-number-field";
-import { doResetExportViewBoxDraftAtom, exportViewBoxDraftAtom, exportViewBoxPresetDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
+import { doResetExportViewBoxDraftAtom, exportViewBoxCustomValueDraftAtom, exportViewBoxDraftAtom, exportViewBoxPresetDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
 import { appSettings } from "@/store/0-ui-settings";
-import { ViewBoxPresetSelect, VIEWBOX_PRESET_KEYS, toCustomPresetId, viewBoxToString } from "./3-viewbox-preset";
+import { ViewBoxPresetSelect, VIEWBOX_PRESET_KEYS, toCustomPresetId } from "./3-viewbox-preset";
 
 export function ViewBoxEditor() {
     const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
     const resetExportViewBox = useSetAtom(doResetExportViewBoxDraftAtom);
     const setExportViewBoxPresetDraft = useSetAtom(exportViewBoxPresetDraftAtom);
+    const customPresetValue = useAtomValue(exportViewBoxCustomValueDraftAtom);
+    const customPresetId = toCustomPresetId(customPresetValue);
 
     function updateViewBoxDraft(update: (previous: typeof exportViewBoxDraft) => typeof exportViewBoxDraft) {
-        setExportViewBoxDraft((previous) => {
-            const nextDraft = update(previous);
-            setExportViewBoxPresetDraft(toCustomPresetId(viewBoxToString(nextDraft)));
-            return nextDraft;
-        });
+        setExportViewBoxPresetDraft(customPresetId);
+        setExportViewBoxDraft((previous) => update(previous));
     }
 
     return (
