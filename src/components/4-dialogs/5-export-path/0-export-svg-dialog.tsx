@@ -30,7 +30,9 @@ export function ExportSvgDialog() {
         <Dialog open={openExportDialog} onOpenChange={setOpenExportDialog}>
             <DialogContent className="max-w-sm!">
                 <DialogHeader>
-                    <DialogTitle>Export SVG</DialogTitle>
+                    <DialogTitle>
+                        Export SVG
+                    </DialogTitle>
                     <DialogDescription>Export current path with chosen styling.</DialogDescription>
                 </DialogHeader>
 
