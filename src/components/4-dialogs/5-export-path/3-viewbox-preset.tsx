@@ -31,7 +31,7 @@ export function ViewBoxPresetSelect() {
             }
             setExportViewBoxPresetDraft(resolvedPresetId);
         },
-        [exportViewBoxPresetDraft, resolvedPresetId, setExportViewBoxPresetDraft]);
+        [resolvedPresetId, exportViewBoxPresetDraft, setExportViewBoxPresetDraft]);
 
     useEffect(
         () => {
@@ -97,9 +97,6 @@ const VIEWBOX_PRESET_KEYS = {
     current: "current",
 } as const;
 
-const LEGACY_CUSTOM_PRESET = "custom";
-const CUSTOM_PRESET_PREFIX = "custom:";
-
 const STATIC_VIEWBOX_PRESETS: [string, ExportViewBoxPresetStr][] = [
     ["16x16", "0,0,16,16"],
     ["20x20", "0,0,20,20"],
@@ -130,10 +127,7 @@ function isViewBoxString(value: ExportViewBoxPresetStr): boolean {
 }
 
 function areViewBoxesEqual(left: ExportViewBoxDraft, right: ExportViewBoxDraft): boolean {
-    return left[0] === right[0]
-        && left[1] === right[1]
-        && left[2] === right[2]
-        && left[3] === right[3];
+    return left[0] === right[0] && left[1] === right[1] && left[2] === right[2] && left[3] === right[3];
 }
 
 //
@@ -147,10 +141,6 @@ function resolvePresetId(preset: ExportViewBoxPresetStr, fallbackViewBoxValue: s
         return preset;
     }
 
-    if (preset === LEGACY_CUSTOM_PRESET) {
-        return toCustomPresetId(fallbackViewBoxValue);
-    }
-
     if (isViewBoxString(preset)) {
         if (STATIC_VIEWBOX_PRESET_VALUES.has(preset)) {
             return preset;
@@ -162,6 +152,8 @@ function resolvePresetId(preset: ExportViewBoxPresetStr, fallbackViewBoxValue: s
 }
 
 const STATIC_VIEWBOX_PRESET_VALUES = new Set(STATIC_VIEWBOX_PRESETS.map(([, value]) => value));
+
+//
 
 function buildSelectItems(customPresetValue: string): ViewBoxPresetOption[] {
     const items: ViewBoxPresetOption[] = [
@@ -181,6 +173,8 @@ function buildSelectItems(customPresetValue: string): ViewBoxPresetOption[] {
 const STATIC_VIEWBOX_PRESET_ITEMS: ViewBoxPresetOption[] = STATIC_VIEWBOX_PRESETS.map(([label, value]) => ({ id: value, label }));
 
 //
+
+const CUSTOM_PRESET_PREFIX = "custom:";
 
 export function toCustomPresetId(viewBoxValue: string): string {
     return `${CUSTOM_PRESET_PREFIX}${viewBoxValue}`;
