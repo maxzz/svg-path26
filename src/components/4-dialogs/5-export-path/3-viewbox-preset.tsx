@@ -4,15 +4,15 @@ import { useSnapshot } from "valtio";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/shadcn/select";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { type ViewBoxStr } from "@/store/9-ui-settings-types-and-defaults";
-import { type ExportViewBoxDraft, exportViewBoxCustomValueDraftAtom, exportViewBoxDraftAtom, exportViewBoxPresetDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
+import { type ExportViewBoxDraft, viewBoxCustomValueStrDraftAtom, viewBoxDraftAtom, viewBoxStrDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
 import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-path-commands/8-svg-utils";
 import { appSettings } from "@/store/0-ui-settings";
 
 export function ViewBoxPresetSelect() {
-    const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
-    const customPresetValue = useAtomValue(exportViewBoxCustomValueDraftAtom);
-    const [exportViewBoxPresetDraft, setExportViewBoxPresetDraft] = useAtom(exportViewBoxPresetDraftAtom);
+    const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(viewBoxDraftAtom);
+    const viewBoxCustomValueStrDraft = useAtomValue(viewBoxCustomValueStrDraftAtom);
+    const [viewBoxStrDraft, setViewBoxStrDraft] = useAtom(viewBoxStrDraftAtom);
     const pathViewBox = useAtomValue(pathViewBoxAtom);
     const pathValue = useAtomValue(svgPathInputAtom);
     const { exportStroke, exportStrokeWidth } = useSnapshot(appSettings.export);
@@ -21,17 +21,17 @@ export function ViewBoxPresetSelect() {
         () => computeExportViewBox(pathValue, exportStroke ? exportStrokeWidth : 0, pathViewBox),
         [exportStroke, exportStrokeWidth, pathValue, pathViewBox]);
 
-    const resolvedPresetId = resolvePresetId(exportViewBoxPresetDraft, customPresetValue);
-    const selectItems = buildSelectItems(customPresetValue);
+    const resolvedPresetId = resolvePresetId(viewBoxStrDraft, viewBoxCustomValueStrDraft);
+    const selectItems = buildSelectItems(viewBoxCustomValueStrDraft);
 
     useEffect(
         () => {
-            if (exportViewBoxPresetDraft === resolvedPresetId) {
+            if (viewBoxStrDraft === resolvedPresetId) {
                 return;
             }
-            setExportViewBoxPresetDraft(resolvedPresetId);
+            setViewBoxStrDraft(resolvedPresetId);
         },
-        [resolvedPresetId, exportViewBoxPresetDraft, setExportViewBoxPresetDraft]);
+        [resolvedPresetId, viewBoxStrDraft, setViewBoxStrDraft]);
 
     useEffect(
         () => {
@@ -59,7 +59,7 @@ export function ViewBoxPresetSelect() {
         [boundsViewBox, exportViewBoxDraft, pathViewBox, resolvedPresetId, setExportViewBoxDraft]);
 
     function handlePresetChange(nextPresetId: string) {
-        setExportViewBoxPresetDraft(nextPresetId);
+        setViewBoxStrDraft(nextPresetId);
         if (isCustomPresetId(nextPresetId)) {
             const nextDraft = parseViewBoxString(fromCustomPresetId(nextPresetId));
             if (!areViewBoxesEqual(exportViewBoxDraft, nextDraft)) {

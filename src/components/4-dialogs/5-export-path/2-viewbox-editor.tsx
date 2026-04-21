@@ -1,17 +1,18 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { Input } from "@/components/ui/shadcn/input";
-import { exportViewBoxCustomValueDraftAtom, exportViewBoxDraftAtom, exportViewBoxPresetDraftAtom } from "./8-dialog-export-atoms";
+import { viewBoxCustomValueStrDraftAtom, viewBoxDraftAtom, viewBoxStrDraftAtom } from "./8-dialog-export-atoms";
 import { ViewBoxPresetSelect, toCustomPresetId } from "./3-viewbox-preset";
 
 export function ViewBoxEditor() {
-    const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
-    const setExportViewBoxPresetDraft = useSetAtom(exportViewBoxPresetDraftAtom);
-    const customPresetValue = useAtomValue(exportViewBoxCustomValueDraftAtom);
-    const customPresetId = toCustomPresetId(customPresetValue);
+    const [viewBoxDraft, setViewBoxDraft] = useAtom(viewBoxDraftAtom);
+    const setViewBoxStrDraft = useSetAtom(viewBoxStrDraftAtom);
+    const viewBoxCustomValueStrDraft = useAtomValue(viewBoxCustomValueStrDraftAtom);
+    
+    const customPresetId = toCustomPresetId(viewBoxCustomValueStrDraft);
 
-    function updateViewBoxDraft(update: (previous: typeof exportViewBoxDraft) => typeof exportViewBoxDraft) {
-        setExportViewBoxPresetDraft(customPresetId);
-        setExportViewBoxDraft((previous) => update(previous));
+    function updateViewBoxDraft(update: (previous: typeof viewBoxDraft) => typeof viewBoxDraft) {
+        setViewBoxStrDraft(customPresetId);
+        setViewBoxDraft((previous) => update(previous));
     }
 
     return (
@@ -19,24 +20,24 @@ export function ViewBoxEditor() {
             <div className="px-2 py-2 border rounded flex items-center gap-2">
                 <NumberField
                     label="X"
-                    value={exportViewBoxDraft[0]}
+                    value={viewBoxDraft[0]}
                     onChange={(value) => updateViewBoxDraft((previous) => [value, previous[1], previous[2], previous[3]])}
                 />
                 <NumberField
                     label="Y"
-                    value={exportViewBoxDraft[1]}
+                    value={viewBoxDraft[1]}
                     onChange={(value) => updateViewBoxDraft((previous) => [previous[0], value, previous[2], previous[3]])}
                 />
                 <NumberField
                     label="Width"
                     min={0.000001}
-                    value={exportViewBoxDraft[2]}
+                    value={viewBoxDraft[2]}
                     onChange={(value) => updateViewBoxDraft((previous) => [previous[0], previous[1], value, previous[3]])}
                 />
                 <NumberField
                     label="Height"
                     min={0.000001}
-                    value={exportViewBoxDraft[3]}
+                    value={viewBoxDraft[3]}
                     onChange={(value) => updateViewBoxDraft((previous) => [previous[0], previous[1], previous[2], value])}
                 />
 

@@ -2,12 +2,12 @@ import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { exportViewBoxDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
+import { viewBoxDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
 
 export function SvgPreview() {
     const { exportFill, exportFillColor, exportStroke, exportStrokeColor, exportStrokeWidth } = useSnapshot(appSettings.export);
 
-    const exportViewBoxDraft = useAtomValue(exportViewBoxDraftAtom);
+    const exportViewBoxDraft = useAtomValue(viewBoxDraftAtom);
     const pathValue = useAtomValue(svgPathInputAtom);
     const previewWidth = Math.max(1e-6, exportViewBoxDraft[2]);
     const previewHeight = Math.max(1e-6, exportViewBoxDraft[3]);

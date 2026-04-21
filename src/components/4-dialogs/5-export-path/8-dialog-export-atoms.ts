@@ -21,17 +21,17 @@ export const exportSvgDialogOpenAtom = atom(
             const presetStr = appSettings.export.viewBoxPreset;
             const customValue = resolveCustomPresetValue(presetStr, boundsViewBox, pathViewBox);
 
-            set(exportViewBoxPresetDraftAtom, presetStr);
-            set(exportViewBoxCustomValueDraftAtom, customValue);
+            set(viewBoxStrDraftAtom, presetStr);
+            set(viewBoxCustomValueStrDraftAtom, customValue);
 
             if (presetStr === "current") {
-                set(exportViewBoxDraftAtom, pathViewBox);
+                set(viewBoxDraftAtom, pathViewBox);
             } else if (presetStr === "bounds") {
-                set(exportViewBoxDraftAtom, boundsViewBox);
+                set(viewBoxDraftAtom, boundsViewBox);
             } else if (isViewBoxString(presetStr)) {
-                set(exportViewBoxDraftAtom, parseViewBoxString(presetStr));
+                set(viewBoxDraftAtom, parseViewBoxString(presetStr));
             } else {
-                set(exportViewBoxDraftAtom, boundsViewBox);
+                set(viewBoxDraftAtom, boundsViewBox);
             }
         }
         set(exportSvgDialogOpenBaseAtom, open);
@@ -46,7 +46,7 @@ export const doResetExportViewBoxDraftAtom = atom(
         const pathValue = get(svgPathInputAtom);
         const exportViewBox = computeExportViewBox(pathValue, exportStroke ? exportStrokeWidth : 0, fallback);
         
-        set(exportViewBoxDraftAtom, exportViewBox);
+        set(viewBoxDraftAtom, exportViewBox);
     },
 );
 
@@ -54,11 +54,10 @@ export const doResetExportViewBoxDraftAtom = atom(
 
 export type ExportViewBoxDraft = ViewBox;
 
-export const exportViewBoxDraftAtom = atom<ExportViewBoxDraft>([0, 0, 1, 1]);
+export const viewBoxDraftAtom = atom<ExportViewBoxDraft>([0, 0, 1, 1]);
+export const viewBoxStrDraftAtom = atom<ViewBoxStr>(appSettings.export.viewBoxPreset);
 
-export const exportViewBoxPresetDraftAtom = atom<ViewBoxStr>(appSettings.export.viewBoxPreset);
-
-export const exportViewBoxCustomValueDraftAtom = atom<string>(viewBoxToString([0, 0, 1, 1]));
+export const viewBoxCustomValueStrDraftAtom = atom<string>(viewBoxToString([0, 0, 1, 1]));
 
 function resolveCustomPresetValue(preset: ViewBoxStr, boundsViewBox: ViewBox, currentViewBox: ViewBox): string {
     if (preset === "current") {
