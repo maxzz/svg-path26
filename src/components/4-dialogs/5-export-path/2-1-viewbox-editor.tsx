@@ -17,7 +17,7 @@ export function ViewBoxEditor() {
     }
 
     return (
-        <div className="px-2 py-2 border rounded space-y-1">
+        <div className="px-2 py-2 border rounded space-y-1 select-none">
 
             <div>
                 ViewBox
@@ -26,11 +26,11 @@ export function ViewBoxEditor() {
             <div className="flex items-center gap-x-1">
                 <span className="text-muted-foreground">x, y:</span>
                 <NumberField value={viewBoxDraft[0]} onChange={(value) => updateViewBoxDraft((previous) => [value, previous[1], previous[2], previous[3]])} className="text-right" />
-                <NumberField value={viewBoxDraft[1]} onChange={(value) => updateViewBoxDraft((previous) => [previous[0], value, previous[2], previous[3]])} />
+                <NumberField value={viewBoxDraft[1]} onChange={(value) => updateViewBoxDraft((previous) => [previous[0], value, previous[2], previous[3]])} className="pl-3" />
 
                 <span className="ml-4 text-muted-foreground">width, height:</span>
                 <NumberField min={0.000001} value={viewBoxDraft[2]} onChange={(value) => updateViewBoxDraft((previous) => [previous[0], previous[1], value, previous[3]])} className="text-right" />
-                <NumberField min={0.000001} value={viewBoxDraft[3]} onChange={(value) => updateViewBoxDraft((previous) => [previous[0], previous[1], previous[2], value])} />
+                <NumberField min={0.000001} value={viewBoxDraft[3]} onChange={(value) => updateViewBoxDraft((previous) => [previous[0], previous[1], previous[2], value])} className="pl-3" />
             </div>
 
             <div>
