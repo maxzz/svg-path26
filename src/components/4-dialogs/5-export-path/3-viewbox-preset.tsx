@@ -72,8 +72,6 @@ export function ViewBoxPresetSelect() {
     }
 
     return (
-        <label className="space-y-1">
-            <span className="text-muted-foreground">Preset</span>
             <Select value={resolvedPresetId} onValueChange={handlePresetChange}>
                 <SelectTrigger className="w-full">
                     <SelectValue />
@@ -86,7 +84,6 @@ export function ViewBoxPresetSelect() {
                     ))}
                 </SelectContent>
             </Select>
-        </label>
     );
 }
 
