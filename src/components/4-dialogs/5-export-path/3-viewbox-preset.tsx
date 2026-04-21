@@ -9,14 +9,6 @@ import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-pa
 import { appSettings } from "@/store/0-ui-settings";
 import { type ExportViewBoxPresetStr } from "@/store/9-ui-settings-types-and-defaults";
 
-export const VIEWBOX_PRESET_KEYS = {
-    bounds: "bounds",
-    current: "current",
-} as const;
-
-const LEGACY_CUSTOM_PRESET = "custom";
-const CUSTOM_PRESET_PREFIX = "custom:";
-
 export function ViewBoxPresetSelect() {
     const [exportViewBoxDraft, setExportViewBoxDraft] = useAtom(exportViewBoxDraftAtom);
     const customPresetValue = useAtomValue(exportViewBoxCustomValueDraftAtom);
@@ -98,20 +90,21 @@ export function ViewBoxPresetSelect() {
     );
 }
 
-const CUSTOM_VIEWBOX_LABEL = "Custom";
-const CURRENT_VIEWBOX_LABEL = "Current";
-const BOUNDS_VIEWBOX_LABEL = "Bounds";
+//
 
-type ViewBoxPreset = [string, ExportViewBoxPresetStr];
+const VIEWBOX_PRESET_KEYS = {
+    bounds: "bounds",
+    current: "current",
+} as const;
 
-const STATIC_VIEWBOX_PRESETS: ViewBoxPreset[] = [
+const LEGACY_CUSTOM_PRESET = "custom";
+const CUSTOM_PRESET_PREFIX = "custom:";
+
+const STATIC_VIEWBOX_PRESETS: [string, ExportViewBoxPresetStr][] = [
     ["16x16", "0,0,16,16"],
     ["20x20", "0,0,20,20"],
     ["24x24", "0,0,24,24"],
 ];
-
-const STATIC_VIEWBOX_PRESET_VALUES = new Set(STATIC_VIEWBOX_PRESETS.map(([, value]) => value));
-const STATIC_VIEWBOX_PRESET_ITEMS: ViewBoxPresetOption[] = STATIC_VIEWBOX_PRESETS.map(([label, value]) => ({ id: value, label }));
 
 type ViewBoxPresetOption = {
     id: string;
@@ -143,6 +136,8 @@ function areViewBoxesEqual(left: ExportViewBoxDraft, right: ExportViewBoxDraft):
         && left[3] === right[3];
 }
 
+//
+
 function resolvePresetId(preset: ExportViewBoxPresetStr, fallbackViewBoxValue: string): string {
     if (preset === VIEWBOX_PRESET_KEYS.bounds || preset === VIEWBOX_PRESET_KEYS.current) {
         return preset;
@@ -166,20 +161,26 @@ function resolvePresetId(preset: ExportViewBoxPresetStr, fallbackViewBoxValue: s
     return toCustomPresetId(fallbackViewBoxValue);
 }
 
+const STATIC_VIEWBOX_PRESET_VALUES = new Set(STATIC_VIEWBOX_PRESETS.map(([, value]) => value));
+
 function buildSelectItems(customPresetValue: string): ViewBoxPresetOption[] {
     const items: ViewBoxPresetOption[] = [
         ...STATIC_VIEWBOX_PRESET_ITEMS,
-        { id: VIEWBOX_PRESET_KEYS.bounds, label: BOUNDS_VIEWBOX_LABEL },
-        { id: VIEWBOX_PRESET_KEYS.current, label: CURRENT_VIEWBOX_LABEL },
+        { id: VIEWBOX_PRESET_KEYS.bounds, label: "Bounds" },
+        { id: VIEWBOX_PRESET_KEYS.current, label: "Current" },
     ];
 
     items.push({
         id: toCustomPresetId(customPresetValue),
-        label: `${CUSTOM_VIEWBOX_LABEL} ${customPresetValue}`,
+        label: `Custom: ${customPresetValue}`,
     });
 
     return items;
 }
+
+const STATIC_VIEWBOX_PRESET_ITEMS: ViewBoxPresetOption[] = STATIC_VIEWBOX_PRESETS.map(([label, value]) => ({ id: value, label }));
+
+//
 
 export function toCustomPresetId(viewBoxValue: string): string {
     return `${CUSTOM_PRESET_PREFIX}${viewBoxValue}`;
@@ -189,6 +190,6 @@ export function isCustomPresetId(presetId: string): boolean {
     return presetId.startsWith(CUSTOM_PRESET_PREFIX);
 }
 
-export function fromCustomPresetId(presetId: string): string {
+function fromCustomPresetId(presetId: string): string {
     return presetId.slice(CUSTOM_PRESET_PREFIX.length);
 }

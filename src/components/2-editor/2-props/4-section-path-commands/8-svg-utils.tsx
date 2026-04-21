@@ -172,7 +172,9 @@ export function commandValueTooltip(command: string, valueIndex: number): string
     return `${commandCellNames(command)[valueIndex] ?? `value ${valueIndex + 1}`}`;
 }
 
-export function computeExportViewBox(path: string, strokePadding: number, fallback: ViewBox) {
+//
+
+export function computeExportViewBox(path: string, strokePadding: number, fallback: ViewBox): ViewBox {
     try {
         const model = new SvgPathModel(path);
         const bounds = model.getBounds();
