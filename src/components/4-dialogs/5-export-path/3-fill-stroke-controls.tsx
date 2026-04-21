@@ -6,40 +6,22 @@ import { appSettings } from "@/store/0-ui-settings";
 export function FillStrokeControls() {
     const { exportFill, exportFillColor, exportStroke, exportStrokeColor, exportStrokeWidth } = useSnapshot(appSettings.export);
     return (
-        <div className="grid grid-cols-[auto_auto_minmax(0,1fr)] gap-y-2">
-            <div className="grid grid-cols-subgrid col-span-3 items-center gap-x-2">
-                <label className="flex items-center justify-between px-2 py-1.5">
-                    <span className="w-10">
-                        Fill
-                    </span>
-                    <Switch
-                        checked={exportFill}
-                        onCheckedChange={(checked) => appSettings.export.exportFill = Boolean(checked)}
-                    />
-                </label>
+        <div className="grid grid-cols-[auto_auto_minmax(0,1fr)] gap-y-1">
 
-                <Input
-                    className="w-16 px-1 py-0.5 disabled:opacity-20"
-                    type="color"
-                    disabled={!exportFill}
-                    value={exportFillColor}
-                    onChange={(event) => appSettings.export.exportFillColor = event.target.value}
-                />
-            </div>
-
-            <div className="grid grid-cols-subgrid col-span-3 items-center gap-x-2">
-                <label className="flex items-center justify-between px-2 py-1.5">
+            <div className="grid grid-cols-subgrid col-span-3 items-center gap-x-1.5">
+                <label className="flex items-center justify-between">
                     <span className="w-10">
                         Stroke
                     </span>
                     <Switch
+                        className="scale-75 cursor-pointer"
                         checked={exportStroke}
                         onCheckedChange={(checked) => appSettings.export.exportStroke = Boolean(checked)}
                     />
                 </label>
 
                 <Input
-                    className="w-16 px-1 py-0.5 disabled:opacity-20"
+                    className="px-0.5 py-0 w-12 h-6 disabled:opacity-20"
                     type="color"
                     disabled={!exportStroke}
                     value={exportStrokeColor}
@@ -48,10 +30,10 @@ export function FillStrokeControls() {
 
                 <label className="flex items-center gap-x-2">
                     <span className="whitespace-nowrap">
-                        Stroke width
+                        width
                     </span>
                     <Input
-                        className="w-16 disabled:opacity-20"
+                        className="pl-1.5 pr-1 py-0 w-16 h-6 disabled:opacity-20"
                         disabled={!exportStroke}
                         type="number"
                         min={0.1}
@@ -61,6 +43,28 @@ export function FillStrokeControls() {
                     />
                 </label>
             </div>
+
+            <div className="grid grid-cols-subgrid col-span-3 items-center gap-x-1.5">
+                <label className="flex items-center justify-between">
+                    <span className="w-10">
+                        Fill
+                    </span>
+                    <Switch
+                        className="scale-75 cursor-pointer"
+                        checked={exportFill}
+                        onCheckedChange={(checked) => appSettings.export.exportFill = Boolean(checked)}
+                    />
+                </label>
+
+                <Input
+                    className="px-0.5 py-0 w-12 h-6 disabled:opacity-20"
+                    type="color"
+                    disabled={!exportFill}
+                    value={exportFillColor}
+                    onChange={(event) => appSettings.export.exportFillColor = event.target.value}
+                />
+            </div>
+
         </div>
     );
 }

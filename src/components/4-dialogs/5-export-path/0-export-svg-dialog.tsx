@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { exportSvgDialogOpenAtom, viewBoxDraftAtom, viewBoxStrDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
-import { FillStrokeControls } from "./3-fill-stroke-controls";
+import { SvgPreview } from "./1-svg-preview";
 import { ViewBoxEditor } from "./2-1-viewbox-editor";
 import { isCustomPresetId, viewBoxToString } from "./2-2-viewbox-preset";
-import { SvgPreview } from "./1-svg-preview";
+import { FillStrokeControls } from "./3-fill-stroke-controls";
 import { exportSvgToFile } from "./7-export-utils";
 
 export function ExportSvgDialog() {
@@ -42,7 +42,7 @@ export function ExportSvgDialog() {
                     <FillStrokeControls />
                 </div>
 
-                <DialogFooter>
+                <DialogFooter className="mt-1">
                     <Button variant="outline" onClick={() => setOpenExportDialog(false)}>Cancel</Button>
                     <Button onClick={handleExport}>Export</Button>
                 </DialogFooter>

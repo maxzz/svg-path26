@@ -11,7 +11,7 @@ import { appSettings } from "@/store/0-ui-settings";
 
 export function ViewBoxPresetSelect() {
     const { exportStroke, exportStrokeWidth } = useSnapshot(appSettings.export);
-    
+
     const pathValue = useAtomValue(svgPathInputAtom);
     const pathViewBox = useAtomValue(pathViewBoxAtom);
     const viewBoxCustomValueStrDraft = useAtomValue(viewBoxCustomValueStrDraftAtom);
@@ -74,7 +74,7 @@ export function ViewBoxPresetSelect() {
 
     return (
         <Select value={resolvedPresetId} onValueChange={handlePresetChange}>
-            <SelectTrigger>
+            <SelectTrigger className="h-6!">
                 <SelectValue />
             </SelectTrigger>
 

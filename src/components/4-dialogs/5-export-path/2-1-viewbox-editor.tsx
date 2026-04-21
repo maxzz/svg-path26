@@ -23,7 +23,7 @@ export function ViewBoxEditor() {
             </div>
             <ViewBoxPresetSelect />
 
-            <div className="mt-1.5">
+            <div className="mt-2">
                 ViewBox
             </div>
             <div className="flex items-center gap-x-1">
