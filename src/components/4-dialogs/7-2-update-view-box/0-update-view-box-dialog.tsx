@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { NumberField } from "@/components/ui/loacal-ui/2-number-field";
 import { notice } from "@/components/ui/loacal-ui/7-toaster";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
+import { sanitizeViewBox } from "@/store/8-utils/1-viewbox-utils";
 import { type UpdateViewBoxResult, isOpenUpdateViewBoxDialogAtom } from "./8-1-update-viewbox-atoms";
 
 export function UpdateViewBoxDialog() {
@@ -103,14 +104,4 @@ function updateDraftValue(setDraftViewBox: Dispatch<SetStateAction<ViewBox>>, in
             return next;
         }
     );
-}
-
-function sanitizeViewBox(viewBox: ViewBox): ViewBox | null {
-    const [x, y, width, height] = viewBox;
-
-    if (width <= 0 || height <= 0 || ![x, y, width, height].every((value) => Number.isFinite(value))) {
-        return null;
-    }
-
-    return [x, y, Math.max(1e-3, width), Math.max(1e-3, height)];
 }

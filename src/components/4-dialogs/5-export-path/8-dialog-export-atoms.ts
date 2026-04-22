@@ -5,6 +5,7 @@ import { type ViewBoxStr } from "@/store/9-ui-settings-types-and-defaults";
 import { svgPathInputAtom } from "../../../store/0-atoms/1-1-svg-path-input";
 import { pathViewBoxAtom } from "../../../store/0-atoms/2-2-path-viewbox";
 import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-path-commands/8-svg-utils";
+import { isViewBoxString, parseViewBoxString, viewBoxToString } from "@/store/8-utils/1-viewbox-utils";
 
 // Open dialog atom
 
@@ -73,28 +74,4 @@ function resolveCustomPresetValue(preset: ViewBoxStr, boundsViewBox: ViewBox, cu
     }
 
     return viewBoxToString(boundsViewBox);
-}
-
-function viewBoxToString(viewBox: ViewBox): string {
-    return `${viewBox[0]},${viewBox[1]},${viewBox[2]},${viewBox[3]}`;
-}
-
-function parseViewBoxString(viewBox: string): ViewBox {
-    const parsed = viewBox.split(",").map((value) => Number(value));
-    if (parsed.length !== 4) {
-        return [0, 0, 1, 1];
-    }
-    const [x, y, width, height] = parsed;
-    if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(width) || !Number.isFinite(height)) {
-        return [0, 0, 1, 1];
-    }
-    return [x, y, width, height];
-}
-
-function isViewBoxString(value: string): boolean {
-    const parts = value.split(",");
-    if (parts.length !== 4) {
-        return false;
-    }
-    return parts.every((part) => Number.isFinite(Number(part)));
 }

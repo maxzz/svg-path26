@@ -9,6 +9,7 @@ import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { svgInputDocumentAtom } from "@/store/0-atoms/1-3-svg-input";
 import { svgInputStateAtom } from "@/store/0-atoms/1-3-svg-input-state";
 import { doSetPathViewBoxAtom, pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
+import { areViewBoxesEqual, sanitizeViewBox } from "@/store/8-utils/1-viewbox-utils";
 
 type UpdateViewBoxArgs = {
     nextViewBox: ViewBox;
@@ -21,8 +22,6 @@ type ViewBoxTransform = {
     translateX: number;
     translateY: number;
 };
-
-const VIEWBOX_EPS = 1e-9;
 
 export const doUpdateViewBoxAtom = atom(
     null,
@@ -84,18 +83,6 @@ export const doUpdateViewBoxAtom = atom(
         return true;
     },
 );
-
-function sanitizeViewBox(viewBox: ViewBox): ViewBox | null {
-    const [x, y, width, height] = viewBox;
-    if (width <= 0 || height <= 0 || ![x, y, width, height].every((value) => Number.isFinite(value))) {
-        return null;
-    }
-    return [x, y, Math.max(1e-3, width), Math.max(1e-3, height)];
-}
-
-function areViewBoxesEqual(left: ViewBox, right: ViewBox) {
-    return left.every((value, index) => Math.abs(value - right[index]) < VIEWBOX_EPS);
-}
 
 function createViewBoxTransform(previous: ViewBox, next: ViewBox): ViewBoxTransform | null {
     const previousWidth = previous[2];

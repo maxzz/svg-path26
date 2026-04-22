@@ -4,10 +4,11 @@ import { useSnapshot } from "valtio";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/shadcn/select";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { type ViewBoxStr } from "@/store/9-ui-settings-types-and-defaults";
-import { type ExportViewBoxDraft, viewBoxCustomValueStrDraftAtom, viewBoxDraftAtom, viewBoxStrDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
+import { viewBoxCustomValueStrDraftAtom, viewBoxDraftAtom, viewBoxStrDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
 import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-path-commands/8-svg-utils";
 import { appSettings } from "@/store/0-ui-settings";
+import { areViewBoxesEqual, isViewBoxString, parseViewBoxString } from "@/store/8-utils/1-viewbox-utils";
 import { classNames } from "@/utils";
 
 export function ViewBoxPresetSelect({className}: {className?: string}) {
@@ -109,30 +110,6 @@ type ViewBoxPresetOption = {
     id: string;
     label: string;
 };
-
-export function viewBoxToString(viewBox: ExportViewBoxDraft): string {
-    return `${viewBox[0]},${viewBox[1]},${viewBox[2]},${viewBox[3]}`;
-}
-
-function parseViewBoxString(viewBox: string): ExportViewBoxDraft {
-    const parsed = viewBox.split(",").map((value) => Number(value));
-    const isViewBox = parsed.length === 4 && parsed.every((value) => Number.isFinite(value));
-    return isViewBox ? (parsed as unknown as ExportViewBoxDraft) : [0, 0, 1, 1];
-}
-
-function isViewBoxString(value: ViewBoxStr): boolean {
-    const parts = value.split(",");
-    if (parts.length !== 4) {
-        return false;
-    }
-    return parts.every((part) => Number.isFinite(Number(part)));
-}
-
-function areViewBoxesEqual(left: ExportViewBoxDraft, right: ExportViewBoxDraft): boolean {
-    return left[0] === right[0] && left[1] === right[1] && left[2] === right[2] && left[3] === right[3];
-}
-
-//
 
 function resolvePresetId(preset: ViewBoxStr, fallbackViewBoxValue: string): string {
     if (preset === VIEWBOX_PRESET_KEYS.bounds || preset === VIEWBOX_PRESET_KEYS.current) {
