@@ -1,5 +1,5 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
-import { useAtom } from "jotai";
+import { useEffect, useState, type SetStateAction } from "react";
+import { atom, useAtom } from "jotai";
 import { Button } from "@/components/ui/shadcn/button";
 import { Checkbox } from "@/components/ui/shadcn/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
@@ -11,8 +11,8 @@ import { type UpdateViewBoxResult, isOpenUpdateViewBoxDialogAtom } from "./8-1-u
 
 export function UpdateViewBoxDialog() {
     const [dialogData, setDialogData] = useAtom(isOpenUpdateViewBoxDialogAtom);
-    const [draftViewBox, setDraftViewBox] = useState<ViewBox>(DEFAULT_VIEWBOX);
-    const [scaleSvgElements, setScaleSvgElements] = useState(true);
+    const [draftViewBox, setDraftViewBox] = useAtom(draftViewBoxAtom);
+    const [scaleElements, setScaleElements] = useState(true);
 
     useEffect(
         () => {
@@ -20,7 +20,7 @@ export function UpdateViewBoxDialog() {
                 return;
             }
             setDraftViewBox(dialogData.ui.initialViewBox);
-            setScaleSvgElements(dialogData.ui.initialScaleSvgElements);
+            setScaleElements(dialogData.ui.initialScaleSvgElements);
         },
         [dialogData]);
 
@@ -41,7 +41,7 @@ export function UpdateViewBoxDialog() {
             notice.info("Enter a valid viewBox with positive width and height.");
             return;
         }
-        close({ viewBox: nextViewBox, scaleSvgElements });
+        close({ viewBox: nextViewBox, scaleSvgElements: scaleElements });
     }
 
     return (
@@ -58,19 +58,10 @@ export function UpdateViewBoxDialog() {
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className="text-xs flex items-center gap-2">
-                        <NumberField label="x" value={draftViewBox[0]} onChange={(value) => updateDraftValue(setDraftViewBox, 0, value)} />
-                        <NumberField label="y" value={draftViewBox[1]} onChange={(value) => updateDraftValue(setDraftViewBox, 1, value)} />
-                        <NumberField label="width" min={1e-3} value={draftViewBox[2]} onChange={(value) => updateDraftValue(setDraftViewBox, 2, value)} />
-                        <NumberField label="height" min={1e-3} value={draftViewBox[3]} onChange={(value) => updateDraftValue(setDraftViewBox, 3, value)} />
-                    </div>
+                    <ViewBoxFields />
 
                     <label className="py-2 text-xs flex items-start gap-2">
-                        <Checkbox
-                            className="mt-0.5"
-                            checked={scaleSvgElements}
-                            onCheckedChange={(checked) => setScaleSvgElements(checked === true)}
-                        />
+                        <Checkbox className="mt-0.5" checked={scaleElements} onCheckedChange={(checked) => setScaleElements(checked === true)} />
 
                         <span className="leading-5">
                             Scale all SVG elements into the new viewBox.
@@ -93,10 +84,26 @@ export function UpdateViewBoxDialog() {
     );
 }
 
-const DEFAULT_VIEWBOX: ViewBox = [0, 0, 24, 24];
-const DESCRIPTION_ID = "update-view-box-dialog-description";
 
-function updateDraftValue(setDraftViewBox: Dispatch<SetStateAction<ViewBox>>, index: 0 | 1 | 2 | 3, value: number,) {
+const DESCRIPTION_ID = "update-view-box-dialog-description";
+const DEFAULT_VIEWBOX: ViewBox = [0, 0, 24, 24];
+
+const draftViewBoxAtom = atom<ViewBox>(DEFAULT_VIEWBOX);
+
+function ViewBoxFields() {
+    const [draftViewBox, setDraftViewBox] = useAtom(draftViewBoxAtom);
+
+    return (
+        <div className="text-xs flex items-center gap-2">
+            <NumberField label="x" value={draftViewBox[0]} onChange={(value) => updateDraftValue(setDraftViewBox, 0, value)} />
+            <NumberField label="y" value={draftViewBox[1]} onChange={(value) => updateDraftValue(setDraftViewBox, 1, value)} />
+            <NumberField label="width" min={1e-3} value={draftViewBox[2]} onChange={(value) => updateDraftValue(setDraftViewBox, 2, value)} />
+            <NumberField label="height" min={1e-3} value={draftViewBox[3]} onChange={(value) => updateDraftValue(setDraftViewBox, 3, value)} />
+        </div>
+    );
+}
+
+function updateDraftValue(setDraftViewBox: (update: SetStateAction<ViewBox>) => void, index: 0 | 1 | 2 | 3, value: number,) {
     setDraftViewBox(
         (previous) => {
             const next = [...previous] as [number, number, number, number];
