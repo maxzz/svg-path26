@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from "react";
+import { useId } from "react";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
@@ -26,64 +26,8 @@ export function Section_SvgPreview() {
 }
 
 function SvgPreview() {
-    const document = useAtomValue(svgInputDocumentAtom);
-    const selectedNode = useAtomValue(svgInputSelectedNodeAtom);
-    const parseError = useAtomValue(svgInputErrorAtom);
-    const { viewBox } = useSnapshot(appSettings.pathEditor);
     const [previewGrid, setPreviewGrid] = useAtom(previewGridAtom);
-    const gridPatternId = useId();
-
-    const fallbackViewBoxString = viewBox.join(" ");
-    const inputRootViewBoxString = document?.root.tagName === "svg"
-        ? document.root.attributes.find((attribute) => attribute.name.toLowerCase() === "viewbox")?.value?.trim() ?? null
-        : null;
-
-    const viewBoxStr = inputRootViewBoxString ?? fallbackViewBoxString;
-    const previewMarkup = selectedNode ? serializeSvgInputDocument({ root: selectedNode, sourceKind: "svg-fragment" }) : "";
-    const gridId = `${gridPatternId}-preview-grid`;
-    const viewBoxNumbers = parseViewBoxString(viewBoxStr);
-
-    let content: ReactNode;
-    if (parseError) {
-        content = (
-            <div className="rounded border border-destructive/20 bg-destructive/5 px-3 py-2 text-[11px] text-destructive">
-                {parseError}
-            </div>
-        );
-    } else if (!selectedNode) {
-        content = (
-            <div className="px-3 py-3 text-[11px] leading-5 text-muted-foreground">
-                Paste SVG markup, a &lt;path&gt; element, or path data here to preview.
-            </div>
-        );
-    } else if (selectedNode.tagName === "svg") {
-        content = (
-            <div className="relative h-40 w-full overflow-hidden rounded bg-muted/20">
-                <div
-                    className="h-full w-full p-1 [&svg]:block [&svg]:h-full [&svg]:w-full"
-                    dangerouslySetInnerHTML={{ __html: previewMarkup }}
-                />
-                {previewGrid && (
-                    <PreviewGridOverlay viewBoxStr={viewBoxStr} viewBox={viewBoxNumbers} gridId={gridId} className="inset-1" />
-                )}
-            </div>
-        );
-    } else {
-        content = (
-            <div className="relative h-40 w-full">
-                <svg
-                    className="h-40 w-full rounded bg-muted/20"
-                    viewBox={viewBoxStr}
-                    xmlns="http://www.w3.org/2000/svg"
-                    pointerEvents="none"
-                    dangerouslySetInnerHTML={{ __html: previewMarkup }}
-                />
-                {previewGrid && (
-                    <PreviewGridOverlay viewBoxStr={viewBoxStr} viewBox={viewBoxNumbers} gridId={gridId} className="inset-0 rounded" />
-                )}
-            </div>
-        );
-    }
+    const viewBoxStr = usePreviewViewBoxString();
 
     return (
         <div className="px-2 pt-1 pb-2.5 border rounded select-none">
@@ -110,12 +54,69 @@ function SvgPreview() {
                 </label>
             </div>
 
-            {content}
+            <SvgPreviewContent />
         </div>
     );
 }
 
 const previewGridAtom = atom(true);
+
+function SvgPreviewContent() {
+    const selectedNode = useAtomValue(svgInputSelectedNodeAtom);
+    const parseError = useAtomValue(svgInputErrorAtom);
+    const [previewGrid] = useAtom(previewGridAtom);
+    const gridPatternId = useId();
+    const viewBoxStr = usePreviewViewBoxString();
+
+    const previewMarkup = selectedNode ? serializeSvgInputDocument({ root: selectedNode, sourceKind: "svg-fragment" }) : "";
+    const gridId = `${gridPatternId}-preview-grid`;
+    const viewBoxNumbers = parseViewBoxString(viewBoxStr);
+
+    if (parseError) {
+        return (
+            <div className="rounded border border-destructive/20 bg-destructive/5 px-3 py-2 text-[11px] text-destructive">
+                {parseError}
+            </div>
+        );
+    }
+
+    if (!selectedNode) {
+        return (
+            <div className="px-3 py-3 text-[11px] leading-5 text-muted-foreground">
+                Paste SVG markup, a &lt;path&gt; element, or path data here to preview.
+            </div>
+        );
+    }
+
+    if (selectedNode.tagName === "svg") {
+        return (
+            <div className="relative h-40 w-full overflow-hidden rounded bg-muted/20">
+                <div
+                    className="h-full w-full p-1 [&svg]:block [&svg]:h-full [&svg]:w-full"
+                    dangerouslySetInnerHTML={{ __html: previewMarkup }}
+                />
+                {previewGrid && (
+                    <PreviewGridOverlay viewBoxStr={viewBoxStr} viewBox={viewBoxNumbers} gridId={gridId} className="inset-1" />
+                )}
+            </div>
+        );
+    }
+
+    return (
+        <div className="relative h-40 w-full">
+            <svg
+                className="h-40 w-full rounded bg-muted/20"
+                viewBox={viewBoxStr}
+                xmlns="http://www.w3.org/2000/svg"
+                pointerEvents="none"
+                dangerouslySetInnerHTML={{ __html: previewMarkup }}
+            />
+            {previewGrid && (
+                <PreviewGridOverlay viewBoxStr={viewBoxStr} viewBox={viewBoxNumbers} gridId={gridId} className="inset-0 rounded" />
+            )}
+        </div>
+    );
+}
 
 function PreviewGridOverlay({ viewBoxStr, viewBox, gridId, className }: { viewBoxStr: string; viewBox: ViewBox; gridId: string; className: string | undefined; }) {
     const previewWidth = Math.max(1e-6, viewBox[2]);
@@ -135,4 +136,15 @@ function PreviewGridOverlay({ viewBoxStr, viewBox, gridId, className }: { viewBo
             <rect x={viewBox[0]} y={viewBox[1]} width={previewWidth} height={previewHeight} fill={`url(#${gridId})`} />
         </svg>
     );
+}
+
+function usePreviewViewBoxString() {
+    const document = useAtomValue(svgInputDocumentAtom);
+    const { viewBox } = useSnapshot(appSettings.pathEditor);
+    const fallbackViewBoxString = viewBox.join(" ");
+    const inputRootViewBoxString = document?.root.tagName === "svg"
+        ? document.root.attributes.find((attribute) => attribute.name.toLowerCase() === "viewbox")?.value?.trim() ?? null
+        : null;
+
+    return inputRootViewBoxString ?? fallbackViewBoxString;
 }
