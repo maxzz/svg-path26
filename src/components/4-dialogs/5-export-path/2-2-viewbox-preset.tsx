@@ -8,8 +8,9 @@ import { type ExportViewBoxDraft, viewBoxCustomValueStrDraftAtom, viewBoxDraftAt
 import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-path-commands/8-svg-utils";
 import { appSettings } from "@/store/0-ui-settings";
+import { classNames } from "@/utils";
 
-export function ViewBoxPresetSelect() {
+export function ViewBoxPresetSelect({className}: {className?: string}) {
     const { exportStroke, exportStrokeWidth } = useSnapshot(appSettings.export);
 
     const pathValue = useAtomValue(svgPathInputAtom);
@@ -74,7 +75,7 @@ export function ViewBoxPresetSelect() {
 
     return (
         <Select value={resolvedPresetId} onValueChange={handlePresetChange}>
-            <SelectTrigger className="h-6!">
+            <SelectTrigger className={classNames("h-6!", className)}>
                 <SelectValue />
             </SelectTrigger>
 

@@ -36,7 +36,7 @@ export function ViewBoxEditor() {
                 <NumberField min={0.000001} value={viewBoxDraft[3]} onChange={(value) => updateViewBoxDraft((previous) => [previous[0], previous[1], previous[2], value])} className="pl-2.5" />
             </div>
 
-            <ViewBoxPresetSelect />
+            <ViewBoxPresetSelect className="w-full" />
         </div>
     );
 }
