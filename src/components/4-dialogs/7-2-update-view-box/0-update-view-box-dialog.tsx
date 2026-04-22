@@ -73,7 +73,7 @@ export function UpdateViewBoxDialog() {
                             {currentDialogData.ui.buttonCancel}
                         </Button>
 
-                        <Button type="submit">
+                        <Button type="submit" autoFocus>
                             {currentDialogData.ui.buttonApply}
                         </Button>
                     </DialogFooter>
