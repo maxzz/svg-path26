@@ -1,7 +1,8 @@
+import { type ReactNode } from "react";
 import { atom } from "jotai";
-import { type UpdateViewBoxResult, doAsyncExecuteUpdateViewBoxDialogAtom } from "./9-types-update-view-box";
+import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
-import { doUpdateViewBoxAtom } from "@/store/1-atoms-commands/3-update-view-box";
+import { doUpdateViewBoxAtom } from "@/components/4-dialogs/7-2-update-view-box/3-update-view-box";
 
 export const doAsyncOpenUpdateViewBoxDialogAndApplyAtom = atom(
     null,
@@ -28,3 +29,39 @@ export const doAsyncOpenUpdateViewBoxDialogAndApplyAtom = atom(
         return applied ? result : null;
     },
 );
+
+//
+
+export type UpdateViewBoxResult = {
+    viewBox: ViewBox;
+    scaleSvgElements: boolean;
+};
+
+type UpdateViewBoxUi = {
+    title: string;
+    description?: ReactNode;
+    buttonApply: string;
+    buttonCancel: string;
+    initialViewBox: ViewBox;
+    initialScaleSvgElements: boolean;
+};
+
+export type UpdateViewBoxData = {
+    ui: UpdateViewBoxUi;
+    resolve: (result: UpdateViewBoxResult | null) => void;
+};
+
+export const isOpenUpdateViewBoxDialogAtom = atom<UpdateViewBoxData | undefined>(undefined);
+
+export const doAsyncExecuteUpdateViewBoxDialogAtom = atom( // Exporst for testing purposes only
+    null,
+    async (_get, set, ui: UpdateViewBoxUi): Promise<UpdateViewBoxResult | null> => {
+        return await new Promise<UpdateViewBoxResult | null>(
+            (resolve) => {
+                set(isOpenUpdateViewBoxDialogAtom, { ui, resolve });
+            }
+        );
+    },
+);
+
+//
