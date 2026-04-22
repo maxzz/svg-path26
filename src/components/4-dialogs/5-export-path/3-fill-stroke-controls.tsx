@@ -14,21 +14,21 @@ export function FillStrokeControls() {
                         Stroke
                     </span>
                     <Switch
-                        className="scale-75 cursor-pointer"
+                        className="scale-60 cursor-pointer"
                         checked={exportStroke}
                         onCheckedChange={(checked) => appSettings.export.exportStroke = Boolean(checked)}
                     />
                 </label>
 
                 <Input
-                    className="px-0.5 py-0 w-12 h-6 disabled:opacity-20"
+                    className="px-0.5 py-0 w-8 h-6 disabled:opacity-20"
                     type="color"
                     disabled={!exportStroke}
                     value={exportStrokeColor}
                     onChange={(event) => appSettings.export.exportStrokeColor = event.target.value}
                 />
 
-                <label className="flex items-center gap-x-2">
+                <label className="flex items-center gap-x-1">
                     <span className="whitespace-nowrap">
                         width
                     </span>
@@ -50,14 +50,14 @@ export function FillStrokeControls() {
                         Fill
                     </span>
                     <Switch
-                        className="scale-75 cursor-pointer"
+                        className="scale-60 cursor-pointer"
                         checked={exportFill}
                         onCheckedChange={(checked) => appSettings.export.exportFill = Boolean(checked)}
                     />
                 </label>
 
                 <Input
-                    className="px-0.5 py-0 w-12 h-6 disabled:opacity-20"
+                    className="px-0.5 py-0 w-8 h-6 disabled:opacity-20"
                     type="color"
                     disabled={!exportFill}
                     value={exportFillColor}

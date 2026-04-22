@@ -17,7 +17,7 @@ export function ViewBoxEditor() {
     }
 
     return (
-        <div className="px-2 pt-1 pb-2.5 border rounded grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-0.5 select-none">
+        <div className="px-2 pt-1 pb-2.5 border rounded grid grid-cols-[auto_minmax(0,1fr)] gap-x-2 gap-y-0.5 select-none">
             <div className="">
                 ViewBox
             </div>

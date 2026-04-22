@@ -176,7 +176,7 @@ const STATIC_VIEWBOX_PRESET_ITEMS: ViewBoxPresetOption[] = STATIC_VIEWBOX_PRESET
 
 //
 
-const CUSTOM_PRESET_PREFIX = "custom:";
+const CUSTOM_PRESET_PREFIX = "Custom:";
 
 export function toCustomPresetId(viewBoxValue: string): string {
     return `${CUSTOM_PRESET_PREFIX}${viewBoxValue}`;
