@@ -30,7 +30,7 @@ function SvgPreview() {
     const selectedNode = useAtomValue(svgInputSelectedNodeAtom);
     const parseError = useAtomValue(svgInputErrorAtom);
     const { viewBox } = useSnapshot(appSettings.pathEditor);
-    const [svgPreviewGrid, setSvgPreviewGrid] = useAtom(svgPreviewGridAtom);
+    const [previewGrid, setPreviewGrid] = useAtom(previewGridAtom);
     const gridPatternId = useId();
 
     const fallbackViewBoxString = viewBox.join(" ");
@@ -63,7 +63,7 @@ function SvgPreview() {
                     className="h-full w-full p-1 [&svg]:block [&svg]:h-full [&svg]:w-full"
                     dangerouslySetInnerHTML={{ __html: previewMarkup }}
                 />
-                {svgPreviewGrid && (
+                {previewGrid && (
                     <PreviewGridOverlay viewBoxStr={viewBoxStr} viewBox={viewBoxNumbers} gridId={gridId} className="inset-1" />
                 )}
             </div>
@@ -78,7 +78,7 @@ function SvgPreview() {
                     pointerEvents="none"
                     dangerouslySetInnerHTML={{ __html: previewMarkup }}
                 />
-                {svgPreviewGrid && (
+                {previewGrid && (
                     <PreviewGridOverlay viewBoxStr={viewBoxStr} viewBox={viewBoxNumbers} gridId={gridId} className="inset-0 rounded" />
                 )}
             </div>
@@ -104,8 +104,8 @@ function SvgPreview() {
                     <Switch
                         className="scale-50 cursor-pointer"
                         tabIndex={-1}
-                        checked={svgPreviewGrid}
-                        onCheckedChange={(checked) => setSvgPreviewGrid(Boolean(checked))}
+                        checked={previewGrid}
+                        onCheckedChange={(checked) => setPreviewGrid(Boolean(checked))}
                     />
                 </label>
             </div>
@@ -115,7 +115,7 @@ function SvgPreview() {
     );
 }
 
-const svgPreviewGridAtom = atom(true);
+const previewGridAtom = atom(true);
 
 function PreviewGridOverlay({ viewBoxStr, viewBox, gridId, className }: { viewBoxStr: string; viewBox: ViewBox; gridId: string; className: string | undefined; }) {
     const previewWidth = Math.max(1e-6, viewBox[2]);
