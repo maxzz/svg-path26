@@ -87,10 +87,7 @@ export const doUpdateViewBoxAtom = atom(
 
 function sanitizeViewBox(viewBox: ViewBox): ViewBox | null {
     const [x, y, width, height] = viewBox;
-    if (![x, y, width, height].every((value) => Number.isFinite(value))) {
-        return null;
-    }
-    if (width <= 0 || height <= 0) {
+    if (width <= 0 || height <= 0 || ![x, y, width, height].every((value) => Number.isFinite(value))) {
         return null;
     }
     return [x, y, Math.max(1e-3, width), Math.max(1e-3, height)];
@@ -302,11 +299,7 @@ function transformPointsAttributes(attributes: SvgInputAttribute[], transform: V
     return nextPoints === points ? attributes : setAttributesValue(attributes, "points", nextPoints);
 }
 
-function transformLengthAttributes(
-    attributes: SvgInputAttribute[],
-    transform: ViewBoxTransform,
-    specs: Array<{ name: string; axis: "x" | "y" | "width" | "height" | "radius"; }>,
-) {
+function transformLengthAttributes(attributes: SvgInputAttribute[], transform: ViewBoxTransform, specs: Array<{ name: string; axis: "x" | "y" | "width" | "height" | "radius"; }>) {
     let nextAttributes = attributes;
 
     for (const spec of specs) {
@@ -326,11 +319,7 @@ function transformLengthAttributes(
     return nextAttributes;
 }
 
-function transformNumericAttribute(
-    rawValue: string,
-    transform: ViewBoxTransform,
-    axis: "x" | "y" | "width" | "height" | "radius",
-) {
+function transformNumericAttribute(rawValue: string, transform: ViewBoxTransform, axis: "x" | "y" | "width" | "height" | "radius") {
     const match = rawValue.trim().match(/^(-?\d*\.?\d+(?:e[+-]?\d+)?)(.*)$/i);
     if (!match) {
         return null;
@@ -346,11 +335,7 @@ function transformNumericAttribute(
     return `${formatNumber(nextNumeric)}${suffix}`;
 }
 
-function transformCoordinate(
-    value: number,
-    transform: ViewBoxTransform,
-    axis: "x" | "y" | "width" | "height" | "radius",
-) {
+function transformCoordinate(value: number, transform: ViewBoxTransform, axis: "x" | "y" | "width" | "height" | "radius") {
     switch (axis) {
         case "x":
             return value * transform.scaleX + transform.translateX;

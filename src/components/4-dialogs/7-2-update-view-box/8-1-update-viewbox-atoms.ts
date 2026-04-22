@@ -2,7 +2,7 @@ import { type ReactNode } from "react";
 import { atom } from "jotai";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
-import { doUpdateViewBoxAtom } from "@/components/4-dialogs/7-2-update-view-box/3-update-view-box";
+import { doUpdateViewBoxAtom } from "@/components/4-dialogs/7-2-update-view-box/8-2-do-update-view-box";
 
 export const doAsyncOpenUpdateViewBoxDialogAndApplyAtom = atom(
     null,

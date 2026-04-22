@@ -10,7 +10,7 @@ import { doPasteSvgTextAtom, doSelectSvgInputNodeAtom, svgInputDocumentAtom, svg
 import { svgPathInputAtom } from "../0-atoms/1-1-svg-path-input";
 import { doCommitCurrentPathToHistoryAtom as commitCurrentPathToHistoryAtom } from "../0-atoms/1-2-history";
 import { doAsyncExecuteConfirmDialogAtom, isOpenConfirmDialogAtom } from "../../components/4-dialogs/8-1-confirmation/9-types-confirmation";
-import { doAsyncExecuteUpdateViewBoxDialogAtom, isOpenUpdateViewBoxDialogAtom } from "../../components/4-dialogs/7-2-update-view-box/8-update-viewbox-atoms";
+import { doAsyncExecuteUpdateViewBoxDialogAtom, isOpenUpdateViewBoxDialogAtom } from "../../components/4-dialogs/7-2-update-view-box/8-1-update-viewbox-atoms";
 import { doOpenNamedPathAtom, doSaveNamedPathAtom } from "../0-atoms/2-6-stored-paths-actions";
 import { doSetPathViewBoxAtom, pathViewBoxAtom } from "../0-atoms/2-2-path-viewbox";
 import { doScaleSelectedSegmentsIntoViewBoxFromDraftAtom, scaleToViewBoxMarginDraftAtom } from "../../components/4-dialogs/7-1-scale-to-viewbox/1-scale-to-viewbox-atoms";
@@ -19,7 +19,7 @@ import { normalizeStoredSettings } from "@/store/1-ui-settings-normalize";
 import { DEFAULT_DIALOGS_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS } from "@/store/9-ui-settings-types-and-defaults";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
 import { doCenterSelectedSegmentsIntoViewBoxAtom } from "../1-atoms-commands/1-center-selected";
-import { doUpdateViewBoxAtom } from "../../components/4-dialogs/7-2-update-view-box/3-update-view-box";
+import { doUpdateViewBoxAtom } from "../../components/4-dialogs/7-2-update-view-box/8-2-do-update-view-box";
 
 function getSelectionBounds(model: SvgPathModel, selectionIndices: number[]) {
     let xmin = Infinity;

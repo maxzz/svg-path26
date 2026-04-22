@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { NumberField } from "@/components/ui/loacal-ui/2-number-field";
 import { notice } from "@/components/ui/loacal-ui/7-toaster";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
-import { type UpdateViewBoxResult, isOpenUpdateViewBoxDialogAtom } from "./8-update-viewbox-atoms";
+import { type UpdateViewBoxResult, isOpenUpdateViewBoxDialogAtom } from "./8-1-update-viewbox-atoms";
 
 export function UpdateViewBoxDialog() {
     const [dialogData, setDialogData] = useAtom(isOpenUpdateViewBoxDialogAtom);
