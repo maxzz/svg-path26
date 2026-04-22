@@ -17,24 +17,26 @@ export function ViewBoxEditor() {
     }
 
     return (
-        <div className="px-2 pt-1 pb-2.5 border rounded space-y-1 select-none">
-            <div>
-                Preset
-            </div>
-            <ViewBoxPresetSelect />
-
-            <div className="mt-2">
+        <div className="px-2 pt-1 pb-2.5 border rounded grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-0.5 select-none">
+            <div className="">
                 ViewBox
             </div>
-            <div className="flex items-center gap-x-1">
-                <span className="text-muted-foreground">x, y:</span>
-                <NumberField value={viewBoxDraft[0]} onChange={(value) => updateViewBoxDraft((previous) => [value, previous[1], previous[2], previous[3]])} className="text-right" />
-                <NumberField value={viewBoxDraft[1]} onChange={(value) => updateViewBoxDraft((previous) => [previous[0], value, previous[2], previous[3]])} className="pl-3.5" />
 
-                <span className="ml-4 text-muted-foreground">width, height:</span>
-                <NumberField min={0.000001} value={viewBoxDraft[2]} onChange={(value) => updateViewBoxDraft((previous) => [previous[0], previous[1], value, previous[3]])} className="text-right" />
-                <NumberField min={0.000001} value={viewBoxDraft[3]} onChange={(value) => updateViewBoxDraft((previous) => [previous[0], previous[1], previous[2], value])} className="pl-3.5" />
+            <div className="">
+                Preset
             </div>
+
+            <div className="grid grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)] gap-x-1 gap-y-0.5">
+                <span className="px-1 1text-right text-muted-foreground" title="x, y">x, y:</span>
+                <NumberField value={viewBoxDraft[0]} onChange={(value) => updateViewBoxDraft((previous) => [value, previous[1], previous[2], previous[3]])} className="text-right" />
+                <NumberField value={viewBoxDraft[1]} onChange={(value) => updateViewBoxDraft((previous) => [previous[0], value, previous[2], previous[3]])} className="pl-2.5" />
+
+                <span className="px-1 1text-right text-muted-foreground" title="width, height">w, h:</span>
+                <NumberField min={0.000001} value={viewBoxDraft[2]} onChange={(value) => updateViewBoxDraft((previous) => [previous[0], previous[1], value, previous[3]])} className="text-right" />
+                <NumberField min={0.000001} value={viewBoxDraft[3]} onChange={(value) => updateViewBoxDraft((previous) => [previous[0], previous[1], previous[2], value])} className="pl-2.5" />
+            </div>
+
+            <ViewBoxPresetSelect />
         </div>
     );
 }
