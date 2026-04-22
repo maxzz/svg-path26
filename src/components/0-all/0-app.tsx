@@ -25,16 +25,22 @@ export function App() {
                 <Footer />
             </div>
 
-            <SavePathDialog />
-            <ConfirmationDialog />
-            <OpenPathDialog />
-            <ExportSvgDialog />
-            <AddImageDialog />
-            <ScaleToViewBoxDialog />
-            <UpdateViewBoxDialog />
-            <AboutDialog />
-            <OptionsDialog />
+            <AllDialogs />
         </div>
+    </>);
+}
+
+function AllDialogs() {
+    return (<>
+        <SavePathDialog />
+        <ConfirmationDialog />
+        <OpenPathDialog />
+        <ExportSvgDialog />
+        <AddImageDialog />
+        <ScaleToViewBoxDialog />
+        <UpdateViewBoxDialog />
+        <AboutDialog />
+        <OptionsDialog />
     </>);
 }
 
