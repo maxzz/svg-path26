@@ -7,6 +7,8 @@ import { Switch } from "@/components/ui/shadcn/switch";
 import { appSettings } from "@/store/0-ui-settings";
 import { svgInputDocumentAtom, svgInputErrorAtom, svgInputSelectedNodeAtom } from "@/store/0-atoms/1-3-svg-input";
 import { serializeSvgInputDocument } from "@/svg-core/3-svg-input";
+import { parseViewBoxString } from "@/store/8-utils/1-viewbox-utils";
+import type { ViewBox } from "@/svg-core/9-types-svg-model";
 
 export function Section_SvgPreview() {
     const { showSvgPreviewSection } = useSnapshot(appSettings);
@@ -23,7 +25,7 @@ export function Section_SvgPreview() {
     );
 }
 
-export function SvgPreview() {
+function SvgPreview() {
     const document = useAtomValue(svgInputDocumentAtom);
     const selectedNode = useAtomValue(svgInputSelectedNodeAtom);
     const parseError = useAtomValue(svgInputErrorAtom);
@@ -36,10 +38,10 @@ export function SvgPreview() {
         ? document.root.attributes.find((attribute) => attribute.name.toLowerCase() === "viewbox")?.value?.trim() ?? null
         : null;
 
-    const viewBoxString = inputRootViewBoxString ?? fallbackViewBoxString;
+    const viewBoxStr = inputRootViewBoxString ?? fallbackViewBoxString;
     const previewMarkup = selectedNode ? serializeSvgInputDocument({ root: selectedNode, sourceKind: "svg-fragment" }) : "";
     const gridId = `${gridPatternId}-preview-grid`;
-    const viewBoxNumbers = parseViewBoxNumbers(viewBoxString);
+    const viewBoxNumbers = parseViewBoxString(viewBoxStr);
 
     let content: ReactNode;
     if (parseError) {
@@ -62,7 +64,7 @@ export function SvgPreview() {
                     dangerouslySetInnerHTML={{ __html: previewMarkup }}
                 />
                 {svgPreviewGrid && (
-                    <PreviewGridOverlay viewBoxString={viewBoxString} viewBox={viewBoxNumbers} gridId={gridId} className="inset-1" />
+                    <PreviewGridOverlay viewBoxStr={viewBoxStr} viewBox={viewBoxNumbers} gridId={gridId} className="inset-1" />
                 )}
             </div>
         );
@@ -71,13 +73,13 @@ export function SvgPreview() {
             <div className="relative h-40 w-full">
                 <svg
                     className="h-40 w-full rounded bg-muted/20"
-                    viewBox={viewBoxString}
+                    viewBox={viewBoxStr}
                     xmlns="http://www.w3.org/2000/svg"
                     pointerEvents="none"
                     dangerouslySetInnerHTML={{ __html: previewMarkup }}
                 />
                 {svgPreviewGrid && (
-                    <PreviewGridOverlay viewBoxString={viewBoxString} viewBox={viewBoxNumbers} gridId={gridId} className="inset-0 rounded" />
+                    <PreviewGridOverlay viewBoxStr={viewBoxStr} viewBox={viewBoxNumbers} gridId={gridId} className="inset-0 rounded" />
                 )}
             </div>
         );
@@ -90,8 +92,8 @@ export function SvgPreview() {
                     <p className="mb-0.5">
                         Live preview
                     </p>
-                    <p className="text-[11px] text-muted-foreground truncate" title={`ViewBox: ${viewBoxString}`}>
-                        ViewBox: {viewBoxString}
+                    <p className="text-[11px] text-muted-foreground truncate" title={`ViewBox: ${viewBoxStr}`}>
+                        ViewBox: {viewBoxStr}
                     </p>
                 </div>
 
@@ -115,14 +117,14 @@ export function SvgPreview() {
 
 const svgPreviewGridAtom = atom(true);
 
-function PreviewGridOverlay({ viewBoxString, viewBox, gridId, className }: { viewBoxString: string; viewBox: [number, number, number, number]; gridId: string; className: string; }) {
+function PreviewGridOverlay({ viewBoxStr, viewBox, gridId, className }: { viewBoxStr: string; viewBox: ViewBox; gridId: string; className: string | undefined; }) {
     const previewWidth = Math.max(1e-6, viewBox[2]);
     const previewHeight = Math.max(1e-6, viewBox[3]);
 
     return (
         <svg
             className={`pointer-events-none absolute ${className}`}
-            viewBox={viewBoxString}
+            viewBox={viewBoxStr}
             aria-hidden="true"
         >
             <defs>
@@ -133,12 +135,4 @@ function PreviewGridOverlay({ viewBoxString, viewBox, gridId, className }: { vie
             <rect x={viewBox[0]} y={viewBox[1]} width={previewWidth} height={previewHeight} fill={`url(#${gridId})`} />
         </svg>
     );
-}
-
-function parseViewBoxNumbers(viewBoxString: string): [number, number, number, number] {
-    const parts = viewBoxString.trim().split(/[\s,]+/).map((value) => Number(value));
-    if (parts.length !== 4 || parts.some((value) => !Number.isFinite(value))) {
-        return [0, 0, 1, 1];
-    }
-    return [parts[0], parts[1], parts[2], parts[3]];
 }
