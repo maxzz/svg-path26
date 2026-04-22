@@ -55,17 +55,17 @@ export function EditMenu() {
             </MenubarTrigger>
 
             <MenubarContent>
-                <MenubarItem disabled={!hasSelection} onClick={() => setScaleToViewBoxDialogOpen(true)}>
-                    Scale to viewBox...
+                <MenubarItem onClick={openUpdateViewBoxDialog}>
+                    Update viewBox... <MenubarShortcut>Alt+V</MenubarShortcut>
                 </MenubarItem>
 
-                <MenubarItem onClick={openUpdateViewBoxDialog}>
-                    Update View Box... <MenubarShortcut>Alt+V</MenubarShortcut>
+                <MenubarItem disabled={!hasSelection} onClick={() => setScaleToViewBoxDialogOpen(true)}>
+                    Scale selection to viewBox...
                 </MenubarItem>
 
                 <MenubarSub>
                     <MenubarSubTrigger>
-                        Center selected
+                        Center selection
                     </MenubarSubTrigger>
 
                     <MenubarSubContent>
