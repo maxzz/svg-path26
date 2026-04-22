@@ -6,7 +6,7 @@ import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { exportSvgDialogOpenAtom, viewBoxDraftAtom, viewBoxStrDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
 import { SvgPreview } from "./1-svg-preview";
 import { ViewBoxEditor } from "./2-1-viewbox-editor";
-import { isCustomPresetId, viewBoxToString } from "./2-2-viewbox-preset";
+import { viewBoxToString } from "./2-2-viewbox-preset";
 import { FillStrokeControls } from "./3-fill-stroke-controls";
 import { exportSvgToFile } from "./7-export-utils";
 
@@ -19,7 +19,7 @@ export function ExportSvgDialog() {
     function handleExport() {
         const didExport = exportSvgToFile({ pathValue, exportViewBoxDraft, });
         if (didExport) {
-            if (isCustomPresetId(exportViewBoxPresetDraft)) {
+            if (exportViewBoxPresetDraft === "current") {
                 appSettings.export.viewBoxPreset = viewBoxToString(exportViewBoxDraft);
             }
             setOpenExportDialog(false);
