@@ -1,5 +1,4 @@
 import { atom } from "jotai";
-import { doAsyncExecuteUpdateViewBoxDialogAtom } from "@/components/4-dialogs/7-2-update-view-box/9-types-update-view-box";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
 import { type SvgInputAttribute, type SvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-input";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
@@ -24,32 +23,6 @@ type ViewBoxTransform = {
 };
 
 const VIEWBOX_EPS = 1e-9;
-
-export const doAsyncOpenUpdateViewBoxDialogAndApplyAtom = atom(
-    null,
-    async (get, set) => {
-        const currentViewBox = get(pathViewBoxAtom);
-        const result = await set(doAsyncExecuteUpdateViewBoxDialogAtom, {
-            title: "Update View Box",
-            description: "Update the viewBox and optionally scale the current SVG elements into the new coordinates.",
-            buttonApply: "Apply",
-            buttonCancel: "Cancel",
-            initialViewBox: currentViewBox,
-            initialScaleSvgElements: true,
-        });
-
-        if (!result) {
-            return null;
-        }
-
-        const applied = set(doUpdateViewBoxAtom, {
-            nextViewBox: result.viewBox,
-            scaleSvgElements: result.scaleSvgElements,
-        });
-
-        return applied ? result : null;
-    },
-);
 
 export const doUpdateViewBoxAtom = atom(
     null,

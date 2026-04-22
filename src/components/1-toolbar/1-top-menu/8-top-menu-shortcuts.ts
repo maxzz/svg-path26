@@ -4,7 +4,7 @@ import { aboutDialogOpenAtom, openPathDialogOpenAtom, optionsDialogOpenAtom, sav
 import { exportSvgDialogOpenAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
 import { isImageEditModeAtom } from "@/store/0-atoms/2-8-images";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { doAsyncOpenUpdateViewBoxDialogAndApplyAtom } from "@/store/1-atoms-commands/3-update-view-box";
+import { doAsyncOpenUpdateViewBoxDialogAndApplyAtom } from "@/components/4-dialogs/7-2-update-view-box/8-update-viewbox-atoms";
 import { appSettings } from "@/store/0-ui-settings";
 import { toggleTheme } from "@/utils";
 

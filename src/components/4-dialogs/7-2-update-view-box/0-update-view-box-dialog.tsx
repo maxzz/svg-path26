@@ -8,9 +8,6 @@ import { notice } from "@/components/ui/loacal-ui/7-toaster";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { type UpdateViewBoxResult, isOpenUpdateViewBoxDialogAtom } from "./9-types-update-view-box";
 
-const DEFAULT_VIEWBOX: ViewBox = [0, 0, 24, 24];
-const DESCRIPTION_ID = "update-view-box-dialog-description";
-
 export function UpdateViewBoxDialog() {
     const [dialogData, setDialogData] = useAtom(isOpenUpdateViewBoxDialogAtom);
     const [draftViewBox, setDraftViewBox] = useState<ViewBox>(DEFAULT_VIEWBOX);
@@ -21,7 +18,6 @@ export function UpdateViewBoxDialog() {
             if (!dialogData) {
                 return;
             }
-
             setDraftViewBox(dialogData.ui.initialViewBox);
             setScaleSvgElements(dialogData.ui.initialScaleSvgElements);
         },
@@ -96,22 +92,23 @@ export function UpdateViewBoxDialog() {
     );
 }
 
+const DEFAULT_VIEWBOX: ViewBox = [0, 0, 24, 24];
+const DESCRIPTION_ID = "update-view-box-dialog-description";
+
 function updateDraftValue(setDraftViewBox: Dispatch<SetStateAction<ViewBox>>, index: 0 | 1 | 2 | 3, value: number,) {
-    setDraftViewBox((previous) => {
-        const next = [...previous] as [number, number, number, number];
-        next[index] = value;
-        return next;
-    });
+    setDraftViewBox(
+        (previous) => {
+            const next = [...previous] as [number, number, number, number];
+            next[index] = value;
+            return next;
+        }
+    );
 }
 
 function sanitizeViewBox(viewBox: ViewBox): ViewBox | null {
     const [x, y, width, height] = viewBox;
 
-    if (![x, y, width, height].every((value) => Number.isFinite(value))) {
-        return null;
-    }
-
-    if (width <= 0 || height <= 0) {
+    if (width <= 0 || height <= 0 || ![x, y, width, height].every((value) => Number.isFinite(value))) {
         return null;
     }
 
