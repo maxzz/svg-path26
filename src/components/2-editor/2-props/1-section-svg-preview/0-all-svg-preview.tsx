@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
 import { Switch } from "@/components/ui/shadcn/switch";
 import { appSettings } from "@/store/0-ui-settings";
-import { svgInputDocumentAtom, svgInputErrorAtom, svgInputSelectedNodeAtom } from "@/store/0-atoms/1-3-svg-input";
+import { svgInputErrorAtom, svgInputSelectedNodeAtom } from "@/store/0-atoms/1-3-svg-input";
 import { serializeSvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-input";
 import { parseViewBoxString } from "@/store/8-utils/1-viewbox-utils";
 
@@ -122,14 +122,8 @@ function SvgPreviewContent() {
 }
 
 function usePreviewViewBoxString() {
-    const document = useAtomValue(svgInputDocumentAtom);
     const { viewBox } = useSnapshot(appSettings.pathEditor);
-    const fallbackViewBoxString = viewBox.join(" ");
-    const inputRootViewBoxString = document?.root.tagName === "svg"
-        ? document.root.attributes.find((attribute) => attribute.name.toLowerCase() === "viewbox")?.value?.trim() ?? null
-        : null;
-
-    return inputRootViewBoxString ?? fallbackViewBoxString;
+    return viewBox.join(" ");
 }
 
 const SVG_ROOT_ATTRS_TO_STRIP = new Set([
