@@ -18,39 +18,41 @@ export function Section_SvgPreview() {
 
     return (
         <TooltipProvider delayDuration={250}>
-            <SectionPanel sectionKey="svg-preview" label={<div className="flex items-center gap-1"><span>SVG preview</span><span className="pt-0.5 text-[11px] text-muted-foreground">({viewBoxStr})</span></div>} contentClassName="px-1 py-1">
+            <SectionPanel
+                sectionKey="svg-preview"
+                label={<div className="flex items-center gap-1"><span>SVG preview</span><span className="pt-0.5 text-[11px] text-muted-foreground">({viewBoxStr})</span></div>} contentClassName="px-1 py-1"
+                overlay={<SvgPreviewOverlay />}
+            >
                 <SvgPreview />
             </SectionPanel>
         </TooltipProvider>
     );
 }
 
-function SvgPreview() {
+function SvgPreviewOverlay() {
     const [previewGrid, setPreviewGrid] = useAtom(previewGridAtom);
-    const viewBoxStr = useSnapshot(appSettings.pathEditor).viewBox.join(" ");
 
     return (
+        <div className="text-xs flex items-center justify-between">
+
+            <label className="-mr-1.5 flex items-center cursor-pointer">
+                <span className="mb-px -mr-0.75 text-muted-foreground">
+                    Grid
+                </span>
+                <Switch
+                    className="scale-50 cursor-pointer"
+                    tabIndex={-1}
+                    checked={previewGrid}
+                    onCheckedChange={(checked) => setPreviewGrid(Boolean(checked))}
+                />
+            </label>
+        </div>
+    );
+}
+
+function SvgPreview() {
+    return (
         <div className="px-2 pt-1 pb-2.5 border rounded select-none flex flex-col gap-2">
-            <div className="text-xs flex items-center justify-between">
-                <div className="min-w-0">
-                    <p className="mb-0.5">
-                        Live preview (viewBox: {viewBoxStr})
-                    </p>
-                </div>
-
-                <label className="-mr-1.5 flex items-center cursor-pointer">
-                    <span className="mb-px -mr-0.75 text-muted-foreground">
-                        Grid
-                    </span>
-                    <Switch
-                        className="scale-50 cursor-pointer"
-                        tabIndex={-1}
-                        checked={previewGrid}
-                        onCheckedChange={(checked) => setPreviewGrid(Boolean(checked))}
-                    />
-                </label>
-            </div>
-
             <SvgPreviewContent />
         </div>
     );
