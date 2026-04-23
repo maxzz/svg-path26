@@ -1,12 +1,12 @@
 import { useId } from "react";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
+import { appSettings } from "@/store/0-ui-settings";
 import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
 import { Switch } from "@/components/ui/shadcn/switch";
-import { appSettings } from "@/store/0-ui-settings";
 import { svgInputErrorAtom, svgInputSelectedNodeAtom } from "@/store/0-atoms/1-3-svg-input";
-import { serializeSvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-input";
+import { type SvgInputNode, serializeSvgInputDocument } from "@/svg-core/3-svg-input";
 import { parseViewBoxString } from "@/store/8-utils/1-viewbox-utils";
 
 export function Section_SvgPreview() {
@@ -26,7 +26,7 @@ export function Section_SvgPreview() {
 
 function SvgPreview() {
     const [previewGrid, setPreviewGrid] = useAtom(previewGridAtom);
-    const viewBoxStr = usePreviewViewBoxString();
+    const viewBoxStr = useSnapshot(appSettings.pathEditor).viewBox.join(" ");
 
     return (
         <div className="px-2 pt-1 pb-2.5 border rounded select-none flex flex-col gap-2">
@@ -62,7 +62,7 @@ function SvgPreviewContent() {
     const parseError = useAtomValue(svgInputErrorAtom);
     const [previewGrid] = useAtom(previewGridAtom);
     const gridPatternId = useId();
-    const viewBoxStr = usePreviewViewBoxString();
+    const viewBoxStr = useSnapshot(appSettings.pathEditor).viewBox.join(" ");
 
     const previewNode = selectedNode ? toPreviewNode(selectedNode) : null;
     const previewMarkup = previewNode ? serializeSvgInputDocument({ root: previewNode, sourceKind: "svg-fragment" }) : "";
@@ -121,21 +121,6 @@ function SvgPreviewContent() {
     );
 }
 
-function usePreviewViewBoxString() {
-    const { viewBox } = useSnapshot(appSettings.pathEditor);
-    return viewBox.join(" ");
-}
-
-const SVG_ROOT_ATTRS_TO_STRIP = new Set([
-    "viewbox",
-    "width",
-    "height",
-    "x",
-    "y",
-    "xmlns",
-    "xmlns:xlink",
-]);
-
 function toPreviewNode(node: SvgInputNode): SvgInputNode {
     if (node.tagName !== "svg") {
         return node;
@@ -149,3 +134,13 @@ function toPreviewNode(node: SvgInputNode): SvgInputNode {
         ),
     };
 }
+
+const SVG_ROOT_ATTRS_TO_STRIP = new Set([
+    "viewbox",
+    "width",
+    "height",
+    "x",
+    "y",
+    "xmlns",
+    "xmlns:xlink",
+]);
