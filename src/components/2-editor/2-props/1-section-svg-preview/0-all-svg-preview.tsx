@@ -151,8 +151,10 @@ function usePreviewUnitsPerPixel(viewBoxWidth: number, viewBoxHeight: number) {
 
 function getSvgUnitsPerPixel(width: number, height: number, viewPortSize: SizeWH | null): number {
     if (!viewPortSize || viewPortSize.width <= 0 || viewPortSize.height <= 0) {
-        return Math.max(width, height) / 1000;
+        return Math.max(width, height) / FALLBACK_VIEWPORT_PIXELS;
     }
 
     return Math.max(width / viewPortSize.width, height / viewPortSize.height);
 }
+
+const FALLBACK_VIEWPORT_PIXELS = 160;
