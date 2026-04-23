@@ -32,44 +32,6 @@ export function Section_SvgPreview() {
     );
 }
 
-function SvgPreviewOverlay() {
-    const [showGrid, setShowGrid] = useAtom(showGridAtom);
-
-    return (
-        <div className="mr-1 text-xs flex items-center justify-between gap-1 select-none">
-
-            <label className="flex items-center cursor-pointer gap-0.5">
-                <span className="mb-px -mr-0.75 text-muted-foreground">
-                    grid:
-                </span>
-                <Button
-                    className={classNames(overlayButtonClasses, showGrid && overlayButtonActiveClasses)}
-                    onClick={() => setShowGrid((current) => !current)}
-                    variant="ghost"
-                    size="icon"
-                    type="button"
-                >
-                    {showGrid ? <ToggleRight className="size-3.5" /> : <ToggleLeft className="size-3.5" />}
-                </Button>
-            </label>
-
-
-
-            {/* <label className="-mr-1.5 flex items-center cursor-pointer">
-                <span className="mb-px -mr-0.75 text-muted-foreground">
-                    Grid
-                </span>
-                <Switch
-                    className="scale-50 cursor-pointer"
-                    tabIndex={-1}
-                    checked={previewGrid}
-                    onCheckedChange={(checked) => setPreviewGrid(Boolean(checked))}
-                />
-            </label> */}
-        </div>
-    );
-}
-
 function SvgPreview() {
     return (
         <div className="px-2 pt-1 pb-2.5 border rounded select-none flex flex-col gap-2">
@@ -168,5 +130,42 @@ const SVG_ROOT_ATTRS_TO_STRIP = new Set([
     "xmlns:xlink",
 ]);
 
+function SvgPreviewOverlay() {
+    const [showGrid, setShowGrid] = useAtom(showGridAtom);
+
+    return (
+        <div className="mr-1 text-xs flex items-center justify-between gap-1 select-none">
+
+            <label className="flex items-center cursor-pointer gap-0.5">
+                <span className="mb-px -mr-0.75 text-muted-foreground">
+                    grid:
+                </span>
+                <Button
+                    className={classNames(overlayButtonClasses)}
+                    onClick={() => setShowGrid((current) => !current)}
+                    variant="ghost"
+                    size="icon"
+                    type="button"
+                >
+                    {showGrid ? <ToggleRight className="size-3.5" /> : <ToggleLeft className="size-3.5" />}
+                </Button>
+            </label>
+
+
+
+            {/* <label className="-mr-1.5 flex items-center cursor-pointer">
+                <span className="mb-px -mr-0.75 text-muted-foreground">
+                    Grid
+                </span>
+                <Switch
+                    className="scale-50 cursor-pointer"
+                    tabIndex={-1}
+                    checked={previewGrid}
+                    onCheckedChange={(checked) => setPreviewGrid(Boolean(checked))}
+                />
+            </label> */}
+        </div>
+    );
+}
+
 const overlayButtonClasses = "size-5 rounded-sm text-muted-foreground hover:text-foreground";
-const overlayButtonActiveClasses = "bg-background/80 text-foreground";
