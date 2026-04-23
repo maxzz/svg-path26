@@ -1,20 +1,16 @@
 import { useId } from "react";
-import { atom, useAtom, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
 import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
-import { Switch } from "@/components/ui/shadcn/switch";
 import { svgInputErrorAtom, svgInputSelectedNodeAtom } from "@/store/0-atoms/1-3-svg-input";
 import { type SvgInputNode, serializeSvgInputDocument } from "@/svg-core/3-svg-input";
 import { parseViewBoxString } from "@/store/8-utils/1-viewbox-utils";
-import { classNames } from "@/utils";
-import { Button } from "@/components/ui/shadcn/button";
-import { ToggleLeft, ToggleRight } from "lucide-react";
+import { showGridAtom, SvgPreviewLabel, SvgPreviewOverlay } from "./1-svg-preview-controls.tsx";
 
 export function Section_SvgPreview() {
     const { showSvgPreviewSection } = useSnapshot(appSettings);
-    const viewBoxStr = useSnapshot(appSettings.pathEditor).viewBox.join(", ");
     if (!showSvgPreviewSection) {
         return null;
     }
@@ -23,7 +19,8 @@ export function Section_SvgPreview() {
         <TooltipProvider delayDuration={250}>
             <SectionPanel
                 sectionKey="svg-preview"
-                label={<div className="flex items-center gap-1"><span>SVG preview</span><span className="pt-0.5 text-[11px] text-muted-foreground">({viewBoxStr})</span></div>} contentClassName="px-1 py-1"
+                label={<SvgPreviewLabel />}
+                contentClassName="px-1 py-1"
                 overlay={<SvgPreviewOverlay />}
             >
                 <SvgPreview />
@@ -40,12 +37,10 @@ function SvgPreview() {
     );
 }
 
-const showGridAtom = atom(true);
-
 function SvgPreviewContent() {
     const selectedNode = useAtomValue(svgInputSelectedNodeAtom);
     const parseError = useAtomValue(svgInputErrorAtom);
-    const [previewGrid] = useAtom(showGridAtom);
+    const previewGrid = useAtomValue(showGridAtom);
     const gridPatternId = useId();
     const viewBoxStr = useSnapshot(appSettings.pathEditor).viewBox.join(" ");
 
@@ -129,43 +124,3 @@ const SVG_ROOT_ATTRS_TO_STRIP = new Set([
     "xmlns",
     "xmlns:xlink",
 ]);
-
-function SvgPreviewOverlay() {
-    const [showGrid, setShowGrid] = useAtom(showGridAtom);
-
-    return (
-        <div className="mr-1 text-xs flex items-center justify-between gap-1 select-none">
-
-            <label className="flex items-center cursor-pointer gap-0.5">
-                <span className="mb-px -mr-0.75 text-muted-foreground">
-                    grid:
-                </span>
-                <Button
-                    className={classNames(overlayButtonClasses)}
-                    onClick={() => setShowGrid((current) => !current)}
-                    variant="ghost"
-                    size="icon"
-                    type="button"
-                >
-                    {showGrid ? <ToggleRight className="size-3.5" /> : <ToggleLeft className="size-3.5" />}
-                </Button>
-            </label>
-
-
-
-            {/* <label className="-mr-1.5 flex items-center cursor-pointer">
-                <span className="mb-px -mr-0.75 text-muted-foreground">
-                    Grid
-                </span>
-                <Switch
-                    className="scale-50 cursor-pointer"
-                    tabIndex={-1}
-                    checked={previewGrid}
-                    onCheckedChange={(checked) => setPreviewGrid(Boolean(checked))}
-                />
-            </label> */}
-        </div>
-    );
-}
-
-const overlayButtonClasses = "size-5 rounded-sm text-muted-foreground hover:text-foreground";
