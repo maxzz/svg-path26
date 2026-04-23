@@ -6,7 +6,7 @@ import { appSettings } from "@/store/0-ui-settings";
 
 interface SectionPanelProps {
     sectionKey: string;
-    label: string;
+    label: ReactNode;
     children: ReactNode;
     triggerClassName?: string;
     contentClassName?: string;

@@ -11,13 +11,14 @@ import { parseViewBoxString } from "@/store/8-utils/1-viewbox-utils";
 
 export function Section_SvgPreview() {
     const { showSvgPreviewSection } = useSnapshot(appSettings);
+    const viewBoxStr = useSnapshot(appSettings.pathEditor).viewBox.join(", ");
     if (!showSvgPreviewSection) {
         return null;
     }
 
     return (
         <TooltipProvider delayDuration={250}>
-            <SectionPanel sectionKey="svg-preview" label="SVG preview" contentClassName="px-1 py-1">
+            <SectionPanel sectionKey="svg-preview" label={<div className="flex items-center gap-1"><span>SVG preview</span><span className="pt-0.5 text-[11px] text-muted-foreground">({viewBoxStr})</span></div>} contentClassName="px-1 py-1">
                 <SvgPreview />
             </SectionPanel>
         </TooltipProvider>
