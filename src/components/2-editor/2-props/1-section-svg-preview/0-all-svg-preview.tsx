@@ -8,6 +8,9 @@ import { Switch } from "@/components/ui/shadcn/switch";
 import { svgInputErrorAtom, svgInputSelectedNodeAtom } from "@/store/0-atoms/1-3-svg-input";
 import { type SvgInputNode, serializeSvgInputDocument } from "@/svg-core/3-svg-input";
 import { parseViewBoxString } from "@/store/8-utils/1-viewbox-utils";
+import { classNames } from "@/utils";
+import { Button } from "@/components/ui/shadcn/button";
+import { ToggleLeft, ToggleRight } from "lucide-react";
 
 export function Section_SvgPreview() {
     const { showSvgPreviewSection } = useSnapshot(appSettings);
@@ -33,9 +36,22 @@ function SvgPreviewOverlay() {
     const [previewGrid, setPreviewGrid] = useAtom(previewGridAtom);
 
     return (
-        <div className="text-xs flex items-center justify-between">
+        <div className="mr-1  text-xs flex items-center justify-between gap-1">
 
-            <label className="-mr-1.5 flex items-center cursor-pointer">
+            <div className="text-muted-foreground">grid:</div>
+
+            <Button
+                className={classNames(overlayButtonClasses, previewGrid && overlayButtonActiveClasses)}
+                onClick={() => setPreviewGrid((current) => !current)}
+                variant="ghost"
+                size="icon"
+                type="button"
+            >
+                {previewGrid ? <ToggleRight className="size-3.5" /> : <ToggleLeft className="size-3.5" />}
+            </Button>
+
+
+            {/* <label className="-mr-1.5 flex items-center cursor-pointer">
                 <span className="mb-px -mr-0.75 text-muted-foreground">
                     Grid
                 </span>
@@ -45,7 +61,7 @@ function SvgPreviewOverlay() {
                     checked={previewGrid}
                     onCheckedChange={(checked) => setPreviewGrid(Boolean(checked))}
                 />
-            </label>
+            </label> */}
         </div>
     );
 }
@@ -147,3 +163,6 @@ const SVG_ROOT_ATTRS_TO_STRIP = new Set([
     "xmlns",
     "xmlns:xlink",
 ]);
+
+const overlayButtonClasses = "size-5 rounded-sm text-muted-foreground hover:text-foreground";
+const overlayButtonActiveClasses = "bg-background/80 text-foreground";
