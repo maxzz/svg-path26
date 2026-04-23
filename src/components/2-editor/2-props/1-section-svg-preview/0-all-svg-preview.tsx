@@ -6,8 +6,7 @@ import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
 import { svgInputErrorAtom, svgInputSelectedNodeAtom } from "@/store/0-atoms/1-3-svg-input";
 import { type SvgInputNode, serializeSvgInputDocument } from "@/svg-core/3-svg-input";
-import { parseViewBoxString } from "@/store/8-utils/1-viewbox-utils";
-import { showGridAtom, SvgPreviewLabel, SvgPreviewOverlay } from "./1-svg-preview-controls.tsx";
+import { showGridAtom, SvgPreviewLabel, SvgPreviewOverlay } from "./7-svg-preview-controls.tsx";
 
 export function Section_SvgPreview() {
     const { showSvgPreviewSection } = useSnapshot(appSettings);
@@ -17,12 +16,7 @@ export function Section_SvgPreview() {
 
     return (
         <TooltipProvider delayDuration={250}>
-            <SectionPanel
-                sectionKey="svg-preview"
-                label={<SvgPreviewLabel />}
-                contentClassName="px-1 py-1"
-                overlay={<SvgPreviewOverlay />}
-            >
+            <SectionPanel sectionKey="svg-preview" label={<SvgPreviewLabel />} contentClassName="px-1 py-1" overlay={<SvgPreviewOverlay />}>
                 <SvgPreview />
             </SectionPanel>
         </TooltipProvider>
@@ -38,18 +32,19 @@ function SvgPreview() {
 }
 
 function SvgPreviewContent() {
+    const gridPatternId = useId();
+    const showGrid = useAtomValue(showGridAtom);
     const selectedNode = useAtomValue(svgInputSelectedNodeAtom);
     const parseError = useAtomValue(svgInputErrorAtom);
-    const previewGrid = useAtomValue(showGridAtom);
-    const gridPatternId = useId();
-    const viewBoxStr = useSnapshot(appSettings.pathEditor).viewBox.join(" ");
+    const viewBox = useSnapshot(appSettings.pathEditor).viewBox;
+    const viewBoxStr = viewBox.join(" ");
 
     const previewNode = selectedNode ? toPreviewNode(selectedNode) : null;
     const previewMarkup = previewNode ? serializeSvgInputDocument({ root: previewNode, sourceKind: "svg-fragment" }) : "";
     const gridId = `${gridPatternId}-preview-grid`;
-    const viewBoxNumbers = parseViewBoxString(viewBoxStr);
-    const previewWidth = Math.max(1e-6, viewBoxNumbers[2]);
-    const previewHeight = Math.max(1e-6, viewBoxNumbers[3]);
+    const [viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight] = viewBox;
+    const previewWidth = Math.max(1e-6, viewBoxWidth);
+    const previewHeight = Math.max(1e-6, viewBoxHeight);
 
     if (parseError) {
         return (
@@ -70,26 +65,26 @@ function SvgPreviewContent() {
     return (
         <div className="relative w-full min-h-40 flex-1 overflow-hidden rounded bg-muted/20">
             <svg className="absolute inset-0 h-full w-full" viewBox={viewBoxStr} xmlns="http://www.w3.org/2000/svg" pointerEvents="none" aria-hidden="true">
-                {previewGrid && (
-                    <>
-                        <defs>
-                            <pattern id={gridId} width="1" height="1" patternUnits="userSpaceOnUse">
-                                <path d="M 10 0 L 0 0 0 10" fill="none" stroke="oklch(0.7 0 0 / 0.25)" strokeWidth="0.3" />
-                            </pattern>
-                        </defs>
-                        <rect
-                            x={viewBoxNumbers[0]}
-                            y={viewBoxNumbers[1]}
-                            width={previewWidth}
-                            height={previewHeight}
-                            fill={`url(#${gridId})`}
-                        />
-                    </>
-                )}
+                {showGrid && (<>
+                    <defs>
+                        <pattern id={gridId} width="1" height="1" patternUnits="userSpaceOnUse">
+                            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="oklch(0.7 0 0 / 0.25)" strokeWidth="0.3" />
+                        </pattern>
+                    </defs>
+                    <rect
+                        x={viewBoxX}
+                        y={viewBoxY}
+                        width={previewWidth}
+                        height={previewHeight}
+                        fill={`url(#${gridId})`}
+                    />
+                </>)}
+
                 <g dangerouslySetInnerHTML={{ __html: previewMarkup }} />
+
                 <rect
-                    x={viewBoxNumbers[0]}
-                    y={viewBoxNumbers[1]}
+                    x={viewBoxX}
+                    y={viewBoxY}
                     width={previewWidth}
                     height={previewHeight}
                     className="fill-none stroke-muted-foreground/75"
@@ -105,7 +100,6 @@ function toPreviewNode(node: SvgInputNode): SvgInputNode {
     if (node.tagName !== "svg") {
         return node;
     }
-
     return {
         ...node,
         tagName: "g",
@@ -115,12 +109,4 @@ function toPreviewNode(node: SvgInputNode): SvgInputNode {
     };
 }
 
-const SVG_ROOT_ATTRS_TO_STRIP = new Set([
-    "viewbox",
-    "width",
-    "height",
-    "x",
-    "y",
-    "xmlns",
-    "xmlns:xlink",
-]);
+const SVG_ROOT_ATTRS_TO_STRIP = new Set(["viewbox", "width", "height", "x", "y", "xmlns", "xmlns:xlink",]);
