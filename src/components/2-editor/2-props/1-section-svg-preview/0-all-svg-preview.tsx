@@ -1,11 +1,12 @@
-import { useId } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
 import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
 import { svgInputErrorAtom, svgInputSelectedNodeAtom } from "@/store/0-atoms/1-3-svg-input";
-import { type SvgInputNode, serializeSvgInputDocument } from "@/svg-core/3-svg-input";
+import { serializeSvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-input";
+import { type SizeWH } from "@/svg-core/9-types-svg-model";
 import { showGridAtom, SvgPreviewLabel, SvgPreviewOverlay } from "./7-svg-preview-controls.tsx";
 
 export function Section_SvgPreview() {
@@ -38,12 +39,17 @@ function SvgPreviewContent() {
     const parseError = useAtomValue(svgInputErrorAtom);
     const viewBox = useSnapshot(appSettings.pathEditor).viewBox;
     const [viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight] = viewBox;
+    const viewBoxStr = viewBox.join(" ");
 
     const previewNode = selectedNode ? toPreviewNode(selectedNode) : null;
     const previewMarkup = previewNode ? serializeSvgInputDocument({ root: previewNode, sourceKind: "svg-fragment" }) : "";
     const gridId = `${gridPatternId}-preview-grid`;
     const previewWidth = Math.max(1e-6, viewBoxWidth);
     const previewHeight = Math.max(1e-6, viewBoxHeight);
+
+    const { svgRef, unitsPerPixel } = usePreviewUnitsPerPixel(previewWidth, previewHeight);
+    const frameStrokeWidth = Math.max(unitsPerPixel * 1.5, unitsPerPixel);
+    const frameDashArray = `${unitsPerPixel * 6} ${unitsPerPixel * 3}`;
 
     if (parseError) {
         return (
@@ -63,7 +69,7 @@ function SvgPreviewContent() {
 
     return (
         <div className="relative w-full min-h-40 flex-1 overflow-hidden rounded bg-muted/20">
-            <svg className="absolute inset-0 h-full w-full" viewBox={viewBox.join(" ")} xmlns="http://www.w3.org/2000/svg" pointerEvents="none" aria-hidden="true">
+            <svg ref={svgRef} className="absolute inset-0 h-full w-full" viewBox={viewBoxStr} xmlns="http://www.w3.org/2000/svg" pointerEvents="none" aria-hidden="true">
                 {showGrid && (<>
                     <defs>
                         <pattern id={gridId} width="1" height="1" patternUnits="userSpaceOnUse">
@@ -82,13 +88,14 @@ function SvgPreviewContent() {
                 <g dangerouslySetInnerHTML={{ __html: previewMarkup }} />
 
                 <rect
-                    className="fill-none stroke-muted-foreground/75"
+                    className="fill-none stroke-[#7f7f7fb8] dark:stroke-[#ffffffb8]"
                     x={viewBoxX}
                     y={viewBoxY}
                     width={previewWidth}
                     height={previewHeight}
-                    strokeWidth={0.3}
-                    vectorEffect="non-scaling-stroke"
+                    strokeWidth={frameStrokeWidth}
+                    strokeDasharray={frameDashArray}
+                    pointerEvents="none"
                 />
             </svg>
         </div>
@@ -109,3 +116,43 @@ function toPreviewNode(node: SvgInputNode): SvgInputNode {
 }
 
 const SVG_ROOT_ATTRS_TO_STRIP = new Set(["viewbox", "width", "height", "x", "y", "xmlns", "xmlns:xlink",]);
+
+function usePreviewUnitsPerPixel(viewBoxWidth: number, viewBoxHeight: number) {
+    const svgRef = useRef<SVGSVGElement | null>(null);
+    const [viewportSize, setViewportSize] = useState<SizeWH | null>(null);
+
+    useEffect(
+        () => {
+            const svg = svgRef.current;
+            if (!svg) {
+                setViewportSize(null);
+                return;
+            }
+
+            const updateSize = () => {
+                const rect = svg.getBoundingClientRect();
+                setViewportSize({ width: rect.width, height: rect.height });
+            };
+
+            updateSize();
+            const observer = new ResizeObserver(() => updateSize());
+            observer.observe(svg);
+            return () => observer.disconnect();
+        },
+        []);
+
+    const unitsPerPixel = useMemo(
+        () => getSvgUnitsPerPixel(viewBoxWidth, viewBoxHeight, viewportSize),
+        [viewBoxWidth, viewBoxHeight, viewportSize]
+    );
+
+    return { svgRef, unitsPerPixel };
+}
+
+function getSvgUnitsPerPixel(width: number, height: number, viewPortSize: SizeWH | null): number {
+    if (!viewPortSize || viewPortSize.width <= 0 || viewPortSize.height <= 0) {
+        return Math.max(width, height) / 1000;
+    }
+
+    return Math.max(width / viewPortSize.width, height / viewPortSize.height);
+}
