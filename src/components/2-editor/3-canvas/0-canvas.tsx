@@ -80,7 +80,7 @@ export function PathCanvasElement({ children }: { children: ReactNode; }) {
                 {children}
             </CanvasRootSvg>
 
-            <ViewportZoomControls />
+            <ZoomControls />
 
             {parseError && (
                 <div className="absolute inset-x-4 bottom-4 px-3 py-2 text-xs text-destructive-foreground bg-destructive/90 rounded-md pointer-events-none">
@@ -107,29 +107,27 @@ function CanvasRootSvg({ children }: { children: ReactNode; }) {
 
     const { onTouchEnd, onTouchMove, onTouchStart, startCanvasPointerDown } = useCanvasDragAndDrop();
 
-    return (
-        <>
-            <svg
-                ref={setCanvasRootSvgRef}
-                tabIndex={0}
-                className="size-full touch-none outline-none focus:outline-none"
-                onPointerDown={(event) => {
-                    if (event.pointerType !== "touch") {
-                        event.currentTarget.focus();
-                    }
-                    startCanvasPointerDown(event);
-                }}
-                onTouchStart={onTouchStart}
-                onTouchMove={onTouchMove}
-                onTouchEnd={onTouchEnd}
-                onClick={doClearCanvasFocus}
-            >
-                {children}
-            </svg>
+    return (<>
+        <svg
+            ref={setCanvasRootSvgRef}
+            tabIndex={0}
+            className="size-full touch-none outline-none focus:outline-none"
+            onPointerDown={(event) => {
+                if (event.pointerType !== "touch") {
+                    event.currentTarget.focus();
+                }
+                startCanvasPointerDown(event);
+            }}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+            onClick={doClearCanvasFocus}
+        >
+            {children}
+        </svg>
 
-            <CanvasViewPortSync />
-        </>
-    );
+        <CanvasViewPortSync />
+    </>);
 }
 
 function CanvasViewPortSync() {
@@ -146,11 +144,12 @@ function CanvasViewPortSync() {
     return null;
 }
 
-function ViewportZoomControls() {
+// Zoom Controls
+
+function ZoomControls() {
     const doFitViewPort = useSetAtom(doFitViewPortAtom);
     const doFitViewPortToPathViewBox = useSetAtom(doFitViewPortToPathViewBoxAtom);
     const doZoomViewPort = useSetAtom(doZoomViewPortAtom);
-    const buttonClasses = "size-7 rounded-full text-slate-500 bg-slate-500/10! border-slate-500/10! dark:bg-slate-100/10! dark:border-slate-100/10!";
     return (
         <div className="absolute bottom-3 right-3 flex items-center gap-0.5 z-10">
             <Button variant="outline" size="icon" className={buttonClasses} title="Zoom to viewBox" onClick={() => doFitViewPortToPathViewBox()}>
@@ -168,3 +167,5 @@ function ViewportZoomControls() {
         </div>
     );
 }
+
+const buttonClasses = "size-7 rounded-full text-slate-500 bg-slate-500/10! border-slate-500/10! dark:bg-slate-100/10! dark:border-slate-100/10!";

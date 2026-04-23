@@ -23,13 +23,13 @@ export function GridBody() {
     const rootSvgElementSize = useAtomValue(rootSvgElementSizeAtom);
 
     const canvasWidth = rootSvgElementSize?.width ?? 0;
-    const grid = calcGrid(viewPort, canvasWidth);
+    const gridSteps = calcGridSteps(viewPort, canvasWidth);
 
     return (
         <g className="svg-ticks select-none" pointerEvents="none">
 
             {/* X axis (vertical lines) */}
-            {grid.xGrid.map(
+            {gridSteps.xGrid.map(
                 (v) => (
                     <line
                         x1={v} x2={v} y1={viewPort[1]} y2={viewPort[1] + viewPort[3]} key={`x${v}`}
@@ -40,7 +40,7 @@ export function GridBody() {
             )}
 
             {/* Y axis (horizontal lines) */}
-            {grid.yGrid.map(
+            {gridSteps.yGrid.map(
                 (v) => (
                     <line
                         y1={v} y2={v} x1={viewPort[0]} x2={viewPort[0] + viewPort[2]} key={`y${v}`}
@@ -53,7 +53,7 @@ export function GridBody() {
             {showTicks && (<>
 
                 {/* X axis numbers */}
-                {grid.xGrid.map(
+                {gridSteps.xGrid.map(
                     (v) => (
                         <Fragment key={v}>
                             {v !== 0 && v % tickInterval === 0 &&
@@ -70,7 +70,7 @@ export function GridBody() {
                 )}
 
                 {/* Y axis numbers */}
-                {grid.yGrid.map(
+                {gridSteps.yGrid.map(
                     (v) => (
                         <Fragment key={v}>
                             {v % tickInterval === 0 &&
@@ -93,7 +93,7 @@ export function GridBody() {
     );
 }
 
-function calcGrid(viewPort: ViewBox, canvasWidth: number) {
+function calcGridSteps(viewPort: ViewBox, canvasWidth: number) {
     const doGrid = 5 * viewPort[2] <= canvasWidth;
     return {
         xGrid: doGrid ? Array(Math.ceil(viewPort[2]) + 1).fill(null).map((_, i) => Math.floor(viewPort[0]) + i) : [],

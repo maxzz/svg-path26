@@ -37,12 +37,11 @@ function SvgPreviewContent() {
     const selectedNode = useAtomValue(svgInputSelectedNodeAtom);
     const parseError = useAtomValue(svgInputErrorAtom);
     const viewBox = useSnapshot(appSettings.pathEditor).viewBox;
-    const viewBoxStr = viewBox.join(" ");
+    const [viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight] = viewBox;
 
     const previewNode = selectedNode ? toPreviewNode(selectedNode) : null;
     const previewMarkup = previewNode ? serializeSvgInputDocument({ root: previewNode, sourceKind: "svg-fragment" }) : "";
     const gridId = `${gridPatternId}-preview-grid`;
-    const [viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight] = viewBox;
     const previewWidth = Math.max(1e-6, viewBoxWidth);
     const previewHeight = Math.max(1e-6, viewBoxHeight);
 
@@ -64,7 +63,7 @@ function SvgPreviewContent() {
 
     return (
         <div className="relative w-full min-h-40 flex-1 overflow-hidden rounded bg-muted/20">
-            <svg className="absolute inset-0 h-full w-full" viewBox={viewBoxStr} xmlns="http://www.w3.org/2000/svg" pointerEvents="none" aria-hidden="true">
+            <svg className="absolute inset-0 h-full w-full" viewBox={viewBox.join(" ")} xmlns="http://www.w3.org/2000/svg" pointerEvents="none" aria-hidden="true">
                 {showGrid && (<>
                     <defs>
                         <pattern id={gridId} width="1" height="1" patternUnits="userSpaceOnUse">
@@ -83,11 +82,11 @@ function SvgPreviewContent() {
                 <g dangerouslySetInnerHTML={{ __html: previewMarkup }} />
 
                 <rect
+                    className="fill-none stroke-muted-foreground/75"
                     x={viewBoxX}
                     y={viewBoxY}
                     width={previewWidth}
                     height={previewHeight}
-                    className="fill-none stroke-muted-foreground/75"
                     strokeWidth={0.3}
                     vectorEffect="non-scaling-stroke"
                 />

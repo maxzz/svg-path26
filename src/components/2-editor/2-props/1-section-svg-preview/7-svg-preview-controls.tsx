@@ -8,18 +8,20 @@ export const showGridAtom = atom(true);
 
 export function SvgPreviewLabel() {
     const viewBoxStr = useSnapshot(appSettings.pathEditor).viewBox.join(", ");
-
     return (
         <div className="flex items-center gap-1">
-            <span>SVG preview</span>
-            <span className="pt-0.5 text-[11px] text-muted-foreground">({viewBoxStr})</span>
+            <span>
+                SVG Preview
+            </span>
+            <span className="pt-0.5 text-[11px] text-muted-foreground">
+                ({viewBoxStr})
+            </span>
         </div>
     );
 }
 
 export function SvgPreviewOverlay() {
     const [showGrid, setShowGrid] = useAtom(showGridAtom);
-
     return (
         <div className="mr-1 text-xs flex items-center justify-between gap-1 select-none">
             <label className="flex items-center cursor-pointer gap-0.5">
