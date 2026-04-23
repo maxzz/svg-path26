@@ -31,8 +31,8 @@ function SvgPreview() {
     const viewBoxStr = usePreviewViewBoxString();
 
     return (
-        <div className="px-2 pt-1 pb-2.5 border rounded select-none">
-            <div className="mb-2 text-xs flex items-center justify-between">
+        <div className="px-2 pt-1 pb-2.5 border rounded select-none flex flex-col gap-2">
+            <div className="text-xs flex items-center justify-between">
                 <div className="min-w-0">
                     <p className="mb-0.5">
                         Live preview (viewBox: {viewBoxStr})
@@ -88,22 +88,22 @@ function SvgPreviewContent() {
 
     if (selectedNode.tagName === "svg") {
         return (
-            <div className="relative h-40 w-full overflow-hidden rounded bg-muted/20">
-                <div className="h-full w-full p-1 [&svg]:block [&svg]:h-full [&svg]:w-full" dangerouslySetInnerHTML={{ __html: previewMarkup }} />
+            <div className="relative w-full min-h-40 flex-1 overflow-hidden rounded bg-muted/20">
+                <div className="absolute inset-0 [&svg]:block [&svg]:h-full [&svg]:w-full" dangerouslySetInnerHTML={{ __html: previewMarkup }} />
 
                 {previewGrid && (
-                    <GridOverlay viewBoxStr={viewBoxStr} viewBox={viewBoxNumbers} gridId={gridId} className="inset-1" />
+                    <GridOverlay viewBoxStr={viewBoxStr} viewBox={viewBoxNumbers} gridId={gridId} className="inset-0" />
                 )}
             </div>
         );
     }
 
     return (
-        <div className="relative h-40 w-full">
-            <svg className="h-40 w-full rounded bg-muted/20" viewBox={viewBoxStr} xmlns="http://www.w3.org/2000/svg" pointerEvents="none" dangerouslySetInnerHTML={{ __html: previewMarkup }}/>
+        <div className="relative w-full min-h-40 flex-1 overflow-hidden rounded bg-muted/20">
+            <svg className="absolute inset-0 h-full w-full" viewBox={viewBoxStr} xmlns="http://www.w3.org/2000/svg" pointerEvents="none" dangerouslySetInnerHTML={{ __html: previewMarkup }}/>
 
             {previewGrid && (
-                <GridOverlay className="inset-0 rounded" viewBoxStr={viewBoxStr} viewBox={viewBoxNumbers} gridId={gridId} />
+                <GridOverlay className="inset-0" viewBoxStr={viewBoxStr} viewBox={viewBoxNumbers} gridId={gridId} />
             )}
         </div>
     );
