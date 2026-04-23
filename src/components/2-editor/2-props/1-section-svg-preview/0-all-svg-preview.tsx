@@ -49,7 +49,7 @@ function SvgPreviewContent() {
 
     const { svgRef, unitsPerPixel } = usePreviewUnitsPerPixel(previewWidth, previewHeight);
     const frameStrokeWidth = Math.max(unitsPerPixel * 1.5, unitsPerPixel);
-    const frameDashArray = `${unitsPerPixel * 6} ${unitsPerPixel * 3}`;
+    const frameDashArray = `${unitsPerPixel * 3} ${unitsPerPixel * 1.5}`;
 
     if (parseError) {
         return (
