@@ -7,7 +7,7 @@ export function viewBoxToString(viewBox: ViewBox): string {
 }
 
 export function parseViewBoxString(viewBox: string, fallback: ViewBox = DEFAULT_VIEWBOX): ViewBox {
-    const parsed = viewBox.split(",").map((value) => Number(value));
+    const parsed = splitViewBoxString(viewBox).map((value) => Number(value));
     if (parsed.length !== 4 || parsed.some((value) => !Number.isFinite(value))) {
         return [fallback[0], fallback[1], fallback[2], fallback[3]];
     }
@@ -15,7 +15,7 @@ export function parseViewBoxString(viewBox: string, fallback: ViewBox = DEFAULT_
 }
 
 export function isViewBoxString(value: string): boolean {
-    const parts = value.split(",");
+    const parts = splitViewBoxString(value);
     if (parts.length !== 4) {
         return false;
     }
@@ -48,3 +48,7 @@ export function sanitizeViewBox(viewBox: ViewBox, minSize = MIN_VIEWBOX_SIZE): V
 const VIEWBOX_EPS = 1e-9;
 const MIN_VIEWBOX_SIZE = 1e-3;
 const DEFAULT_VIEWBOX: ViewBox = [0, 0, 1, 1];
+
+function splitViewBoxString(value: string): string[] {
+    return value.trim().split(/[,\s]+/).filter(Boolean);
+}
