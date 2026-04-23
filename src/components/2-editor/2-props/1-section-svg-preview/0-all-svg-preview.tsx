@@ -9,6 +9,7 @@ import { svgInputDocumentAtom, svgInputErrorAtom, svgInputSelectedNodeAtom } fro
 import { serializeSvgInputDocument } from "@/svg-core/3-svg-input";
 import { parseViewBoxString } from "@/store/8-utils/1-viewbox-utils";
 import type { ViewBox } from "@/svg-core/9-types-svg-model";
+import { classNames } from "@/utils/classnames";
 
 export function Section_SvgPreview() {
     const { showSvgPreviewSection } = useSnapshot(appSettings);
@@ -34,10 +35,7 @@ function SvgPreview() {
             <div className="mb-2 text-xs flex items-center justify-between">
                 <div className="min-w-0">
                     <p className="mb-0.5">
-                        Live preview
-                    </p>
-                    <p className="text-[11px] text-muted-foreground truncate" title={`ViewBox: ${viewBoxStr}`}>
-                        ViewBox: {viewBoxStr}
+                        Live preview (viewBox: {viewBoxStr})
                     </p>
                 </div>
 
@@ -91,12 +89,10 @@ function SvgPreviewContent() {
     if (selectedNode.tagName === "svg") {
         return (
             <div className="relative h-40 w-full overflow-hidden rounded bg-muted/20">
-                <div
-                    className="h-full w-full p-1 [&svg]:block [&svg]:h-full [&svg]:w-full"
-                    dangerouslySetInnerHTML={{ __html: previewMarkup }}
-                />
+                <div className="h-full w-full p-1 [&svg]:block [&svg]:h-full [&svg]:w-full" dangerouslySetInnerHTML={{ __html: previewMarkup }} />
+
                 {previewGrid && (
-                    <PreviewGridOverlay viewBoxStr={viewBoxStr} viewBox={viewBoxNumbers} gridId={gridId} className="inset-1" />
+                    <GridOverlay viewBoxStr={viewBoxStr} viewBox={viewBoxNumbers} gridId={gridId} className="inset-1" />
                 )}
             </div>
         );
@@ -104,36 +100,33 @@ function SvgPreviewContent() {
 
     return (
         <div className="relative h-40 w-full">
-            <svg
-                className="h-40 w-full rounded bg-muted/20"
-                viewBox={viewBoxStr}
-                xmlns="http://www.w3.org/2000/svg"
-                pointerEvents="none"
-                dangerouslySetInnerHTML={{ __html: previewMarkup }}
-            />
+            <svg className="h-40 w-full rounded bg-muted/20" viewBox={viewBoxStr} xmlns="http://www.w3.org/2000/svg" pointerEvents="none" dangerouslySetInnerHTML={{ __html: previewMarkup }}/>
+
             {previewGrid && (
-                <PreviewGridOverlay viewBoxStr={viewBoxStr} viewBox={viewBoxNumbers} gridId={gridId} className="inset-0 rounded" />
+                <GridOverlay className="inset-0 rounded" viewBoxStr={viewBoxStr} viewBox={viewBoxNumbers} gridId={gridId} />
             )}
         </div>
     );
 }
 
-function PreviewGridOverlay({ viewBoxStr, viewBox, gridId, className }: { viewBoxStr: string; viewBox: ViewBox; gridId: string; className: string | undefined; }) {
+function GridOverlay({ viewBoxStr, viewBox, gridId, className }: { viewBoxStr: string; viewBox: ViewBox; gridId: string; className?: string; }) {
     const previewWidth = Math.max(1e-6, viewBox[2]);
     const previewHeight = Math.max(1e-6, viewBox[3]);
 
     return (
-        <svg
-            className={`pointer-events-none absolute ${className}`}
-            viewBox={viewBoxStr}
-            aria-hidden="true"
-        >
+        <svg className={classNames("absolute pointer-events-none", className)} viewBox={viewBoxStr} aria-hidden="true">
             <defs>
                 <pattern id={gridId} width="1" height="1" patternUnits="userSpaceOnUse">
                     <path d="M 10 0 L 0 0 0 10" fill="none" stroke="oklch(0.7 0 0 / 0.25)" strokeWidth="0.3" />
                 </pattern>
             </defs>
-            <rect x={viewBox[0]} y={viewBox[1]} width={previewWidth} height={previewHeight} fill={`url(#${gridId})`} />
+            <rect
+                x={viewBox[0]}
+                y={viewBox[1]}
+                width={previewWidth}
+                height={previewHeight}
+                fill={`url(#${gridId})`}
+            />
         </svg>
     );
 }
