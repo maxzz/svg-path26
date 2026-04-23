@@ -33,22 +33,26 @@ export function Section_SvgPreview() {
 }
 
 function SvgPreviewOverlay() {
-    const [previewGrid, setPreviewGrid] = useAtom(previewGridAtom);
+    const [showGrid, setShowGrid] = useAtom(showGridAtom);
 
     return (
-        <div className="mr-1  text-xs flex items-center justify-between gap-1">
+        <div className="mr-1 text-xs flex items-center justify-between gap-1 select-none">
 
-            <div className="text-muted-foreground">grid:</div>
+            <label className="flex items-center cursor-pointer gap-0.5">
+                <span className="mb-px -mr-0.75 text-muted-foreground">
+                    grid:
+                </span>
+                <Button
+                    className={classNames(overlayButtonClasses, showGrid && overlayButtonActiveClasses)}
+                    onClick={() => setShowGrid((current) => !current)}
+                    variant="ghost"
+                    size="icon"
+                    type="button"
+                >
+                    {showGrid ? <ToggleRight className="size-3.5" /> : <ToggleLeft className="size-3.5" />}
+                </Button>
+            </label>
 
-            <Button
-                className={classNames(overlayButtonClasses, previewGrid && overlayButtonActiveClasses)}
-                onClick={() => setPreviewGrid((current) => !current)}
-                variant="ghost"
-                size="icon"
-                type="button"
-            >
-                {previewGrid ? <ToggleRight className="size-3.5" /> : <ToggleLeft className="size-3.5" />}
-            </Button>
 
 
             {/* <label className="-mr-1.5 flex items-center cursor-pointer">
@@ -74,12 +78,12 @@ function SvgPreview() {
     );
 }
 
-const previewGridAtom = atom(true);
+const showGridAtom = atom(true);
 
 function SvgPreviewContent() {
     const selectedNode = useAtomValue(svgInputSelectedNodeAtom);
     const parseError = useAtomValue(svgInputErrorAtom);
-    const [previewGrid] = useAtom(previewGridAtom);
+    const [previewGrid] = useAtom(showGridAtom);
     const gridPatternId = useId();
     const viewBoxStr = useSnapshot(appSettings.pathEditor).viewBox.join(" ");
 
