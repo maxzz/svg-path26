@@ -107,6 +107,15 @@ function SvgPreviewContent() {
                     </>
                 )}
                 <g dangerouslySetInnerHTML={{ __html: previewMarkup }} />
+                <rect
+                    x={viewBoxNumbers[0]}
+                    y={viewBoxNumbers[1]}
+                    width={previewWidth}
+                    height={previewHeight}
+                    className="fill-none stroke-muted-foreground/75"
+                    strokeWidth={0.3}
+                    vectorEffect="non-scaling-stroke"
+                />
             </svg>
         </div>
     );
