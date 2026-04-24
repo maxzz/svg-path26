@@ -74,35 +74,68 @@ function SvgPreviewContent() {
     return (
         <div className="relative w-full min-h-40 flex-1 overflow-hidden rounded bg-muted/20">
             <svg ref={svgRef} className="absolute inset-0 h-full w-full text-foreground" viewBox={viewBoxStr} xmlns="http://www.w3.org/2000/svg" pointerEvents="none" aria-hidden="true">
-                {showGrid && (<>
-                    <defs>
-                        <pattern id={gridId} width="1" height="1" patternUnits="userSpaceOnUse">
-                            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="oklch(0.7 0 0 / 0.25)" strokeWidth="0.3" />
-                        </pattern>
-                    </defs>
-                    <rect
-                        x={viewBoxX}
-                        y={viewBoxY}
-                        width={previewWidth}
-                        height={previewHeight}
-                        fill={`url(#${gridId})`}
-                    />
-                </>)}
+                <SvgPreviewBackdrop
+                    showGrid={showGrid}
+                    gridId={gridId}
+                    viewBoxX={viewBoxX}
+                    viewBoxY={viewBoxY}
+                    previewWidth={previewWidth}
+                    previewHeight={previewHeight}
+                    frameStrokeWidth={frameStrokeWidth}
+                    frameDashArray={frameDashArray}
+                />
+                <g className="svg-preview-content" dangerouslySetInnerHTML={{ __html: previewMarkup }} />
+            </svg>
+        </div>
+    );
+}
 
+function SvgPreviewBackdrop({
+    showGrid,
+    gridId,
+    viewBoxX,
+    viewBoxY,
+    previewWidth,
+    previewHeight,
+    frameStrokeWidth,
+    frameDashArray,
+}: {
+    showGrid: boolean;
+    gridId: string;
+    viewBoxX: number;
+    viewBoxY: number;
+    previewWidth: number;
+    previewHeight: number;
+    frameStrokeWidth: number;
+    frameDashArray: string;
+}) {
+    return (
+        <>
+            {showGrid && (<>
+                <defs>
+                    <pattern id={gridId} width="1" height="1" patternUnits="userSpaceOnUse">
+                        <path d="M 10 0 L 0 0 0 10" fill="none" stroke="oklch(0.7 0 0 / 0.25)" strokeWidth="0.3" />
+                    </pattern>
+                </defs>
                 <rect
-                    className="fill-none stroke-[#7f7f7fb8] dark:stroke-[#ffffffb8]"
                     x={viewBoxX}
                     y={viewBoxY}
                     width={previewWidth}
                     height={previewHeight}
-                    strokeWidth={frameStrokeWidth}
-                    strokeDasharray={frameDashArray}
-                    pointerEvents="none"
+                    fill={`url(#${gridId})`}
                 />
-
-                <g className="svg-preview-content" dangerouslySetInnerHTML={{ __html: previewMarkup }} />
-            </svg>
-        </div>
+            </>)}
+            <rect
+                className="fill-none stroke-[#7f7f7fb8] dark:stroke-[#ffffffb8]"
+                x={viewBoxX}
+                y={viewBoxY}
+                width={previewWidth}
+                height={previewHeight}
+                strokeWidth={frameStrokeWidth}
+                strokeDasharray={frameDashArray}
+                pointerEvents="none"
+            />
+        </>
     );
 }
 
