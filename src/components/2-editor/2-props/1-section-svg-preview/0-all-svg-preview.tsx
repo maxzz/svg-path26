@@ -89,45 +89,40 @@ function SvgPreviewContent() {
     );
 }
 
-type PreviewFrame = {
-    strokeWidth: number;
-    dashArray: string;
-};
+function SvgPreviewBackdrop({ viewBox, frame, }: { viewBox: ViewBox; frame: { strokeWidth: number; dashArray: string; }; }) {
+    const { grid: showGrid } = useSnapshot(appSettings.sectionPreview);
+    const [x, y, width, height] = viewBox;
 
-function SvgPreviewBackdrop({ viewBox, frame, }: { viewBox: ViewBox; frame: PreviewFrame; }) {
     const gridPatternId = useId();
     const gridId = `${gridPatternId}-preview-grid`;
-    const { grid: showGrid } = useSnapshot(appSettings.sectionPreview);
-    const [viewBoxX, viewBoxY, previewWidth, previewHeight] = viewBox;
 
-    return (
-        <>
-            {showGrid && (<>
-                <defs>
-                    <pattern id={gridId} width="1" height="1" patternUnits="userSpaceOnUse">
-                        <path d="M 10 0 L 0 0 0 10" fill="none" stroke="oklch(0.7 0 0 / 0.25)" strokeWidth="0.3" />
-                    </pattern>
-                </defs>
-                <rect
-                    x={viewBoxX}
-                    y={viewBoxY}
-                    width={previewWidth}
-                    height={previewHeight}
-                    fill={`url(#${gridId})`}
-                />
-            </>)}
+    return (<>
+        {showGrid && (<>
+            <defs>
+                <pattern id={gridId} width="1" height="1" patternUnits="userSpaceOnUse">
+                    <path d="M 10 0 L 0 0 0 10" fill="none" stroke="oklch(0.7 0 0 / 0.25)" strokeWidth="0.3" />
+                </pattern>
+            </defs>
             <rect
-                className="fill-none stroke-[#7f7f7fb8] dark:stroke-[#ffffffb8]"
-                x={viewBoxX}
-                y={viewBoxY}
-                width={previewWidth}
-                height={previewHeight}
-                strokeWidth={frame.strokeWidth}
-                strokeDasharray={frame.dashArray}
-                pointerEvents="none"
+                x={x}
+                y={y}
+                width={width}
+                height={height}
+                fill={`url(#${gridId})`}
             />
-        </>
-    );
+        </>)}
+        
+        <rect
+            className="fill-none stroke-[#7f7f7fb8] dark:stroke-[#ffffffb8]"
+            x={x}
+            y={y}
+            width={width}
+            height={height}
+            strokeWidth={frame.strokeWidth}
+            strokeDasharray={frame.dashArray}
+            pointerEvents="none"
+        />
+    </>);
 }
 
 function toPreviewNode(node: SvgInputNode): SvgInputNode {
