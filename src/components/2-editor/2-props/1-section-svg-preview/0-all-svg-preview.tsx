@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useId } from "react";
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
 import { svgInputErrorAtom, svgInputSelectedNodeAtom } from "@/store/0-atoms/1-3-svg-input";
 import { serializeSvgInputDocument, type SvgInputAttribute, type SvgInputNode } from "@/svg-core/3-svg-input";
-import { type SizeWH } from "@/svg-core/9-types-svg-model";
+import { usePreviewUnitsPerPixel } from "./5-preview-units";
 import { SvgPreviewLabel, SvgPreviewOverlay } from "./7-svg-preview-overlay.tsx";
 
 export function Section_SvgPreview() {
@@ -131,48 +131,6 @@ type PreviewOverrides = {
     defaultStrokeColor: string;
     defaultStrokeWidth: number;
 };
-
-function usePreviewUnitsPerPixel(viewBoxWidth: number, viewBoxHeight: number) {
-    const svgRef = useRef<SVGSVGElement | null>(null);
-    const [viewportSize, setViewportSize] = useState<SizeWH | null>(null);
-
-    useEffect(
-        () => {
-            const svg = svgRef.current;
-            if (!svg) {
-                setViewportSize(null);
-                return;
-            }
-
-            const updateSize = () => {
-                const rect = svg.getBoundingClientRect();
-                setViewportSize({ width: rect.width, height: rect.height });
-            };
-
-            updateSize();
-            const observer = new ResizeObserver(() => updateSize());
-            observer.observe(svg);
-            return () => observer.disconnect();
-        },
-        []);
-
-    const unitsPerPixel = useMemo(
-        () => getSvgUnitsPerPixel(viewBoxWidth, viewBoxHeight, viewportSize),
-        [viewBoxWidth, viewBoxHeight, viewportSize]
-    );
-
-    return { svgRef, unitsPerPixel };
-}
-
-function getSvgUnitsPerPixel(width: number, height: number, viewPortSize: SizeWH | null): number {
-    if (!viewPortSize || viewPortSize.width <= 0 || viewPortSize.height <= 0) {
-        return Math.max(width, height) / FALLBACK_VIEWPORT_PIXELS;
-    }
-
-    return Math.max(width / viewPortSize.width, height / viewPortSize.height);
-}
-
-const FALLBACK_VIEWPORT_PIXELS = 160;
 
 function applyPreviewOverrides(node: SvgInputNode, options: PreviewOverrides): SvgInputNode {
     const attributes = updatePreviewAttributes(node.tagName, node.attributes, options);
