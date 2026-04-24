@@ -7,7 +7,7 @@ import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
 import { svgInputErrorAtom, svgInputSelectedNodeAtom } from "@/store/0-atoms/1-3-svg-input";
 import { serializeSvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-input";
 import { type SizeWH } from "@/svg-core/9-types-svg-model";
-import { showGridAtom, SvgPreviewLabel, SvgPreviewOverlay } from "./7-svg-preview-overlay.tsx";
+import { SvgPreviewLabel, SvgPreviewOverlay } from "./7-svg-preview-overlay.tsx";
 
 export function Section_SvgPreview() {
     const { showSvgPreviewSection } = useSnapshot(appSettings);
@@ -34,10 +34,10 @@ function SvgPreview() {
 
 function SvgPreviewContent() {
     const gridPatternId = useId();
-    const showGrid = useAtomValue(showGridAtom);
     const selectedNode = useAtomValue(svgInputSelectedNodeAtom);
     const parseError = useAtomValue(svgInputErrorAtom);
     const viewBox = useSnapshot(appSettings.pathEditor).viewBox;
+    const { grid: showGrid, fill: showFill, stroke: showStroke } = useSnapshot(appSettings.sectionPreview);
     const [viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight] = viewBox;
     const viewBoxStr = viewBox.join(" ");
 
@@ -50,6 +50,7 @@ function SvgPreviewContent() {
     const { svgRef, unitsPerPixel } = usePreviewUnitsPerPixel(previewWidth, previewHeight);
     const frameStrokeWidth = Math.max(unitsPerPixel * 1.5, unitsPerPixel);
     const frameDashArray = `${unitsPerPixel * 3} ${unitsPerPixel * 1.5}`;
+    const previewStyle = getPreviewStyle(showFill, showStroke);
 
     if (parseError) {
         return (
@@ -85,7 +86,9 @@ function SvgPreviewContent() {
                     />
                 </>)}
 
-                <g dangerouslySetInnerHTML={{ __html: previewMarkup }} />
+                {previewStyle && <style>{previewStyle}</style>}
+
+                <g className="svg-preview-content" dangerouslySetInnerHTML={{ __html: previewMarkup }} />
 
                 <rect
                     className="fill-none stroke-[#7f7f7fb8] dark:stroke-[#ffffffb8]"
@@ -158,3 +161,14 @@ function getSvgUnitsPerPixel(width: number, height: number, viewPortSize: SizeWH
 }
 
 const FALLBACK_VIEWPORT_PIXELS = 160;
+
+function getPreviewStyle(showFill: boolean, showStroke: boolean): string {
+    const rules: string[] = [];
+    if (!showFill) {
+        rules.push(".svg-preview-content * { fill: none !important; }");
+    }
+    if (!showStroke) {
+        rules.push(".svg-preview-content * { stroke: none !important; }");
+    }
+    return rules.join("\n");
+}

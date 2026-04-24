@@ -1,10 +1,7 @@
-import { atom, useAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { ToggleLeft, ToggleRight } from "lucide-react";
 import { appSettings } from "@/store/0-ui-settings";
 import { Button } from "@/components/ui/shadcn/button";
-
-export const showGridAtom = atom(true);
 
 export function SvgPreviewLabel() {
     const viewBoxStr = useSnapshot(appSettings.pathEditor).viewBox.join(", ");
@@ -21,24 +18,34 @@ export function SvgPreviewLabel() {
 }
 
 export function SvgPreviewOverlay() {
-    const [showGrid, setShowGrid] = useAtom(showGridAtom);
+    const { fill, stroke, grid } = useSnapshot(appSettings.sectionPreview);
     return (
-        <div className="mr-1 text-xs flex items-center justify-between gap-1 select-none">
-            <label className="flex items-center cursor-pointer gap-0.5">
-                <span className="mb-px -mr-0.75 text-muted-foreground">
-                    grid:
-                </span>
-                <Button
-                    className={overlayButtonClasses}
-                    onClick={() => setShowGrid((current) => !current)}
-                    variant="ghost"
-                    size="icon"
-                    type="button"
-                >
-                    {showGrid ? <ToggleRight className="size-3.5" /> : <ToggleLeft className="size-3.5" />}
-                </Button>
-            </label>
+        <div className="mr-1 text-xs flex items-center justify-between gap-2 select-none">
+            <PreviewToggle label="fill" pressed={fill} onToggle={() => appSettings.sectionPreview.fill = !fill} />
+            <PreviewToggle label="stroke" pressed={stroke} onToggle={() => appSettings.sectionPreview.stroke = !stroke} />
+            <PreviewToggle label="grid" pressed={grid} onToggle={() => appSettings.sectionPreview.grid = !grid} />
         </div>
+    );
+}
+
+function PreviewToggle({ label, pressed, onToggle }: { label: string; pressed: boolean; onToggle: () => void; }) {
+    return (
+        <label className="flex items-center cursor-pointer gap-0.5">
+            <span className="mb-px -mr-0.75 text-muted-foreground">
+                {label}:
+            </span>
+            <Button
+                className={overlayButtonClasses}
+                onClick={onToggle}
+                variant="ghost"
+                size="icon"
+                type="button"
+                aria-label={`${label} ${pressed ? "on" : "off"}`}
+                aria-pressed={pressed}
+            >
+                {pressed ? <ToggleRight className="size-3.5" /> : <ToggleLeft className="size-3.5" />}
+            </Button>
+        </label>
     );
 }
 

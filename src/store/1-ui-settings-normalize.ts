@@ -1,12 +1,13 @@
 import { z } from "zod";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
-import { type CanvasSettings, type DialogSettings, type ExportSettings, type FooterSettings, type PathEditorSettings, type UiSettings, DEFAULT_CANVAS_SETTINGS, DEFAULT_DIALOGS_SETTINGS, DEFAULT_EXPORT_SETTINGS, DEFAULT_FOOTER_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SETTINGS, DEFAULT_VIEWBOX_SETTINGS } from "./9-ui-settings-types-and-defaults";
+import { type CanvasSettings, type DialogSettings, type ExportSettings, type FooterSettings, type PathEditorSettings, type SectionPreviewSettings, type UiSettings, DEFAULT_CANVAS_SETTINGS, DEFAULT_DIALOGS_SETTINGS, DEFAULT_EXPORT_SETTINGS, DEFAULT_FOOTER_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SECTION_PREVIEW_SETTINGS, DEFAULT_SETTINGS, DEFAULT_VIEWBOX_SETTINGS } from "./9-ui-settings-types-and-defaults";
 
 type MutableViewBox = Writeable<ViewBox>;
 
 export function normalizeStoredSettings(value: unknown): UiSettings {
     const defaultSettings = DEFAULT_SETTINGS;
     const defaultCanvasSettings = DEFAULT_CANVAS_SETTINGS;
+    const defaultSectionPreviewSettings = DEFAULT_SECTION_PREVIEW_SETTINGS;
     const defaultDialogsSettings = DEFAULT_DIALOGS_SETTINGS;
     const defaultPathEditorSettings = DEFAULT_PATH_EDITOR_SETTINGS;
     const defaultExportSettings = DEFAULT_EXPORT_SETTINGS;
@@ -22,6 +23,7 @@ export function normalizeStoredSettings(value: unknown): UiSettings {
     });
 
     const canvasSettingsSchema = createCanvasSettingsSchema(defaultCanvasSettings);
+    const sectionPreviewSettingsSchema = createSectionPreviewSettingsSchema(defaultSectionPreviewSettings);
     const dialogsSettingsSchema = createDialogsSettingsSchema(defaultDialogsSettings);
     const pathEditorSchema = createPathEditorSettingsSchema(defaultPathEditorSettings);
     const exportSettingsSchema = createExportSettingsSchema(defaultExportSettings);
@@ -32,6 +34,7 @@ export function normalizeStoredSettings(value: unknown): UiSettings {
         z.object({
             theme: themeModeSchema.catch(defaultSettings.theme),
             showSvgPreviewSection: z.boolean().catch(defaultSettings.showSvgPreviewSection),
+            sectionPreview: sectionPreviewSettingsSchema.catch(defaultSectionPreviewSettings),
             canvas: canvasSettingsSchema.catch(defaultCanvasSettings),
             dialogs: dialogsSettingsSchema.catch(defaultDialogsSettings),
             footer: footerSettingsSchema.catch(defaultFooterSettings),
@@ -66,6 +69,7 @@ function cloneUiSettings(settings: UiSettings): UiSettings {
     return {
         ...settings,
         canvas: { ...settings.canvas },
+        sectionPreview: { ...settings.sectionPreview },
         dialogs: {
             ...settings.dialogs,
             scaleToViewBox: { ...settings.dialogs.scaleToViewBox },
@@ -100,6 +104,17 @@ function createCanvasSettingsSchema(defaultSettings: CanvasSettings) {
             fillPreview: z.boolean().catch(defaultSettings.fillPreview),
             canvasPreview: z.boolean().catch(defaultSettings.canvasPreview),
             showViewBoxFrame: z.boolean().catch(defaultSettings.showViewBoxFrame),
+        })
+    );
+}
+
+function createSectionPreviewSettingsSchema(defaultSettings: SectionPreviewSettings) {
+    return z.preprocess(
+        toRecord,
+        z.object({
+            fill: z.boolean().catch(defaultSettings.fill),
+            stroke: z.boolean().catch(defaultSettings.stroke),
+            grid: z.boolean().catch(defaultSettings.grid),
         })
     );
 }

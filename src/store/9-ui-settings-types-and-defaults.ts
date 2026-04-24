@@ -36,6 +36,12 @@ export interface CanvasSettings {
     showViewBoxFrame: boolean;            // Show view box frame or not
 }
 
+export interface SectionPreviewSettings {
+    fill: boolean;                        // Show fill in SVG preview
+    stroke: boolean;                      // Show stroke in SVG preview
+    grid: boolean;                        // Show grid in SVG preview
+}
+
 export interface FooterButtonsSettings {
     showTicksToggle: boolean;
     showGridToggle: boolean;
@@ -72,6 +78,7 @@ export interface DialogSettings {
 export interface UiSettings {
     theme: ThemeMode;                     // Theme mode (light or dark)
     showSvgPreviewSection: boolean;       // Show "SVG preview" section above SVG input
+    sectionPreview: SectionPreviewSettings; // SVG preview overlay settings
     canvas: CanvasSettings;               // Canvas settings
     dialogs: DialogSettings;              // Dialog-specific settings
     footer: FooterSettings;               // Footer button visibility
@@ -110,6 +117,12 @@ export const DEFAULT_CANVAS_SETTINGS: CanvasSettings = {
     showViewBoxFrame: false,
 };
 
+export const DEFAULT_SECTION_PREVIEW_SETTINGS: SectionPreviewSettings = {
+    fill: true,
+    stroke: true,
+    grid: true,
+};
+
 export const DEFAULT_FOOTER_SETTINGS: FooterSettings = {
     buttons: {
         showTicksToggle: true,
@@ -140,6 +153,7 @@ export const DEFAULT_DIALOGS_SETTINGS: DialogSettings = {
 export const DEFAULT_SETTINGS: UiSettings = {
     theme: "light",
     showSvgPreviewSection: false,
+    sectionPreview: DEFAULT_SECTION_PREVIEW_SETTINGS,
     canvas: DEFAULT_CANVAS_SETTINGS,
     dialogs: DEFAULT_DIALOGS_SETTINGS,
     footer: DEFAULT_FOOTER_SETTINGS,
