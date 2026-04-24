@@ -34,9 +34,7 @@ function SvgPreview() {
 }
 
 function SvgPreviewContent() {
-    const gridPatternId = useId();
-    const gridId = `${gridPatternId}-preview-grid`;
-    const { grid: showGrid, fill: showFill, stroke: showStroke } = useSnapshot(appSettings.sectionPreview);
+    const { fill: showFill, stroke: showStroke } = useSnapshot(appSettings.sectionPreview);
 
     const selectedNode = useAtomValue(svgInputSelectedNodeAtom);
     const parseError = useAtomValue(svgInputErrorAtom);
@@ -48,11 +46,26 @@ function SvgPreviewContent() {
     const previewHeight = Math.max(1e-6, viewBoxHeight);
 
     const { svgRef, unitsPerPixel } = usePreviewUnitsPerPixel(previewWidth, previewHeight);
-    const frameStrokeWidth = Math.max(unitsPerPixel * 1.5, unitsPerPixel);
-    const frameDashArray = `${unitsPerPixel * 3} ${unitsPerPixel * 1.5}`;
+    const previewFrame = {
+        strokeWidth: Math.max(unitsPerPixel * 1.5, unitsPerPixel),
+        dashArray: `${unitsPerPixel * 3} ${unitsPerPixel * 1.5}`,
+    };
+    const previewBox = {
+        x: viewBoxX,
+        y: viewBoxY,
+        width: previewWidth,
+        height: previewHeight,
+    };
 
     const rootNode = selectedNode ? toPreviewNode(selectedNode) : null;
-    const previewNode = rootNode ? applyPreviewOverrides(rootNode, { showFill, showStroke, defaultStrokeColor: "currentColor", defaultStrokeWidth: frameStrokeWidth, }) : null;
+    const previewNode = rootNode
+        ? applyPreviewOverrides(rootNode, {
+            showFill,
+            showStroke,
+            defaultStrokeColor: "currentColor",
+            defaultStrokeWidth: previewFrame.strokeWidth,
+        })
+        : null;
     const previewMarkup = previewNode ? serializeSvgInputDocument({ root: previewNode, sourceKind: "svg-fragment" }) : "";
 
     if (parseError) {
@@ -74,41 +87,36 @@ function SvgPreviewContent() {
     return (
         <div className="relative w-full min-h-40 flex-1 overflow-hidden rounded bg-muted/20">
             <svg ref={svgRef} className="absolute inset-0 h-full w-full text-foreground" viewBox={viewBoxStr} xmlns="http://www.w3.org/2000/svg" pointerEvents="none" aria-hidden="true">
-                <SvgPreviewBackdrop
-                    showGrid={showGrid}
-                    gridId={gridId}
-                    viewBoxX={viewBoxX}
-                    viewBoxY={viewBoxY}
-                    previewWidth={previewWidth}
-                    previewHeight={previewHeight}
-                    frameStrokeWidth={frameStrokeWidth}
-                    frameDashArray={frameDashArray}
-                />
+                <SvgPreviewBackdrop box={previewBox} frame={previewFrame} />
                 <g className="svg-preview-content" dangerouslySetInnerHTML={{ __html: previewMarkup }} />
             </svg>
         </div>
     );
 }
 
+type PreviewBox = {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+};
+
+type PreviewFrame = {
+    strokeWidth: number;
+    dashArray: string;
+};
+
 function SvgPreviewBackdrop({
-    showGrid,
-    gridId,
-    viewBoxX,
-    viewBoxY,
-    previewWidth,
-    previewHeight,
-    frameStrokeWidth,
-    frameDashArray,
+    box,
+    frame,
 }: {
-    showGrid: boolean;
-    gridId: string;
-    viewBoxX: number;
-    viewBoxY: number;
-    previewWidth: number;
-    previewHeight: number;
-    frameStrokeWidth: number;
-    frameDashArray: string;
+    box: PreviewBox;
+    frame: PreviewFrame;
 }) {
+    const gridPatternId = useId();
+    const gridId = `${gridPatternId}-preview-grid`;
+    const { grid: showGrid } = useSnapshot(appSettings.sectionPreview);
+
     return (
         <>
             {showGrid && (<>
@@ -118,21 +126,21 @@ function SvgPreviewBackdrop({
                     </pattern>
                 </defs>
                 <rect
-                    x={viewBoxX}
-                    y={viewBoxY}
-                    width={previewWidth}
-                    height={previewHeight}
+                    x={box.x}
+                    y={box.y}
+                    width={box.width}
+                    height={box.height}
                     fill={`url(#${gridId})`}
                 />
             </>)}
             <rect
                 className="fill-none stroke-[#7f7f7fb8] dark:stroke-[#ffffffb8]"
-                x={viewBoxX}
-                y={viewBoxY}
-                width={previewWidth}
-                height={previewHeight}
-                strokeWidth={frameStrokeWidth}
-                strokeDasharray={frameDashArray}
+                x={box.x}
+                y={box.y}
+                width={box.width}
+                height={box.height}
+                strokeWidth={frame.strokeWidth}
+                strokeDasharray={frame.dashArray}
                 pointerEvents="none"
             />
         </>
