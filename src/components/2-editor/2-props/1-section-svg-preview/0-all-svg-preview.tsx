@@ -1,4 +1,3 @@
-import { useId } from "react";
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
@@ -9,6 +8,7 @@ import { serializeSvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-i
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { usePreviewUnitsPerPixel } from "./5-preview-units";
 import { applyPreviewOverrides } from "./6-preview-attrs.tsx";
+import { SvgPreviewBackdrop } from "./8-svg-preview-backdrop";
 import { SvgPreviewLabel, SvgPreviewOverlay } from "./7-svg-preview-overlay";
 
 export function Section_SvgPreview() {
@@ -87,42 +87,6 @@ function SvgPreviewContent() {
             </svg>
         </div>
     );
-}
-
-function SvgPreviewBackdrop({ viewBox, frame, }: { viewBox: ViewBox; frame: { strokeWidth: number; dashArray: string; }; }) {
-    const { grid: showGrid } = useSnapshot(appSettings.sectionPreview);
-    const [x, y, width, height] = viewBox;
-
-    const gridPatternId = useId();
-    const gridId = `${gridPatternId}-preview-grid`;
-
-    return (<>
-        {showGrid && (<>
-            <defs>
-                <pattern id={gridId} width="1" height="1" patternUnits="userSpaceOnUse">
-                    <path d="M 10 0 L 0 0 0 10" fill="none" stroke="oklch(0.7 0 0 / 0.25)" strokeWidth="0.3" />
-                </pattern>
-            </defs>
-            <rect
-                x={x}
-                y={y}
-                width={width}
-                height={height}
-                fill={`url(#${gridId})`}
-            />
-        </>)}
-        
-        <rect
-            className="fill-none stroke-[#7f7f7fb8] dark:stroke-[#ffffffb8]"
-            x={x}
-            y={y}
-            width={width}
-            height={height}
-            strokeWidth={frame.strokeWidth}
-            strokeDasharray={frame.dashArray}
-            pointerEvents="none"
-        />
-    </>);
 }
 
 function toPreviewNode(node: SvgInputNode): SvgInputNode {
