@@ -35,31 +35,24 @@ function SvgPreview() {
 
 function SvgPreviewContent() {
     const gridPatternId = useId();
+    const gridId = `${gridPatternId}-preview-grid`;
+    const { grid: showGrid, fill: showFill, stroke: showStroke } = useSnapshot(appSettings.sectionPreview);
+
     const selectedNode = useAtomValue(svgInputSelectedNodeAtom);
     const parseError = useAtomValue(svgInputErrorAtom);
     const viewBox = useSnapshot(appSettings.pathEditor).viewBox;
-    const { grid: showGrid, fill: showFill, stroke: showStroke } = useSnapshot(appSettings.sectionPreview);
     const [viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight] = viewBox;
     const viewBoxStr = viewBox.join(" ");
 
-    const gridId = `${gridPatternId}-preview-grid`;
     const previewWidth = Math.max(1e-6, viewBoxWidth);
     const previewHeight = Math.max(1e-6, viewBoxHeight);
 
     const { svgRef, unitsPerPixel } = usePreviewUnitsPerPixel(previewWidth, previewHeight);
     const frameStrokeWidth = Math.max(unitsPerPixel * 1.5, unitsPerPixel);
     const frameDashArray = `${unitsPerPixel * 3} ${unitsPerPixel * 1.5}`;
-    
-    const previewNode = selectedNode ? applyPreviewOverrides(
-        toPreviewNode(selectedNode),
-        {
-            showFill,
-            showStroke,
-            defaultStrokeColor: "currentColor",
-            defaultStrokeWidth: frameStrokeWidth,
-        }
-    ) : null;
-    
+
+    const rootNode = selectedNode ? toPreviewNode(selectedNode) : null;
+    const previewNode = rootNode ? applyPreviewOverrides(rootNode, { showFill, showStroke, defaultStrokeColor: "currentColor", defaultStrokeWidth: frameStrokeWidth, }) : null;
     const previewMarkup = previewNode ? serializeSvgInputDocument({ root: previewNode, sourceKind: "svg-fragment" }) : "";
 
     if (parseError) {
