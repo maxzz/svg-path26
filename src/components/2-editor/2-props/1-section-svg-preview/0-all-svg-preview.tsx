@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
 import { svgInputErrorAtom, svgInputSelectedNodeAtom } from "@/store/0-atoms/1-3-svg-input";
 import { serializeSvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-input";
+import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { usePreviewUnitsPerPixel } from "./5-preview-units";
 import { applyPreviewOverrides } from "./6-preview-attrs.tsx";
 import { SvgPreviewLabel, SvgPreviewOverlay } from "./7-svg-preview-overlay";
@@ -50,12 +51,7 @@ function SvgPreviewContent() {
         strokeWidth: Math.max(unitsPerPixel * 1.5, unitsPerPixel),
         dashArray: `${unitsPerPixel * 3} ${unitsPerPixel * 1.5}`,
     };
-    const previewBox = {
-        x: viewBoxX,
-        y: viewBoxY,
-        width: previewWidth,
-        height: previewHeight,
-    };
+    const previewBox: ViewBox = [viewBoxX, viewBoxY, previewWidth, previewHeight];
 
     const rootNode = selectedNode ? toPreviewNode(selectedNode) : null;
     const previewNode = rootNode
@@ -87,35 +83,23 @@ function SvgPreviewContent() {
     return (
         <div className="relative w-full min-h-40 flex-1 overflow-hidden rounded bg-muted/20">
             <svg ref={svgRef} className="absolute inset-0 h-full w-full text-foreground" viewBox={viewBoxStr} xmlns="http://www.w3.org/2000/svg" pointerEvents="none" aria-hidden="true">
-                <SvgPreviewBackdrop box={previewBox} frame={previewFrame} />
+                <SvgPreviewBackdrop viewBox={previewBox} frame={previewFrame} />
                 <g className="svg-preview-content" dangerouslySetInnerHTML={{ __html: previewMarkup }} />
             </svg>
         </div>
     );
 }
 
-type PreviewBox = {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-};
-
 type PreviewFrame = {
     strokeWidth: number;
     dashArray: string;
 };
 
-function SvgPreviewBackdrop({
-    box,
-    frame,
-}: {
-    box: PreviewBox;
-    frame: PreviewFrame;
-}) {
+function SvgPreviewBackdrop({ viewBox, frame, }: { viewBox: ViewBox; frame: PreviewFrame; }) {
     const gridPatternId = useId();
     const gridId = `${gridPatternId}-preview-grid`;
     const { grid: showGrid } = useSnapshot(appSettings.sectionPreview);
+    const [viewBoxX, viewBoxY, previewWidth, previewHeight] = viewBox;
 
     return (
         <>
@@ -126,19 +110,19 @@ function SvgPreviewBackdrop({
                     </pattern>
                 </defs>
                 <rect
-                    x={box.x}
-                    y={box.y}
-                    width={box.width}
-                    height={box.height}
+                    x={viewBoxX}
+                    y={viewBoxY}
+                    width={previewWidth}
+                    height={previewHeight}
                     fill={`url(#${gridId})`}
                 />
             </>)}
             <rect
                 className="fill-none stroke-[#7f7f7fb8] dark:stroke-[#ffffffb8]"
-                x={box.x}
-                y={box.y}
-                width={box.width}
-                height={box.height}
+                x={viewBoxX}
+                y={viewBoxY}
+                width={previewWidth}
+                height={previewHeight}
                 strokeWidth={frame.strokeWidth}
                 strokeDasharray={frame.dashArray}
                 pointerEvents="none"
