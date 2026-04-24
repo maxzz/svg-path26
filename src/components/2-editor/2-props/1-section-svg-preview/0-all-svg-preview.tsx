@@ -89,8 +89,6 @@ function SvgPreviewContent() {
                     />
                 </>)}
 
-                <g className="svg-preview-content" dangerouslySetInnerHTML={{ __html: previewMarkup }} />
-
                 <rect
                     className="fill-none stroke-[#7f7f7fb8] dark:stroke-[#ffffffb8]"
                     x={viewBoxX}
@@ -101,6 +99,8 @@ function SvgPreviewContent() {
                     strokeDasharray={frameDashArray}
                     pointerEvents="none"
                 />
+
+                <g className="svg-preview-content" dangerouslySetInnerHTML={{ __html: previewMarkup }} />
             </svg>
         </div>
     );
