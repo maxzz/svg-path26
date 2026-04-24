@@ -41,7 +41,6 @@ function SvgPreviewContent() {
     const parseError = useAtomValue(svgInputErrorAtom);
     const viewBox = useSnapshot(appSettings.pathEditor).viewBox;
     const [viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight] = viewBox;
-    const viewBoxStr = viewBox.join(" ");
 
     const previewWidth = Math.max(1e-6, viewBoxWidth);
     const previewHeight = Math.max(1e-6, viewBoxHeight);
@@ -82,7 +81,7 @@ function SvgPreviewContent() {
 
     return (
         <div className="relative w-full min-h-40 flex-1 overflow-hidden rounded bg-muted/20">
-            <svg ref={svgRef} className="absolute inset-0 h-full w-full text-foreground" viewBox={viewBoxStr} xmlns="http://www.w3.org/2000/svg" pointerEvents="none" aria-hidden="true">
+            <svg ref={svgRef} className="absolute inset-0 h-full w-full text-foreground" viewBox={viewBox.join(" ")} xmlns="http://www.w3.org/2000/svg" pointerEvents="none" aria-hidden="true">
                 <SvgPreviewBackdrop viewBox={previewBox} frame={previewFrame} />
                 <g className="svg-preview-content" dangerouslySetInnerHTML={{ __html: previewMarkup }} />
             </svg>
