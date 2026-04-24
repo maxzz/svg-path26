@@ -20,21 +20,15 @@ export function Section_SvgPreview() {
     return (
         <TooltipProvider delayDuration={250}>
             <SectionPanel sectionKey="svg-preview" label={<SvgPreviewLabel />} contentClassName="px-1 py-1" overlay={<SvgPreviewOverlay />}>
-                <SvgPreview />
+                <div className="px-2 pt-1 pb-2.5 border rounded select-none flex flex-col gap-2">
+                    <SvgPreview />
+                </div>
             </SectionPanel>
         </TooltipProvider>
     );
 }
 
 function SvgPreview() {
-    return (
-        <div className="px-2 pt-1 pb-2.5 border rounded select-none flex flex-col gap-2">
-            <SvgPreviewContent />
-        </div>
-    );
-}
-
-function SvgPreviewContent() {
     const { fill: showFill, stroke: showStroke } = useSnapshot(appSettings.sectionPreview);
 
     const selectedNode = useAtomValue(svgInputSelectedNodeAtom);
