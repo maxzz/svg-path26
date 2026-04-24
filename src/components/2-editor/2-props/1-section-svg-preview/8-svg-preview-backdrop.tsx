@@ -3,12 +3,7 @@ import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
 
-type PreviewFrame = {
-    strokeWidth: number;
-    dashArray: string;
-};
-
-export function SvgPreviewBackdrop({ viewBox, frame, }: { viewBox: ViewBox; frame: PreviewFrame; }) {
+export function SvgPreviewBackdrop({ viewBox, frameUnits, }: { viewBox: ViewBox; frameUnits: { strokeWidth: number; dashArray: string; }; }) {
     const { grid: showGrid } = useSnapshot(appSettings.sectionPreview);
     const [x, y, width, height] = viewBox;
 
@@ -22,6 +17,7 @@ export function SvgPreviewBackdrop({ viewBox, frame, }: { viewBox: ViewBox; fram
                     <path d="M 10 0 L 0 0 0 10" fill="none" stroke="oklch(0.7 0 0 / 0.25)" strokeWidth="0.3" />
                 </pattern>
             </defs>
+
             <rect
                 x={x}
                 y={y}
@@ -37,8 +33,8 @@ export function SvgPreviewBackdrop({ viewBox, frame, }: { viewBox: ViewBox; fram
             y={y}
             width={width}
             height={height}
-            strokeWidth={frame.strokeWidth}
-            strokeDasharray={frame.dashArray}
+            strokeWidth={frameUnits.strokeWidth}
+            strokeDasharray={frameUnits.dashArray}
             pointerEvents="none"
         />
     </>);

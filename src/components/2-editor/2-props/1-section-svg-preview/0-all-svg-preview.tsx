@@ -44,13 +44,13 @@ function SvgPreviewContent() {
 
     const previewWidth = Math.max(1e-6, viewBoxWidth);
     const previewHeight = Math.max(1e-6, viewBoxHeight);
+    const previewViewBox: ViewBox = [viewBoxX, viewBoxY, previewWidth, previewHeight];
 
     const { svgRef, unitsPerPixel } = usePreviewUnitsPerPixel(previewWidth, previewHeight);
-    const previewFrame = {
+    const frameUnits = {
         strokeWidth: Math.max(unitsPerPixel * 1.5, unitsPerPixel),
         dashArray: `${unitsPerPixel * 3} ${unitsPerPixel * 1.5}`,
     };
-    const previewBox: ViewBox = [viewBoxX, viewBoxY, previewWidth, previewHeight];
 
     const rootNode = selectedNode ? toPreviewNode(selectedNode) : null;
     const previewNode = rootNode
@@ -58,7 +58,7 @@ function SvgPreviewContent() {
             showFill,
             showStroke,
             defaultStrokeColor: "currentColor",
-            defaultStrokeWidth: previewFrame.strokeWidth,
+            defaultStrokeWidth: frameUnits.strokeWidth,
         })
         : null;
     const previewMarkup = previewNode ? serializeSvgInputDocument({ root: previewNode, sourceKind: "svg-fragment" }) : "";
@@ -82,7 +82,7 @@ function SvgPreviewContent() {
     return (
         <div className="relative w-full min-h-40 flex-1 overflow-hidden rounded bg-muted/20">
             <svg ref={svgRef} className="absolute inset-0 h-full w-full text-foreground" viewBox={viewBox.join(" ")} xmlns="http://www.w3.org/2000/svg" pointerEvents="none" aria-hidden="true">
-                <SvgPreviewBackdrop viewBox={previewBox} frame={previewFrame} />
+                <SvgPreviewBackdrop viewBox={previewViewBox} frameUnits={frameUnits} />
                 <g className="svg-preview-content" dangerouslySetInnerHTML={{ __html: previewMarkup }} />
             </svg>
         </div>
