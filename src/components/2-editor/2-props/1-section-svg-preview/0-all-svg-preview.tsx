@@ -49,6 +49,7 @@ function SvgPreviewContent() {
     const { svgRef, unitsPerPixel } = usePreviewUnitsPerPixel(previewWidth, previewHeight);
     const frameStrokeWidth = Math.max(unitsPerPixel * 1.5, unitsPerPixel);
     const frameDashArray = `${unitsPerPixel * 3} ${unitsPerPixel * 1.5}`;
+    
     const previewNode = selectedNode ? applyPreviewOverrides(
         toPreviewNode(selectedNode),
         {
@@ -58,6 +59,7 @@ function SvgPreviewContent() {
             defaultStrokeWidth: frameStrokeWidth,
         }
     ) : null;
+    
     const previewMarkup = previewNode ? serializeSvgInputDocument({ root: previewNode, sourceKind: "svg-fragment" }) : "";
 
     if (parseError) {

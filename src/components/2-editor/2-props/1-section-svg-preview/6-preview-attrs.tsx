@@ -9,7 +9,11 @@ type PreviewOverrides = {
 
 export function applyPreviewOverrides(node: SvgInputNode, options: PreviewOverrides): SvgInputNode {
     const attributes = updatePreviewAttributes(node.tagName, node.attributes, options);
-    const children = node.children.map((child) => applyPreviewOverrides(child, options));
+
+    const children = node.children.map(
+        (child) => applyPreviewOverrides(child, options)
+    );
+    
     return {
         ...node,
         attributes,
@@ -19,6 +23,7 @@ export function applyPreviewOverrides(node: SvgInputNode, options: PreviewOverri
 
 function updatePreviewAttributes(tagName: string, attributes: SvgInputAttribute[], options: PreviewOverrides): SvgInputAttribute[] {
     const next = attributes.map((attribute) => ({ ...attribute }));
+
     const styleOverrides: string[] = [];
     const isStrokeTarget = PREVIEW_STROKE_TARGETS.has(tagName);
     const strokeValue = getStyleValue(next, "stroke") ?? getAttributeValue(next, "stroke");
@@ -36,7 +41,8 @@ function updatePreviewAttributes(tagName: string, attributes: SvgInputAttribute[
         upsertAttribute(next, "stroke-width", "0");
         upsertAttribute(next, "stroke-opacity", "0");
         styleOverrides.push("stroke: none !important", "stroke-width: 0 !important", "stroke-opacity: 0 !important");
-    } else if (isStrokeTarget && shouldAddDefaultStroke(strokeValue)) {
+    }
+    else if (isStrokeTarget && shouldAddDefaultStroke(strokeValue)) {
         const needsStrokeWidth = !hasUsableStrokeWidth(strokeWidthValue);
         const needsStrokeOpacity = !hasUsableStrokeOpacity(strokeOpacityValue);
         upsertAttribute(next, "stroke", options.defaultStrokeColor);
@@ -67,7 +73,9 @@ function getAttributeValue(attributes: SvgInputAttribute[], name: string): strin
 }
 
 function upsertAttribute(attributes: SvgInputAttribute[], name: string, value: string) {
-    const index = attributes.findIndex((attribute) => attribute.name.toLowerCase() === name);
+    const index = attributes.findIndex(
+        (attribute) => attribute.name.toLowerCase() === name
+    );
     if (index >= 0) {
         attributes[index] = { ...attributes[index], value };
         return;
@@ -88,10 +96,12 @@ function mergeStyleOverrides(existingStyle: string, overrides: string[]): string
 function getStyleValue(attributes: SvgInputAttribute[], name: string): string | undefined {
     const style = getAttributeValue(attributes, "style");
     if (!style) return undefined;
+
     const entries = style
         .split(";")
         .map((entry) => entry.trim())
         .filter(Boolean);
+
     for (const entry of entries) {
         const [property, ...rest] = entry.split(":");
         if (!property) continue;
