@@ -7,7 +7,7 @@ import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
 import { svgInputErrorAtom, svgInputSelectedNodeAtom } from "@/store/0-atoms/1-3-svg-input";
 import { serializeSvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-input";
 import { type SizeWH } from "@/svg-core/9-types-svg-model";
-import { showGridAtom, SvgPreviewLabel, SvgPreviewOverlay } from "./7-svg-preview-controls.tsx";
+import { showGridAtom, SvgPreviewLabel, SvgPreviewOverlay } from "./7-svg-preview-overlay.tsx";
 
 export function Section_SvgPreview() {
     const { showSvgPreviewSection } = useSnapshot(appSettings);

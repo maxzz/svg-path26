@@ -17,7 +17,7 @@ import { SubPathToggleRow } from "./7-2-subpath-header.tsx";
 export function Section_PathCommands() {
     return (
         <TooltipProvider delayDuration={250}>
-            <SectionPanel label="Path Commands" sectionKey="commands" contentClassName="px-0 pt-0.5 pb-4" overlay={<PathCommandsOverlay />}>
+            <SectionPanel label={<PathCommandsLabel />} sectionKey="commands" contentClassName="px-0 pt-0.5 pb-4" overlay={<PathCommandsOverlay />}>
 
                 {/* The ScrollArea viewport was still using h-full, which needs a definite parent height; max-h-64 on the root doesn’t give it one, 
                 so the viewport expands with content and never overflows (no scrollbars, no wheel scroll). I moved the height constraint to the viewport and
@@ -30,6 +30,20 @@ export function Section_PathCommands() {
 
             </SectionPanel>
         </TooltipProvider>
+    );
+}
+
+function PathCommandsLabel() {
+    const subPaths = useAtomValue(subPathsAtom);
+    const subPathsCount = subPaths.length;
+
+    return (
+        <div className="flex items-center gap-1">
+            <span>Path Commands</span>
+            {subPathsCount > 1 && (
+                <span className="pt-0.5 text-[11px] text-muted-foreground">({subPathsCount} subpaths)</span>
+            )}
+        </div>
     );
 }
 
