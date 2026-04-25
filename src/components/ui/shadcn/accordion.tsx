@@ -1,4 +1,4 @@
-import * as React from "react" // 03.15.26
+import * as React from "react" // 03.15.26; 04.24.26
 import * as AccordionPrimitive from "@radix-ui/react-accordion"
 import { ChevronDown } from "lucide-react"
 import { cn } from "@/utils"
@@ -53,4 +53,32 @@ const AccordionContent = React.forwardRef<
 ))
 AccordionContent.displayName = AccordionPrimitive.Content.displayName
 
-export { Accordion, AccordionItem, AccordionTrigger, AccordionContent }
+export { Accordion, AccordionItem, AccordionTrigger, AccordionContent, AccordionTriggerNonButton }
+
+// Accordion with icon
+// The main difference is that it is not a button, so it can have buttons inside it (useful for overlays to avoid absolute positioning).
+
+const AccordionTriggerNonButton = React.forwardRef<
+    React.ElementRef<typeof AccordionPrimitive.Trigger>,
+    React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger> & { showIcon?: boolean; }
+>(({ className, children, showIcon = true, ...props }, ref) => (
+    <AccordionPrimitive.Header className="flex">
+        <AccordionPrimitive.Trigger
+            ref={ref}
+            className={cn(
+                "flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all hover:underline text-left [&[data-state=open]>svg]:rotate-180 cursor-pointer",
+                className
+            )}
+            asChild
+            {...props}
+        >
+            <div className="flex items-center gap-1">
+                {children}
+                {showIcon && (
+                    <ChevronDown className="mr-1 size-3.5 shrink-0 text-muted-foreground transition-transform duration-200" />
+                )}
+            </div>
+        </AccordionPrimitive.Trigger>
+    </AccordionPrimitive.Header>
+));
+AccordionTriggerNonButton.displayName = `${AccordionPrimitive.Trigger.displayName}-non-button`;

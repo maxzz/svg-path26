@@ -1,7 +1,7 @@
 import { type ReactNode } from "react";
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/shadcn/accordion";
+import { Accordion, AccordionContent, AccordionItem, AccordionTriggerNonButton } from "@/components/ui/shadcn/accordion";
 import { appSettings } from "@/store/0-ui-settings";
 
 interface SectionPanelProps {
@@ -28,9 +28,9 @@ export function SectionPanel({ sectionKey, label, children, triggerClassName, co
         >
             <AccordionItem value={sectionKey} className="border-none">
                 <div className="relative">
-                    <AccordionTrigger className={classNames("mr-1 px-3 py-1.5 text-base font-ui bg-foreground/7 border-b hover:no-underline select-none", triggerClassName)}>
+                    <AccordionTriggerNonButton className={classNames("mr-1 px-3 py-1.5 text-base font-ui bg-foreground/7 border-b hover:no-underline select-none", triggerClassName)}>
                         {label}
-                    </AccordionTrigger>
+                    </AccordionTriggerNonButton>
 
                     {overlay && (
                         <div className="absolute inset-y-0 right-8 flex items-center pointer-events-none z-10">
