@@ -24,10 +24,7 @@ const AccordionTrigger = React.forwardRef<
   <AccordionPrimitive.Header className="flex">
     <AccordionPrimitive.Trigger
       ref={ref}
-      className={cn(
-        "flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all hover:underline text-left [&[data-state=open]>svg]:rotate-180 cursor-pointer",
-        className
-      )}
+      className={cn("flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all hover:underline text-left [&[data-state=open]>svg]:rotate-180 cursor-pointer", className)}
       {...props}
     >
       {children}
@@ -59,20 +56,16 @@ export { Accordion, AccordionItem, AccordionTrigger, AccordionContent, Accordion
 // The main difference is that it is not a button, so it can have buttons inside it (useful for overlays to avoid absolute positioning).
 
 const AccordionTriggerNonButton = React.forwardRef<
-    React.ElementRef<typeof AccordionPrimitive.Trigger>,
-    React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger> & { showIcon?: boolean; }
+    React.ElementRef<"div">,
+    React.ComponentPropsWithoutRef<"div"> & { showIcon?: boolean; }
 >(({ className, children, showIcon = true, ...props }, ref) => (
     <AccordionPrimitive.Header className="flex">
-        <AccordionPrimitive.Trigger
-            ref={ref}
-            className={cn(
-                "flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all hover:underline text-left [&[data-state=open]>svg]:rotate-180 cursor-pointer",
-                className
-            )}
-            asChild
-            {...props}
-        >
-            <div className="flex items-center gap-1">
+        <AccordionPrimitive.Trigger asChild>
+            <div 
+                ref={ref} 
+                className={cn("flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all hover:underline text-left [&[data-state=open]>svg]:rotate-180 cursor-pointer", className)}
+                {...props}
+            >
                 {children}
                 {showIcon && (
                     <ChevronDown className="mr-1 size-3.5 shrink-0 text-muted-foreground transition-transform duration-200" />
