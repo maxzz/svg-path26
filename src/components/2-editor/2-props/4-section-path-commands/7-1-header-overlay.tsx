@@ -7,7 +7,21 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/shadcn/
 import { allSubPathsEnabledAtom, hasCompoundSubPathsAtom, subPathAccordionValuesAtom, subPathsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
 
-export function PathCommandsOverlay() {
+export function PathCommands_Label() {
+    const subPaths = useAtomValue(subPathsAtom);
+    const subPathsCount = subPaths.length;
+
+    return (
+        <div className="flex items-center gap-1">
+            <span>Path Commands</span>
+            {subPathsCount > 1 && (
+                <span className="@max-[250px]/section-panel:hidden pt-0.5 text-[11px] text-muted-foreground">({subPathsCount} subpaths)</span>
+            )}
+        </div>
+    );
+}
+
+export function PathCommands_Overlay() {
     const hasCompoundSubPaths = useAtomValue(hasCompoundSubPathsAtom);
     return (
         <div className="mr-1 flex items-center gap-0.5">

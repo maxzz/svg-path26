@@ -3,7 +3,7 @@ import { appSettings } from "@/store/0-ui-settings";
 import { ToggleLeft, ToggleRight } from "lucide-react";
 import { Button } from "@/components/ui/shadcn/button";
 
-export function SvgPreviewLabel() {
+export function SvgPreview_Label() {
     const viewBoxStr = useSnapshot(appSettings.pathEditor).viewBox.join(", ");
     return (
         <div className="flex items-center gap-1">
@@ -18,7 +18,7 @@ export function SvgPreviewLabel() {
     );
 }
 
-export function SvgPreviewOverlay() {
+export function SvgPreview_Overlay() {
     const { fill, stroke, grid } = useSnapshot(appSettings.sectionPreview);
     return (
         <div className="mr-1 text-xs flex items-center justify-between gap-1.5 select-none">

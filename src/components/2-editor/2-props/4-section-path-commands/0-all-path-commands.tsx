@@ -11,13 +11,13 @@ import { commandRowsAtom, subPathAccordionValuesAtom, subPathsAtom } from "@/sto
 import { doSelectCommandAtom, doToggleSegmentRelativeAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions.ts";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
 import { CommandRow, focusField } from "./1-commands-list-row.tsx";
-import { PathCommandsOverlay } from "./7-1-header-overlay.tsx";
+import { PathCommands_Label, PathCommands_Overlay } from "./7-1-header-overlay.tsx";
 import { SubPathToggleRow } from "./7-2-subpath-header.tsx";
 
 export function Section_PathCommands() {
     return (
         <TooltipProvider delayDuration={250}>
-            <SectionPanel label={<PathCommandsLabel />} sectionKey="commands" contentClassName="px-0 pt-0.5 pb-4" overlay={<PathCommandsOverlay />}>
+            <SectionPanel label={<PathCommands_Label />} sectionKey="commands" contentClassName="px-0 pt-0.5 pb-4" overlay={<PathCommands_Overlay />}>
 
                 {/* The ScrollArea viewport was still using h-full, which needs a definite parent height; max-h-64 on the root doesn’t give it one, 
                 so the viewport expands with content and never overflows (no scrollbars, no wheel scroll). I moved the height constraint to the viewport and
@@ -30,20 +30,6 @@ export function Section_PathCommands() {
 
             </SectionPanel>
         </TooltipProvider>
-    );
-}
-
-function PathCommandsLabel() {
-    const subPaths = useAtomValue(subPathsAtom);
-    const subPathsCount = subPaths.length;
-
-    return (
-        <div className="flex items-center gap-1">
-            <span>Path Commands</span>
-            {subPathsCount > 1 && (
-                <span className="@max-[250px]/section-panel:hidden pt-0.5 text-[11px] text-muted-foreground">({subPathsCount} subpaths)</span>
-            )}
-        </div>
     );
 }
 
