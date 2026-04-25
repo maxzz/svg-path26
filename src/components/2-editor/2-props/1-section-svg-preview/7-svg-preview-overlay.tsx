@@ -21,7 +21,7 @@ export function SvgPreview_Label() {
 export function SvgPreview_Overlay() {
     const { fill, stroke, grid } = useSnapshot(appSettings.sectionPreview);
     return (
-        <div className="mr-1 text-xs flex items-center justify-between gap-1.5 select-none">
+        <div className="mr-1 text-xs bg-section-panel-background flex items-center justify-between gap-1.5 select-none">
             <PreviewToggle label="fill" pressed={fill} onToggle={() => appSettings.sectionPreview.fill = !fill} />
             <PreviewToggle label="stroke" pressed={stroke} onToggle={() => appSettings.sectionPreview.stroke = !stroke} />
             <PreviewToggle label="grid" pressed={grid} onToggle={() => appSettings.sectionPreview.grid = !grid} />

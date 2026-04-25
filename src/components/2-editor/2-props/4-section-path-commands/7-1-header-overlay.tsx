@@ -24,7 +24,7 @@ export function PathCommands_Label() {
 export function PathCommands_Overlay() {
     const hasCompoundSubPaths = useAtomValue(hasCompoundSubPathsAtom);
     return (
-        <div className="mr-1 flex items-center gap-0.5">
+        <div className="mr-1 bg-section-panel-background flex items-center gap-0.5">
             {hasCompoundSubPaths && <BtnAllSubPaths />}
             {hasCompoundSubPaths && <BtnSubPathAllAccordions />}
             <BtnScrollOnHover />
