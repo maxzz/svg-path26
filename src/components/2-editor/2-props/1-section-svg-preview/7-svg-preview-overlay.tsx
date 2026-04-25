@@ -1,8 +1,9 @@
 import { useSnapshot } from "valtio";
+import { cn } from "@/utils";
 import { appSettings } from "@/store/0-ui-settings";
 import { ToggleLeft, ToggleRight } from "lucide-react";
 import { Button } from "@/components/ui/shadcn/button";
-import { cn } from "@/utils";
+import { overlayButtonClasses, overlayButtonActiveClasses } from "../8-shared-classes/0-classes";
 
 export function SvgPreview_Label() {
     const viewBoxStr = useSnapshot(appSettings.pathEditor).viewBox.join(", ");
@@ -22,7 +23,7 @@ export function SvgPreview_Label() {
 export function SvgPreview_Overlay() {
     const { fill, stroke, grid } = useSnapshot(appSettings.sectionPreview);
     return (
-        <div className="mr-1 text-xs bg-section-panel-background flex items-center justify-between gap-1.5 select-none">
+        <div className="mr-1 pl-2 text-xs bg-section-panel-background flex items-center justify-between gap-1.5 select-none">
             <PreviewToggle label="fill" pressed={fill} onToggle={() => appSettings.sectionPreview.fill = !fill} />
             <PreviewToggle label="stroke" pressed={stroke} onToggle={() => appSettings.sectionPreview.stroke = !stroke} />
             <PreviewToggle label="grid" pressed={grid} onToggle={() => appSettings.sectionPreview.grid = !grid} />
@@ -37,7 +38,7 @@ function PreviewToggle({ label, pressed, onToggle }: { label: string; pressed: b
             <span className="@max-[300px]/section-panel:hidden inline mb-px -mr-0.75 text-muted-foreground">
                 {label}:
             </span>
-            <span className="@max-[300px]/section-panel:inline hidden mb-px -mr-1 text-muted-foreground">
+            <span className="@max-[300px]/section-panel:inline hidden mb-px text-[9px] text-muted-foreground">
                 {label.charAt(0).toLocaleUpperCase()}:
             </span>
 
@@ -55,6 +56,3 @@ function PreviewToggle({ label, pressed, onToggle }: { label: string; pressed: b
         </label>
     );
 }
-
-const overlayButtonClasses = "size-5 rounded text-muted-foreground hover:text-foreground hover:bg-section-panel-active! cursor-pointer";
-const overlayButtonActiveClasses = "bg-section-panel-active text-foreground";

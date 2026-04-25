@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/shadcn/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 import { allSubPathsEnabledAtom, hasCompoundSubPathsAtom, subPathAccordionValuesAtom, subPathsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
+import { overlayButtonClasses, overlayButtonActiveClasses } from "../8-shared-classes/0-classes";
 
 export function PathCommands_Label() {
     const subPaths = useAtomValue(subPathsAtom);
@@ -113,5 +114,3 @@ function BtnScrollOnHover() {
     );
 }
 
-const overlayButtonClasses = "size-5 rounded text-muted-foreground hover:text-foreground hover:bg-section-panel-active! cursor-pointer";
-const overlayButtonActiveClasses = "bg-section-panel-active text-foreground";

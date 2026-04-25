@@ -41,7 +41,7 @@ export function CopyClipboardOverlayButton(props: { copyText: string; canCopy: b
             <TooltipTrigger asChild>
                 <Button
                     className={cn(
-                        "size-5 rounded-sm",
+                        "size-5 rounded",
                         copied
                             ? " bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 hover:text-emerald-700 dark:text-emerald-300"
                             : " text-muted-foreground hover:text-foreground",
@@ -75,7 +75,7 @@ export function CopyClipboardOverlayButton(props: { copyText: string; canCopy: b
                                 transition={{ duration: 0.14 }}
                                 className="flex items-center justify-center"
                             >
-                                <Copy className={cn("size-4", btnClasses)} />
+                                <Copy className={cn("size-4 stroke-[1.5px]", btnClasses)} />
                             </motion.span>
                         )}
                     </AnimatePresence>

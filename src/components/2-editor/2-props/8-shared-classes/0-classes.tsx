@@ -22,3 +22,6 @@ active:scale-95 \
 cursor-pointer \
 shadow \
 rounded";
+
+export const overlayButtonClasses = "size-5 rounded text-muted-foreground hover:text-foreground hover:bg-section-panel-active! cursor-pointer";
+export const overlayButtonActiveClasses = "bg-section-panel-active text-foreground";

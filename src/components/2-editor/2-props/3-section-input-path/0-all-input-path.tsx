@@ -1,11 +1,8 @@
 import { useAtom } from "jotai";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
-import { CopyClipboardOverlayButton } from "../../../ui/loacal-ui/5-section-overlay-buttons/4-1-copy-clipboard";
+import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
-import { OverlayButton_MinifyPath } from "../../../ui/loacal-ui/5-section-overlay-buttons/4-2-minify-path";
-import { IconHomeToCloud } from "@/components/ui/icons/app-specific";
-import { Button } from "@/components/ui/shadcn/button";
+import { PathInputOverlay } from "./7-overlays";
 
 export function Section_PathInput() {
     const [pathValue, setPathValue] = useAtom(svgPathInputAtom);
@@ -21,40 +18,5 @@ export function Section_PathInput() {
                 />
             </SectionPanel>
         </TooltipProvider>
-    );
-}
-
-function PathInputOverlay({ pathValue }: { pathValue: string; }) {
-    const hasPath = pathValue.trim().length > 0;
-    return (
-        <div className="mr-1 flex items-center gap-0.5">
-
-            <BtnHomeToCloud />
-
-            <OverlayButton_MinifyPath />
-
-            <CopyClipboardOverlayButton
-                copyText={pathValue}
-                canCopy={hasPath}
-                idleLabel="Copy path"
-                successLabel="Path copied"
-            />
-        </div>
-    );
-}
-
-function BtnHomeToCloud() {
-    return (
-        <Tooltip>
-            <TooltipTrigger asChild>
-                <Button className="size-5" variant="ghost" size="icon">
-                    <IconHomeToCloud className="size-4" />
-                </Button>
-            </TooltipTrigger>
-
-            <TooltipContent sideOffset={6}>
-                Home to Cloud
-            </TooltipContent>
-        </Tooltip>
     );
 }
