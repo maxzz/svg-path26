@@ -32,7 +32,7 @@ export function SvgPreviewOverlay() {
 function PreviewToggle({ label, pressed, onToggle }: { label: string; pressed: boolean; onToggle: () => void; }) {
     return (
         <label className="flex items-center cursor-pointer gap-0.5">
-            <span className="mb-px -mr-0.75 text-muted-foreground">
+            <span className="@max-[300px]/section-panel:hidden mb-px -mr-0.75 text-muted-foreground">
                 {label}:
             </span>
 
