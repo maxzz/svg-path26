@@ -11,7 +11,7 @@ export function SvgPreviewLabel() {
                 SVG Preview
             </span>
             
-            <span className="pt-0.5 text-[11px] text-muted-foreground">
+            <span className="@max-[300px]/section-panel:hidden pt-0.5 text-[11px] text-muted-foreground">
                 ({viewBoxStr})
             </span>
         </div>
@@ -32,8 +32,12 @@ export function SvgPreviewOverlay() {
 function PreviewToggle({ label, pressed, onToggle }: { label: string; pressed: boolean; onToggle: () => void; }) {
     return (
         <label className="flex items-center cursor-pointer gap-0.5">
-            <span className="@max-[300px]/section-panel:hidden mb-px -mr-0.75 text-muted-foreground">
+
+            <span className="@max-[300px]/section-panel:hidden inline mb-px -mr-0.75 text-muted-foreground">
                 {label}:
+            </span>
+            <span className="@max-[300px]/section-panel:inline hidden mb-px -mr-1 text-muted-foreground">
+                {label.charAt(0).toLocaleUpperCase()}:
             </span>
 
             <Button
