@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useSetAtom } from "jotai";
 import { ScrollArea } from "@/components/ui/shadcn/scroll-area";
-import { doHandleEditorKeyDownAtom } from "./8-atoms";
+import { doHandleEditorKeyDownAtom } from "./8-global-shortcuts";
 
 import { Section_SvgPreview } from "../1-section-svg-preview/0-all-svg-preview";
 import { Section_SvgInput } from "../2-section-input-svg/0-all-input-svg";
@@ -26,7 +26,7 @@ export function EditorPanels() {
 
     return (
         <aside className="h-full border-r flex flex-col justify-between">
-            <ScrollArea className="flex-1 grow pr-1">
+            <ScrollArea className="flex-1 grow pr-1" fixedWidth>
                 <Section_SvgPreview />
                 <Section_SvgInput />
                 <Section_PathInput />
