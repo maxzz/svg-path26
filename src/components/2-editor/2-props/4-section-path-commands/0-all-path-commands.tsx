@@ -41,7 +41,7 @@ function PathCommandsLabel() {
         <div className="flex items-center gap-1">
             <span>Path Commands</span>
             {subPathsCount > 1 && (
-                <span className="pt-0.5 text-[11px] text-muted-foreground">({subPathsCount} subpaths)</span>
+                <span className="@max-[250px]/section-panel:hidden pt-0.5 text-[11px] text-muted-foreground">({subPathsCount} subpaths)</span>
             )}
         </div>
     );
