@@ -63,12 +63,12 @@ const AccordionTriggerNonButton = React.forwardRef<
         <AccordionPrimitive.Trigger asChild>
             <div 
                 ref={ref} 
-                className={cn("flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all hover:underline text-left [&[data-state=open]>svg]:rotate-180 cursor-pointer", className)}
+                className={cn("flex-1 flex items-center 1justify-between py-4 text-sm font-medium transition-all hover:underline text-left [&[data-state=open]>svg]:rotate-180 cursor-pointer", className)}
                 {...props}
             >
                 {children}
                 {showIcon && (
-                    <ChevronDown className="mr-1 size-3.5 shrink-0 text-muted-foreground transition-transform duration-200" />
+                    <ChevronDown className="justify-self-end mr-1 size-3.5 shrink-0 text-muted-foreground transition-transform duration-200" />
                 )}
             </div>
         </AccordionPrimitive.Trigger>
