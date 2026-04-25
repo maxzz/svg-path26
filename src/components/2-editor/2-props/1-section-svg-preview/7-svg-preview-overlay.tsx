@@ -2,6 +2,7 @@ import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
 import { ToggleLeft, ToggleRight } from "lucide-react";
 import { Button } from "@/components/ui/shadcn/button";
+import { cn } from "@/utils";
 
 export function SvgPreview_Label() {
     const viewBoxStr = useSnapshot(appSettings.pathEditor).viewBox.join(", ");
@@ -41,7 +42,7 @@ function PreviewToggle({ label, pressed, onToggle }: { label: string; pressed: b
             </span>
 
             <Button
-                className={overlayButtonClasses}
+                className={cn(overlayButtonClasses, pressed && overlayButtonActiveClasses)}
                 onClick={onToggle}
                 variant="ghost"
                 size="icon"
@@ -55,4 +56,5 @@ function PreviewToggle({ label, pressed, onToggle }: { label: string; pressed: b
     );
 }
 
-const overlayButtonClasses = "size-5 rounded-sm text-muted-foreground hover:text-foreground";
+const overlayButtonClasses = "size-5 rounded text-muted-foreground hover:text-foreground hover:bg-section-panel-active! cursor-pointer";
+const overlayButtonActiveClasses = "bg-section-panel-active text-foreground";

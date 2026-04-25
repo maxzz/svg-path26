@@ -113,5 +113,5 @@ function BtnScrollOnHover() {
     );
 }
 
-const overlayButtonClasses = "size-5 rounded-sm text-muted-foreground hover:text-foreground";
-const overlayButtonActiveClasses = "bg-background/80 text-foreground";
+const overlayButtonClasses = "size-5 rounded text-muted-foreground hover:text-foreground hover:bg-section-panel-active! cursor-pointer";
+const overlayButtonActiveClasses = "bg-section-panel-active text-foreground";
