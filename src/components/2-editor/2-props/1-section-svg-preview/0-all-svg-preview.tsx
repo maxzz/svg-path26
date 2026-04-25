@@ -6,9 +6,9 @@ import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
 import { svgInputErrorAtom, svgInputSelectedNodeAtom } from "@/store/0-atoms/1-3-svg-input";
 import { serializeSvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-input";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
-import { usePreviewUnitsPerPixel } from "./5-preview-units";
-import { applyPreviewOverrides } from "./6-preview-attrs.tsx";
-import { SvgPreviewBackdrop } from "./8-svg-preview-backdrop";
+import { usePreviewUnitsPerPixel } from "./4-preview-units.tsx";
+import { applyPreviewOverrides } from "./5-preview-attrs.tsx";
+import { SvgPreviewBackdrop } from "./6-svg-preview-backdrop.tsx";
 import { SvgPreviewLabel, SvgPreviewOverlay } from "./7-svg-preview-overlay";
 
 export function Section_SvgPreview() {
