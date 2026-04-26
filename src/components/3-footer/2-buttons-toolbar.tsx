@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/shadcn/button";
 import { FooterButtonsSelector, footerBtnClasses, footerIconFillOnClasses, footerIconOffClasses, footerIconOnClasses } from "./3-buttons-selector";
 
 export function FooterButtonsToolbar() {
-    const { showGrid, showViewBoxFrame, snapToGrid, showHelpers, fillPreview } = useSnapshot(appSettings.canvas);
+    const { showGrid, showViewBoxFrame, showHelpers, fillPreview } = useSnapshot(appSettings.canvas);
     const { buttons: footerButtons } = useSnapshot(appSettings.footer);
 
     return (
@@ -111,16 +111,17 @@ function SnapToGridInput() {
     const { snapToGrid } = useSnapshot(appSettings.canvas);
     const { dragPrecision } = useSnapshot(appSettings.pathEditor);
     return (
-        <div className="flex items-center" title={snapToGrid ? "Snap to grid is on" : "Snap to grid is off"}>
+        <div className="flex items-center">
             <input
                 className="pl-2 pr-0.5 h-5 w-12 max-w-20 scale-80 text-[10px] text-center rounded border bg-background disabled:opacity-20"
-                disabled={!snapToGrid}
+                //disabled={!snapToGrid}
                 type="number"
                 value={dragPrecision}
                 min={0}
                 max={8}
                 step={1}
                 aria-label="Drag precision"
+                title="Drag precision"
                 onChange={(event) => {
                     const nextValue = Math.max(0, Math.min(8, Number(event.target.value) || 0));
                     appSettings.pathEditor.dragPrecision = nextValue;
@@ -131,6 +132,7 @@ function SnapToGridInput() {
                 size="xs"
                 className={classNames(footerBtnClasses, "-ml-0.75")}
                 onClick={() => { appSettings.canvas.snapToGrid = !snapToGrid; }}
+                title={snapToGrid ? "Snap to grid is on" : "Snap to grid is off"}
                 aria-pressed={snapToGrid}
                 type="button"
             >
