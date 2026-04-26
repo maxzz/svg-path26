@@ -6,19 +6,14 @@ import { Button } from "@/components/ui/shadcn/button";
 import { FooterButtonsSelector, footerBtnClasses, footerIconFillOnClasses, footerIconOffClasses, footerIconOnClasses } from "./3-buttons-selector";
 
 export function FooterButtonsToolbar() {
-    const { showGrid, showViewBoxFrame, snapToGrid, showHelpers, fillPreview, showTicks } = useSnapshot(appSettings.canvas);
-    const { tickInterval, dragPrecision } = useSnapshot(appSettings.pathEditor);
+    const { showGrid, showViewBoxFrame, snapToGrid, showHelpers, fillPreview } = useSnapshot(appSettings.canvas);
     const { buttons: footerButtons } = useSnapshot(appSettings.footer);
 
     return (
         <div className="flex items-center gap-1">
-            {footerButtons.showTicksToggle && (
-                <TicksToggleInput showTicks={showTicks} tickInterval={tickInterval} />
-            )}
+            {footerButtons.showTicksToggle && <TicksToggleInput />}
 
-            {footerButtons.showSnapToGridToggle && (
-                <SnapToGridInput snapToGrid={snapToGrid} dragPrecision={dragPrecision} />
-            )}
+            {footerButtons.showSnapToGridToggle && <SnapToGridInput />}
 
             {footerButtons.showGridToggle && (
                 <Button
@@ -81,7 +76,9 @@ export function FooterButtonsToolbar() {
     );
 }
 
-function TicksToggleInput({ showTicks, tickInterval }: { showTicks: boolean; tickInterval: number; }) {
+function TicksToggleInput() {
+    const { showTicks } = useSnapshot(appSettings.canvas);
+    const { tickInterval } = useSnapshot(appSettings.pathEditor);
     return (
         <div className="flex items-center" title={showTicks ? "Ticks on" : "Ticks off"}>
             <input
@@ -110,12 +107,9 @@ function TicksToggleInput({ showTicks, tickInterval }: { showTicks: boolean; tic
     );
 }
 
-type SnapToGridInputProps = {
-    snapToGrid: boolean;
-    dragPrecision: number;
-};
-
-function SnapToGridInput({ snapToGrid, dragPrecision }: SnapToGridInputProps) {
+function SnapToGridInput() {
+    const { snapToGrid } = useSnapshot(appSettings.canvas);
+    const { dragPrecision } = useSnapshot(appSettings.pathEditor);
     return (
         <div className="flex items-center" title={snapToGrid ? "Snap to grid is on" : "Snap to grid is off"}>
             <input
