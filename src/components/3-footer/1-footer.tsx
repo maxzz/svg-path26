@@ -24,7 +24,7 @@ export function Footer() {
                     <Button
                         variant="outline"
                         size="xs"
-                        className={buttonClasses}
+                        className={footerButtonClasses}
                         onClick={() => { appSettings.canvas.snapToGrid = !snapToGrid; }}
                         aria-pressed={snapToGrid}
                         title={snapToGrid ? "Snap to grid is on" : "Snap to grid is off"}
@@ -38,7 +38,7 @@ export function Footer() {
                     <Button
                         variant="outline"
                         size="xs"
-                        className={buttonClasses}
+                        className={footerButtonClasses}
                         onClick={() => { appSettings.canvas.showGrid = !showGrid; }}
                         aria-pressed={showGrid}
                         title={showGrid ? "Grid is on" : "Grid is off"}
@@ -52,7 +52,7 @@ export function Footer() {
                     <Button
                         variant="outline"
                         size="xs"
-                        className={buttonClasses}
+                        className={footerButtonClasses}
                         onClick={() => { appSettings.canvas.showViewBoxFrame = !showViewBoxFrame; }}
                         aria-pressed={showViewBoxFrame}
                         title={showViewBoxFrame ? "ViewBox frame on" : "ViewBox frame off"}
@@ -66,7 +66,7 @@ export function Footer() {
                     <Button
                         variant="outline"
                         size="xs"
-                        className={buttonClasses}
+                        className={footerButtonClasses}
                         onClick={() => { appSettings.canvas.showHelpers = !showHelpers; }}
                         aria-pressed={showHelpers}
                         title={showHelpers ? "Control points on" : "Control points off"}
@@ -80,7 +80,7 @@ export function Footer() {
                     <Button
                         variant="outline"
                         size="xs"
-                        className={buttonClasses}
+                        className={footerButtonClasses}
                         onClick={() => { appSettings.canvas.fillPreview = !fillPreview; }}
                         aria-pressed={fillPreview}
                         title={!fillPreview ? "Fill is on" : "Fill is off"}
@@ -96,10 +96,11 @@ export function Footer() {
     );
 }
 
-const buttonClasses = "px-0.5! size-5 text-[10px] border rounded";
 const buttonIconOnClasses = "text-emerald-700 dark:text-emerald-300";
 const buttonIconOffClasses = "text-muted-foreground ";
 const buttonIconFillOnClasses = "text-emerald-700 dark:text-emerald-300 fill-emerald-200/50! dark:fill-emerald-300/30!";
+
+const footerButtonClasses = "px-0.5! size-5 text-[10px] border rounded";
 
 function FooterButtonsPopover() {
     const { buttons } = useSnapshot(appSettings.footer);
@@ -110,7 +111,7 @@ function FooterButtonsPopover() {
                 <Button
                     variant="outline"
                     size="icon"
-                    className={buttonClasses}
+                    className={footerButtonClasses}
                     title="Choose footer buttons"
                     aria-label="Choose footer buttons"
                     type="button"
@@ -198,7 +199,7 @@ function TicksToggleInput() {
             <Button
                 variant="outline"
                 size="xs"
-                className={classNames(buttonClasses, "-ml-0.75")}
+                className={classNames(footerButtonClasses, "-ml-0.75")}
                 onClick={() => { appSettings.canvas.showTicks = !showTicks; }}
                 aria-pressed={showTicks}
                 type="button"
