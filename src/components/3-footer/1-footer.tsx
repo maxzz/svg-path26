@@ -48,7 +48,7 @@ export function Footer() {
                         title={showGrid ? "Grid is on" : "Grid is off"}
                         type="button"
                     >
-                        <IconGrid className={classNames("size-3 stroke-3!", showGrid ? footerIconOnClasses : footerIconOffClasses)} />
+                        <IconGrid className={classNames("size-3 stroke-1!", showGrid ? footerIconOnClasses : footerIconOffClasses)} />
                     </Button>
                 )}
 
