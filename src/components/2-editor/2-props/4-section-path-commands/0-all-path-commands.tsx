@@ -11,8 +11,8 @@ import { commandRowsAtom, subPathAccordionValuesAtom, subPathsAtom } from "@/sto
 import { doSelectCommandAtom, doToggleSegmentRelativeAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions.ts";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
 import { CommandRow, focusField } from "./1-commands-list-row.tsx";
-import { PathCommands_Label, PathCommands_Overlay } from "./7-1-header-overlay.tsx";
-import { SubPathToggleRow } from "./7-2-subpath-header.tsx";
+import { PathCommands_Label, PathCommands_Overlay } from "./7-1-overlays.tsx";
+import { SubPathToggleRow } from "./7-2-row-subpath-header.tsx";
 
 export function Section_PathCommands() {
     return (

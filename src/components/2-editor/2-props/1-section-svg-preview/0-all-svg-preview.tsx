@@ -9,7 +9,7 @@ import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { usePreviewUnitsPerPixel } from "./4-preview-units.tsx";
 import { applyPreviewOverrides } from "./5-preview-attrs.tsx";
 import { SvgPreviewBackdrop } from "./6-svg-preview-backdrop.tsx";
-import { SvgPreview_Label, SvgPreview_Overlay } from "./7-svg-preview-overlay";
+import { SvgPreview_Label, SvgPreview_Overlay } from "./7-overlays.tsx";
 
 export function Section_SvgPreview() {
     const { showSvgPreviewSection } = useSnapshot(appSettings);

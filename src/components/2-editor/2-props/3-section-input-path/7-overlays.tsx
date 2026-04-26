@@ -6,10 +6,10 @@ import { IconHomeToCloud } from "@/components/ui/icons/app-specific";
 import { Button } from "@/components/ui/shadcn/button";
 import { overlayButtonClasses } from "../8-shared-classes/0-classes";
 
-export function PathInputOverlay({ pathValue }: { pathValue: string; }) {
+export function PathInput_Overlay({ pathValue }: { pathValue: string; }) {
     const hasPath = pathValue.trim().length > 0;
     return (
-        <div className="mr-1 flex items-center gap-0.5">
+        <div className="mr-1 pl-2 flex items-center gap-0.5">
 
             <BtnHomeToCloud />
 
