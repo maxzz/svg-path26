@@ -1,7 +1,7 @@
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
 import { appSettings } from "@/store/0-ui-settings";
-import { IconGrid, IconSnapToGrid2, IconAxis, IconFrame, IconControlPoints, IconFillSvg } from "../ui/icons";
+import { IconGrid, IconSnapToGrid2, IconAxis, IconFrame, IconControlPoints, IconFillSvg } from "../ui/icons/index.tsx";
 import { Button } from "@/components/ui/shadcn/button";
 import {
     FooterButtonsPopover,
@@ -9,7 +9,7 @@ import {
     footerIconFillOnClasses,
     footerIconOffClasses,
     footerIconOnClasses,
-} from "./2-footer-buttons-popover.tsx";
+} from "./3-buttons-selector.tsx";
 
 export function FooterButtonsRow() {
     const { showGrid, showViewBoxFrame, snapToGrid, showHelpers, fillPreview, showTicks } = useSnapshot(appSettings.canvas);

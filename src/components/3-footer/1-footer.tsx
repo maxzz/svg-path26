@@ -1,6 +1,6 @@
 import { useAtomValue } from "jotai";
 import { commandCountAtom, parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
-import { FooterButtonsRow } from "@/components/3-footer/3-footer-buttons-row.tsx";
+import { FooterButtonsRow } from "@/components/3-footer/2-buttons-toolbar";
 
 export function Footer() {
     return (
