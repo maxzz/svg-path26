@@ -7,6 +7,7 @@ import { IconAdjustmentsHorizontal } from "@/components/ui/icons/normal";
 
 export function FooterButtonsPopover() {
     const { buttons } = useSnapshot(appSettings.footer);
+    
     return (
         <Popover>
             <PopoverTrigger asChild>
