@@ -82,7 +82,7 @@ export function FooterButtonsSelector() {
     );
 }
 
-export const footerBtnClasses = "px-0.5! size-5 text-[10px] border rounded";
+export const footerBtnClasses = "px-0.5! size-5 text-[10px] border rounded cursor-pointer";
 export const footerIconOnClasses = "text-emerald-700 dark:text-emerald-300";
 export const footerIconOffClasses = "text-muted-foreground ";
 export const footerIconFillOnClasses = "text-emerald-700 dark:text-emerald-300 fill-emerald-200/50! dark:fill-emerald-300/30!";

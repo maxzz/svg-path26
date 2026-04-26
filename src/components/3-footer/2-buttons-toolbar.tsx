@@ -80,7 +80,7 @@ function TicksToggleInput() {
     const { showTicks } = useSnapshot(appSettings.canvas);
     const { tickInterval } = useSnapshot(appSettings.pathEditor);
     return (
-        <div className="flex items-center" title={showTicks ? "Ticks on" : "Ticks off"}>
+        <div className="flex items-center">
             <input
                 className="pl-2 pr-0.5 h-5 w-12 max-w-20 scale-80 text-[10px] text-center rounded border bg-background disabled:opacity-20"
                 disabled={!showTicks}
@@ -89,6 +89,7 @@ function TicksToggleInput() {
                 min={1}
                 step={1}
                 aria-label="Tick interval"
+                title="Tick interval"
                 onChange={(event) => {
                     appSettings.pathEditor.tickInterval = Math.max(1, Number(event.target.value) || 1);
                 }}
@@ -99,6 +100,7 @@ function TicksToggleInput() {
                 className={classNames(footerBtnClasses, "-ml-0.75")}
                 onClick={() => { appSettings.canvas.showTicks = !showTicks; }}
                 aria-pressed={showTicks}
+                title={showTicks ? "Ticks on" : "Ticks off"}
                 type="button"
             >
                 <IconAxis className={classNames("size-3", showTicks ? "stroke-2! text-emerald-700 dark:text-emerald-300" : "text-muted-foreground")} />
@@ -111,7 +113,7 @@ function SnapToGridInput() {
     const { snapToGrid } = useSnapshot(appSettings.canvas);
     const { dragPrecision } = useSnapshot(appSettings.pathEditor);
     return (
-        <div className="flex items-center">
+        <div className="mr-4 flex items-center">
             <input
                 className="pl-2 pr-0.5 h-5 w-12 max-w-20 scale-80 text-[10px] text-center rounded border bg-background disabled:opacity-20"
                 //disabled={!snapToGrid}
