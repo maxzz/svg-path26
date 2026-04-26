@@ -1,15 +1,9 @@
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
 import { appSettings } from "@/store/0-ui-settings";
-import { IconGrid, IconSnapToGrid2, IconAxis, IconFrame, IconControlPoints, IconFillSvg } from "../ui/icons/index.tsx";
+import { IconGrid, IconSnapToGrid2, IconAxis, IconFrame, IconControlPoints, IconFillSvg } from "../ui/icons";
 import { Button } from "@/components/ui/shadcn/button";
-import {
-    FooterButtonsPopover,
-    footerBtnClasses,
-    footerIconFillOnClasses,
-    footerIconOffClasses,
-    footerIconOnClasses,
-} from "./3-buttons-selector.tsx";
+import { FooterButtonsPopover, footerBtnClasses, footerIconFillOnClasses, footerIconOffClasses, footerIconOnClasses } from "./3-buttons-selector";
 
 export function FooterButtonsRow() {
     const { showGrid, showViewBoxFrame, snapToGrid, showHelpers, fillPreview, showTicks } = useSnapshot(appSettings.canvas);
@@ -97,12 +91,7 @@ export function FooterButtonsRow() {
     );
 }
 
-type TicksToggleInputProps = {
-    showTicks: boolean;
-    tickInterval: number;
-};
-
-function TicksToggleInput({ showTicks, tickInterval }: TicksToggleInputProps) {
+function TicksToggleInput({ showTicks, tickInterval }: { showTicks: boolean; tickInterval: number; }) {
     return (
         <div className="flex items-center" title={showTicks ? "Ticks on" : "Ticks off"}>
             <input
