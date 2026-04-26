@@ -7,7 +7,7 @@ import { FooterButtonsSelector, footerBtnClasses, footerIconFillOnClasses, foote
 
 export function FooterButtonsToolbar() {
     const { showGrid, showViewBoxFrame, snapToGrid, showHelpers, fillPreview, showTicks } = useSnapshot(appSettings.canvas);
-    const { tickInterval } = useSnapshot(appSettings.pathEditor);
+    const { tickInterval, dragPrecision } = useSnapshot(appSettings.pathEditor);
     const { buttons: footerButtons } = useSnapshot(appSettings.footer);
 
     return (
@@ -17,17 +17,7 @@ export function FooterButtonsToolbar() {
             )}
 
             {footerButtons.showSnapToGridToggle && (
-                <Button
-                    variant="outline"
-                    size="xs"
-                    className={footerBtnClasses}
-                    onClick={() => { appSettings.canvas.snapToGrid = !snapToGrid; }}
-                    aria-pressed={snapToGrid}
-                    title={snapToGrid ? "Snap to grid is on" : "Snap to grid is off"}
-                    type="button"
-                >
-                    <IconSnapToGrid2 className={classNames("size-3", snapToGrid ? footerIconOnClasses : footerIconOffClasses)} />
-                </Button>
+                <SnapToGridInput snapToGrid={snapToGrid} dragPrecision={dragPrecision} />
             )}
 
             {footerButtons.showGridToggle && (
@@ -115,6 +105,42 @@ function TicksToggleInput({ showTicks, tickInterval }: { showTicks: boolean; tic
                 type="button"
             >
                 <IconAxis className={classNames("size-3", showTicks ? "stroke-2! text-emerald-700 dark:text-emerald-300" : "text-muted-foreground")} />
+            </Button>
+        </div>
+    );
+}
+
+type SnapToGridInputProps = {
+    snapToGrid: boolean;
+    dragPrecision: number;
+};
+
+function SnapToGridInput({ snapToGrid, dragPrecision }: SnapToGridInputProps) {
+    return (
+        <div className="flex items-center" title={snapToGrid ? "Snap to grid is on" : "Snap to grid is off"}>
+            <input
+                className="pl-2 pr-0.5 h-5 w-12 max-w-20 scale-80 text-[10px] text-center rounded border bg-background disabled:opacity-20"
+                disabled={!snapToGrid}
+                type="number"
+                value={dragPrecision}
+                min={0}
+                max={8}
+                step={1}
+                aria-label="Drag precision"
+                onChange={(event) => {
+                    const nextValue = Math.max(0, Math.min(8, Number(event.target.value) || 0));
+                    appSettings.pathEditor.dragPrecision = nextValue;
+                }}
+            />
+            <Button
+                variant="outline"
+                size="xs"
+                className={classNames(footerBtnClasses, "-ml-0.75")}
+                onClick={() => { appSettings.canvas.snapToGrid = !snapToGrid; }}
+                aria-pressed={snapToGrid}
+                type="button"
+            >
+                <IconSnapToGrid2 className={classNames("size-3", snapToGrid ? footerIconOnClasses : footerIconOffClasses)} />
             </Button>
         </div>
     );
