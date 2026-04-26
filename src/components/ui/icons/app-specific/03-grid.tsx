@@ -3,9 +3,9 @@ import { classNames } from "@/utils";
 
 export function IconGrid({ className, title, ...rest }: HTMLAttributes<SVGSVGElement>) {
     return (
-        <svg className={classNames("fill-none stroke-current stroke-[1.5px]", className)} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 80 80" {...rest}>
+        <svg className={classNames("fill-none stroke-current stroke-[1.5px]", className)} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" {...rest}>
             {title && <title>{title}</title>}
-            <path d="M30 10v60m20-60v60m20-40H10m60 20H10m0-36a4 4 0 0 1 4-4h52a4 4 0 0 1 4 4v52a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4z"/>
+            <path d="M8.333 1v22m7.333-22v22m7.333-14.667H1m22 7.333H1m0-13.2a1.467 1.467 0 0 1 1.467-1.467h19.067a1.467 1.467 0 0 1 1.467 1.467v19.067a1.467 1.467 0 0 1-1.467 1.467H2.467a1.467 1.467 0 0 1-1.467-1.467z"/>
         </svg>
     );
 }
