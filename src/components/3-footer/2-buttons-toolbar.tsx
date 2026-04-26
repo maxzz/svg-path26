@@ -3,9 +3,9 @@ import { classNames } from "@/utils";
 import { appSettings } from "@/store/0-ui-settings";
 import { IconGrid, IconSnapToGrid2, IconAxis, IconFrame, IconControlPoints, IconFillSvg } from "../ui/icons";
 import { Button } from "@/components/ui/shadcn/button";
-import { FooterButtonsPopover, footerBtnClasses, footerIconFillOnClasses, footerIconOffClasses, footerIconOnClasses } from "./3-buttons-selector";
+import { FooterButtonsSelector, footerBtnClasses, footerIconFillOnClasses, footerIconOffClasses, footerIconOnClasses } from "./3-buttons-selector";
 
-export function FooterButtonsRow() {
+export function FooterButtonsToolbar() {
     const { showGrid, showViewBoxFrame, snapToGrid, showHelpers, fillPreview, showTicks } = useSnapshot(appSettings.canvas);
     const { tickInterval } = useSnapshot(appSettings.pathEditor);
     const { buttons: footerButtons } = useSnapshot(appSettings.footer);
@@ -86,7 +86,7 @@ export function FooterButtonsRow() {
                 </Button>
             )}
 
-            <FooterButtonsPopover />
+            <FooterButtonsSelector />
         </div>
     );
 }

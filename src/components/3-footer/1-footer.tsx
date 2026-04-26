@@ -1,12 +1,12 @@
 import { useAtomValue } from "jotai";
 import { commandCountAtom, parseErrorAtom } from "@/store/0-atoms/2-0-svg-model";
-import { FooterButtonsRow } from "@/components/3-footer/2-buttons-toolbar";
+import { FooterButtonsToolbar } from "@/components/3-footer/2-buttons-toolbar";
 
 export function Footer() {
     return (
         <footer className="px-4 pt-1 pb-1.5 pr-2 text-xs text-muted-foreground border-t flex items-center justify-between">
             <PathStateInfo />
-            <FooterButtonsRow />
+            <FooterButtonsToolbar />
         </footer>
     );
 }

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/shadcn/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
 import { IconAdjustmentsHorizontal } from "@/components/ui/icons/normal";
 
-export function FooterButtonsPopover() {
+export function FooterButtonsSelector() {
     const { buttons } = useSnapshot(appSettings.footer);
     
     return (
