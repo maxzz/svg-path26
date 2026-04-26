@@ -10,7 +10,7 @@ import { SegmentHoveredOverlay, SegmentHitAreas, SegmentSelectedOverlay } from "
 import { PathPts } from "./3-1-path-points";
 import { PathImageEditOverlays } from "./6-images";
 import { CanvasViewBoxFrame } from "./7-viewbox-frame";
-import { CanvasSelectionMarquee } from "../../../ui/loacal-ui/3-selection-marquee";
+import { CanvasSelectionMarquee } from "../../../ui/local-ui/3-selection-marquee";
 
 export function CanvasAllOverlays() {
     const { showHelpers, canvasPreview, showViewBoxFrame } = useSnapshot(appSettings.canvas);

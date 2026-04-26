@@ -1,7 +1,7 @@
 import { cn } from "@/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
-import { CopyClipboardOverlayButton } from "../../../ui/loacal-ui/5-section-overlay-buttons/4-1-copy-clipboard";
-import { OverlayButton_MinifyPath } from "../../../ui/loacal-ui/5-section-overlay-buttons/4-2-minify-path";
+import { CopyClipboardOverlayButton } from "../../../ui/local-ui/5-section-overlay-buttons/4-1-copy-clipboard";
+import { OverlayButton_MinifyPath } from "../../../ui/local-ui/5-section-overlay-buttons/4-2-minify-path";
 import { IconHomeToCloud } from "@/components/ui/icons/app-specific";
 import { Button } from "@/components/ui/shadcn/button";
 import { overlayButtonClasses } from "../8-shared-classes/0-classes";

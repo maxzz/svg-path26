@@ -1,5 +1,5 @@
 import { useSnapshot } from "valtio";
-import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
+import { SectionPanel } from "@/components/ui/local-ui/1-section-panel";
 import { appSettings } from "@/store/0-ui-settings";
 import { NumberRow } from "../../../4-dialogs/8-3-options/1-options-controls";
 import { ViewBoxControls } from "../../../4-dialogs/8-3-options/2-viewbox-controls";

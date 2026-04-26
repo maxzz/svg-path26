@@ -1,9 +1,9 @@
 import { useAtom, useSetAtom } from "jotai";
 import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
-import { NumberField } from "@/components/ui/loacal-ui/2-number-field";
+import { NumberField } from "@/components/ui/local-ui/2-number-field";
 import { applyButtonAtom, scaleToViewBoxDialogOpenAtom, scaleToViewBoxMarginDraftAtom } from "@/components/4-dialogs/7-1-scale-to-viewbox/1-scale-to-viewbox-atoms";
-import { notice } from "@/components/ui/loacal-ui/7-toaster";
+import { notice } from "@/components/ui/local-ui/7-toaster";
 
 export function ScaleToViewBoxDialog() {
     const [open, setOpen] = useAtom(scaleToViewBoxDialogOpenAtom);

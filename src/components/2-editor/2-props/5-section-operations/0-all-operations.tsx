@@ -5,7 +5,7 @@ import { Link2, Unlink2 } from "lucide-react";
 import { classNames } from "@/utils";
 import { appSettings } from "@/store/0-ui-settings";
 import { Button } from "@/components/ui/shadcn/button";
-import { SectionPanel } from "../../../ui/loacal-ui/1-section-panel";
+import { SectionPanel } from "../../../ui/local-ui/1-section-panel";
 import { doApplyScaleAtom, doApplyTranslateAtom, doNormalizePathAtom, doSetAbsoluteAtom, doSetRelativeAtom, scaleXAtom, scaleYAtom, translateXAtom, translateYAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { buttonPanelClasses, compactInputClasses, compactLabelClasses } from "../8-shared-classes/0-classes";
 

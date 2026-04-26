@@ -2,7 +2,7 @@ import { atom } from "jotai";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
 import { type SvgInputAttribute, type SvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-input";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
-import { notice } from "@/components/ui/loacal-ui/7-toaster";
+import { notice } from "@/components/ui/local-ui/7-toaster";
 import { appSettings } from "@/store/0-ui-settings";
 import { doCommitCurrentPathToHistoryAtom, doSetPathWithoutHistoryAtom } from "@/store/0-atoms/1-2-history";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";

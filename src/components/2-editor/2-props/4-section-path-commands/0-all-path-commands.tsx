@@ -5,7 +5,7 @@ import { appSettings } from "@/store/0-ui-settings";
 import { Accordion } from "@/components/ui/shadcn/accordion";
 import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
 import { ScrollArea } from "@/components/ui/shadcn/scroll-area";
-import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel.tsx";
+import { SectionPanel } from "@/components/ui/local-ui/1-section-panel.tsx";
 import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 import { commandRowsAtom, subPathAccordionValuesAtom, subPathsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { doSelectCommandAtom, doToggleSegmentRelativeAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions.ts";

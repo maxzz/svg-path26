@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Switch } from "@/components/ui/shadcn/switch";
 import { doAddImageAtom, isImageEditModeAtom, pendingImageAtom } from "@/store/0-atoms/2-8-images";
 import { addImageDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
-import { NumberField } from "@/components/ui/loacal-ui/2-number-field";
+import { NumberField } from "@/components/ui/local-ui/2-number-field";
 
 export function AddImageDialog() {
     const [open, setOpen] = useAtom(addImageDialogOpenAtom);

@@ -1,7 +1,7 @@
 import { useAtom } from "jotai";
 import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
+import { SectionPanel } from "@/components/ui/local-ui/1-section-panel";
 import { PathInput_Overlay } from "./7-overlays";
 
 export function Section_PathInput() {

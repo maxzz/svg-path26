@@ -2,7 +2,7 @@ import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
 import { TooltipProvider } from "@/components/ui/shadcn/tooltip";
-import { SectionPanel } from "@/components/ui/loacal-ui/1-section-panel";
+import { SectionPanel } from "@/components/ui/local-ui/1-section-panel";
 import { svgInputErrorAtom, svgInputSelectedNodeAtom } from "@/store/0-atoms/1-3-svg-input";
 import { serializeSvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-input";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";

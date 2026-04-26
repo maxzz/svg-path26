@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import { SvgPathModel } from "@/svg-core/2-svg-model";
-import { notice } from "@/components/ui/loacal-ui/7-toaster/7-toaster";
+import { notice } from "@/components/ui/local-ui/7-toaster/7-toaster";
 import { svgModelAtom } from "../../../store/0-atoms/2-0-svg-model";
 import { pathViewBoxAtom } from "../../../store/0-atoms/2-2-path-viewbox";
 import { canvasSegmentHitAreaElementsAtom, doApplySvgModelAtom, selectedCommandIndicesAtom } from "../../../store/0-atoms/2-4-0-editor-actions";

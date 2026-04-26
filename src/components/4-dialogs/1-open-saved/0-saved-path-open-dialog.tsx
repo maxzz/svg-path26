@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { appSettings } from "@/store/0-ui-settings";
 import { doDeleteNamedPathAtom, doOpenNamedPathAtom } from "@/store/0-atoms/2-6-stored-paths-actions";
 import { openPathDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
-import { PathPreview } from "@/components/ui/loacal-ui/8-path-preview";
+import { PathPreview } from "@/components/ui/local-ui/8-path-preview";
 import { IconTrash } from "@/components/ui/icons/normal";
 
 export function OpenPathDialog() {
