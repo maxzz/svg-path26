@@ -1,4 +1,5 @@
-import { CommandFlagToggle, getCommandFlagGroupClassName } from "./1-4-commands-list-flag-cell-arc";
+import { getCommandFlagGroupClassName } from "./1-4-commands-list-flag-cell-arc";
+import { CommandFlagToggle } from "./1-6-commands-list-flag-toggle";
 
 type CommandFlagInputProps = {
     rowIndex: number;
