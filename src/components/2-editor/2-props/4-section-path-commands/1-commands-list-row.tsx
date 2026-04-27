@@ -5,8 +5,8 @@ import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 import { commandHoveredAtom, commandSelectedAtom, highlightedCanvasPointAtomForSegment } from "@/store/0-atoms/2-4-0-editor-actions.ts";
 import { getCommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils.ts";
 import { CommandSelectionMenu } from "./6-commands-list-row-menu.tsx";
-import { type CommandProps, CommandArcFlagsInput, CommandCellInput } from "./2-commands-list-cells.tsx";
-import { commandSummaryTooltip, isCommandCellLinkedToPoint, isCommandValueLinkedToPoint } from "./8-svg-utils.tsx";
+import { CommandRowValues } from "./3-commands-list-row-values.tsx";
+import { commandSummaryTooltip, isCommandCellLinkedToPoint } from "./8-svg-utils.tsx";
 
 export function CommandRow(props: {
     row: SvgSegmentSummary;
@@ -19,6 +19,7 @@ export function CommandRow(props: {
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
 }) {
     const { row, setRowRef, doSelectCommand, setHoveredCommandIndex, doToggleRelative, focusCommandCell, moveVertical, registerFieldRef } = props;
+    
     const selected = useAtomValue(commandSelectedAtom(row.index));
     const hovered = useAtomValue(commandHoveredAtom(row.index));
     const highlightedCanvasPoint = useAtomValue(highlightedCanvasPointAtomForSegment(row.index));
@@ -69,43 +70,13 @@ export function CommandRow(props: {
                     <span className="text-[10px] text-muted-foreground">No values</span>
                 )}
 
-                {row.values.map(
-                    (value, valueIndex) => {
-                        if (row.command.toLowerCase() === "a" && valueIndex === 3) {
-                            return null;
-                        }
-
-                        if (row.command.toLowerCase() === "a" && valueIndex === 4) {
-                            return (
-                                <CommandArcFlagsInput
-                                    key={`${row.index}:arc-flags`}
-                                    rowIndex={row.index}
-                                    rowValueCount={row.values.length}
-                                    command={row.command}
-                                    largeArcValue={row.values[3] ?? 0}
-                                    sweepValue={row.values[4] ?? 0}
-                                    focusField={focusCommandCell}
-                                    moveVertical={moveVertical}
-                                    registerFieldRef={registerFieldRef}
-                                />
-                            );
-                        }
-
-                        const isLinkedValue = isCommandValueLinkedToPoint(row, valueIndex, highlightedCanvasPoint);
-                        const inputProps: CommandProps = {
-                            rowIndex: row.index,
-                            valueIndex,
-                            rowValueCount: row.values.length,
-                            value,
-                            command: row.command,
-                            highlighted: isLinkedValue,
-                            focusField: focusCommandCell,
-                            moveVertical,
-                            registerFieldRef,
-                        };
-                        return <CommandCellInput key={`${row.index}:${valueIndex}`} {...inputProps} />;
-                    }
-                )}
+                <CommandRowValues
+                    row={row}
+                    highlightedCanvasPoint={highlightedCanvasPoint}
+                    focusCommandCell={focusCommandCell}
+                    moveVertical={moveVertical}
+                    registerFieldRef={registerFieldRef}
+                />
             </div>
 
             <div className="ml-auto">
