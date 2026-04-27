@@ -1,22 +1,20 @@
 import { type SvgCanvasPoint, type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 
-export type CommandRowValuesProps = {
+type RowCallbacksProps = {
     focusCell: (rowIndex: number, valueIndex: number) => void;
     moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
+};
 
+export type CommandRowValuesProps = RowCallbacksProps & {
     row: SvgSegmentSummary;
     highlightedCanvasPoint: SvgCanvasPoint | null;
 };
 
-export type CommandProps = {
-    focusCell: (rowIndex: number, valueIndex: number) => void;
-    moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
-    registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
-
+export type CommandProps = RowCallbacksProps & {
     rowIndex: number;
     rowValueCount: number;
-    
+
     command: string;
 
     value: number;
@@ -24,40 +22,28 @@ export type CommandProps = {
     highlighted?: boolean;
 };
 
-export type CommandArcFlagsProps = {
-    focusCell: (rowIndex: number, valueIndex: number) => void;
-    moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
-    registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
-
+export type CommandArcFlagsProps = RowCallbacksProps & {
     rowIndex: number;
     rowValueCount: number;
-    
+
     command: string;
 
     largeArcValue: number;
     sweepValue: number;
 };
 
-export type CommandFlagInputProps = {
-    focusCell: (rowIndex: number, valueIndex: number) => void;
-    moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
-    registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
-
+export type CommandFlagInputProps = RowCallbacksProps & {
     rowIndex: number;
     rowValueCount: number;
 
     valueIndex: number;
     value: number;
     highlighted?: boolean;
-    
+
     tooltip?: string;
 };
 
-export type CommandFlagToggleProps = {
-    focusCell: (rowIndex: number, valueIndex: number) => void;
-    moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
-    registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
-
+export type CommandFlagToggleProps = RowCallbacksProps & {
     rowIndex: number;
     rowValueCount: number;
 

@@ -26,6 +26,7 @@ function CellFlagInput(props: CommandFlagInputProps) {
                 rowValueCount={rowValueCount}
                 value={value}
                 tooltip={tooltip}
+
                 focusCell={focusCell}
                 moveVertical={moveVertical}
                 registerFieldRef={registerFieldRef}
@@ -47,6 +48,7 @@ export function CellArcFlagsInput(props: CommandArcFlagsProps) {
                 rowValueCount={rowValueCount}
                 value={largeArcValue}
                 tooltip={largeArcTooltip}
+
                 focusCell={focusCell}
                 moveVertical={moveVertical}
                 registerFieldRef={registerFieldRef}
@@ -57,6 +59,7 @@ export function CellArcFlagsInput(props: CommandArcFlagsProps) {
                 rowValueCount={rowValueCount}
                 value={sweepValue}
                 tooltip={sweepTooltip}
+                
                 focusCell={focusCell}
                 moveVertical={moveVertical}
                 registerFieldRef={registerFieldRef}

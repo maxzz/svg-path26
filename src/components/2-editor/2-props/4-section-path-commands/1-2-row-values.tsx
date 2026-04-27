@@ -28,6 +28,7 @@ function RowValue(props: { value: number; valueIndex: number; } & CommandRowValu
                     rowIndex={row.index}
                     rowValueCount={row.values.length}
                     command={row.command}
+
                     focusCell={focusCell}
                     moveVertical={moveVertical}
                     registerFieldRef={registerFieldRef}
@@ -45,6 +46,7 @@ function RowValue(props: { value: number; valueIndex: number; } & CommandRowValu
         rowIndex: row.index,
         rowValueCount: row.values.length,
         command: row.command,
+        
         focusCell,
         moveVertical,
         registerFieldRef,

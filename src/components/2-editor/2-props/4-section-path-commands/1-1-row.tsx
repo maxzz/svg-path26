@@ -1,8 +1,8 @@
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 import { cn } from "@/utils";
 import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
-import { commandHoveredAtom, commandSelectedAtom, highlightedCanvasPointAtomForSegment } from "@/store/0-atoms/2-4-0-editor-actions.ts";
+import { commandHoveredAtom, commandSelectedAtom, doSelectCommandAtom, doToggleSegmentRelativeAtom, highlightedCanvasPointAtomForSegment, hoveredCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions.ts";
 import { getCommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils.ts";
 import { CommandSelectionMenu } from "./6-commands-list-row-menu.tsx";
 import { RowValues } from "./1-2-row-values.tsx";
@@ -11,16 +11,16 @@ import { commandSummaryTooltip, isCommandCellLinkedToPoint } from "./8-svg-utils
 export function CommandRow(props: {
     row: SvgSegmentSummary;
     setRowRef: (rowIndex: number, element: HTMLDivElement | null) => void;
-    
-    doSelectCommand: (args: { index: number; mode: "replace" | "add" | "remove"; }) => void;
-    setHoveredCommandIndex: (index: number | null) => void;
-    doToggleRelative: (segmentIndex: number) => void;
-    
+   
     focusCell: (rowIndex: number, valueIndex: number) => void;
     moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
 }) {
-    const { row, setRowRef, doSelectCommand, setHoveredCommandIndex, doToggleRelative, focusCell, moveVertical, registerFieldRef } = props;
+    const { row, setRowRef, focusCell, moveVertical, registerFieldRef } = props;
+
+    const doSelectCommand = useSetAtom(doSelectCommandAtom);
+    const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
+    const doToggleRelative = useSetAtom(doToggleSegmentRelativeAtom);
     
     const selected = useAtomValue(commandSelectedAtom(row.index));
     const hovered = useAtomValue(commandHoveredAtom(row.index));
