@@ -5,7 +5,7 @@ import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 import { commandHoveredAtom, commandSelectedAtom, highlightedCanvasPointAtomForSegment } from "@/store/0-atoms/2-4-0-editor-actions.ts";
 import { getCommandSelectionMode } from "@/store/0-atoms/2-5-editor-selection-utils.ts";
 import { CommandSelectionMenu } from "./6-commands-list-row-menu.tsx";
-import { CommandRowValues } from "./1-2-row-values.tsx";
+import { RowValues } from "./1-2-row-values.tsx";
 import { commandSummaryTooltip, isCommandCellLinkedToPoint } from "./8-svg-utils.tsx";
 
 export function CommandRow(props: {
@@ -70,7 +70,7 @@ export function CommandRow(props: {
                     <span className="text-[10px] text-muted-foreground">No values</span>
                 )}
 
-                <CommandRowValues
+                <RowValues
                     row={row}
                     highlightedCanvasPoint={highlightedCanvasPoint}
                     focusCell={focusCell}

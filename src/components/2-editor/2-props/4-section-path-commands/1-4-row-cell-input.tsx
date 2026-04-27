@@ -5,7 +5,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/shadcn/
 import { doSetCommandValueAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { type CommandProps } from "./1-9-commands-list-types";
 
-export function CommandValueInput(props: CommandProps & { tooltip?: string; }) {
+export function CellValueInput(props: CommandProps & { tooltip?: string; }) {
     const { rowIndex, valueIndex, rowValueCount, value, highlighted, tooltip, focusCell: focusField, moveVertical, registerFieldRef } = props;
 
     const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);

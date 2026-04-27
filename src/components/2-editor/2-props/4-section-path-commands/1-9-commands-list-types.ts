@@ -1,3 +1,13 @@
+import { type SvgCanvasPoint, type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
+
+export type CommandRowValuesProps = {
+    row: SvgSegmentSummary;
+    highlightedCanvasPoint: SvgCanvasPoint | null;
+    focusCell: (nextRowIndex: number, nextValueIndex: number) => void;
+    moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
+    registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
+};
+
 export type CommandProps = {
     rowIndex: number;
     rowValueCount: number;
@@ -48,6 +58,6 @@ export type CommandFlagToggleProps = {
 
     value: number;
     valueIndex: number;
-    
+
     tooltip?: string;
 };
