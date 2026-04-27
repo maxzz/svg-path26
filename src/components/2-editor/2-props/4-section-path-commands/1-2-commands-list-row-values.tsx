@@ -15,24 +15,25 @@ export function CommandRowValues(props: CommandRowValuesProps) {
 
     return row.values.map(
         (value, valueIndex) => {
-            if (row.command.toLowerCase() === "a" && valueIndex === 3) {
-                return null;
-            }
-
-            if (row.command.toLowerCase() === "a" && valueIndex === 4) {
-                return (
-                    <CommandArcFlagsInput
-                        key={`${row.index}:arc-flags`}
-                        rowIndex={row.index}
-                        rowValueCount={row.values.length}
-                        command={row.command}
-                        largeArcValue={row.values[3] ?? 0}
-                        sweepValue={row.values[4] ?? 0}
-                        focusField={focusCommandCell}
-                        moveVertical={moveVertical}
-                        registerFieldRef={registerFieldRef}
-                    />
-                );
+            if (row.command.toLowerCase() === "a") {
+                if (valueIndex === 3) {
+                    return null;
+                }
+                else if (valueIndex === 4) {
+                    return (
+                        <CommandArcFlagsInput
+                            key={`${row.index}:arc-flags`}
+                            rowIndex={row.index}
+                            rowValueCount={row.values.length}
+                            command={row.command}
+                            largeArcValue={row.values[3] ?? 0}
+                            sweepValue={row.values[4] ?? 0}
+                            focusField={focusCommandCell}
+                            moveVertical={moveVertical}
+                            registerFieldRef={registerFieldRef}
+                        />
+                    );
+                }
             }
 
             const isLinkedValue = isCommandValueLinkedToPoint(row, valueIndex, highlightedCanvasPoint);
@@ -47,6 +48,7 @@ export function CommandRowValues(props: CommandRowValuesProps) {
                 moveVertical,
                 registerFieldRef,
             };
+            
             return <CommandCellInput key={`${row.index}:${valueIndex}`} {...inputProps} />;
         }
     );
