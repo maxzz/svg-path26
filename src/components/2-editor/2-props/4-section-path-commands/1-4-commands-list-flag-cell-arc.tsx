@@ -46,37 +46,6 @@ export function CommandArcFlagsInput(props: CommandArcFlagsProps) {
     );
 }
 
-type CommandFlagInputProps = {
-    rowIndex: number;
-    valueIndex: number;
-    rowValueCount: number;
-    value: number;
-    highlighted?: boolean;
-    tooltip?: string;
-    focusField: (rowIndex: number, valueIndex: number) => void;
-    moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
-    registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
-};
-
-export function CommandFlagInput(props: CommandFlagInputProps) {
-    const { rowIndex, valueIndex, rowValueCount, value, highlighted, tooltip, focusField, moveVertical, registerFieldRef } = props;
-
-    return (
-        <div className={getCommandFlagGroupClassName(highlighted)}>
-            <CommandFlagToggle
-                rowIndex={rowIndex}
-                valueIndex={valueIndex}
-                rowValueCount={rowValueCount}
-                value={value}
-                tooltip={tooltip}
-                focusField={focusField}
-                moveVertical={moveVertical}
-                registerFieldRef={registerFieldRef}
-            />
-        </div>
-    );
-}
-
 export function CommandFlagToggle(props: {
     rowIndex: number;
     valueIndex: number;
@@ -145,7 +114,7 @@ export function CommandFlagToggle(props: {
     );
 }
 
-function getCommandFlagGroupClassName(highlighted?: boolean) {
+export function getCommandFlagGroupClassName(highlighted?: boolean) {
     return cn(
         "px-0.5 h-5 w-[2.4rem] transition-colors rounded inline-flex items-center justify-center gap-0.5 border",
         highlighted ? "border border-sky-500/60 bg-sky-500/10" : "border bg-background"
