@@ -15,7 +15,7 @@ type CommandArcFlagsProps = {
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
 };
 
-export function CommandArcFlagsInput(props: CommandArcFlagsProps) {
+export function CellInputArcFlags(props: CommandArcFlagsProps) {
     const { rowIndex, rowValueCount, command, largeArcValue, sweepValue, focusField, moveVertical, registerFieldRef } = props;
     const largeArcTooltip = commandValueTooltip(command, 3);
     const sweepTooltip = commandValueTooltip(command, 4);
