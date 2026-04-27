@@ -4,7 +4,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/shadcn/
 import { doSetCommandValueAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { cn } from "@/utils";
 import { commandValueTooltip } from "./8-svg-utils";
-import { CommandFlagToggle, getCommandFlagGroupClassName } from "./1-4-commands-list-flag-cell-arc";
+import { CommandFlagInput } from "./1-4-commands-list-flag-cell-arc";
 
 export type CommandProps = {
     rowIndex: number;
@@ -110,25 +110,6 @@ function CommandValueInput(props: CommandProps & { tooltip?: string; }) {
                 {tooltip}
             </TooltipContent>
         </Tooltip>
-    );
-}
-
-function CommandFlagInput(props: CommandProps & { tooltip?: string; }) {
-    const { rowIndex, valueIndex, rowValueCount, value, highlighted, tooltip, focusField, moveVertical, registerFieldRef } = props;
-
-    return (
-        <div className={getCommandFlagGroupClassName(highlighted)}>
-            <CommandFlagToggle
-                rowIndex={rowIndex}
-                valueIndex={valueIndex}
-                rowValueCount={rowValueCount}
-                value={value}
-                tooltip={tooltip}
-                focusField={focusField}
-                moveVertical={moveVertical}
-                registerFieldRef={registerFieldRef}
-            />
-        </div>
     );
 }
 

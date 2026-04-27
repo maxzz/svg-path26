@@ -15,6 +15,18 @@ type CommandArcFlagsProps = {
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
 };
 
+type CommandFlagInputProps = {
+    rowIndex: number;
+    valueIndex: number;
+    rowValueCount: number;
+    value: number;
+    highlighted?: boolean;
+    tooltip?: string;
+    focusField: (rowIndex: number, valueIndex: number) => void;
+    moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
+    registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
+};
+
 export function CommandArcFlagsInput(props: CommandArcFlagsProps) {
     const { rowIndex, rowValueCount, command, largeArcValue, sweepValue, focusField, moveVertical, registerFieldRef } = props;
     const largeArcTooltip = commandValueTooltip(command, 3);
@@ -38,6 +50,25 @@ export function CommandArcFlagsInput(props: CommandArcFlagsProps) {
                 rowValueCount={rowValueCount}
                 value={sweepValue}
                 tooltip={sweepTooltip}
+                focusField={focusField}
+                moveVertical={moveVertical}
+                registerFieldRef={registerFieldRef}
+            />
+        </div>
+    );
+}
+
+export function CommandFlagInput(props: CommandFlagInputProps) {
+    const { rowIndex, valueIndex, rowValueCount, value, highlighted, tooltip, focusField, moveVertical, registerFieldRef } = props;
+
+    return (
+        <div className={getCommandFlagGroupClassName(highlighted)}>
+            <CommandFlagToggle
+                rowIndex={rowIndex}
+                valueIndex={valueIndex}
+                rowValueCount={rowValueCount}
+                value={value}
+                tooltip={tooltip}
                 focusField={focusField}
                 moveVertical={moveVertical}
                 registerFieldRef={registerFieldRef}
