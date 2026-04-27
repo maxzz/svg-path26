@@ -36,30 +36,33 @@ export function Section_PathCommands() {
 export function CommandsList() {
     const rows = useAtomValue(commandRowsAtom);
     const subPaths = useAtomValue(subPathsAtom);
+
     const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
     const doSelectCommand = useSetAtom(doSelectCommandAtom);
     const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
     const doToggleRelative = useSetAtom(doToggleSegmentRelativeAtom);
+
     const rowRefs = useRef<Record<number, HTMLDivElement | null>>({});
     const fieldRefs = useRef<Record<string, HTMLInputElement | null>>({});
     const [openSubPaths, setOpenSubPaths] = useAtom(subPathAccordionValuesAtom);
     const hasCompoundSubPaths = subPaths.length > 1;
 
+    const focusCell = useCallback(
+        (rowIndex: number, valueIndex: number) => {
+            focusField(rows, rowRefs.current, fieldRefs.current, rowIndex, valueIndex, setSelectedCommandIndex);
+        },
+        [rows, setSelectedCommandIndex]);
+
     const moveVertical = useCallback(
         (rowIndex: number, valueIndex: number, direction: "up" | "down") => {
             const nextRowIndex = direction === "up" ? rowIndex - 1 : rowIndex + 1;
-            if (nextRowIndex < 0 || nextRowIndex >= rows.length) return;
-
+            if (nextRowIndex < 0 || nextRowIndex >= rows.length) {
+                return;
+            }
             setSelectedCommandIndex(nextRowIndex);
             focusCell(nextRowIndex, valueIndex);
         },
-        [rows.length, setSelectedCommandIndex]);
-
-    const focusCell = useCallback(
-        (nextRowIndex: number, nextValueIndex: number) => {
-            focusField(rows, rowRefs.current, fieldRefs.current, nextRowIndex, nextValueIndex, setSelectedCommandIndex);
-        },
-        [rows, setSelectedCommandIndex]);
+        [rows.length, focusCell, setSelectedCommandIndex]);
 
     const registerFieldRef = useCallback(
         (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => {
@@ -117,7 +120,7 @@ export function CommandsList() {
 
 function CommandsListScrollEffects({ rowRefs, rowsLength }: { rowRefs: React.RefObject<Record<number, HTMLDivElement | null>>; rowsLength: number; }) {
     const { scrollOnHover } = useSnapshot(appSettings.canvas);
-    
+
     const selectedCommandIndex = useAtomValue(selectedCommandIndexAtom);
     const hoveredCommandIndex = useAtomValue(hoveredCommandIndexAtom);
     const dragState = useAtomValue(canvasDragStateAtom);

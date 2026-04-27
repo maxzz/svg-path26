@@ -1,19 +1,21 @@
 import { type SvgCanvasPoint, type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 
 export type CommandRowValuesProps = {
-    row: SvgSegmentSummary;
-    highlightedCanvasPoint: SvgCanvasPoint | null;
-    focusCell: (nextRowIndex: number, nextValueIndex: number) => void;
-    moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
-    registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
-};
-
-export type CommandProps = {
-    rowIndex: number;
-    rowValueCount: number;
     focusCell: (rowIndex: number, valueIndex: number) => void;
     moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
+
+    row: SvgSegmentSummary;
+    highlightedCanvasPoint: SvgCanvasPoint | null;
+};
+
+export type CommandProps = {
+    focusCell: (rowIndex: number, valueIndex: number) => void;
+    moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
+    registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
+
+    rowIndex: number;
+    rowValueCount: number;
     
     command: string;
 
@@ -23,11 +25,12 @@ export type CommandProps = {
 };
 
 export type CommandArcFlagsProps = {
-    rowIndex: number;
-    rowValueCount: number;
     focusCell: (rowIndex: number, valueIndex: number) => void;
     moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
+
+    rowIndex: number;
+    rowValueCount: number;
     
     command: string;
 
@@ -36,11 +39,12 @@ export type CommandArcFlagsProps = {
 };
 
 export type CommandFlagInputProps = {
-    rowIndex: number;
-    rowValueCount: number;
     focusCell: (rowIndex: number, valueIndex: number) => void;
     moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
+
+    rowIndex: number;
+    rowValueCount: number;
 
     valueIndex: number;
     value: number;
@@ -50,11 +54,12 @@ export type CommandFlagInputProps = {
 };
 
 export type CommandFlagToggleProps = {
-    rowIndex: number;
-    rowValueCount: number;
     focusCell: (rowIndex: number, valueIndex: number) => void;
     moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
+
+    rowIndex: number;
+    rowValueCount: number;
 
     value: number;
     valueIndex: number;

@@ -14,7 +14,7 @@ export function CommandRow(props: {
     doSelectCommand: (args: { index: number; mode: "replace" | "add" | "remove"; }) => void;
     setHoveredCommandIndex: (index: number | null) => void;
     doToggleRelative: (segmentIndex: number) => void;
-    focusCell: (nextRowIndex: number, nextValueIndex: number) => void;
+    focusCell: (rowIndex: number, valueIndex: number) => void;
     moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
 }) {
