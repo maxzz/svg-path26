@@ -1,5 +1,5 @@
 import { type SvgCanvasPoint, type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
-import { CommandArcFlagsInput, CommandCellInput, type CommandProps } from "./2-commands-list-cells";
+import { CommandArcFlagsInput, CommandCellInput, type CommandProps } from "./1-3-commands-list-cells";
 import { isCommandValueLinkedToPoint } from "./8-svg-utils";
 
 type CommandRowValuesProps = {

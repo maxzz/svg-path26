@@ -10,7 +10,7 @@ import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 import { commandRowsAtom, subPathAccordionValuesAtom, subPathsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { doSelectCommandAtom, doToggleSegmentRelativeAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions.ts";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
-import { CommandRow, focusField } from "./1-commands-list-row.tsx";
+import { CommandRow, focusField } from "./1-1-commands-list-row.tsx";
 import { PathCommands_Label, PathCommands_Overlay } from "./7-1-overlays.tsx";
 import { SubPathToggleRow } from "./7-2-row-subpath-header.tsx";
 
