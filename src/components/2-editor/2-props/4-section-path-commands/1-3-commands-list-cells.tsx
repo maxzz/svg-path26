@@ -3,33 +3,9 @@ import { useSetAtom } from "jotai";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 import { doSetCommandValueAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { cn } from "@/utils";
-import { commandValueTooltip } from "./8-svg-utils";
-import { CommandFlagInput } from "./1-4-commands-list-flag-cell-arc";
+import type { CommandProps } from "./1-2-commands-list-row-values";
 
-export type CommandProps = {
-    rowIndex: number;
-    valueIndex: number;
-    rowValueCount: number;
-    value: number;
-    command: string;
-    highlighted?: boolean;
-    focusField: (rowIndex: number, valueIndex: number) => void;
-    moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
-    registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
-};
-
-export function CommandCellInput(props: CommandProps) {
-    const tooltip = commandValueTooltip(props.command, props.valueIndex);
-    
-    const isArcFlag = props.command.toLowerCase() === "a" && (props.valueIndex === 3 || props.valueIndex === 4);
-    if (isArcFlag) {
-        return <CommandFlagInput {...props} tooltip={tooltip} />;
-    }
-
-    return <CommandValueInput {...props} tooltip={tooltip} />;
-}
-
-function CommandValueInput(props: CommandProps & { tooltip?: string; }) {
+export function CommandValueInput(props: CommandProps & { tooltip?: string; }) {
     const { rowIndex, valueIndex, rowValueCount, value, highlighted, tooltip, focusField, moveVertical, registerFieldRef } = props;
 
     const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
