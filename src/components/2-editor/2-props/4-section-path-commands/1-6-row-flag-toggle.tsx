@@ -1,17 +1,7 @@
 import { useSetAtom } from "jotai";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 import { doSetCommandValueAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions";
-
-type CommandFlagToggleProps = {
-    rowIndex: number;
-    valueIndex: number;
-    rowValueCount: number;
-    value: number;
-    tooltip?: string;
-    focusCell: (rowIndex: number, valueIndex: number) => void;
-    moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
-    registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
-};
+import { type CommandFlagToggleProps } from "./1-9-commands-list-types";
 
 export function CommandFlagToggle(props: CommandFlagToggleProps) {
     const { rowIndex, valueIndex, rowValueCount, value, tooltip, focusCell, moveVertical, registerFieldRef } = props;
@@ -22,7 +12,7 @@ export function CommandFlagToggle(props: CommandFlagToggleProps) {
     const input = (
         <input
             type="checkbox"
-            className={getCommandFlagCheckboxClassName()}
+            className="h-3 w-3 shrink-0 rounded-[0.2rem] border-muted-foreground/50 bg-background align-middle accent-primary"
             checked={value === 1}
             ref={(element) => registerFieldRef(rowIndex, valueIndex, element)}
             onFocus={() => setSelectedCommandIndex(rowIndex)}
@@ -60,7 +50,9 @@ export function CommandFlagToggle(props: CommandFlagToggleProps) {
         />
     );
 
-    if (!tooltip) return input;
+    if (!tooltip) {
+        return input;
+    }
 
     return (
         <Tooltip>
@@ -70,8 +62,4 @@ export function CommandFlagToggle(props: CommandFlagToggleProps) {
             </TooltipContent>
         </Tooltip>
     );
-}
-
-function getCommandFlagCheckboxClassName() {
-    return "h-3 w-3 shrink-0 rounded-[0.2rem] border-muted-foreground/50 bg-background align-middle accent-primary";
 }

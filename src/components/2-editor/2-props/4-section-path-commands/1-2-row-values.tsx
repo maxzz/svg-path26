@@ -1,9 +1,9 @@
 import { type SvgCanvasPoint, type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
-import type { CommandProps } from "./1-9-commands-list-types";
+import { type CommandProps } from "./1-9-commands-list-types";
+import { CommandValueInput } from "./1-3-row-cell-input";
+import { CellInputArcFlags } from "./1-4-row-flag-cell-arc";
+import { CommandFlagInput } from "./1-5-row-flag-cell-input";
 import { commandValueTooltip, isCommandValueLinkedToPoint } from "./8-svg-utils";
-import { CommandValueInput } from "./1-3-commands-list-cell-input";
-import { CellInputArcFlags } from "./1-4-commands-list-flag-cell-arc";
-import { CommandFlagInput } from "./1-5-commands-list-flag-cell-input";
 
 type CommandRowValuesProps = {
     row: SvgSegmentSummary;

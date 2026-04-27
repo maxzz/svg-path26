@@ -1,17 +1,7 @@
 import { cn } from "@/utils";
 import { commandValueTooltip } from "./8-svg-utils";
-import { CommandFlagToggle } from "./1-6-commands-list-flag-toggle";
-
-type CommandArcFlagsProps = {
-    rowIndex: number;
-    rowValueCount: number;
-    command: string;
-    largeArcValue: number;
-    sweepValue: number;
-    focusCell: (rowIndex: number, valueIndex: number) => void;
-    moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
-    registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
-};
+import { type CommandArcFlagsProps } from "./1-9-commands-list-types";
+import { CommandFlagToggle } from "./1-6-row-flag-toggle";
 
 export function CellInputArcFlags(props: CommandArcFlagsProps) {
     const { rowIndex, rowValueCount, command, largeArcValue, sweepValue, focusCell, moveVertical, registerFieldRef } = props;

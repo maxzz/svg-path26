@@ -1,17 +1,6 @@
-import { getCommandFlagGroupClassName } from "./1-4-commands-list-flag-cell-arc";
-import { CommandFlagToggle } from "./1-6-commands-list-flag-toggle";
-
-type CommandFlagInputProps = {
-    rowIndex: number;
-    valueIndex: number;
-    rowValueCount: number;
-    value: number;
-    highlighted?: boolean;
-    tooltip?: string;
-    focusCell: (rowIndex: number, valueIndex: number) => void;
-    moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
-    registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
-};
+import { type CommandFlagInputProps } from "./1-9-commands-list-types";
+import { getCommandFlagGroupClassName } from "./1-4-row-flag-cell-arc";
+import { CommandFlagToggle } from "./1-6-row-flag-toggle";
 
 export function CommandFlagInput(props: CommandFlagInputProps) {
     const { rowIndex, valueIndex, rowValueCount, value, highlighted, tooltip, focusCell, moveVertical, registerFieldRef } = props;

@@ -30,10 +30,10 @@ export function CommandValueInput(props: CommandProps & { tooltip?: string; }) {
 
     const input = (
         <input
+            ref={(element) => registerFieldRef(rowIndex, valueIndex, element)}
+            className={getCommandValueInputClassName(highlighted)}
             type="text"
             inputMode="decimal"
-            className={getCommandValueInputClassName(highlighted)}
-            ref={(element) => registerFieldRef(rowIndex, valueIndex, element)}
             value={draft}
             onFocus={() => setSelectedCommandIndex(rowIndex)}
             onChange={(event) => setDraft(event.target.value)}
@@ -77,7 +77,9 @@ export function CommandValueInput(props: CommandProps & { tooltip?: string; }) {
         />
     );
 
-    if (!tooltip) return input;
+    if (!tooltip) {
+        return input;
+    }
 
     return (
         <Tooltip>
