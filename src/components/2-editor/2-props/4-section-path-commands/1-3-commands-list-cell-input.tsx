@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useSetAtom } from "jotai";
+import { cn } from "@/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 import { doSetCommandValueAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions";
-import { cn } from "@/utils";
-import type { CommandProps } from "./1-2-commands-list-row-values";
+import { type CommandProps } from "./1-9-commands-list-types";
 
 export function CommandValueInput(props: CommandProps & { tooltip?: string; }) {
     const { rowIndex, valueIndex, rowValueCount, value, highlighted, tooltip, focusField, moveVertical, registerFieldRef } = props;

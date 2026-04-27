@@ -1,7 +1,7 @@
 import { useSetAtom } from "jotai";
+import { cn } from "@/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 import { doSetCommandValueAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions";
-import { cn } from "@/utils";
 import { commandValueTooltip } from "./8-svg-utils";
 
 type CommandArcFlagsProps = {
@@ -10,18 +10,6 @@ type CommandArcFlagsProps = {
     command: string;
     largeArcValue: number;
     sweepValue: number;
-    focusField: (rowIndex: number, valueIndex: number) => void;
-    moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
-    registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
-};
-
-type CommandFlagInputProps = {
-    rowIndex: number;
-    valueIndex: number;
-    rowValueCount: number;
-    value: number;
-    highlighted?: boolean;
-    tooltip?: string;
     focusField: (rowIndex: number, valueIndex: number) => void;
     moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
@@ -57,6 +45,18 @@ export function CommandArcFlagsInput(props: CommandArcFlagsProps) {
         </div>
     );
 }
+
+type CommandFlagInputProps = {
+    rowIndex: number;
+    valueIndex: number;
+    rowValueCount: number;
+    value: number;
+    highlighted?: boolean;
+    tooltip?: string;
+    focusField: (rowIndex: number, valueIndex: number) => void;
+    moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
+    registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
+};
 
 export function CommandFlagInput(props: CommandFlagInputProps) {
     const { rowIndex, valueIndex, rowValueCount, value, highlighted, tooltip, focusField, moveVertical, registerFieldRef } = props;
@@ -145,7 +145,7 @@ export function CommandFlagToggle(props: {
     );
 }
 
-export function getCommandFlagGroupClassName(highlighted?: boolean) {
+function getCommandFlagGroupClassName(highlighted?: boolean) {
     return cn(
         "px-0.5 h-5 w-[2.4rem] transition-colors rounded inline-flex items-center justify-center gap-0.5 border",
         highlighted ? "border border-sky-500/60 bg-sky-500/10" : "border bg-background"
