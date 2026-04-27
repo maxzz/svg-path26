@@ -4,7 +4,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/shadcn/
 import { doSetCommandValueAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 import { cn } from "@/utils";
 import { commandValueTooltip } from "./8-svg-utils";
-import { CommandFlagToggle, getCommandFlagGroupClassName } from "./1-4-commands-list-flag-inputs";
+import { CommandFlagToggle, getCommandFlagGroupClassName } from "./1-4-commands-list-flag-cell-arc";
 
 export type CommandProps = {
     rowIndex: number;
@@ -19,9 +19,9 @@ export type CommandProps = {
 };
 
 export function CommandCellInput(props: CommandProps) {
-    const isArcFlag = props.command.toLowerCase() === "a" && (props.valueIndex === 3 || props.valueIndex === 4);
     const tooltip = commandValueTooltip(props.command, props.valueIndex);
-
+    
+    const isArcFlag = props.command.toLowerCase() === "a" && (props.valueIndex === 3 || props.valueIndex === 4);
     if (isArcFlag) {
         return <CommandFlagInput {...props} tooltip={tooltip} />;
     }

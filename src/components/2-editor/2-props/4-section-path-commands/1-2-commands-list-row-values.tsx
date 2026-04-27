@@ -1,5 +1,5 @@
 import { type SvgCanvasPoint, type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
-import { CommandArcFlagsInput } from "./1-4-commands-list-flag-inputs";
+import { CommandArcFlagsInput } from "./1-4-commands-list-flag-cell-arc";
 import { CommandCellInput, type CommandProps } from "./1-3-commands-list-cells";
 import { isCommandValueLinkedToPoint } from "./8-svg-utils";
 
@@ -49,7 +49,7 @@ export function CommandRowValues(props: CommandRowValuesProps) {
                 moveVertical,
                 registerFieldRef,
             };
-            
+
             return <CommandCellInput key={`${row.index}:${valueIndex}`} {...inputProps} />;
         }
     );
