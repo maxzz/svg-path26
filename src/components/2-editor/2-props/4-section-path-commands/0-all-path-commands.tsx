@@ -51,11 +51,11 @@ export function CommandsList() {
             if (nextRowIndex < 0 || nextRowIndex >= rows.length) return;
 
             setSelectedCommandIndex(nextRowIndex);
-            focusCommandCell(nextRowIndex, valueIndex);
+            focusCell(nextRowIndex, valueIndex);
         },
         [rows.length, setSelectedCommandIndex]);
 
-    const focusCommandCell = useCallback(
+    const focusCell = useCallback(
         (nextRowIndex: number, nextValueIndex: number) => {
             focusField(rows, rowRefs.current, fieldRefs.current, nextRowIndex, nextValueIndex, setSelectedCommandIndex);
         },
@@ -86,7 +86,7 @@ export function CommandsList() {
                 doSelectCommand={doSelectCommand}
                 setHoveredCommandIndex={setHoveredCommandIndex}
                 doToggleRelative={doToggleRelative}
-                focusCommandCell={focusCommandCell}
+                focusCell={focusCell}
                 moveVertical={moveVertical}
                 registerFieldRef={registerFieldRef} />
         );

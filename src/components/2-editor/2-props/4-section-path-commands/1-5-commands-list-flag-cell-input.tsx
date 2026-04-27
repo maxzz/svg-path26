@@ -7,13 +7,13 @@ type CommandFlagInputProps = {
     value: number;
     highlighted?: boolean;
     tooltip?: string;
-    focusField: (rowIndex: number, valueIndex: number) => void;
+    focusCell: (rowIndex: number, valueIndex: number) => void;
     moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
 };
 
 export function CommandFlagInput(props: CommandFlagInputProps) {
-    const { rowIndex, valueIndex, rowValueCount, value, highlighted, tooltip, focusField, moveVertical, registerFieldRef } = props;
+    const { rowIndex, valueIndex, rowValueCount, value, highlighted, tooltip, focusCell, moveVertical, registerFieldRef } = props;
 
     return (
         <div className={getCommandFlagGroupClassName(highlighted)}>
@@ -23,7 +23,7 @@ export function CommandFlagInput(props: CommandFlagInputProps) {
                 rowValueCount={rowValueCount}
                 value={value}
                 tooltip={tooltip}
-                focusField={focusField}
+                focusCell={focusCell}
                 moveVertical={moveVertical}
                 registerFieldRef={registerFieldRef}
             />

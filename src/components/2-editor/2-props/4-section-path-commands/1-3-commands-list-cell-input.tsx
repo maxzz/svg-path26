@@ -6,7 +6,7 @@ import { doSetCommandValueAtom, selectedCommandIndexAtom } from "@/store/0-atoms
 import { type CommandProps } from "./1-9-commands-list-types";
 
 export function CommandValueInput(props: CommandProps & { tooltip?: string; }) {
-    const { rowIndex, valueIndex, rowValueCount, value, highlighted, tooltip, focusField, moveVertical, registerFieldRef } = props;
+    const { rowIndex, valueIndex, rowValueCount, value, highlighted, tooltip, focusCell: focusField, moveVertical, registerFieldRef } = props;
 
     const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
     const setCommandValue = useSetAtom(doSetCommandValueAtom);

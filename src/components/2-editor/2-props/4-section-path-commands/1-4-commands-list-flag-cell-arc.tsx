@@ -10,13 +10,13 @@ type CommandArcFlagsProps = {
     command: string;
     largeArcValue: number;
     sweepValue: number;
-    focusField: (rowIndex: number, valueIndex: number) => void;
+    focusCell: (rowIndex: number, valueIndex: number) => void;
     moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
 };
 
 export function CellInputArcFlags(props: CommandArcFlagsProps) {
-    const { rowIndex, rowValueCount, command, largeArcValue, sweepValue, focusField, moveVertical, registerFieldRef } = props;
+    const { rowIndex, rowValueCount, command, largeArcValue, sweepValue, focusCell, moveVertical, registerFieldRef } = props;
     const largeArcTooltip = commandValueTooltip(command, 3);
     const sweepTooltip = commandValueTooltip(command, 4);
 
@@ -28,7 +28,7 @@ export function CellInputArcFlags(props: CommandArcFlagsProps) {
                 rowValueCount={rowValueCount}
                 value={largeArcValue}
                 tooltip={largeArcTooltip}
-                focusField={focusField}
+                focusCell={focusCell}
                 moveVertical={moveVertical}
                 registerFieldRef={registerFieldRef}
             />
@@ -38,7 +38,7 @@ export function CellInputArcFlags(props: CommandArcFlagsProps) {
                 rowValueCount={rowValueCount}
                 value={sweepValue}
                 tooltip={sweepTooltip}
-                focusField={focusField}
+                focusCell={focusCell}
                 moveVertical={moveVertical}
                 registerFieldRef={registerFieldRef}
             />
@@ -52,11 +52,11 @@ export function CommandFlagToggle(props: {
     rowValueCount: number;
     value: number;
     tooltip?: string;
-    focusField: (rowIndex: number, valueIndex: number) => void;
+    focusCell: (rowIndex: number, valueIndex: number) => void;
     moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
 }) {
-    const { rowIndex, valueIndex, rowValueCount, value, tooltip, focusField, moveVertical, registerFieldRef } = props;
+    const { rowIndex, valueIndex, rowValueCount, value, tooltip, focusCell, moveVertical, registerFieldRef } = props;
 
     const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
     const setCommandValue = useSetAtom(doSetCommandValueAtom);
@@ -79,11 +79,11 @@ export function CommandFlagToggle(props: {
             onKeyDown={(event) => {
                 switch (event.key) {
                     case "ArrowLeft":
-                        focusField(rowIndex, Math.max(0, valueIndex - 1));
+                        focusCell(rowIndex, Math.max(0, valueIndex - 1));
                         event.preventDefault();
                         break;
                     case "ArrowRight":
-                        focusField(rowIndex, Math.min(rowValueCount - 1, valueIndex + 1));
+                        focusCell(rowIndex, Math.min(rowValueCount - 1, valueIndex + 1));
                         event.preventDefault();
                         break;
                     case "ArrowUp":

@@ -8,7 +8,7 @@ import { CommandFlagInput } from "./1-5-commands-list-flag-cell-input";
 type CommandRowValuesProps = {
     row: SvgSegmentSummary;
     highlightedCanvasPoint: SvgCanvasPoint | null;
-    focusCommandCell: (nextRowIndex: number, nextValueIndex: number) => void;
+    focusCell: (nextRowIndex: number, nextValueIndex: number) => void;
     moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
 };
@@ -23,7 +23,7 @@ export function CommandRowValues(props: CommandRowValuesProps) {
 }
 
 function RowValue(props: { value: number; valueIndex: number; } & CommandRowValuesProps) {
-    const { row, value, valueIndex, highlightedCanvasPoint, focusCommandCell, moveVertical, registerFieldRef } = props;
+    const { row, value, valueIndex, highlightedCanvasPoint, focusCell, moveVertical, registerFieldRef } = props;
 
     if (row.command.toLowerCase() === "a") {
         if (valueIndex === 3) {
@@ -39,7 +39,7 @@ function RowValue(props: { value: number; valueIndex: number; } & CommandRowValu
                     rowIndex={row.index}
                     rowValueCount={row.values.length}
                     command={row.command}
-                    focusField={focusCommandCell}
+                    focusCell={focusCell}
                     moveVertical={moveVertical}
                     registerFieldRef={registerFieldRef}
                 />
@@ -56,7 +56,7 @@ function RowValue(props: { value: number; valueIndex: number; } & CommandRowValu
         rowIndex: row.index,
         rowValueCount: row.values.length,
         command: row.command,
-        focusField: focusCommandCell,
+        focusCell,
         moveVertical,
         registerFieldRef,
     };

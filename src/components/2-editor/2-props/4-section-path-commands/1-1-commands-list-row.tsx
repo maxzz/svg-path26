@@ -14,11 +14,11 @@ export function CommandRow(props: {
     doSelectCommand: (args: { index: number; mode: "replace" | "add" | "remove"; }) => void;
     setHoveredCommandIndex: (index: number | null) => void;
     doToggleRelative: (segmentIndex: number) => void;
-    focusCommandCell: (nextRowIndex: number, nextValueIndex: number) => void;
+    focusCell: (nextRowIndex: number, nextValueIndex: number) => void;
     moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
 }) {
-    const { row, setRowRef, doSelectCommand, setHoveredCommandIndex, doToggleRelative, focusCommandCell, moveVertical, registerFieldRef } = props;
+    const { row, setRowRef, doSelectCommand, setHoveredCommandIndex, doToggleRelative, focusCell, moveVertical, registerFieldRef } = props;
     
     const selected = useAtomValue(commandSelectedAtom(row.index));
     const hovered = useAtomValue(commandHoveredAtom(row.index));
@@ -73,7 +73,7 @@ export function CommandRow(props: {
                 <CommandRowValues
                     row={row}
                     highlightedCanvasPoint={highlightedCanvasPoint}
-                    focusCommandCell={focusCommandCell}
+                    focusCell={focusCell}
                     moveVertical={moveVertical}
                     registerFieldRef={registerFieldRef}
                 />
