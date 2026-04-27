@@ -10,7 +10,7 @@ import { type SvgSegmentSummary } from "@/svg-core/9-types-svg-model";
 import { commandRowsAtom, subPathAccordionValuesAtom, subPathsAtom } from "@/store/0-atoms/2-0-svg-model";
 import { doSelectCommandAtom, doToggleSegmentRelativeAtom, hoveredCommandIndexAtom, selectedCommandIndexAtom } from "@/store/0-atoms/2-4-0-editor-actions.ts";
 import { canvasDragStateAtom } from "@/components/2-editor/3-canvas/3-canvas-drag";
-import { CommandRow, focusField } from "./1-1-commands-list-row.tsx";
+import { CommandRow, focusField } from "./1-1-row.tsx";
 import { PathCommands_Label, PathCommands_Overlay } from "./7-1-overlays.tsx";
 import { SubPathToggleRow } from "./7-2-row-subpath-header.tsx";
 
@@ -36,16 +36,16 @@ export function Section_PathCommands() {
 export function CommandsList() {
     const rows = useAtomValue(commandRowsAtom);
     const subPaths = useAtomValue(subPathsAtom);
+    const [openSubPaths, setOpenSubPaths] = useAtom(subPathAccordionValuesAtom);
 
     const setSelectedCommandIndex = useSetAtom(selectedCommandIndexAtom);
+    
     const doSelectCommand = useSetAtom(doSelectCommandAtom);
     const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
     const doToggleRelative = useSetAtom(doToggleSegmentRelativeAtom);
 
     const rowRefs = useRef<Record<number, HTMLDivElement | null>>({});
     const fieldRefs = useRef<Record<string, HTMLInputElement | null>>({});
-    const [openSubPaths, setOpenSubPaths] = useAtom(subPathAccordionValuesAtom);
-    const hasCompoundSubPaths = subPaths.length > 1;
 
     const focusCell = useCallback(
         (rowIndex: number, valueIndex: number) => {
@@ -77,7 +77,9 @@ export function CommandsList() {
         []);
 
     if (rows.length === 0) {
-        return <p className="text-muted-foreground">No commands to show.</p>;
+        return (
+            <p className="text-muted-foreground">No commands to show.</p>
+        );
     }
 
     function renderRow(row: SvgSegmentSummary) {
@@ -86,14 +88,18 @@ export function CommandsList() {
                 key={row.index}
                 row={row}
                 setRowRef={setRowRef}
+                
                 doSelectCommand={doSelectCommand}
                 setHoveredCommandIndex={setHoveredCommandIndex}
                 doToggleRelative={doToggleRelative}
+
                 focusCell={focusCell}
                 moveVertical={moveVertical}
                 registerFieldRef={registerFieldRef} />
         );
     }
+
+    const hasCompoundSubPaths = subPaths.length > 1;
 
     return (<>
         <CommandsListScrollEffects rowRefs={rowRefs} rowsLength={rows.length} />

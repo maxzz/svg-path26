@@ -11,9 +11,11 @@ import { commandSummaryTooltip, isCommandCellLinkedToPoint } from "./8-svg-utils
 export function CommandRow(props: {
     row: SvgSegmentSummary;
     setRowRef: (rowIndex: number, element: HTMLDivElement | null) => void;
+    
     doSelectCommand: (args: { index: number; mode: "replace" | "add" | "remove"; }) => void;
     setHoveredCommandIndex: (index: number | null) => void;
     doToggleRelative: (segmentIndex: number) => void;
+    
     focusCell: (rowIndex: number, valueIndex: number) => void;
     moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
