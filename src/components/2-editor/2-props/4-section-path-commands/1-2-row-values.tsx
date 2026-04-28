@@ -4,12 +4,12 @@ import { isCommandValueLinkedToPoint } from "./8-svg-utils";
 
 export function RowValues(props: CommandRowValuesProps) {
     const { row } = props;
-    const groups = getValueGroups(row);
+    const groups = getValueCellGroups(row);
 
     return groups.map(
         (group) => {
             switch (group.type) {
-                case ValueGroupType.Pair:
+                case CellGroup.Pair:
                     return (
                         <div key={group.key} className="col-span-2 grid grid-cols-2 gap-0.5">
                             {group.indices.map((index) => (
@@ -22,7 +22,7 @@ export function RowValues(props: CommandRowValuesProps) {
                             ))}
                         </div>
                     );
-                case ValueGroupType.Single:
+                case CellGroup.Single:
                     return (
                         <RowValue
                             key={group.key}
@@ -31,7 +31,7 @@ export function RowValues(props: CommandRowValuesProps) {
                             {...props}
                         />
                     );
-                case ValueGroupType.ArcFlags:
+                case CellGroup.ArcFlags:
                     return (
                         <CellArcFlagsInput
                             key={group.key}
@@ -97,46 +97,46 @@ function RowValue(props: { value: number; valueIndex: number; } & CommandRowValu
 }
 
 // Value groups are used to determine the layout of the values in the row
+//type CellGroup = typeof CellGroup[keyof typeof CellGroup];
 
-const ValueGroupType = { Pair: 0, Single: 1, ArcFlags: 2, } as const;
-type ValueGroupType = typeof ValueGroupType[keyof typeof ValueGroupType];
+const CellGroup = { Pair: 0, Single: 1, ArcFlags: 2, } as const;
 
-type ValueGroup =
-    | { type: typeof ValueGroupType.Pair; indices: [number, number]; key: string; }
-    | { type: typeof ValueGroupType.Single; index: number; key: string; }
-    | { type: typeof ValueGroupType.ArcFlags; key: string; };
+type ValueCellGroup =
+    | { type: typeof CellGroup.Pair; indices: [number, number]; key: string; }
+    | { type: typeof CellGroup.Single; index: number; key: string; }
+    | { type: typeof CellGroup.ArcFlags; key: string; };
 
-function getValueGroups(row: CommandRowValuesProps["row"]): ValueGroup[] {
+function getValueCellGroups(row: CommandRowValuesProps["row"]): ValueCellGroup[] {
     const { values: { length }, index } = row;
-    const groups: ValueGroup[] = [];
+    const groups: ValueCellGroup[] = [];
 
     const upper = row.command.toUpperCase();
     if (upper === "A") {
         if (length >= 2) {
-            groups.push({ type: ValueGroupType.Pair, indices: [0, 1], key: `${index}:pair-0` });
+            groups.push({ type: CellGroup.Pair, indices: [0, 1], key: `${index}:pair-0` });
         }
         else if (length === 1) {
-            groups.push({ type: ValueGroupType.Single, index: 0, key: `${index}:single-0` });
+            groups.push({ type: CellGroup.Single, index: 0, key: `${index}:single-0` });
         }
         if (length >= 3) {
-            groups.push({ type: ValueGroupType.Single, index: 2, key: `${index}:single-2` });
+            groups.push({ type: CellGroup.Single, index: 2, key: `${index}:single-2` });
         }
         if (length >= 5) {
-            groups.push({ type: ValueGroupType.ArcFlags, key: `${index}:arc-flags` });
+            groups.push({ type: CellGroup.ArcFlags, key: `${index}:arc-flags` });
         }
         if (length >= 7) {
-            groups.push({ type: ValueGroupType.Pair, indices: [5, 6], key: `${index}:pair-5` });
+            groups.push({ type: CellGroup.Pair, indices: [5, 6], key: `${index}:pair-5` });
         }
         else if (length === 6) {
-            groups.push({ type: ValueGroupType.Single, index: 5, key: `${index}:single-5` });
+            groups.push({ type: CellGroup.Single, index: 5, key: `${index}:single-5` });
         }
     } else {
         for (let i = 0; i < length; i += 2) {
             if (i + 1 < length) {
-                groups.push({ type: ValueGroupType.Pair, indices: [i, i + 1], key: `${index}:pair-${i}` });
+                groups.push({ type: CellGroup.Pair, indices: [i, i + 1], key: `${index}:pair-${i}` });
             }
             else {
-                groups.push({ type: ValueGroupType.Single, index: i, key: `${index}:single-${i}` });
+                groups.push({ type: CellGroup.Single, index: i, key: `${index}:single-${i}` });
             }
         }
     }
