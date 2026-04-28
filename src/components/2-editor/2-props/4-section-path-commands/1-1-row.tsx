@@ -38,17 +38,19 @@ export function CommandRow(props: {
         >
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <button
-                        className={getRowButtonClassName(row.command === row.command.toLowerCase(), highlightCommandCell)}
-                        onClick={(event) => {
-                            event.stopPropagation();
-                            doSelectCommand({ index: row.index, mode: "replace" });
-                            doToggleRelative(row.index);
-                        }}
-                        type="button"
-                    >
-                        {row.command}
-                    </button>
+                    <div className="py-1 flex items-center justify-center">
+                        <button
+                            className={getRowButtonClassName(row.command === row.command.toLowerCase(), highlightCommandCell)}
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                doSelectCommand({ index: row.index, mode: "replace" });
+                                doToggleRelative(row.index);
+                            }}
+                            type="button"
+                        >
+                            {row.command}
+                        </button>
+                    </div>
                 </TooltipTrigger>
 
                 <TooltipContent sideOffset={6} className="max-w-80">
