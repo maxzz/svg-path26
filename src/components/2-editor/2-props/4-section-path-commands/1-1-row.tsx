@@ -11,7 +11,7 @@ import { commandSummaryTooltip, isCommandCellLinkedToPoint } from "./8-svg-utils
 export function CommandRow(props: {
     row: SvgSegmentSummary;
     setRowRef: (rowIndex: number, element: HTMLDivElement | null) => void;
-   
+
     focusCell: (rowIndex: number, valueIndex: number) => void;
     moveVertical: (rowIndex: number, valueIndex: number, direction: "up" | "down") => void;
     registerFieldRef: (rowIndex: number, valueIndex: number, element: HTMLInputElement | null) => void;
@@ -21,7 +21,7 @@ export function CommandRow(props: {
     const doSelectCommand = useSetAtom(doSelectCommandAtom);
     const setHoveredCommandIndex = useSetAtom(hoveredCommandIndexAtom);
     const doToggleRelative = useSetAtom(doToggleSegmentRelativeAtom);
-    
+
     const selected = useAtomValue(commandSelectedAtom(row.index));
     const hovered = useAtomValue(commandHoveredAtom(row.index));
     const highlightedCanvasPoint = useAtomValue(highlightedCanvasPointAtomForSegment(row.index));
@@ -31,14 +31,7 @@ export function CommandRow(props: {
     return (
         <div
             ref={(element) => { setRowRef(row.index, element); }}
-            className={cn(
-                "px-1.5 border rounded flex items-center gap-1 transition-colors",
-                selected
-                    ? "border-transparent bg-blue-300"
-                    : (hovered || isCanvasPointFocused)
-                        ? "border-transparent bg-slate-400/40"
-                        : "border-transparent bg-background hover:bg-slate-400/25"
-            )}
+            className={getRowClassName(selected, hovered, isCanvasPointFocused)}
             onClick={(event) => doSelectCommand({ index: row.index, mode: getCommandSelectionMode(event) })}
             onMouseEnter={() => setHoveredCommandIndex(row.index)}
             onMouseLeave={() => setHoveredCommandIndex(null)}
@@ -46,17 +39,13 @@ export function CommandRow(props: {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <button
-                        type="button"
-                        className={cn(
-                            "w-5 h-5 shrink-0 text-xs leading-3 text-center font-semibold rounded-l-[0.2rem] cursor-pointer transition-colors",
-                            row.command === row.command.toLowerCase() ? "bg-slate-400 text-slate-900" : "bg-slate-500 text-slate-900",
-                            highlightCommandCell && "ring-1 ring-[#9c00ffa0]"
-                        )}
+                        className={getCommandCellClassName(row.command === row.command.toLowerCase(), highlightCommandCell)}
                         onClick={(event) => {
                             event.stopPropagation();
                             doSelectCommand({ index: row.index, mode: "replace" });
                             doToggleRelative(row.index);
                         }}
+                        type="button"
                     >
                         {row.command}
                     </button>
@@ -85,6 +74,24 @@ export function CommandRow(props: {
                 <CommandSelectionMenu rowIndex={row.index} command={row.command} />
             </div>
         </div>
+    );
+}
+
+function getRowClassName(isSelected: boolean, isHovered: boolean, isCanvasPointFocused: boolean) {
+    return cn(
+        "px-1.5 border rounded flex items-center gap-1 transition-colors",
+        isSelected
+            ? "border-transparent bg-blue-300"
+            : (isHovered || isCanvasPointFocused)
+                ? "border-transparent bg-slate-400/40"
+                : "border-transparent bg-background hover:bg-slate-400/25"
+    );
+}
+function getCommandCellClassName(isRelative: boolean, isHighlighted: boolean) {
+    return cn(
+        "w-5 h-5 shrink-0 text-xs leading-3 text-center font-semibold rounded-l-[0.2rem] cursor-pointer transition-colors",
+        isRelative ? "bg-slate-400 text-slate-900" : "bg-slate-500 text-slate-900",
+        isHighlighted && "ring-1 ring-[#9c00ffa0]"
     );
 }
 
@@ -128,3 +135,5 @@ export function focusField(
         }
     }
 }
+
+//TODO: show relative or absolute points differently in the canvas

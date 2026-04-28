@@ -10,6 +10,7 @@ const COMMAND_TYPES = ["M", "L", "V", "H", "C", "S", "Q", "T", "A", "Z"] as cons
 
 export function CommandSelectionMenu({ rowIndex, command }: { rowIndex: number; command: string; }) {
     const parseState = useAtomValue(svgModelAtom);
+    
     const doToggleRelative = useSetAtom(doToggleSegmentRelativeAtom);
     const doDeleteSegment = useSetAtom(doDeleteSegmentAtom);
     const doInsertSegment = useSetAtom(doInsertSegmentAtom);
