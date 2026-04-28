@@ -6,8 +6,6 @@ import { commandLabel } from "./8-svg-utils";
 import { svgModelAtom } from "@/store/0-atoms/2-0-svg-model";
 import { doConvertSegmentAtom, doDeleteSegmentAtom, doInsertSegmentAtom, doToggleSegmentRelativeAtom } from "@/store/0-atoms/2-4-0-editor-actions";
 
-const COMMAND_TYPES = ["M", "L", "V", "H", "C", "S", "Q", "T", "A", "Z"] as const;
-
 export function CommandSelectionMenu({ rowIndex, command }: { rowIndex: number; command: string; }) {
     const parseState = useAtomValue(svgModelAtom);
 
@@ -19,7 +17,7 @@ export function CommandSelectionMenu({ rowIndex, command }: { rowIndex: number; 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="size-6" onClick={(event) => event.stopPropagation()}>
+                <Button variant="ghost" size="icon" className="size-4 rounded" onClick={(event) => event.stopPropagation()}>
                     <IconRadix_DotsHorizontal className="size-3" />
                 </Button>
             </DropdownMenuTrigger>
@@ -79,3 +77,5 @@ export function CommandSelectionMenu({ rowIndex, command }: { rowIndex: number; 
         </DropdownMenu>
     );
 }
+
+const COMMAND_TYPES = ["M", "L", "V", "H", "C", "S", "Q", "T", "A", "Z"] as const;
