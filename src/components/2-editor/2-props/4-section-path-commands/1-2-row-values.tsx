@@ -6,48 +6,50 @@ export function RowValues(props: CommandRowValuesProps) {
     const { row } = props;
     const groups = getValueGroups(row);
 
-    return groups.map((group) => {
-        switch (group.type) {
-            case ValueGroupType.Pair:
-                return (
-                    <div key={group.key} className="col-span-2 grid grid-cols-2 gap-0.5">
-                        {group.indices.map((index) => (
-                            <RowValue
-                                key={`${row.index}:${index}`}
-                                value={row.values[index]}
-                                valueIndex={index}
-                                {...props}
-                            />
-                        ))}
-                    </div>
-                );
-            case ValueGroupType.Single:
-                return (
-                    <RowValue
-                        key={group.key}
-                        value={row.values[group.index]}
-                        valueIndex={group.index}
-                        {...props}
-                    />
-                );
-            case ValueGroupType.ArcFlags:
-                return (
-                    <CellArcFlagsInput
-                        key={group.key}
-                        largeArcValue={row.values[3] ?? 0}
-                        sweepValue={row.values[4] ?? 0}
-                        rowIndex={row.index}
-                        rowValueCount={row.values.length}
-                        command={row.command}
-                        focusCell={props.focusCell}
-                        moveVertical={props.moveVertical}
-                        registerFieldRef={props.registerFieldRef}
-                    />
-                );
-            default:
-                return null;
+    return groups.map(
+        (group) => {
+            switch (group.type) {
+                case ValueGroupType.Pair:
+                    return (
+                        <div key={group.key} className="col-span-2 grid grid-cols-2 gap-0.5">
+                            {group.indices.map((index) => (
+                                <RowValue
+                                    key={`${row.index}:${index}`}
+                                    value={row.values[index]}
+                                    valueIndex={index}
+                                    {...props}
+                                />
+                            ))}
+                        </div>
+                    );
+                case ValueGroupType.Single:
+                    return (
+                        <RowValue
+                            key={group.key}
+                            value={row.values[group.index]}
+                            valueIndex={group.index}
+                            {...props}
+                        />
+                    );
+                case ValueGroupType.ArcFlags:
+                    return (
+                        <CellArcFlagsInput
+                            key={group.key}
+                            largeArcValue={row.values[3] ?? 0}
+                            sweepValue={row.values[4] ?? 0}
+                            rowIndex={row.index}
+                            rowValueCount={row.values.length}
+                            command={row.command}
+                            focusCell={props.focusCell}
+                            moveVertical={props.moveVertical}
+                            registerFieldRef={props.registerFieldRef}
+                        />
+                    );
+                default:
+                    return null;
+            }
         }
-    });
+    );
 }
 
 function RowValue(props: { value: number; valueIndex: number; } & CommandRowValuesProps) {
@@ -63,7 +65,7 @@ function RowValue(props: { value: number; valueIndex: number; } & CommandRowValu
                     key={`${row.index}:arc-flags`}
                     largeArcValue={row.values[3] ?? 0}
                     sweepValue={row.values[4] ?? 0}
-        
+
                     rowIndex={row.index}
                     rowValueCount={row.values.length}
                     command={row.command}
@@ -85,7 +87,7 @@ function RowValue(props: { value: number; valueIndex: number; } & CommandRowValu
         rowIndex: row.index,
         rowValueCount: row.values.length,
         command: row.command,
-        
+
         focusCell,
         moveVertical,
         registerFieldRef,
@@ -96,50 +98,46 @@ function RowValue(props: { value: number; valueIndex: number; } & CommandRowValu
 
 // Value groups are used to determine the layout of the values in the row
 
-const ValueGroupType = {
-    Pair: 0,
-    Single: 1,
-    ArcFlags: 2,
-} as const;
-
+const ValueGroupType = { Pair: 0, Single: 1, ArcFlags: 2, } as const;
 type ValueGroupType = typeof ValueGroupType[keyof typeof ValueGroupType];
+
 type ValueGroup =
     | { type: typeof ValueGroupType.Pair; indices: [number, number]; key: string; }
     | { type: typeof ValueGroupType.Single; index: number; key: string; }
     | { type: typeof ValueGroupType.ArcFlags; key: string; };
 
 function getValueGroups(row: CommandRowValuesProps["row"]): ValueGroup[] {
+    const { values: { length }, index } = row;
+    const groups: ValueGroup[] = [];
+
     const upper = row.command.toUpperCase();
     if (upper === "A") {
-        const groups: ValueGroup[] = [];
-        if (row.values.length >= 2) {
-            groups.push({ type: ValueGroupType.Pair, indices: [0, 1], key: `${row.index}:pair-0` });
+        if (length >= 2) {
+            groups.push({ type: ValueGroupType.Pair, indices: [0, 1], key: `${index}:pair-0` });
         }
-        else if (row.values.length === 1) {
-            groups.push({ type: ValueGroupType.Single, index: 0, key: `${row.index}:single-0` });
+        else if (length === 1) {
+            groups.push({ type: ValueGroupType.Single, index: 0, key: `${index}:single-0` });
         }
-        if (row.values.length >= 3) {
-            groups.push({ type: ValueGroupType.Single, index: 2, key: `${row.index}:single-2` });
+        if (length >= 3) {
+            groups.push({ type: ValueGroupType.Single, index: 2, key: `${index}:single-2` });
         }
-        if (row.values.length >= 5) {
-            groups.push({ type: ValueGroupType.ArcFlags, key: `${row.index}:arc-flags` });
+        if (length >= 5) {
+            groups.push({ type: ValueGroupType.ArcFlags, key: `${index}:arc-flags` });
         }
-        if (row.values.length >= 7) {
-            groups.push({ type: ValueGroupType.Pair, indices: [5, 6], key: `${row.index}:pair-5` });
+        if (length >= 7) {
+            groups.push({ type: ValueGroupType.Pair, indices: [5, 6], key: `${index}:pair-5` });
         }
-        else if (row.values.length === 6) {
-            groups.push({ type: ValueGroupType.Single, index: 5, key: `${row.index}:single-5` });
+        else if (length === 6) {
+            groups.push({ type: ValueGroupType.Single, index: 5, key: `${index}:single-5` });
         }
-        return groups;
-    }
-
-    const groups: ValueGroup[] = [];
-    for (let i = 0; i < row.values.length; i += 2) {
-        if (i + 1 < row.values.length) {
-            groups.push({ type: ValueGroupType.Pair, indices: [i, i + 1], key: `${row.index}:pair-${i}` });
-        }
-        else {
-            groups.push({ type: ValueGroupType.Single, index: i, key: `${row.index}:single-${i}` });
+    } else {
+        for (let i = 0; i < length; i += 2) {
+            if (i + 1 < length) {
+                groups.push({ type: ValueGroupType.Pair, indices: [i, i + 1], key: `${index}:pair-${i}` });
+            }
+            else {
+                groups.push({ type: ValueGroupType.Single, index: i, key: `${index}:single-${i}` });
+            }
         }
     }
     return groups;
