@@ -89,7 +89,7 @@ function getRowClassName(isSelected: boolean, isHovered: boolean, isCanvasPointF
 }
 function getRowCommandClassName(isRelative: boolean, isHighlighted: boolean) {
     return cn(
-        "w-5 h-5 shrink-0 text-xs leading-3 text-center font-semibold rounded-l-[0.2rem] cursor-pointer transition-colors",
+        "shrink-0 w-5 h-5 text-xs leading-3 text-center font-semibold rounded-l-[0.2rem] cursor-pointer transition-colors",
         isRelative ? "bg-slate-100 text-slate-900" : "bg-slate-100 text-slate-900",
         isHighlighted && "ring-1 ring-[#9c00ffa0]"
     );
