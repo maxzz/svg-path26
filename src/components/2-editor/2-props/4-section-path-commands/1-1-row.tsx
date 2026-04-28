@@ -39,7 +39,7 @@ export function CommandRow(props: {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <button
-                        className={getCommandCellClassName(row.command === row.command.toLowerCase(), highlightCommandCell)}
+                        className={getRowCommandClassName(row.command === row.command.toLowerCase(), highlightCommandCell)}
                         onClick={(event) => {
                             event.stopPropagation();
                             doSelectCommand({ index: row.index, mode: "replace" });
@@ -87,10 +87,10 @@ function getRowClassName(isSelected: boolean, isHovered: boolean, isCanvasPointF
                 : "border-transparent bg-background hover:bg-slate-400/25"
     );
 }
-function getCommandCellClassName(isRelative: boolean, isHighlighted: boolean) {
+function getRowCommandClassName(isRelative: boolean, isHighlighted: boolean) {
     return cn(
         "w-5 h-5 shrink-0 text-xs leading-3 text-center font-semibold rounded-l-[0.2rem] cursor-pointer transition-colors",
-        isRelative ? "bg-slate-400 text-slate-900" : "bg-slate-500 text-slate-900",
+        isRelative ? "bg-slate-100 text-slate-900" : "bg-slate-100 text-slate-900",
         isHighlighted && "ring-1 ring-[#9c00ffa0]"
     );
 }
