@@ -39,7 +39,7 @@ export function CommandRow(props: {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <button
-                        className={getRowCommandClassName(row.command === row.command.toLowerCase(), highlightCommandCell)}
+                        className={getRowButtonClassName(row.command === row.command.toLowerCase(), highlightCommandCell)}
                         onClick={(event) => {
                             event.stopPropagation();
                             doSelectCommand({ index: row.index, mode: "replace" });
@@ -56,7 +56,7 @@ export function CommandRow(props: {
                 </TooltipContent>
             </Tooltip>
 
-            <div className="flex-1 min-w-0 text-right content-center font-mono grid grid-cols-[repeat(auto-fill,2.4rem)] auto-rows-min gap-0.5">
+            <div className="flex-1 min-w-0 text-right content-center font-mono grid grid-cols-[repeat(auto-fill,2.4rem)] auto-rows-min gap-x-0.5 gap-y-px">
                 {row.values.length === 0 && (
                     <span className="col-span-full text-[10px] text-muted-foreground">No values</span>
                 )}
@@ -87,9 +87,9 @@ function getRowClassName(isSelected: boolean, isHovered: boolean, isCanvasPointF
                 : "border-transparent bg-background hover:bg-slate-400/25"
     );
 }
-function getRowCommandClassName(isRelative: boolean, isHighlighted: boolean) {
+function getRowButtonClassName(isRelative: boolean, isHighlighted: boolean) {
     return cn(
-        "shrink-0 self-stretch w-5 min-h-5 text-xs leading-3 font-semibold rounded-l-[0.2rem] cursor-pointer transition-colors flex items-center justify-center",
+        "shrink-0 self-stretch py-1 w-4 min-h-5 text-xs leading-3 font-semibold border rounded cursor-pointer transition-colors flex items-center justify-center",
         isRelative ? "bg-slate-100 text-slate-900" : "bg-slate-100 text-slate-900",
         isHighlighted && "ring-1 ring-[#9c00ffa0]"
     );
