@@ -56,7 +56,7 @@ export function CommandRow(props: {
                 </TooltipContent>
             </Tooltip>
 
-            <div className="min-w-0 flex-1 font-mono text-right grid grid-cols-[repeat(auto-fill,2.4rem)] auto-rows-min gap-0.5 content-start">
+            <div className="flex-1 min-w-0 text-right content-center font-mono grid grid-cols-[repeat(auto-fill,2.4rem)] auto-rows-min gap-0.5">
                 {row.values.length === 0 && (
                     <span className="col-span-full text-[10px] text-muted-foreground">No values</span>
                 )}
@@ -89,7 +89,7 @@ function getRowClassName(isSelected: boolean, isHovered: boolean, isCanvasPointF
 }
 function getRowCommandClassName(isRelative: boolean, isHighlighted: boolean) {
     return cn(
-        "shrink-0 w-5 min-h-5 self-stretch text-xs leading-3 font-semibold rounded-l-[0.2rem] cursor-pointer transition-colors flex items-center justify-center",
+        "shrink-0 self-stretch w-5 min-h-5 text-xs leading-3 font-semibold rounded-l-[0.2rem] cursor-pointer transition-colors flex items-center justify-center",
         isRelative ? "bg-slate-100 text-slate-900" : "bg-slate-100 text-slate-900",
         isHighlighted && "ring-1 ring-[#9c00ffa0]"
     );
