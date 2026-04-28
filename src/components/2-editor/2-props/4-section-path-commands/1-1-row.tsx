@@ -56,7 +56,7 @@ export function CommandRow(props: {
                 </TooltipContent>
             </Tooltip>
 
-            <div className="flex-1 min-w-0 text-right content-center font-mono grid grid-cols-[repeat(auto-fill,2.4rem)] auto-rows-min gap-x-0.5 gap-y-px">
+            <div className="flex-1 min-w-0 text-right content-start font-mono grid grid-cols-[repeat(auto-fill,2.4rem)] auto-rows-[1.25rem] gap-x-0.5 gap-y-px">
                 {row.values.length === 0 && (
                     <span className="col-span-full text-[10px] text-muted-foreground">No values</span>
                 )}
