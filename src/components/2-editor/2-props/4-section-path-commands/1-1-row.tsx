@@ -38,19 +38,17 @@ export function CommandRow(props: {
         >
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <div className="py-1 flex items-center justify-center">
-                        <button
-                            className={getRowButtonClassName(row.command === row.command.toLowerCase(), highlightCommandCell)}
-                            onClick={(event) => {
-                                event.stopPropagation();
-                                doSelectCommand({ index: row.index, mode: "replace" });
-                                doToggleRelative(row.index);
-                            }}
-                            type="button"
-                        >
-                            {row.command}
-                        </button>
-                    </div>
+                    <button
+                        className={getRowButtonClassName(row.command === row.command.toLowerCase(), highlightCommandCell)}
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            doSelectCommand({ index: row.index, mode: "replace" });
+                            doToggleRelative(row.index);
+                        }}
+                        type="button"
+                    >
+                        {row.command}
+                    </button>
                 </TooltipTrigger>
 
                 <TooltipContent sideOffset={6} className="max-w-80">
@@ -91,7 +89,7 @@ function getRowClassName(isSelected: boolean, isHovered: boolean, isCanvasPointF
 }
 function getRowButtonClassName(isRelative: boolean, isHighlighted: boolean) {
     return cn(
-        "shrink-0 self-stretch py-1 w-4 min-h-5 text-xs leading-3 font-semibold border rounded cursor-pointer transition-colors flex items-center justify-center",
+        "shrink-0 self-stretch w-4 h-full min-h-5 text-xs leading-none font-semibold border rounded cursor-pointer transition-colors flex items-center justify-center",
         isRelative ? "bg-slate-100 text-slate-900" : "bg-slate-100 text-slate-900",
         isHighlighted && "ring-1 ring-[#9c00ffa0]"
     );
