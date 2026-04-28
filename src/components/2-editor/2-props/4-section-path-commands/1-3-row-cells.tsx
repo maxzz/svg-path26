@@ -70,7 +70,7 @@ export function CellArcFlagsInput(props: CommandArcFlagsProps) {
 
 function getCommandFlagGroupClassName(highlighted?: boolean) {
     return cn(
-        "px-0.5 h-5 w-[2.4rem] transition-colors rounded inline-flex items-center justify-center gap-0.5 border",
+        "px-0.5 h-5 w-full min-w-0 transition-colors rounded inline-flex items-center justify-center gap-0.5 border",
         highlighted ? "border border-sky-500/60 bg-sky-500/10" : "border bg-background"
     );
 }

@@ -93,7 +93,7 @@ export function CellValueInput(props: CommandProps & { tooltip?: string; }) {
 
 function getCommandValueInputClassName(highlighted?: boolean) {
     return cn(
-        "flex-1 px-px h-5 w-[2.4rem] text-[10px] tracking-tighter text-center rounded transition-colors",
+        "px-px h-5 w-full min-w-0 text-[10px] tracking-tighter text-center rounded transition-colors",
         highlighted
             ? "border border-sky-500/60 bg-sky-500/10"
             : "border bg-background"
