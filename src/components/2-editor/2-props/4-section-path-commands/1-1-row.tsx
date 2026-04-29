@@ -30,8 +30,8 @@ export function CommandRow(props: {
 
     return (
         <div
-            ref={(element) => { setRowRef(row.index, element); }}
             className={getRowClassName(selected, hovered, isCanvasPointFocused)}
+            ref={(element) => { setRowRef(row.index, element); }}
             onClick={(event) => doSelectCommand({ index: row.index, mode: getCommandSelectionMode(event) })}
             onMouseEnter={() => setHoveredCommandIndex(row.index)}
             onMouseLeave={() => setHoveredCommandIndex(null)}
@@ -56,9 +56,9 @@ export function CommandRow(props: {
                 </TooltipContent>
             </Tooltip>
 
-            <div className="flex-1 min-w-0 text-right content-start font-mono grid grid-cols-[repeat(auto-fill,2.4rem)] auto-rows-[1.25rem] gap-x-0.5 gap-y-px">
+            <div className="flex-1 min-w-0 text-right content-start font-mono grid grid-cols-[repeat(auto-fill,2.4rem)] auto-rows-[1.25rem] gap-x-0.5 gap-y-0.5">
                 {row.values.length === 0 && (
-                    <span className="col-span-full text-[10px] text-muted-foreground">No values</span>
+                    <span className="col-span-full pl-0.5 text-[10px] text-start self-center text-muted-foreground select-none">No values</span>
                 )}
 
                 <RowValues
@@ -70,16 +70,14 @@ export function CommandRow(props: {
                 />
             </div>
 
-            <div className="ml-auto self-center">
-                <CommandSelectionMenu rowIndex={row.index} command={row.command} />
-            </div>
+            <CommandSelectionMenu rowIndex={row.index} command={row.command} />
         </div>
     );
 }
 
 function getRowClassName(isSelected: boolean, isHovered: boolean, isCanvasPointFocused: boolean) {
     return cn(
-        "px-1.5 border rounded flex items-stretch gap-1 transition-colors",
+        "px-1 py-0.5 border rounded flex items-stretch gap-1 transition-colors select-none",
         isSelected
             ? "border-transparent bg-blue-300"
             : (isHovered || isCanvasPointFocused)

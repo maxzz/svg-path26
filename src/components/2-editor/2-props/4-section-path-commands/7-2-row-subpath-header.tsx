@@ -12,7 +12,7 @@ export function SubPathToggleRow({ subPathIndex, children }: { subPathIndex: num
 
     return (
         <AccordionItem value={value} className="border-none">
-            <div className="px-1.5 py-1 text-[10px] text-muted-foreground flex items-center justify-between [&>h3]:w-full">
+            <div className="pl-1.5 py-1 text-[10px] text-muted-foreground flex items-center justify-between [&>h3]:w-full select-none">
 
                 <AccordionTrigger className={triggerClasses} showIcon={false}>
                     <div className="flex min-w-0 flex-1 items-center gap-x-2">
