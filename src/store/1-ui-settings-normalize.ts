@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
-import { type CanvasSettings, type DialogSettings, type ExportSettings, type ExportSvgoSettings, type FooterSettings, type PathEditorSettings, type SectionPreviewSettings, type SvgoPresetDefaultPluginOptions, type UiSettings, DEFAULT_CANVAS_SETTINGS, DEFAULT_DIALOGS_SETTINGS, DEFAULT_EXPORT_SETTINGS, DEFAULT_FOOTER_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SECTION_PREVIEW_SETTINGS, DEFAULT_SETTINGS, DEFAULT_VIEWBOX_SETTINGS, SVGO_PRESET_DEFAULT_PLUGIN_NAMES } from "./9-ui-settings-types-and-defaults";
+import { type CanvasSettings, type DialogSettings, type ExportSettings, type ExportSvgoSettings, type FooterSettings, type PathEditorSettings, type SectionPreviewSettings, type UiSettings, DEFAULT_CANVAS_SETTINGS, DEFAULT_DIALOGS_SETTINGS, DEFAULT_EXPORT_SETTINGS, DEFAULT_FOOTER_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SECTION_PREVIEW_SETTINGS, DEFAULT_SETTINGS, DEFAULT_VIEWBOX_SETTINGS } from "./9-ui-settings-types-and-defaults";
+import { SVGO_PRESET_DEFAULT_PLUGIN_NAMES, type SvgoPresetDefaultPluginOptions } from "./2-svgo-presets";
 
 type MutableViewBox = Writeable<ViewBox>;
 

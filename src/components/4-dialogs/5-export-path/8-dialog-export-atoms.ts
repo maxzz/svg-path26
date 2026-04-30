@@ -1,7 +1,8 @@
 import { atom, type Getter, type SetStateAction, type Setter } from "jotai";
 import { appSettings } from "@/store/0-ui-settings";
+import { type SvgoPresetDefaultPluginName } from "@/store/2-svgo-presets";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
-import { type SvgoPresetDefaultPluginName, type ViewBoxStr } from "@/store/9-ui-settings-types-and-defaults";
+import { type ViewBoxStr } from "@/store/9-ui-settings-types-and-defaults";
 import { svgPathInputAtom } from "../../../store/0-atoms/1-1-svg-path-input";
 import { pathViewBoxAtom } from "../../../store/0-atoms/2-2-path-viewbox";
 import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-path-commands/8-svg-utils";

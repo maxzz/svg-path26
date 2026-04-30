@@ -1,5 +1,6 @@
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { type ThemeMode } from "@/utils";
+import { SVGO_PRESET_DEFAULT_PLUGIN_NAMES, type SvgoPresetDefaultPluginOptions } from "./2-svgo-presets";
 
 export interface StoredPathSetting {
     name: string;
@@ -56,45 +57,6 @@ export interface FooterSettings {
 }
 
 export type ViewBoxStr = string;          // ViewBox as a string: "x,y,width,height" separated by commas
-
-export const SVGO_PRESET_DEFAULT_PLUGIN_NAMES = [
-    "removeDoctype",
-    "removeXMLProcInst",
-    "removeComments",
-    "removeMetadata",
-    "removeEditorsNSData",
-    "cleanupAttrs",
-    "mergeStyles",
-    "inlineStyles",
-    "minifyStyles",
-    "cleanupIds",
-    "removeUselessDefs",
-    "cleanupNumericValues",
-    "convertColors",
-    "removeUnknownsAndDefaults",
-    "removeNonInheritableGroupAttrs",
-    "removeUselessStrokeAndFill",
-    "cleanupEnableBackground",
-    "removeHiddenElems",
-    "removeEmptyText",
-    "convertShapeToPath",
-    "convertEllipseToCircle",
-    "moveElemsAttrsToGroup",
-    "moveGroupAttrsToElems",
-    "collapseGroups",
-    "convertPathData",
-    "convertTransform",
-    "removeEmptyAttrs",
-    "removeEmptyContainers",
-    "removeUnusedNS",
-    "mergePaths",
-    "sortAttrs",
-    "sortDefsChildren",
-    "removeDesc",
-] as const;
-
-export type SvgoPresetDefaultPluginName = typeof SVGO_PRESET_DEFAULT_PLUGIN_NAMES[number];
-export type SvgoPresetDefaultPluginOptions = Record<SvgoPresetDefaultPluginName, boolean>;
 
 export interface ExportSvgoSettings {
     enabled: boolean;                      // Optimize exported SVG with SVGO

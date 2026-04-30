@@ -1,7 +1,8 @@
 import { optimize, type Config as SvgoConfig } from "svgo/browser";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
-import { type ExportSettings, type ExportSvgoSettings, type SvgoPresetDefaultPluginName, SVGO_PRESET_DEFAULT_PLUGIN_NAMES } from "@/store/9-ui-settings-types-and-defaults";
+import { SVGO_PRESET_DEFAULT_PLUGIN_NAMES, type SvgoPresetDefaultPluginName } from "@/store/2-svgo-presets";
+import { type ExportSettings, type ExportSvgoSettings } from "@/store/9-ui-settings-types-and-defaults";
 
 export type OptimizeExportSvgResult = {
     svgData: string;

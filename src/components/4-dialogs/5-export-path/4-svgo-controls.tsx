@@ -1,13 +1,14 @@
 import { useSetAtom } from "jotai";
-import { SlidersHorizontal } from "lucide-react";
+import { CircleHelp, SlidersHorizontal } from "lucide-react";
 import { useSnapshot } from "valtio";
 import { Button } from "@/components/ui/shadcn/button";
 import { Checkbox } from "@/components/ui/shadcn/checkbox";
 import { Input } from "@/components/ui/shadcn/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
 import { ScrollArea } from "@/components/ui/shadcn/scroll-area";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 import { appSettings } from "@/store/0-ui-settings";
-import { type SvgoPresetDefaultPluginName, SVGO_PRESET_DEFAULT_PLUGIN_NAMES } from "@/store/9-ui-settings-types-and-defaults";
+import { SVGO_PRESET_DEFAULT, SVGO_PRESET_DEFAULT_PLUGINS, type SvgoPresetDefaultPlugin } from "@/store/2-svgo-presets";
 import { doSetOptimizeSvgEnabledAtom, doSetSvgoFloatPrecisionAtom, doSetSvgoMultipassAtom, doSetSvgoPresetDefaultPluginAtom } from "./8-dialog-export-atoms";
 
 export function SvgoControls() {
@@ -52,64 +53,96 @@ function SvgoOptionsPopover() {
             </PopoverTrigger>
 
             <PopoverContent className="p-0 w-72 text-xs" align="end">
-                <h4 className="px-3 py-2 text-xs font-semibold border-b">
-                    SVGO options
-                </h4>
+                <TooltipProvider delayDuration={250}>
+                    <h4 className="px-3 py-2 text-xs font-semibold border-b">
+                        SVGO options
+                    </h4>
 
-                <div className="p-3 pb-2 grid gap-2">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <Checkbox
-                            className="size-3.5"
-                            checked={svgo.multipass}
-                            onCheckedChange={(checked) => setSvgoMultipass(checked === true)}
-                        />
-                        <span>Multipass</span>
-                    </label>
-
-                    <label className="flex items-center justify-between gap-2">
-                        <span>Float precision</span>
-                        <Input
-                            className="h-6 w-16 px-1.5 text-right"
-                            type="number"
-                            min={0}
-                            max={8}
-                            step={1}
-                            value={svgo.floatPrecision}
-                            onChange={(event) => updateFloatPrecision(Number(event.target.value))}
-                        />
-                    </label>
-                </div>
-
-                <div className="px-3 pb-1 text-[11px] font-medium text-muted-foreground">
-                    preset-default plugins
-                </div>
-
-                <ScrollArea className="h-56 px-3 pb-3" viewportClassName="pb-3" fixedWidth parentContentWidth>
-                    <div className="grid gap-1.5">
-                        {SVGO_PRESET_DEFAULT_PLUGIN_NAMES.map((pluginName) => (
-                            <SvgoPluginCheckbox
-                                key={pluginName}
-                                pluginName={pluginName}
-                                checked={svgo.presetDefault[pluginName]}
-                                onCheckedChange={(enabled) => setSvgoPresetDefaultPlugin({ pluginName, enabled })}
+                    <div className="p-3 pb-2 grid gap-2">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <Checkbox
+                                className="size-3.5"
+                                checked={svgo.multipass}
+                                onCheckedChange={(checked) => setSvgoMultipass(checked === true)}
                             />
-                        ))}
+                            <span>Multipass</span>
+                        </label>
+
+                        <label className="flex items-center justify-between gap-2">
+                            <span>Float precision</span>
+                            <Input
+                                className="h-6 w-16 px-1.5 text-right"
+                                type="number"
+                                min={0}
+                                max={8}
+                                step={1}
+                                value={svgo.floatPrecision}
+                                onChange={(event) => updateFloatPrecision(Number(event.target.value))}
+                            />
+                        </label>
                     </div>
-                </ScrollArea>
+
+                    <div className="px-3 pb-2 text-[11px] text-muted-foreground border-t">
+                        <div className="pt-2 flex items-center justify-between gap-2 font-medium">
+                            <span>{SVGO_PRESET_DEFAULT.label} preset plugins</span>
+                            <span className="font-mono text-[10px]">{SVGO_PRESET_DEFAULT.id}</span>
+                        </div>
+                        <p className="mt-1 leading-4">
+                            {SVGO_PRESET_DEFAULT.description}
+                        </p>
+                    </div>
+
+                    <ScrollArea className="h-56 px-3 pb-3" viewportClassName="pb-3" fixedWidth parentContentWidth>
+                        <div className="grid gap-1.5">
+                            {SVGO_PRESET_DEFAULT_PLUGINS.map((plugin) => (
+                                <SvgoPluginCheckbox
+                                    key={plugin.id}
+                                    plugin={plugin}
+                                    checked={svgo.presetDefault[plugin.id]}
+                                    onCheckedChange={(enabled) => setSvgoPresetDefaultPlugin({ pluginName: plugin.id, enabled })}
+                                />
+                            ))}
+                        </div>
+                    </ScrollArea>
+                </TooltipProvider>
             </PopoverContent>
         </Popover>
     );
 }
 
-function SvgoPluginCheckbox({ pluginName, checked, onCheckedChange }: { pluginName: SvgoPresetDefaultPluginName; checked: boolean; onCheckedChange: (enabled: boolean) => void; }) {
+function SvgoPluginCheckbox({ plugin, checked, onCheckedChange }: { plugin: SvgoPresetDefaultPlugin; checked: boolean; onCheckedChange: (enabled: boolean) => void; }) {
     return (
-        <label className="flex items-center gap-2 cursor-pointer">
-            <Checkbox
-                className="size-3.5"
-                checked={checked}
-                onCheckedChange={(nextChecked) => onCheckedChange(nextChecked === true)}
-            />
-            <span className="font-mono text-[11px] leading-4">{pluginName}</span>
-        </label>
+        <div className="grid grid-cols-[1fr_auto] items-start gap-2 rounded-sm px-1 py-1 hover:bg-accent/40">
+            <label className="flex min-w-0 items-start gap-2 cursor-pointer">
+                <Checkbox
+                    className="mt-0.5 size-3.5"
+                    checked={checked}
+                    onCheckedChange={(nextChecked) => onCheckedChange(nextChecked === true)}
+                />
+                <span className="grid gap-0.5 min-w-0">
+                    <span className="text-[11px] font-medium leading-4">{plugin.label}</span>
+                    <span className="font-mono text-[10px] leading-4 text-muted-foreground">{plugin.id}</span>
+                </span>
+            </label>
+
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <button
+                        type="button"
+                        className="mt-0.5 text-muted-foreground transition-colors hover:text-foreground"
+                        aria-label={`About ${plugin.label}`}
+                    >
+                        <CircleHelp className="size-3.5" />
+                    </button>
+                </TooltipTrigger>
+                <TooltipContent side="left" sideOffset={6} className="max-w-72">
+                    <div className="grid gap-1">
+                        <div className="font-medium leading-4">{plugin.label}</div>
+                        <div className="text-[11px] leading-4">{plugin.description}</div>
+                        <div className="font-mono text-[10px] leading-4 text-background/70">{plugin.id}</div>
+                    </div>
+                </TooltipContent>
+            </Tooltip>
+        </div>
     );
 }
