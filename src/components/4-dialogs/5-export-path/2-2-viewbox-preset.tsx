@@ -1,10 +1,10 @@
 import { useEffect, useMemo } from "react";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/shadcn/select";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { type ViewBoxStr } from "@/store/9-ui-settings-types-and-defaults";
-import { viewBoxCustomValueStrDraftAtom, viewBoxDraftAtom, viewBoxStrDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
+import { doSetExportViewBoxDraftAtom, viewBoxCustomValueStrDraftAtom, viewBoxDraftAtom, viewBoxStrDraftAtom } from "@/components/4-dialogs/5-export-path/8-dialog-export-atoms";
 import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-path-commands/8-svg-utils";
 import { appSettings } from "@/store/0-ui-settings";
@@ -17,7 +17,8 @@ export function ViewBoxPresetSelect({className}: {className?: string}) {
     const pathValue = useAtomValue(svgPathInputAtom);
     const pathViewBox = useAtomValue(pathViewBoxAtom);
     const viewBoxCustomValueStrDraft = useAtomValue(viewBoxCustomValueStrDraftAtom);
-    const [viewBoxDraft, setViewBoxDraft] = useAtom(viewBoxDraftAtom);
+    const viewBoxDraft = useAtomValue(viewBoxDraftAtom);
+    const setViewBoxDraft = useSetAtom(doSetExportViewBoxDraftAtom);
     const [viewBoxStrDraft, setViewBoxStrDraft] = useAtom(viewBoxStrDraftAtom);
 
     const boundsViewBox = useMemo(

@@ -1,10 +1,19 @@
+import { useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { Input } from "@/components/ui/shadcn/input";
 import { Switch } from "@/components/ui/shadcn/switch";
 import { appSettings } from "@/store/0-ui-settings";
+import { doRefreshExportSvgCodeAtom } from "./8-dialog-export-atoms";
 
 export function FillStrokeControls() {
     const { exportFill, exportFillColor, exportStroke, exportStrokeColor, exportStrokeWidth } = useSnapshot(appSettings.export);
+    const refreshExportSvgCode = useSetAtom(doRefreshExportSvgCodeAtom);
+
+    function updateExportSetting(update: () => void) {
+        update();
+        refreshExportSvgCode();
+    }
+
     return (
         <div className="grid grid-cols-[auto_auto_minmax(0,1fr)] gap-y-1">
 
@@ -16,7 +25,7 @@ export function FillStrokeControls() {
                     <Switch
                         className="scale-60 cursor-pointer"
                         checked={exportStroke}
-                        onCheckedChange={(checked) => appSettings.export.exportStroke = Boolean(checked)}
+                        onCheckedChange={(checked) => updateExportSetting(() => { appSettings.export.exportStroke = Boolean(checked); })}
                     />
                 </label>
 
@@ -25,7 +34,7 @@ export function FillStrokeControls() {
                     type="color"
                     disabled={!exportStroke}
                     value={exportStrokeColor}
-                    onChange={(event) => appSettings.export.exportStrokeColor = event.target.value}
+                    onChange={(event) => updateExportSetting(() => { appSettings.export.exportStrokeColor = event.target.value; })}
                 />
 
                 <label className="flex items-center gap-x-1">
@@ -39,7 +48,7 @@ export function FillStrokeControls() {
                         min={0.1}
                         step={0.05}
                         value={exportStrokeWidth}
-                        onChange={(event) => appSettings.export.exportStrokeWidth = Number(event.target.value)}
+                        onChange={(event) => updateExportSetting(() => { appSettings.export.exportStrokeWidth = Number(event.target.value); })}
                     />
                 </label>
             </div>
@@ -52,7 +61,7 @@ export function FillStrokeControls() {
                     <Switch
                         className="scale-60 cursor-pointer"
                         checked={exportFill}
-                        onCheckedChange={(checked) => appSettings.export.exportFill = Boolean(checked)}
+                        onCheckedChange={(checked) => updateExportSetting(() => { appSettings.export.exportFill = Boolean(checked); })}
                     />
                 </label>
 
@@ -61,7 +70,7 @@ export function FillStrokeControls() {
                     type="color"
                     disabled={!exportFill}
                     value={exportFillColor}
-                    onChange={(event) => appSettings.export.exportFillColor = event.target.value}
+                    onChange={(event) => updateExportSetting(() => { appSettings.export.exportFillColor = event.target.value; })}
                 />
             </div>
 

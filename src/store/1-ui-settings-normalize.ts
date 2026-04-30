@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
-import { type CanvasSettings, type DialogSettings, type ExportSettings, type FooterSettings, type PathEditorSettings, type SectionPreviewSettings, type UiSettings, DEFAULT_CANVAS_SETTINGS, DEFAULT_DIALOGS_SETTINGS, DEFAULT_EXPORT_SETTINGS, DEFAULT_FOOTER_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SECTION_PREVIEW_SETTINGS, DEFAULT_SETTINGS, DEFAULT_VIEWBOX_SETTINGS } from "./9-ui-settings-types-and-defaults";
+import { type CanvasSettings, type DialogSettings, type ExportSettings, type ExportSvgoSettings, type FooterSettings, type PathEditorSettings, type SectionPreviewSettings, type SvgoPresetDefaultPluginOptions, type UiSettings, DEFAULT_CANVAS_SETTINGS, DEFAULT_DIALOGS_SETTINGS, DEFAULT_EXPORT_SETTINGS, DEFAULT_FOOTER_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SECTION_PREVIEW_SETTINGS, DEFAULT_SETTINGS, DEFAULT_VIEWBOX_SETTINGS, SVGO_PRESET_DEFAULT_PLUGIN_NAMES } from "./9-ui-settings-types-and-defaults";
 
 type MutableViewBox = Writeable<ViewBox>;
 
@@ -76,7 +76,13 @@ function cloneUiSettings(settings: UiSettings): UiSettings {
         },
         sections: { ...settings.sections },
         editorPanelSizes: [...settings.editorPanelSizes],
-        export: { ...settings.export },
+        export: {
+            ...settings.export,
+            svgo: {
+                ...settings.export.svgo,
+                presetDefault: { ...settings.export.svgo.presetDefault },
+            },
+        },
         footer: {
             ...settings.footer,
             buttons: { ...settings.footer.buttons },
@@ -219,8 +225,30 @@ function createExportSettingsSchema(defaultSettings: ExportSettings) {
             exportStrokeWidth: z.number().catch(defaultSettings.exportStrokeWidth),
             exportPreviewGrid: z.boolean().catch(defaultSettings.exportPreviewGrid),
             viewBoxPreset: z.string().catch(defaultSettings.viewBoxPreset),
+            svgo: createExportSvgoSettingsSchema(defaultSettings.svgo).catch(defaultSettings.svgo),
         })
     );
+}
+
+function createExportSvgoSettingsSchema(defaultSettings: ExportSvgoSettings) {
+    return z.preprocess(
+        toRecord,
+        z.object({
+            enabled: z.boolean().catch(defaultSettings.enabled),
+            multipass: z.boolean().catch(defaultSettings.multipass),
+            floatPrecision: z.number().catch(defaultSettings.floatPrecision),
+            presetDefault: z.record(z.string(), z.boolean()).catch(defaultSettings.presetDefault),
+        }).transform((settings) => ({
+            ...settings,
+            presetDefault: normalizeSvgoPresetDefaultOptions(settings.presetDefault, defaultSettings.presetDefault),
+        }))
+    );
+}
+
+function normalizeSvgoPresetDefaultOptions(value: Record<string, boolean>, defaults: SvgoPresetDefaultPluginOptions): SvgoPresetDefaultPluginOptions {
+    return Object.fromEntries(
+        SVGO_PRESET_DEFAULT_PLUGIN_NAMES.map((pluginName) => [pluginName, value[pluginName] ?? defaults[pluginName]])
+    ) as SvgoPresetDefaultPluginOptions;
 }
 
 function toRecord(value: unknown): Record<string, unknown> {

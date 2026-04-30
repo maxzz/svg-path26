@@ -57,6 +57,52 @@ export interface FooterSettings {
 
 export type ViewBoxStr = string;          // ViewBox as a string: "x,y,width,height" separated by commas
 
+export const SVGO_PRESET_DEFAULT_PLUGIN_NAMES = [
+    "removeDoctype",
+    "removeXMLProcInst",
+    "removeComments",
+    "removeMetadata",
+    "removeEditorsNSData",
+    "cleanupAttrs",
+    "mergeStyles",
+    "inlineStyles",
+    "minifyStyles",
+    "cleanupIds",
+    "removeUselessDefs",
+    "cleanupNumericValues",
+    "convertColors",
+    "removeUnknownsAndDefaults",
+    "removeNonInheritableGroupAttrs",
+    "removeUselessStrokeAndFill",
+    "cleanupEnableBackground",
+    "removeHiddenElems",
+    "removeEmptyText",
+    "convertShapeToPath",
+    "convertEllipseToCircle",
+    "moveElemsAttrsToGroup",
+    "moveGroupAttrsToElems",
+    "collapseGroups",
+    "convertPathData",
+    "convertTransform",
+    "removeEmptyAttrs",
+    "removeEmptyContainers",
+    "removeUnusedNS",
+    "mergePaths",
+    "sortAttrs",
+    "sortDefsChildren",
+    "removeDesc",
+] as const;
+
+export type SvgoPresetDefaultPluginName = typeof SVGO_PRESET_DEFAULT_PLUGIN_NAMES[number];
+export type SvgoPresetDefaultPluginOptions = Record<SvgoPresetDefaultPluginName, boolean>;
+
+export interface ExportSvgoSettings {
+    enabled: boolean;                      // Optimize exported SVG with SVGO
+    multipass: boolean;                    // Run SVGO multiple passes
+    floatPrecision: number;                // SVGO float precision
+    presetDefault: SvgoPresetDefaultPluginOptions; // Enabled preset-default plugins
+}
+
 export interface ExportSettings {
     exportFill: boolean;                  // Export fill or not
     exportFillColor: string;              // Export fill color
@@ -65,6 +111,7 @@ export interface ExportSettings {
     exportStrokeWidth: number;            // Export stroke width
     exportPreviewGrid: boolean;           // Show grid in export preview
     viewBoxPreset: ViewBoxStr;            // Selected export viewBox preset value
+    svgo: ExportSvgoSettings;             // SVG optimization settings
 }
 
 export interface ScaleToViewBoxDialogSettings {
@@ -134,6 +181,17 @@ export const DEFAULT_FOOTER_SETTINGS: FooterSettings = {
     },
 };
 
+export const DEFAULT_SVGO_PRESET_DEFAULT_PLUGIN_OPTIONS = Object.fromEntries(
+    SVGO_PRESET_DEFAULT_PLUGIN_NAMES.map((pluginName) => [pluginName, true])
+) as SvgoPresetDefaultPluginOptions;
+
+export const DEFAULT_EXPORT_SVGO_SETTINGS: ExportSvgoSettings = {
+    enabled: false,
+    multipass: false,
+    floatPrecision: 3,
+    presetDefault: DEFAULT_SVGO_PRESET_DEFAULT_PLUGIN_OPTIONS,
+};
+
 export const DEFAULT_EXPORT_SETTINGS: ExportSettings = {
     exportFill: true,
     exportFillColor: "#000000",
@@ -142,6 +200,7 @@ export const DEFAULT_EXPORT_SETTINGS: ExportSettings = {
     exportStrokeWidth: 0.1,
     exportPreviewGrid: true,
     viewBoxPreset: DEFAULT_VIEWBOX_SETTINGS.join(","),
+    svgo: DEFAULT_EXPORT_SVGO_SETTINGS,
 };
 
 export const DEFAULT_DIALOGS_SETTINGS: DialogSettings = {
