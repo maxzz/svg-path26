@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
-import { type CanvasSettings, type DialogSettings, type ExportSettings, type ExportSvgoSettings, type FooterSettings, type PathEditorSettings, type SectionPreviewSettings, type UiSettings, DEFAULT_CANVAS_SETTINGS, DEFAULT_DIALOGS_SETTINGS, DEFAULT_EXPORT_SETTINGS, DEFAULT_FOOTER_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SECTION_PREVIEW_SETTINGS, DEFAULT_SETTINGS, DEFAULT_VIEWBOX_SETTINGS } from "./9-ui-settings-types-and-defaults";
+import { type CanvasSettings, type DialogSettings, type ExportSettings, type ExportSvgoSettings, type FooterSettings, type PathEditorSettings, type ReactComponentGenerator, type SectionPreviewSettings, type UiSettings, DEFAULT_CANVAS_SETTINGS, DEFAULT_DIALOGS_SETTINGS, DEFAULT_EXPORT_SETTINGS, DEFAULT_FOOTER_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS, DEFAULT_SECTION_PREVIEW_SETTINGS, DEFAULT_SETTINGS, DEFAULT_VIEWBOX_SETTINGS } from "./9-ui-settings-types-and-defaults";
 import { SVGO_PRESET_DEFAULT_PLUGIN_NAMES, type SvgoPresetDefaultPluginOptions } from "./2-svgo-presets";
 
 type MutableViewBox = Writeable<ViewBox>;
@@ -225,6 +225,8 @@ function createExportSettingsSchema(defaultSettings: ExportSettings) {
             exportStrokeColor: z.string().catch(defaultSettings.exportStrokeColor),
             exportStrokeWidth: z.number().catch(defaultSettings.exportStrokeWidth),
             exportPreviewGrid: z.boolean().catch(defaultSettings.exportPreviewGrid),
+            exportAsReactComponent: z.boolean().catch(defaultSettings.exportAsReactComponent),
+            reactComponentGenerator: reactComponentGeneratorSchema.catch(defaultSettings.reactComponentGenerator),
             viewBoxPreset: z.string().catch(defaultSettings.viewBoxPreset),
             svgo: createExportSvgoSettingsSchema(defaultSettings.svgo).catch(defaultSettings.svgo),
         })
@@ -257,6 +259,10 @@ function toRecord(value: unknown): Record<string, unknown> {
 }
 
 const themeModeSchema = z.enum(["light", "dark", "system"]);
+const reactComponentGeneratorSchema = z.preprocess(
+    (value) => value === "svgr" ? "markup" : value,
+    z.enum(["template", "markup"])
+) satisfies z.ZodType<ReactComponentGenerator>;
 
 function toMutableViewBox(viewBox: ViewBox): MutableViewBox {
     return [viewBox[0], viewBox[1], viewBox[2], viewBox[3]];
