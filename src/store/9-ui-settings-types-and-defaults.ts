@@ -72,6 +72,7 @@ export interface ExportSettings {
     exportStrokeColor: string;            // Export stroke color
     exportStrokeWidth: number;            // Export stroke width
     exportPreviewGrid: boolean;           // Show grid in export preview
+    exportReactComponent: boolean;        // Export as React component
     viewBoxPreset: ViewBoxStr;            // Selected export viewBox preset value
     svgo: ExportSvgoSettings;             // SVG optimization settings
 }
@@ -161,6 +162,7 @@ export const DEFAULT_EXPORT_SETTINGS: ExportSettings = {
     exportStrokeColor: "#ff0000",
     exportStrokeWidth: 0.1,
     exportPreviewGrid: true,
+    exportReactComponent: false,
     viewBoxPreset: DEFAULT_VIEWBOX_SETTINGS.join(","),
     svgo: DEFAULT_EXPORT_SVGO_SETTINGS,
 };

@@ -225,6 +225,7 @@ function createExportSettingsSchema(defaultSettings: ExportSettings) {
             exportStrokeColor: z.string().catch(defaultSettings.exportStrokeColor),
             exportStrokeWidth: z.number().catch(defaultSettings.exportStrokeWidth),
             exportPreviewGrid: z.boolean().catch(defaultSettings.exportPreviewGrid),
+            exportReactComponent: z.boolean().catch(defaultSettings.exportReactComponent),
             viewBoxPreset: z.string().catch(defaultSettings.viewBoxPreset),
             svgo: createExportSvgoSettingsSchema(defaultSettings.svgo).catch(defaultSettings.svgo),
         })
