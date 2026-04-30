@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, MoveRight } from "lucide-react";
 import { useSnapshot } from "valtio";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/shadcn/accordion";
 import { Button } from "@/components/ui/shadcn/button";
@@ -8,12 +8,14 @@ import { appSettings } from "@/store/0-ui-settings";
 import { doCopyDisplayedExportSvgCodeAtom, exportSvgCodeAccordionValueAtom, exportSvgCodeCopiedAtom, optimizedExportSvgCodeAtom, optimizedExportSvgErrorAtom, rawExportSvgCodeAtom } from "./8-dialog-export-atoms";
 
 export function ExportSvgCodeAccordion() {
-    const { enabled } = useSnapshot(appSettings.export.svgo);
     const [accordionValue, setAccordionValue] = useAtom(exportSvgCodeAccordionValueAtom);
+
+    const { enabled } = useSnapshot(appSettings.export.svgo);
     const rawSvgCode = useAtomValue(rawExportSvgCodeAtom);
     const optimizedSvgCode = useAtomValue(optimizedExportSvgCodeAtom);
     const optimizedError = useAtomValue(optimizedExportSvgErrorAtom);
     const copied = useAtomValue(exportSvgCodeCopiedAtom);
+
     const copySvgCode = useSetAtom(doCopyDisplayedExportSvgCodeAtom);
 
     const displayedSvgCode = enabled ? optimizedSvgCode : rawSvgCode;
@@ -25,9 +27,14 @@ export function ExportSvgCodeAccordion() {
             <AccordionItem value="svg-code" className="border rounded px-2">
                 <AccordionTrigger className="py-1.5 text-xs hover:no-underline">
                     <span className="flex items-center gap-2">
-                        <span>SVG code</span>
-                        <span className="text-[10px] text-muted-foreground">
-                            {displayedSvgCode.length} chars
+                        <span>
+                            SVG code
+                        </span>
+                        <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                            {rawSvgCode.length} 
+                            <MoveRight className="size-3" />
+                            {optimizedSvgCode.length}
+                            {/* TODO: calculate the difference between the two lengths as percentage and show red if grow or green if shrink */}
                         </span>
                     </span>
                 </AccordionTrigger>
@@ -41,7 +48,7 @@ export function ExportSvgCodeAccordion() {
                             type="button"
                             className="h-6 px-2 gap-1"
                             disabled={!canCopy}
-                            onClick={() => void copySvgCode()}
+                            onClick={copySvgCode}
                         >
                             {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
                             {copied ? "Copied" : "Copy"}

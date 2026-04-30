@@ -76,7 +76,7 @@ function SvgoOptionsPopover() {
                                 Float precision
                             </span>
                             <Input
-                                className="h-6 w-16 px-1.5 text-right"
+                                className="h-6 w-16 px-1 text-right"
                                 type="number"
                                 min={0}
                                 max={8}
