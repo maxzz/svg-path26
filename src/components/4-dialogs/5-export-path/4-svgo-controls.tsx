@@ -72,7 +72,9 @@ function SvgoOptionsPopover() {
                         </label>
 
                         <label className="flex items-center justify-between gap-2">
-                            <span>Float precision</span>
+                            <span>
+                                Float precision
+                            </span>
                             <Input
                                 className="h-6 w-16 px-1.5 text-right"
                                 type="number"
@@ -87,8 +89,12 @@ function SvgoOptionsPopover() {
 
                     <div className="px-3 pb-2 text-[11px] text-muted-foreground border-t">
                         <div className="pt-2 flex items-center justify-between gap-2 font-medium">
-                            <span>{SVGO_PRESET_DEFAULT.label} preset plugins</span>
-                            <span className="font-mono text-[10px]">{SVGO_PRESET_DEFAULT.id}</span>
+                            <span>
+                                {SVGO_PRESET_DEFAULT.label} preset plugins
+                            </span>
+                            <span className="font-mono text-[10px]">
+                                {SVGO_PRESET_DEFAULT.id}
+                            </span>
                         </div>
                         <p className="mt-1 leading-4">
                             {SVGO_PRESET_DEFAULT.description}
@@ -121,7 +127,9 @@ function SvgoPluginCheckbox({ plugin, checked, onCheckedChange }: { plugin: Svgo
             <label className="flex min-w-0 items-start gap-2 cursor-pointer">
                 <Checkbox className="mt-0.5 size-3.5" checked={checked} onCheckedChange={(nextChecked) => onCheckedChange(nextChecked === true)} />
                 <span className="grid gap-0.5 min-w-0">
-                    <span className="text-[11px] font-medium leading-4">{plugin.label}</span>
+                    <span className="text-[11px] font-medium leading-4">
+                        {plugin.label}
+                    </span>
                 </span>
             </label>
 
@@ -133,10 +141,12 @@ function SvgoPluginCheckbox({ plugin, checked, onCheckedChange }: { plugin: Svgo
                 </TooltipTrigger>
 
                 <TooltipContent className="max-w-52" side="bottom" sideOffset={6}>
-                    <div className="py-1 grid gap-1">
-                        <div className="text-[11px] leading-4 text-pretty">{plugin.description}</div>
+                    <div className="py-1 text-[11px] leading-4 grid gap-1">
+                        <div className="text-pretty">
+                            {plugin.description}
+                        </div>
                         <a
-                            className="text-[10px] text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                            className="text-sky-500 hover:text-sky-200 dark:text-sky-600 dark:hover:text-sky-400 underline underline-offset-2"
                             href={`https://svgo.dev/docs/plugins/${plugin.id}`}
                             rel="noreferrer"
                             target="_blank"
