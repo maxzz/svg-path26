@@ -30,12 +30,7 @@ export function ExportSvgCodeAccordion() {
                         <span>
                             SVG code
                         </span>
-                        <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-                            {rawSvgCode.length} 
-                            <MoveRight className="size-3" />
-                            {optimizedSvgCode.length}
-                            {/* TODO: calculate the difference between the two lengths as percentage and show red if grow or green if shrink */}
-                        </span>
+                        <SvgCodeLengthDiff />
                     </span>
                 </AccordionTrigger>
 
@@ -70,5 +65,31 @@ export function ExportSvgCodeAccordion() {
                 </AccordionContent>
             </AccordionItem>
         </Accordion>
+    );
+}
+
+function SvgCodeLengthDiff() {
+    const rawSvgCode = useAtomValue(rawExportSvgCodeAtom);
+    const optimizedSvgCode = useAtomValue(optimizedExportSvgCodeAtom);
+    const rawLength = rawSvgCode.length;
+    const optimizedLength = optimizedSvgCode.length;
+    const lengthDiff = optimizedLength - rawLength;
+    const diffPercent = rawLength > 0 ? (lengthDiff / rawLength) * 100 : 0;
+    const diffLabel = rawLength > 0 ? `${lengthDiff > 0 ? "+" : ""}${diffPercent.toFixed(1)}%` : "0%";
+    const diffClassName = lengthDiff > 0
+        ? "text-destructive"
+        : lengthDiff < 0
+            ? "text-emerald-700 dark:text-emerald-300"
+            : "text-muted-foreground";
+
+    return (
+        <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+            {rawLength}
+            <MoveRight className="size-3" />
+            {optimizedLength}
+            <span className={diffClassName}>
+                ({diffLabel})
+            </span>
+        </span>
     );
 }
