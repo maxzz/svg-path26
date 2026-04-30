@@ -135,6 +135,14 @@ function SvgoPluginCheckbox({ plugin, checked, onCheckedChange }: { plugin: Svgo
                 <TooltipContent className="max-w-52" side="bottom" sideOffset={6}>
                     <div className="py-1 grid gap-1">
                         <div className="text-[11px] leading-4 text-pretty">{plugin.description}</div>
+                        <a
+                            className="text-[10px] text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                            href={`https://svgo.dev/docs/plugins/${plugin.id}`}
+                            rel="noreferrer"
+                            target="_blank"
+                        >
+                            Documentation
+                        </a>
                     </div>
                 </TooltipContent>
             </Tooltip>
