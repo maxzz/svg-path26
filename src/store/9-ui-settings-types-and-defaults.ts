@@ -65,6 +65,8 @@ export interface ExportSvgoSettings {
     presetDefault: SvgoPresetDefaultPluginOptions; // Enabled preset-default plugins
 }
 
+export type ReactComponentGenerator = "template" | "markup";
+
 export interface ExportSettings {
     exportFill: boolean;                  // Export fill or not
     exportFillColor: string;              // Export fill color
@@ -72,7 +74,8 @@ export interface ExportSettings {
     exportStrokeColor: string;            // Export stroke color
     exportStrokeWidth: number;            // Export stroke width
     exportPreviewGrid: boolean;           // Show grid in export preview
-    exportReactComponent: boolean;        // Export as React component
+    exportAsReactComponent: boolean;      // Export current SVG as a React component
+    reactComponentGenerator: ReactComponentGenerator; // React component generator strategy
     viewBoxPreset: ViewBoxStr;            // Selected export viewBox preset value
     svgo: ExportSvgoSettings;             // SVG optimization settings
 }
@@ -162,7 +165,8 @@ export const DEFAULT_EXPORT_SETTINGS: ExportSettings = {
     exportStrokeColor: "#ff0000",
     exportStrokeWidth: 0.1,
     exportPreviewGrid: true,
-    exportReactComponent: false,
+    exportAsReactComponent: false,
+    reactComponentGenerator: "template",
     viewBoxPreset: DEFAULT_VIEWBOX_SETTINGS.join(","),
     svgo: DEFAULT_EXPORT_SVGO_SETTINGS,
 };

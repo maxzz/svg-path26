@@ -2,12 +2,16 @@ import { atom, type Getter, type SetStateAction, type Setter } from "jotai";
 import { appSettings } from "@/store/0-ui-settings";
 import { type SvgoPresetDefaultPluginName } from "@/store/2-svgo-presets";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
-import { type ViewBoxStr } from "@/store/9-ui-settings-types-and-defaults";
+import { type ReactComponentGenerator, type ViewBoxStr } from "@/store/9-ui-settings-types-and-defaults";
 import { svgPathInputAtom } from "../../../store/0-atoms/1-1-svg-path-input";
 import { pathViewBoxAtom } from "../../../store/0-atoms/2-2-path-viewbox";
+import { svgInputDocumentAtom } from "@/store/0-atoms/1-3-svg-input";
 import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-path-commands/8-svg-utils";
 import { isViewBoxString, parseViewBoxString, viewBoxToString } from "@/store/8-utils/1-viewbox-utils";
-import { buildExportSvgData, optimizeExportSvgData } from "./7-export-utils";
+import { buildExportSvgDocument } from "./9-export-source";
+import { buildExportSvgData, downloadTextFile, exportSvgToFile, optimizeExportSvgData } from "./7-export-utils";
+import { generateReactComponentFromTemplate } from "./11-react-export-template";
+import { generateReactComponentWithMarkupParser } from "./12-react-export-markup";
 
 // Open dialog atom
 
@@ -29,6 +33,9 @@ export const exportSvgDialogOpenAtom = atom(
 
             const nextViewBoxDraft = resolveViewBoxDraft(presetStr, boundsViewBox, pathViewBox);
             set(viewBoxDraftAtom, nextViewBoxDraft);
+            set(exportReactComponentErrorAtom, "");
+            set(exportReactComponentNoticeAtom, "");
+            set(exportDialogBusyAtom, false);
             refreshExportSvgCode(get, set, nextViewBoxDraft);
         }
         set(exportSvgDialogOpenBaseAtom, open);
@@ -77,6 +84,9 @@ export const optimizedExportSvgCodeAtom = atom("");
 export const optimizedExportSvgErrorAtom = atom("");
 export const exportSvgCodeAccordionValueAtom = atom("");
 export const exportSvgCodeCopiedAtom = atom(false);
+export const exportReactComponentErrorAtom = atom("");
+export const exportReactComponentNoticeAtom = atom("");
+export const exportDialogBusyAtom = atom(false);
 
 const exportSvgCodeCopiedTimerAtom = atom<number | null>(null);
 
@@ -90,6 +100,24 @@ export const doRefreshExportSvgCodeAtom = atom(
     null,
     (get, set) => {
         refreshExportSvgCode(get, set);
+    },
+);
+
+export const doSetExportAsReactComponentAtom = atom(
+    null,
+    (_get, set, enabled: boolean) => {
+        appSettings.export.exportAsReactComponent = enabled;
+        set(exportReactComponentErrorAtom, "");
+        set(exportReactComponentNoticeAtom, "");
+    },
+);
+
+export const doSetReactComponentGeneratorAtom = atom(
+    null,
+    (_get, set, generator: ReactComponentGenerator) => {
+        appSettings.export.reactComponentGenerator = generator;
+        set(exportReactComponentErrorAtom, "");
+        set(exportReactComponentNoticeAtom, "");
     },
 );
 
@@ -120,12 +148,56 @@ export const doCopyDisplayedExportSvgCodeAtom = atom(
     },
 );
 
-// Export settings action atoms
-
-export const doSetExportReactComponentAtom = atom(
+export const doExportFromDialogAtom = atom(
     null,
-    (_get, _set, enabled: boolean) => {
-        appSettings.export.exportReactComponent = enabled;
+    async (get, set) => {
+        set(exportDialogBusyAtom, true);
+        set(exportReactComponentErrorAtom, "");
+        set(exportReactComponentNoticeAtom, "");
+
+        try {
+            if (appSettings.export.exportAsReactComponent) {
+                const exportDocument = buildExportSvgDocument({
+                    svgInputDocument: get(svgInputDocumentAtom),
+                    pathValue: get(svgPathInputAtom),
+                    pathViewBox: get(pathViewBoxAtom),
+                    exportViewBoxDraft: get(viewBoxDraftAtom),
+                    exportSettings: appSettings.export,
+                });
+                const generatorOptions = {
+                    exportDocument,
+                    pathName: appSettings.pathEditor.pathName,
+                };
+                const result = appSettings.export.reactComponentGenerator === "markup"
+                    ? generateReactComponentWithMarkupParser(generatorOptions)
+                    : generateReactComponentFromTemplate(generatorOptions);
+
+                if (result.notice) {
+                    set(exportReactComponentNoticeAtom, result.notice);
+                }
+
+                if (!result.code.trim()) {
+                    set(exportReactComponentErrorAtom, result.error || "Failed to generate a React component export.");
+                    return false;
+                }
+
+                return downloadTextFile({
+                    data: result.code,
+                    fileName: result.fileName,
+                    mimeType: "text/plain;charset=utf-8",
+                });
+            }
+
+            return exportSvgToFile({
+                svgData: get(displayedExportSvgCodeAtom),
+            });
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Failed to export.";
+            set(exportReactComponentErrorAtom, message);
+            return false;
+        } finally {
+            set(exportDialogBusyAtom, false);
+        }
     },
 );
 
@@ -195,8 +267,15 @@ function resolveViewBoxDraft(preset: ViewBoxStr, boundsViewBox: ViewBox, current
 }
 
 function refreshExportSvgCode(get: Getter, set: Setter, exportViewBoxDraft = get(viewBoxDraftAtom)): void {
+    const svgInputDocument = get(svgInputDocumentAtom);
     const pathValue = get(svgPathInputAtom);
-    const rawSvgData = buildExportSvgData({ pathValue, exportViewBoxDraft });
+    const pathViewBox = get(pathViewBoxAtom);
+    const rawSvgData = buildExportSvgData({
+        svgInputDocument,
+        pathValue,
+        pathViewBox,
+        exportViewBoxDraft,
+    });
     const optimizedResult = optimizeExportSvgData(rawSvgData, appSettings.export.svgo);
 
     set(rawExportSvgCodeAtom, rawSvgData);
