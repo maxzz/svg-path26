@@ -121,11 +121,7 @@ function SvgoPluginCheckbox({ plugin, checked, onCheckedChange }: { plugin: Svgo
     return (
         <div className="grid grid-cols-[1fr_auto] items-start gap-2 rounded-sm px-1 py-1 hover:bg-accent/40">
             <label className="flex min-w-0 items-start gap-2 cursor-pointer">
-                <Checkbox
-                    className="mt-0.5 size-3.5"
-                    checked={checked}
-                    onCheckedChange={(nextChecked) => onCheckedChange(nextChecked === true)}
-                />
+                <Checkbox className="mt-0.5 size-3.5" checked={checked} onCheckedChange={(nextChecked) => onCheckedChange(nextChecked === true)} />
                 <span className="grid gap-0.5 min-w-0">
                     <span className="text-[11px] font-medium leading-4">{plugin.label}</span>
                     <span className="font-mono text-[10px] leading-4 text-muted-foreground">{plugin.id}</span>
@@ -134,15 +130,12 @@ function SvgoPluginCheckbox({ plugin, checked, onCheckedChange }: { plugin: Svgo
 
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <button
-                        type="button"
-                        className="mt-0.5 text-muted-foreground transition-colors hover:text-foreground"
-                        aria-label={`About ${plugin.label}`}
-                    >
+                    <button className="mt-0.5 text-muted-foreground transition-colors hover:text-foreground" aria-label={`About ${plugin.label}`} type="button">
                         <CircleHelp className="size-3.5" />
                     </button>
                 </TooltipTrigger>
-                <TooltipContent side="left" sideOffset={6} className="max-w-72">
+
+                <TooltipContent className="max-w-68" side="bottom" sideOffset={6}>
                     <div className="grid gap-1">
                         <div className="font-medium leading-4">{plugin.label}</div>
                         <div className="text-[11px] leading-4">{plugin.description}</div>
