@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/shadcn/checkbox";
 import { Input } from "@/components/ui/shadcn/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn/popover";
 import { ScrollArea } from "@/components/ui/shadcn/scroll-area";
+import { Switch } from "@/components/ui/shadcn/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 import { appSettings } from "@/store/0-ui-settings";
 import { SVGO_PRESET_DEFAULT, SVGO_PRESET_DEFAULT_PLUGINS, type SvgoPresetDefaultPlugin } from "@/store/2-svgo-presets";
@@ -18,8 +19,8 @@ export function SvgoControls() {
 
     return (
         <div className="px-2 py-1.5 border rounded flex items-center justify-between gap-2 select-none">
-            <label className="flex items-center gap-2 cursor-pointer">
-                <Checkbox className="size-3.5" checked={svgo.enabled} onCheckedChange={(checked) => setOptimizeSvgEnabled(checked === true)} />
+            <label className="flex items-center cursor-pointer">
+                <Switch className="scale-60 cursor-pointer" checked={svgo.enabled} onCheckedChange={(checked) => setOptimizeSvgEnabled(checked === true)} />
                 <span>
                     Optimize SVG
                 </span>
