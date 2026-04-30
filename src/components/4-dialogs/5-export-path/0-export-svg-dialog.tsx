@@ -33,7 +33,7 @@ export function ExportSvgDialog() {
 
     return (
         <Dialog open={openExportDialog} onOpenChange={setOpenExportDialog}>
-            <DialogContent className="max-w-sm!">
+            <DialogContent className="max-w-sm!" data-dialog="export-svg">
                 <DialogHeader>
                     <DialogTitle>
                         Export SVG

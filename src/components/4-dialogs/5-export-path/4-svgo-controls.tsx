@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useSetAtom } from "jotai";
 import { CircleHelp, SlidersHorizontal } from "lucide-react";
 import { useSnapshot } from "valtio";
@@ -36,6 +37,12 @@ function SvgoOptionsPopover() {
     const setSvgoMultipass = useSetAtom(doSetSvgoMultipassAtom);
     const setSvgoFloatPrecision = useSetAtom(doSetSvgoFloatPrecisionAtom);
     const setSvgoPresetDefaultPlugin = useSetAtom(doSetSvgoPresetDefaultPluginAtom);
+    const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
+
+    useEffect(() => {
+        if (typeof document === "undefined") return;
+        setPortalContainer(document.querySelector("[data-dialog='export-svg']") as HTMLElement | null);
+    }, []);
 
     function updateFloatPrecision(value: number) {
         if (Number.isFinite(value)) {
@@ -52,7 +59,7 @@ function SvgoOptionsPopover() {
                 </Button>
             </PopoverTrigger>
 
-            <PopoverContent className="p-0 w-72 text-xs" align="end">
+            <PopoverContent className="p-0 w-72 text-xs" align="end" portalProps={{ container: portalContainer ?? undefined }}>
                 <TooltipProvider delayDuration={250}>
                     <h4 className="px-3 py-2 text-xs font-semibold border-b">
                         SVGO options
