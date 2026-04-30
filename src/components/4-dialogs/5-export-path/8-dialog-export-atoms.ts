@@ -120,6 +120,15 @@ export const doCopyDisplayedExportSvgCodeAtom = atom(
     },
 );
 
+// Export settings action atoms
+
+export const doSetExportReactComponentAtom = atom(
+    null,
+    (_get, _set, enabled: boolean) => {
+        appSettings.export.exportReactComponent = enabled;
+    },
+);
+
 // SVGO settings action atoms
 
 export const doSetOptimizeSvgEnabledAtom = atom(
