@@ -19,12 +19,10 @@ export function SvgoControls() {
     return (
         <div className="px-2 py-1.5 border rounded flex items-center justify-between gap-2 select-none">
             <label className="flex items-center gap-2 cursor-pointer">
-                <Checkbox
-                    className="size-3.5"
-                    checked={svgo.enabled}
-                    onCheckedChange={(checked) => setOptimizeSvgEnabled(checked === true)}
-                />
-                <span>Optimize SVG</span>
+                <Checkbox className="size-3.5" checked={svgo.enabled} onCheckedChange={(checked) => setOptimizeSvgEnabled(checked === true)} />
+                <span>
+                    Optimize SVG
+                </span>
             </label>
 
             <SvgoOptionsPopover />
@@ -39,10 +37,12 @@ function SvgoOptionsPopover() {
     const setSvgoPresetDefaultPlugin = useSetAtom(doSetSvgoPresetDefaultPluginAtom);
     const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
 
-    useEffect(() => {
-        if (typeof document === "undefined") return;
-        setPortalContainer(document.querySelector("[data-dialog='export-svg']") as HTMLElement | null);
-    }, []);
+    useEffect(
+        () => {
+            if (typeof document === "undefined") return;
+            setPortalContainer(document.querySelector("[data-dialog='export-svg']") as HTMLElement | null);
+        },
+        []);
 
     function updateFloatPrecision(value: number) {
         if (Number.isFinite(value)) {
@@ -67,11 +67,7 @@ function SvgoOptionsPopover() {
 
                     <div className="p-3 pb-2 grid gap-2">
                         <label className="flex items-center gap-2 cursor-pointer">
-                            <Checkbox
-                                className="size-3.5"
-                                checked={svgo.multipass}
-                                onCheckedChange={(checked) => setSvgoMultipass(checked === true)}
-                            />
+                            <Checkbox className="size-3.5" checked={svgo.multipass} onCheckedChange={(checked) => setSvgoMultipass(checked === true)} />
                             <span>Multipass</span>
                         </label>
 
@@ -101,14 +97,16 @@ function SvgoOptionsPopover() {
 
                     <ScrollArea className="h-56 px-3 pb-3" viewportClassName="pb-3" fixedWidth parentContentWidth>
                         <div className="grid gap-1.5">
-                            {SVGO_PRESET_DEFAULT_PLUGINS.map((plugin) => (
-                                <SvgoPluginCheckbox
-                                    key={plugin.id}
-                                    plugin={plugin}
-                                    checked={svgo.presetDefault[plugin.id]}
-                                    onCheckedChange={(enabled) => setSvgoPresetDefaultPlugin({ pluginName: plugin.id, enabled })}
-                                />
-                            ))}
+                            {SVGO_PRESET_DEFAULT_PLUGINS.map(
+                                (plugin) => (
+                                    <SvgoPluginCheckbox
+                                        key={plugin.id}
+                                        plugin={plugin}
+                                        checked={svgo.presetDefault[plugin.id]}
+                                        onCheckedChange={(enabled) => setSvgoPresetDefaultPlugin({ pluginName: plugin.id, enabled })}
+                                    />
+                                )
+                            )}
                         </div>
                     </ScrollArea>
                 </TooltipProvider>
@@ -124,7 +122,6 @@ function SvgoPluginCheckbox({ plugin, checked, onCheckedChange }: { plugin: Svgo
                 <Checkbox className="mt-0.5 size-3.5" checked={checked} onCheckedChange={(nextChecked) => onCheckedChange(nextChecked === true)} />
                 <span className="grid gap-0.5 min-w-0">
                     <span className="text-[11px] font-medium leading-4">{plugin.label}</span>
-                    <span className="font-mono text-[10px] leading-4 text-muted-foreground">{plugin.id}</span>
                 </span>
             </label>
 
@@ -135,11 +132,9 @@ function SvgoPluginCheckbox({ plugin, checked, onCheckedChange }: { plugin: Svgo
                     </button>
                 </TooltipTrigger>
 
-                <TooltipContent className="max-w-68" side="bottom" sideOffset={6}>
-                    <div className="grid gap-1">
-                        <div className="font-medium leading-4">{plugin.label}</div>
-                        <div className="text-[11px] leading-4">{plugin.description}</div>
-                        <div className="font-mono text-[10px] leading-4 text-background/70">{plugin.id}</div>
+                <TooltipContent className="max-w-52" side="bottom" sideOffset={6}>
+                    <div className="py-1 grid gap-1">
+                        <div className="text-[11px] leading-4 text-pretty">{plugin.description}</div>
                     </div>
                 </TooltipContent>
             </Tooltip>
