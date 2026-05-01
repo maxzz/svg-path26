@@ -7,7 +7,7 @@ export function generateReactComponentFromTemplate(options: GenerateReactCompone
 
     return {
         code: [
-            'import type { ComponentPropsWithoutRef } from "react";',
+            'import { type ComponentPropsWithoutRef } from "react";',
             "",
             `export function ${preparedExport.componentName}({ className, ...props }: ComponentPropsWithoutRef<"svg">) {`,
             "    return (",
@@ -27,7 +27,9 @@ function emitSvgRoot(node: SvgInputNode, depth: number): string {
     const classAttribute = node.attributes.find((attribute) => attribute.name === "class")?.value ?? "";
     const otherAttributes = node.attributes.filter((attribute) => attribute.name !== "class");
     const attributeParts = [
-        ...otherAttributes.map((attribute) => formatJsxAttribute(attribute.name, attribute.value)),
+        ...otherAttributes.map(
+            (attribute) => formatJsxAttribute(attribute.name, attribute.value)
+        ),
         classAttribute
             ? `className={className ? "${escapeJavaScriptString(classAttribute)} " + className : "${escapeJavaScriptString(classAttribute)}"}`
             : "className={className}",
@@ -38,7 +40,9 @@ function emitSvgRoot(node: SvgInputNode, depth: number): string {
 }
 
 function emitChildNode(node: SvgInputNode, depth: number): string {
-    const attributeParts = node.attributes.map((attribute) => formatJsxAttribute(attribute.name, attribute.value));
+    const attributeParts = node.attributes.map(
+        (attribute) => formatJsxAttribute(attribute.name, attribute.value)
+    );
     return emitNodeMarkup(node.tagName, attributeParts, node.children, depth, emitChildNode);
 }
 
@@ -50,7 +54,10 @@ function emitNodeMarkup(tagName: string, attributeParts: string[], children: Svg
         return `${indent}<${tagName}${joinedAttributes} />`;
     }
 
-    const renderedChildren = children.map((child) => emitChild(child, depth + 1)).join("\n");
+    const renderedChildren = children.map(
+        (child) => emitChild(child, depth + 1)
+    ).join("\n");
+
     return `${indent}<${tagName}${joinedAttributes}>\n${renderedChildren}\n${indent}</${tagName}>`;
 }
 
@@ -67,7 +74,7 @@ function normalizeJsxAttributeName(name: string): string {
         return name;
     }
 
-    return name.replace(/[:\-]([a-z])/g, (_match, char: string) => char.toUpperCase());
+    return name.replace(/[:\-]([a-z])/g, (_match, char: string) => char.toUpperCase()); // replace `:` or `-` with the next character in uppercase
 }
 
 function escapeJsxAttributeValue(value: string): string {
