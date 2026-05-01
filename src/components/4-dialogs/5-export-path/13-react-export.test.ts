@@ -5,9 +5,9 @@ import { appSettings } from "@/store/0-ui-settings";
 import { DEFAULT_EXPORT_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS } from "@/store/9-ui-settings-types-and-defaults";
 import { buildExportSvgDocument } from "./9-export-source";
 import { prepareReactExport } from "./10-react-export-common";
-import { generateReactComponentFromTemplate } from "./11-react-export-template";
-import { generateReactComponentWithMarkupParser } from "./12-react-export-markup";
-import { doSetExportAsReactComponentAtom, doSetReactComponentGeneratorAtom } from "./8-dialog-export-atoms";
+import { generateReactComponentFromTemplate } from "./8-3-react-export-template";
+import { generateReactComponentWithMarkupParser } from "./8-4-react-export-markup";
+import { doSetExportAsReactComponentAtom, doSetReactComponentGeneratorAtom } from "./8-1-dialog-export-atoms";
 
 describe("react export helpers", () => {
     beforeEach(() => {

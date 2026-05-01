@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/shadcn/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/shadcn/tooltip";
 import { appSettings } from "@/store/0-ui-settings";
 import { SVGO_PRESET_DEFAULT, SVGO_PRESET_DEFAULT_PLUGINS, type SvgoPresetDefaultPlugin } from "@/store/2-svgo-presets";
-import { doSetOptimizeSvgEnabledAtom, doSetSvgoFloatPrecisionAtom, doSetSvgoMultipassAtom, doSetSvgoPresetDefaultPluginAtom } from "./8-dialog-export-atoms";
+import { doSetOptimizeSvgEnabledAtom, doSetSvgoFloatPrecisionAtom, doSetSvgoMultipassAtom, doSetSvgoPresetDefaultPluginAtom } from "./8-1-dialog-export-atoms";
 
 export function SvgoControls() {
     const svgo = useSnapshot(appSettings.export.svgo);

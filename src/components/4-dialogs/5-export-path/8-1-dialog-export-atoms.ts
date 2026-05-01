@@ -9,9 +9,9 @@ import { svgInputDocumentAtom } from "@/store/0-atoms/1-3-svg-input";
 import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-path-commands/8-svg-utils";
 import { isViewBoxString, parseViewBoxString, viewBoxToString } from "@/store/8-utils/1-viewbox-utils";
 import { buildExportSvgDocument } from "./9-export-source";
-import { buildExportSvgData, downloadTextFile, exportSvgToFile, optimizeExportSvgData } from "./7-export-utils";
-import { generateReactComponentFromTemplate } from "./11-react-export-template";
-import { generateReactComponentWithMarkupParser } from "./12-react-export-markup";
+import { buildExportSvgData, downloadTextFile, exportSvgToFile, optimizeExportSvgData } from "./8-2-export-utils";
+import { generateReactComponentFromTemplate } from "./8-3-react-export-template";
+import { generateReactComponentWithMarkupParser } from "./8-4-react-export-markup";
 
 // Open dialog atom
 
