@@ -1,5 +1,5 @@
+import { type SvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-input";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
-import { type SvgInputDocument, type SvgInputNode, serializeSvgInputDocument } from "@/svg-core/3-svg-input";
 import { type ExportSettings } from "@/store/9-ui-settings-types-and-defaults";
 
 export type BuildExportSvgSourceOptions = {
@@ -9,13 +9,6 @@ export type BuildExportSvgSourceOptions = {
     exportViewBoxDraft: ViewBox;
     exportSettings: ExportSettings;
 };
-
-export function buildExportSvgData(options: BuildExportSvgSourceOptions): string {
-    if (!options.svgInputDocument && !options.pathValue.trim()) {
-        return "";
-    }
-    return serializeSvgInputDocument(buildExportSvgDocument(options));
-}
 
 export function buildExportSvgDocument({ svgInputDocument, pathValue, pathViewBox, exportViewBoxDraft, exportSettings }: BuildExportSvgSourceOptions): SvgInputDocument {
     const baseDocument =

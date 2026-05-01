@@ -1,10 +1,10 @@
 import { optimize, type Config as SvgoConfig } from "svgo/browser";
-import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { appSettings } from "@/store/0-ui-settings";
-import { SVGO_PRESET_DEFAULT_PLUGIN_NAMES, type SvgoPresetDefaultPluginName } from "@/store/2-svgo-presets";
+import { type ViewBox } from "@/svg-core/9-types-svg-model";
+import { type SvgInputDocument, serializeSvgInputDocument } from "@/svg-core/3-svg-input";
+import { type SvgoPresetDefaultPluginName, SVGO_PRESET_DEFAULT_PLUGIN_NAMES } from "@/store/2-svgo-presets";
 import { type ExportSettings, type ExportSvgoSettings } from "@/store/9-ui-settings-types-and-defaults";
-import { buildExportSvgData as buildExportSvgDataFromSource } from "./9-export-source";
-import { type SvgInputDocument } from "@/svg-core/3-svg-input";
+import { buildExportSvgDocument } from "./9-export-source";
 
 export type OptimizeExportSvgResult = {
     svgData: string;
@@ -12,13 +12,17 @@ export type OptimizeExportSvgResult = {
 };
 
 export function buildExportSvgData({ svgInputDocument, pathValue, pathViewBox, exportViewBoxDraft, exportSettings = appSettings.export }: { svgInputDocument: SvgInputDocument | null; pathValue: string; pathViewBox: ViewBox; exportViewBoxDraft: ViewBox; exportSettings?: ExportSettings; }): string {
-    return buildExportSvgDataFromSource({
+    if (!svgInputDocument && !pathValue.trim()) {
+        return "";
+    }
+
+    return serializeSvgInputDocument(buildExportSvgDocument({
         svgInputDocument,
         pathValue,
         pathViewBox,
         exportViewBoxDraft,
         exportSettings,
-    });
+    }));
 }
 
 export function optimizeExportSvgData(svgData: string, svgoSettings: ExportSvgoSettings): OptimizeExportSvgResult {
