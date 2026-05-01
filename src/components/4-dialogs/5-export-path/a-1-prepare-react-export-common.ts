@@ -1,5 +1,5 @@
 import { serializeSvgInputDocument, type SvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-input";
-import { normalizeExportFileBaseName } from "./a-export-utils";
+import { normalizeExportFileBaseName } from "./a-3-export-utils";
 
 export type GenerateReactComponentOptions = {
     exportDocument: SvgInputDocument;

@@ -8,8 +8,8 @@ import { pathViewBoxAtom } from "../../../store/0-atoms/2-2-path-viewbox";
 import { svgInputDocumentAtom } from "@/store/0-atoms/1-3-svg-input";
 import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-path-commands/8-svg-utils";
 import { isViewBoxString, parseViewBoxString, viewBoxToString } from "@/store/8-utils/1-viewbox-utils";
-import { buildExportSvgDocument } from "./a-export-source";
-import { buildExportSvgData, downloadTextFile, exportSvgToFile, optimizeExportSvgData } from "./a-export-utils";
+import { buildExportSvgDocument } from "./a-2-export-source";
+import { buildExportSvgData, downloadTextFile, exportSvgToFile, optimizeExportSvgData } from "./a-3-export-utils";
 import { generateReactComponentFromTemplate } from "./8-3-react-export-template";
 import { generateReactComponentWithMarkupParser } from "./8-4-react-export-markup";
 
