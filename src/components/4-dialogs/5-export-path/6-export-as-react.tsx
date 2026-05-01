@@ -3,7 +3,7 @@ import { useSnapshot } from "valtio";
 import { Checkbox } from "@/components/ui/shadcn/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/shadcn/select";
 import { appSettings } from "@/store/0-ui-settings";
-import { doSetExportAsReactComponentAtom, doSetReactComponentGeneratorAtom, exportReactComponentErrorAtom, exportReactComponentNoticeAtom } from "./8-1-dialog-export-atoms";
+import { doSetExportAsReactComponentAtom, doSetReactComponentGeneratorAtom, exportReactComponentErrorAtom, exportReactComponentNoticeAtom } from "./8-0-dialog-export-atoms";
 
 export function ReactExportControls() {
     const { exportAsReactComponent, reactComponentGenerator } = useSnapshot(appSettings.export);

@@ -2,7 +2,7 @@ import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { appSettings } from "@/store/0-ui-settings";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
-import { viewBoxDraftAtom } from "@/components/4-dialogs/5-export-path/8-1-dialog-export-atoms";
+import { viewBoxDraftAtom } from "@/components/4-dialogs/5-export-path/8-0-dialog-export-atoms";
 import { Switch } from "@/components/ui/shadcn/switch";
 
 export function SvgPreview() {

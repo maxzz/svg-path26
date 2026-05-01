@@ -1,5 +1,5 @@
 import { type SvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-input";
-import { prepareReactExport, type GenerateReactComponentOptions, type ReactComponentGenerationResult } from "./8-0-react-export-common";
+import { prepareReactExport, type GenerateReactComponentOptions, type ReactComponentGenerationResult } from "./8-1-prepare-react-export-common";
 
 export function generateReactComponentFromTemplate(options: GenerateReactComponentOptions): ReactComponentGenerationResult {
     const preparedExport = prepareReactExport(options);
