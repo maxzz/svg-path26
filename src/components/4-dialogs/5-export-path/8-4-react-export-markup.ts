@@ -1,5 +1,5 @@
 import { generateReactComponentFromTemplate } from "./8-3-react-export-template";
-import { prepareReactExport, type GenerateReactComponentOptions, type ReactComponentGenerationResult } from "./10-react-export-common";
+import { prepareReactExport, type GenerateReactComponentOptions, type ReactComponentGenerationResult } from "./8-0-react-export-common";
 
 export function generateReactComponentWithMarkupParser(options: GenerateReactComponentOptions): ReactComponentGenerationResult {
     const preparedExport = prepareReactExport(options);
