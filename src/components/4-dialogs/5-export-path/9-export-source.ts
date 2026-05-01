@@ -1,5 +1,5 @@
-import { serializeSvgInputDocument, type SvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-input";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
+import { type SvgInputDocument, type SvgInputNode, serializeSvgInputDocument } from "@/svg-core/3-svg-input";
 import { type ExportSettings } from "@/store/9-ui-settings-types-and-defaults";
 
 export type BuildExportSvgSourceOptions = {
@@ -10,24 +10,18 @@ export type BuildExportSvgSourceOptions = {
     exportSettings: ExportSettings;
 };
 
-const STYLE_EXPORT_ATTRIBUTE_NAMES = new Set([
-    "clip-rule",
-    "fill",
-    "fill-opacity",
-    "fill-rule",
-    "opacity",
-    "stroke",
-    "stroke-linecap",
-    "stroke-linejoin",
-    "stroke-opacity",
-    "stroke-width",
-    "vector-effect",
-]);
+export function buildExportSvgData(options: BuildExportSvgSourceOptions): string {
+    if (!options.svgInputDocument && !options.pathValue.trim()) {
+        return "";
+    }
+    return serializeSvgInputDocument(buildExportSvgDocument(options));
+}
 
 export function buildExportSvgDocument({ svgInputDocument, pathValue, pathViewBox, exportViewBoxDraft, exportSettings }: BuildExportSvgSourceOptions): SvgInputDocument {
-    const baseDocument = svgInputDocument
-        ? cloneIntoSvgDocument(svgInputDocument, exportViewBoxDraft)
-        : createPathOnlySvgDocument(pathValue, pathViewBox);
+    const baseDocument =
+        svgInputDocument
+            ? cloneIntoSvgDocument(svgInputDocument, exportViewBoxDraft)
+            : createPathOnlySvgDocument(pathValue, pathViewBox);
 
     const expandedRoot = expandStyleAttributes(baseDocument.root);
     const rootWithViewBox = applySvgRootViewBox(expandedRoot, exportViewBoxDraft);
@@ -38,14 +32,6 @@ export function buildExportSvgDocument({ svgInputDocument, pathValue, pathViewBo
     };
 }
 
-export function buildExportSvgData(options: BuildExportSvgSourceOptions): string {
-    if (!options.svgInputDocument && !options.pathValue.trim()) {
-        return "";
-    }
-
-    return serializeSvgInputDocument(buildExportSvgDocument(options));
-}
-
 function cloneIntoSvgDocument(document: SvgInputDocument, exportViewBoxDraft: ViewBox): SvgInputDocument {
     if (document.sourceKind === "svg-document" && document.root.tagName === "svg") {
         return {
@@ -53,7 +39,6 @@ function cloneIntoSvgDocument(document: SvgInputDocument, exportViewBoxDraft: Vi
             root: cloneNode(document.root),
         };
     }
-
     return wrapNodeInSvg(cloneNode(document.root), exportViewBoxDraft);
 }
 
@@ -97,18 +82,11 @@ function cloneNode(node: SvgInputNode): SvgInputNode {
 }
 
 function expandStyleAttributes(node: SvgInputNode): SvgInputNode {
-    const nextChildren = node.children.map(expandStyleAttributes);
     const nextAttributes = extractSupportedStyleAttributes(node.attributes);
+    const nextChildren = node.children.map(expandStyleAttributes);
 
-    if (nextChildren.every((child, index) => child === node.children[index]) && nextAttributes === node.attributes) {
-        return node;
-    }
-
-    return {
-        ...node,
-        attributes: nextAttributes,
-        children: nextChildren,
-    };
+    const didChange = nextAttributes !== node.attributes || nextChildren.some((child, index) => child !== node.children[index]);
+    return didChange ? { ...node, attributes: nextAttributes, children: nextChildren } : node;
 }
 
 function extractSupportedStyleAttributes(attributes: SvgInputNode["attributes"]): SvgInputNode["attributes"] {
@@ -142,6 +120,20 @@ function extractSupportedStyleAttributes(attributes: SvgInputNode["attributes"])
 
     return nextAttributes;
 }
+
+const STYLE_EXPORT_ATTRIBUTE_NAMES = new Set([
+    "clip-rule",
+    "fill",
+    "fill-opacity",
+    "fill-rule",
+    "opacity",
+    "stroke",
+    "stroke-linecap",
+    "stroke-linejoin",
+    "stroke-opacity",
+    "stroke-width",
+    "vector-effect",
+]);
 
 function applySvgRootViewBox(root: SvgInputNode, exportViewBoxDraft: ViewBox): SvgInputNode {
     if (root.tagName !== "svg") {
