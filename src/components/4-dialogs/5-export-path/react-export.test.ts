@@ -3,7 +3,7 @@ import { createStore } from "jotai";
 import { parseSvgInputText } from "@/svg-core/3-svg-input";
 import { appSettings } from "@/store/0-ui-settings";
 import { DEFAULT_EXPORT_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS } from "@/store/9-ui-settings-types-and-defaults";
-import { buildExportSvgDocument } from "./9-export-source";
+import { buildExportSvgDocument } from "./a-export-source";
 import { prepareReactExport } from "./8-1-prepare-react-export-common";
 import { generateReactComponentFromTemplate } from "./8-3-react-export-template";
 import { generateReactComponentWithMarkupParser } from "./8-4-react-export-markup";
