@@ -1,17 +1,14 @@
-import { atom, type Getter, type SetStateAction, type Setter } from "jotai";
+import { type Getter, type SetStateAction, type Setter, atom } from "jotai";
 import { appSettings } from "@/store/0-ui-settings";
-import { type SvgoPresetDefaultPluginName } from "@/store/2-svgo-presets";
 import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { type ReactComponentGenerator, type ViewBoxStr } from "@/store/9-ui-settings-types-and-defaults";
+import { type SvgoPresetDefaultPluginName } from "@/store/2-svgo-presets";
 import { svgPathInputAtom } from "../../../store/0-atoms/1-1-svg-path-input";
 import { pathViewBoxAtom } from "../../../store/0-atoms/2-2-path-viewbox";
 import { svgInputDocumentAtom } from "@/store/0-atoms/1-3-svg-input";
 import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-path-commands/8-svg-utils";
 import { isViewBoxString, parseViewBoxString, viewBoxToString } from "@/store/8-utils/1-viewbox-utils";
-import { buildExportSvgDocument } from "./a-2-export-source";
-import { buildExportSvgData, downloadTextFile, exportSvgToFile, optimizeExportSvgData } from "./a-3-export-utils";
-import { generateReactComponentFromTemplate } from "./8-3-react-export-template";
-import { generateReactComponentWithMarkupParser } from "./8-4-react-export-markup";
+import { buildExportSvgData, optimizeExportSvgData } from "./a-3-export-utils";
 
 // Open dialog atom
 
@@ -145,59 +142,6 @@ export const doCopyDisplayedExportSvgCodeAtom = atom(
             700
         );
         set(exportSvgCodeCopiedTimerAtom, nextTimer);
-    },
-);
-
-export const doExportFromDialogAtom = atom(
-    null,
-    async (get, set) => {
-        set(exportDialogBusyAtom, true);
-        set(exportReactComponentErrorAtom, "");
-        set(exportReactComponentNoticeAtom, "");
-
-        try {
-            if (appSettings.export.exportAsReactComponent) {
-                const exportDocument = buildExportSvgDocument({
-                    svgInputDocument: get(svgInputDocumentAtom),
-                    pathValue: get(svgPathInputAtom),
-                    pathViewBox: get(pathViewBoxAtom),
-                    exportViewBoxDraft: get(viewBoxDraftAtom),
-                    exportSettings: appSettings.export,
-                });
-                const generatorOptions = {
-                    exportDocument,
-                    pathName: appSettings.pathEditor.pathName,
-                };
-                const result = appSettings.export.reactComponentGenerator === "markup"
-                    ? generateReactComponentWithMarkupParser(generatorOptions)
-                    : generateReactComponentFromTemplate(generatorOptions);
-
-                if (result.notice) {
-                    set(exportReactComponentNoticeAtom, result.notice);
-                }
-
-                if (!result.code.trim()) {
-                    set(exportReactComponentErrorAtom, result.error || "Failed to generate a React component export.");
-                    return false;
-                }
-
-                return downloadTextFile({
-                    data: result.code,
-                    fileName: result.fileName,
-                    mimeType: "text/plain;charset=utf-8",
-                });
-            }
-
-            return exportSvgToFile({
-                svgData: get(displayedExportSvgCodeAtom),
-            });
-        } catch (error) {
-            const message = error instanceof Error ? error.message : "Failed to export.";
-            set(exportReactComponentErrorAtom, message);
-            return false;
-        } finally {
-            set(exportDialogBusyAtom, false);
-        }
     },
 );
 
