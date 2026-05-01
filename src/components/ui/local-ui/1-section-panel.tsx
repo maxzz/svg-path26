@@ -32,7 +32,7 @@ export function SectionPanel({ sectionKey, label, children, triggerClassName, co
                         {label}
                     </AccordionTrigger>
 
-                    {overlay && (
+                    {overlay && open && (
                         <div className="absolute inset-y-0 right-8 flex items-center pointer-events-none z-10">
                             <div className="pointer-events-auto flex items-center gap-1">
                                 {overlay}
