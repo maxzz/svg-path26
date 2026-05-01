@@ -35,7 +35,7 @@ export function optimizeExportSvgData(svgData: string, svgoSettings: ExportSvgoS
     }
 }
 
-export function createSvgoConfig(svgoSettings: ExportSvgoSettings): SvgoConfig {
+function createSvgoConfig(svgoSettings: ExportSvgoSettings): SvgoConfig {
     const overrides = Object.fromEntries(
         SVGO_PRESET_DEFAULT_PLUGIN_NAMES
             .filter((pluginName) => !svgoSettings.presetDefault[pluginName])

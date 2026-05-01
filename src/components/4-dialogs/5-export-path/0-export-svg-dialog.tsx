@@ -9,8 +9,8 @@ import { ViewBoxEditor } from "./2-1-viewbox-editor";
 import { isCustomPresetId } from "./2-2-viewbox-preset";
 import { FillStrokeControls } from "./3-fill-stroke-controls";
 import { SvgoControls } from "./4-svgo-controls";
-import { ExportSvgCodeAccordion } from "./5-export-svg-code";
-import { ReactExportControls } from "./6-react-export-controls";
+import { RawSvgPreviewAccordion } from "./5-raw-svg-preview";
+import { ReactExportControls } from "./6-export-as-react";
 
 export function ExportSvgDialog() {
     const [openExportDialog, setOpenExportDialog] = useAtom(exportSvgDialogOpenAtom);
@@ -44,7 +44,7 @@ export function ExportSvgDialog() {
                     <ViewBoxEditor />
                     <FillStrokeControls />
                     <SvgoControls />
-                    <ExportSvgCodeAccordion />
+                    <RawSvgPreviewAccordion />
                     <ReactExportControls />
                 </div>
 

@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/shadcn/textarea";
 import { appSettings } from "@/store/0-ui-settings";
 import { doCopyDisplayedExportSvgCodeAtom, exportSvgCodeAccordionValueAtom, exportSvgCodeCopiedAtom, optimizedExportSvgCodeAtom, optimizedExportSvgErrorAtom, rawExportSvgCodeAtom } from "./8-dialog-export-atoms";
 
-export function ExportSvgCodeAccordion() {
+export function RawSvgPreviewAccordion() {
     const [accordionValue, setAccordionValue] = useAtom(exportSvgCodeAccordionValueAtom);
 
     const { enabled } = useSnapshot(appSettings.export.svgo);

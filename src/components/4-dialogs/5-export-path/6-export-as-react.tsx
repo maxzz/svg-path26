@@ -16,11 +16,7 @@ export function ReactExportControls() {
     return (
         <div className="px-2 py-1.5 border rounded grid gap-2 select-none">
             <label className="flex items-center gap-2 cursor-pointer">
-                <Checkbox
-                    className="size-3.5"
-                    checked={exportAsReactComponent}
-                    onCheckedChange={(checked) => setExportAsReactComponent(checked === true)}
-                />
+                <Checkbox className="size-3.5" checked={exportAsReactComponent} onCheckedChange={(checked) => setExportAsReactComponent(checked === true)} />
                 <span>
                     Export as React component
                 </span>
