@@ -5,8 +5,8 @@ import { appSettings } from "@/store/0-ui-settings";
 import { DEFAULT_EXPORT_SETTINGS, DEFAULT_PATH_EDITOR_SETTINGS } from "@/store/9-ui-settings-types-and-defaults";
 import { buildExportSvgDocument } from "./a-2-export-source";
 import { prepareReactExport } from "./a-1-prepare-react-export-common";
-import { generateReactComponentFromTemplate } from "./8-1-react-export-template";
-import { generateReactComponentWithMarkupParser } from "./8-2-react-export-markup";
+import { generateReactComponentFromTemplate } from "./8-8-1-react-export-template";
+import { generateReactComponentWithMarkupParser } from "./8-8-2-react-export-markup";
 import { doSetExportAsReactComponentAtom, doSetReactComponentGeneratorAtom } from "./8-0-dialog-export-atoms";
 
 describe("react export helpers", () => {

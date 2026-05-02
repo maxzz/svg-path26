@@ -67,14 +67,14 @@ export function exportSvgToFile({ svgData }: { svgData: string; }): boolean {
     }
 
     const { pathName } = appSettings.pathEditor;
-    return downloadTextFile({
+    return saveTextFile({
         data: svgData,
         fileName: `${normalizeExportFileBaseName(pathName)}.svg`,
         mimeType: "image/svg+xml",
     });
 }
 
-export function downloadTextFile({ data, fileName, mimeType }: { data: string; fileName: string; mimeType: string; }): boolean {
+export function saveTextFile({ data, fileName, mimeType }: { data: string; fileName: string; mimeType: string; }): boolean {
     if (!data.trim()) {
         return false;
     }

@@ -4,9 +4,9 @@ import { svgPathInputAtom } from "../../../store/0-atoms/1-1-svg-path-input";
 import { pathViewBoxAtom } from "../../../store/0-atoms/2-2-path-viewbox";
 import { svgInputDocumentAtom } from "@/store/0-atoms/1-3-svg-input";
 import { buildExportSvgDocument } from "./a-2-export-source";
-import { downloadTextFile, exportSvgToFile } from "./a-3-export-utils";
-import { generateReactComponentFromTemplate } from "./8-1-react-export-template";
-import { generateReactComponentWithMarkupParser } from "./8-2-react-export-markup";
+import { saveTextFile, exportSvgToFile } from "./a-3-export-utils";
+import { generateReactComponentFromTemplate } from "./8-8-1-react-export-template";
+import { generateReactComponentWithMarkupParser } from "./8-8-2-react-export-markup";
 import { displayedExportSvgCodeAtom, exportDialogBusyAtom, exportReactComponentErrorAtom, exportReactComponentNoticeAtom, viewBoxDraftAtom } from "./8-0-dialog-export-atoms";
 
 export const doExportFromDialogAtom = atom(
@@ -42,16 +42,10 @@ export const doExportFromDialogAtom = atom(
                     return false;
                 }
 
-                return downloadTextFile({
-                    data: result.code,
-                    fileName: result.fileName,
-                    mimeType: "text/plain;charset=utf-8",
-                });
+                return saveTextFile({ data: result.code, fileName: result.fileName, mimeType: "text/plain;charset=utf-8" });
             }
 
-            return exportSvgToFile({
-                svgData: get(displayedExportSvgCodeAtom),
-            });
+            return exportSvgToFile({ svgData: get(displayedExportSvgCodeAtom) });
         } catch (error) {
             const message = error instanceof Error ? error.message : "Failed to export.";
             set(exportReactComponentErrorAtom, message);
