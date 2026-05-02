@@ -61,19 +61,6 @@ function createSvgoConfig(svgoSettings: ExportSvgoSettings): SvgoConfig {
     };
 }
 
-export function exportSvgToFile({ svgData }: { svgData: string; }): boolean {
-    if (!svgData.trim()) {
-        return false;
-    }
-
-    const { pathName } = appSettings.pathEditor;
-    return saveTextFile({
-        data: svgData,
-        fileName: `${normalizeExportFileBaseName(pathName)}.svg`,
-        mimeType: "image/svg+xml",
-    });
-}
-
 export function saveTextFile({ data, fileName, mimeType }: { data: string; fileName: string; mimeType: string; }): boolean {
     if (!data.trim()) {
         return false;
