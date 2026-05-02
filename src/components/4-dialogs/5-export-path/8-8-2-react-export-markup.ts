@@ -1,5 +1,6 @@
 import { generateReactComponentFromTemplate } from "./8-8-1-react-export-template";
 import { type GenerateReactComponentOptions, type ReactComponentGenerationResult, prepareReactExport } from "./a-1-prepare-react-export-common";
+import { emitElementMarkup, escapeJavaScriptString, formatJsxAttribute } from "./8-8-3-jsx-utils";
 
 export function generateReactComponentWithMarkupParser(options: GenerateReactComponentOptions): ReactComponentGenerationResult {
     const preparedExport = prepareReactExport(options);
@@ -53,42 +54,4 @@ function emitSvgElement(element: Element, depth: number): string {
 function emitChildElement(element: Element, depth: number): string {
     const attributeParts = [...element.attributes].map((attribute) => formatJsxAttribute(attribute.name, attribute.value));
     return emitElementMarkup(element.tagName.toLowerCase(), attributeParts, [...element.children], depth, emitChildElement);
-}
-
-function emitElementMarkup(tagName: string, attributeParts: string[], children: Element[], depth: number, emitChild: (element: Element, depth: number) => string): string {
-    const indent = "    ".repeat(depth);
-    const joinedAttributes = attributeParts.length > 0 ? ` ${attributeParts.join(" ")}` : "";
-
-    if (children.length === 0) {
-        return `${indent}<${tagName}${joinedAttributes} />`;
-    }
-
-    const renderedChildren = children.map((child) => emitChild(child, depth + 1)).join("\n");
-    return `${indent}<${tagName}${joinedAttributes}>\n${renderedChildren}\n${indent}</${tagName}>`;
-}
-
-function formatJsxAttribute(name: string, value: string): string {
-    return `${normalizeJsxAttributeName(name)}="${escapeJsxAttributeValue(value)}"`;
-}
-
-function normalizeJsxAttributeName(name: string): string {
-    if (name === "class") {
-        return "className";
-    }
-
-    if (name.startsWith("aria-") || name.startsWith("data-")) {
-        return name;
-    }
-
-    return name.replace(/[:\-]([a-z])/g, (_match, char: string) => char.toUpperCase());
-}
-
-function escapeJsxAttributeValue(value: string): string {
-    return value.replace(/"/g, "&quot;");
-}
-
-function escapeJavaScriptString(value: string): string {
-    return value
-        .replace(/\\/g, "\\\\")
-        .replace(/"/g, '\\"');
 }
