@@ -4,7 +4,7 @@ import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { type SvgInputDocument, serializeSvgInputDocument } from "@/svg-core/3-svg-input";
 import { type SvgoPresetDefaultPluginName, SVGO_PRESET_DEFAULT_PLUGIN_NAMES } from "@/store/2-svgo-presets";
 import { type ExportSettings, type ExportSvgoSettings } from "@/store/9-ui-settings-types-and-defaults";
-import { buildExportSvgDocument } from "./a-2-export-source";
+import { buildExportSvgDocument } from "./a-2-build-svg";
 
 export type OptimizeExportSvgResult = {
     svgData: string;
