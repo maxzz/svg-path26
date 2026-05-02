@@ -16,7 +16,7 @@ export function generateReactComponentWithMarkupParser(options: GenerateReactCom
         const code = [
             'import { type ComponentPropsWithoutRef } from "react";',
             "",
-            `export function ${preparedExport.componentName}({ className, ...props }: ComponentPropsWithoutRef<"svg">) {`,
+            `export function ${preparedExport.componentName}({ className, ...rest }: ComponentPropsWithoutRef<"svg">) {`,
             "    return (",
                   /**/ svgElement,
             "    );",
@@ -44,18 +44,21 @@ function emitSvgElement(element: Element, depth: number): string {
     const attributes = [...element.attributes];
     const classAttribute = attributes.find((attribute) => attribute.name === "class")?.value ?? "";
     const otherAttributes = attributes.filter((attribute) => attribute.name !== "class");
+
     const attributeParts = [
         ...otherAttributes.map((attribute) => formatJsxAttribute(attribute.name, attribute.value)),
         classAttribute
             ? `className={className ? "${escapeJavaScriptString(classAttribute)} " + className : "${escapeJavaScriptString(classAttribute)}"}`
             : "className={className}",
-        "{...props}",
+        "{...rest}",
     ];
 
     return emitElementMarkup(element.tagName.toLowerCase(), attributeParts, [...element.children], depth, emitChildElement);
 }
 
 function emitChildElement(element: Element, depth: number): string {
-    const attributeParts = [...element.attributes].map((attribute) => formatJsxAttribute(attribute.name, attribute.value));
+    const attributeParts = [...element.attributes].map(
+        (attribute) => formatJsxAttribute(attribute.name, attribute.value)
+    );
     return emitElementMarkup(element.tagName.toLowerCase(), attributeParts, [...element.children], depth, emitChildElement);
 }

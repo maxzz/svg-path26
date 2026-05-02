@@ -10,7 +10,7 @@ export function generateReactComponentFromTemplate(options: GenerateReactCompone
     const code = [
         'import { type ComponentPropsWithoutRef } from "react";',
         "",
-        `export function ${preparedExport.componentName}({ className, ...props }: ComponentPropsWithoutRef<"svg">) {`,
+        `export function ${preparedExport.componentName}({ className, ...rest }: ComponentPropsWithoutRef<"svg">) {`,
         "    return (",
                  /**/ svgElement,
         "    );",
@@ -29,6 +29,7 @@ export function generateReactComponentFromTemplate(options: GenerateReactCompone
 function emitSvgRoot(node: SvgInputNode, depth: number): string {
     const classAttribute = node.attributes.find((attribute) => attribute.name === "class")?.value ?? "";
     const otherAttributes = node.attributes.filter((attribute) => attribute.name !== "class");
+    
     const attributeParts = [
         ...otherAttributes.map(
             (attribute) => formatJsxAttribute(attribute.name, attribute.value)
@@ -36,7 +37,7 @@ function emitSvgRoot(node: SvgInputNode, depth: number): string {
         classAttribute
             ? `className={className ? "${escapeJavaScriptString(classAttribute)} " + className : "${escapeJavaScriptString(classAttribute)}"}`
             : "className={className}",
-        "{...props}",
+        "{...rest}",
     ];
 
     return emitElementMarkup(node.tagName, attributeParts, node.children, depth, emitChildNode);
