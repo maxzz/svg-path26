@@ -1,6 +1,6 @@
 import { generateReactComponentFromTemplate } from "./8-8-1-react-export-template";
 import { type GenerateReactComponentOptions, type ReactComponentGenerationResult, prepareReactExport } from "./a-1-prepare-react-export-common";
-import { emitElementMarkup, escapeJavaScriptString, formatJsxAttribute } from "./8-8-3-jsx-utils";
+import { buildAttributeParts, buildRootAttributeParts, emitElementMarkup } from "./8-8-3-jsx-utils";
 
 export function generateReactComponentWithMarkupParser(options: GenerateReactComponentOptions): ReactComponentGenerationResult {
     const preparedExport = prepareReactExport(options);
@@ -42,23 +42,12 @@ export function generateReactComponentWithMarkupParser(options: GenerateReactCom
 
 function emitSvgElement(element: Element, depth: number): string {
     const attributes = [...element.attributes];
-    const classAttribute = attributes.find((attribute) => attribute.name === "class")?.value ?? "";
-    const otherAttributes = attributes.filter((attribute) => attribute.name !== "class");
-
-    const attributeParts = [
-        ...otherAttributes.map((attribute) => formatJsxAttribute(attribute.name, attribute.value)),
-        classAttribute
-            ? `className={className ? "${escapeJavaScriptString(classAttribute)} " + className : "${escapeJavaScriptString(classAttribute)}"}`
-            : "className={className}",
-        "{...rest}",
-    ];
+    const attributeParts = buildRootAttributeParts(attributes, "rest");
 
     return emitElementMarkup(element.tagName.toLowerCase(), attributeParts, [...element.children], depth, emitChildElement);
 }
 
 function emitChildElement(element: Element, depth: number): string {
-    const attributeParts = [...element.attributes].map(
-        (attribute) => formatJsxAttribute(attribute.name, attribute.value)
-    );
+    const attributeParts = buildAttributeParts([...element.attributes]);
     return emitElementMarkup(element.tagName.toLowerCase(), attributeParts, [...element.children], depth, emitChildElement);
 }

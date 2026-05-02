@@ -41,3 +41,27 @@ export function escapeJavaScriptString(value: string): string {
         .replace(/\\/g, "\\\\")
         .replace(/"/g, '\\"');
 }
+
+// Build attribute parts
+
+type JsxAttributeLike = {
+    name: string;
+    value: string;
+};
+
+export function buildRootAttributeParts(attributes: JsxAttributeLike[], restPropsName: string): string[] {
+    const classAttribute = attributes.find((attribute) => attribute.name === "class")?.value ?? "";
+    const otherAttributes = attributes.filter((attribute) => attribute.name !== "class");
+
+    return [
+        ...otherAttributes.map((attribute) => formatJsxAttribute(attribute.name, attribute.value)),
+        classAttribute
+            ? `className={className ? "${escapeJavaScriptString(classAttribute)} " + className : "${escapeJavaScriptString(classAttribute)}"}`
+            : "className={className}",
+        `{...${restPropsName}}`,
+    ];
+}
+
+export function buildAttributeParts(attributes: JsxAttributeLike[]): string[] {
+    return attributes.map((attribute) => formatJsxAttribute(attribute.name, attribute.value));
+}

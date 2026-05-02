@@ -1,6 +1,6 @@
 import { type SvgInputNode } from "@/svg-core/3-svg-input";
 import { prepareReactExport, type GenerateReactComponentOptions, type ReactComponentGenerationResult } from "./a-1-prepare-react-export-common";
-import { emitElementMarkup, escapeJavaScriptString, formatJsxAttribute } from "./8-8-3-jsx-utils";
+import { buildAttributeParts, buildRootAttributeParts, emitElementMarkup } from "./8-8-3-jsx-utils";
 
 export function generateReactComponentFromTemplate(options: GenerateReactComponentOptions): ReactComponentGenerationResult {
     const preparedExport = prepareReactExport(options);
@@ -27,25 +27,12 @@ export function generateReactComponentFromTemplate(options: GenerateReactCompone
 }
 
 function emitSvgRoot(node: SvgInputNode, depth: number): string {
-    const classAttribute = node.attributes.find((attribute) => attribute.name === "class")?.value ?? "";
-    const otherAttributes = node.attributes.filter((attribute) => attribute.name !== "class");
-    
-    const attributeParts = [
-        ...otherAttributes.map(
-            (attribute) => formatJsxAttribute(attribute.name, attribute.value)
-        ),
-        classAttribute
-            ? `className={className ? "${escapeJavaScriptString(classAttribute)} " + className : "${escapeJavaScriptString(classAttribute)}"}`
-            : "className={className}",
-        "{...rest}",
-    ];
+    const attributeParts = buildRootAttributeParts(node.attributes, "rest");
 
     return emitElementMarkup(node.tagName, attributeParts, node.children, depth, emitChildNode);
 }
 
 function emitChildNode(node: SvgInputNode, depth: number): string {
-    const attributeParts = node.attributes.map(
-        (attribute) => formatJsxAttribute(attribute.name, attribute.value)
-    );
+    const attributeParts = buildAttributeParts(node.attributes);
     return emitElementMarkup(node.tagName, attributeParts, node.children, depth, emitChildNode);
 }
