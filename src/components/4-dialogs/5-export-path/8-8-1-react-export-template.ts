@@ -7,19 +7,19 @@ export function generateReactComponentFromTemplate(options: GenerateReactCompone
     const rootNode = preparedExport.exportDocument.root;
 
     const svgElement = emitSvgRoot(rootNode, 2);
+    const code = [
+        'import { type ComponentPropsWithoutRef } from "react";',
+        "",
+        `export function ${preparedExport.componentName}({ className, ...props }: ComponentPropsWithoutRef<"svg">) {`,
+        "    return (",
+                 /**/ svgElement,
+        "    );",
+        "}",
+        "",
+    ].join("\n");
 
     return {
-        code: [
-            'import { type ComponentPropsWithoutRef } from "react";',
-            "",
-            `export function ${preparedExport.componentName}({ className, ...props }: ComponentPropsWithoutRef<"svg">) {`,
-            "    return (",
-                     /**/ svgElement,
-            "    );",
-            "}",
-            "",
-            `export default ${preparedExport.componentName};`,
-        ].join("\n"),
+        code,
         componentName: preparedExport.componentName,
         error: "",
         fileName: `${preparedExport.fileBaseName}.tsx`,

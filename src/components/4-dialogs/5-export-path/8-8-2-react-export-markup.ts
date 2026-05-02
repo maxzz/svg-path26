@@ -13,17 +13,19 @@ export function generateReactComponentWithMarkupParser(options: GenerateReactCom
         }
 
         const svgElement = emitSvgElement(parsedDocument.documentElement, 1);
+        const code = [
+            'import { type ComponentPropsWithoutRef } from "react";',
+            "",
+            `export function ${preparedExport.componentName}({ className, ...props }: ComponentPropsWithoutRef<"svg">) {`,
+            "    return (",
+                  /**/ svgElement,
+            "    );",
+            "}",
+            "",
+        ].join("\n");
 
         return {
-            code: [
-                'import { type ComponentPropsWithoutRef } from "react";',
-                "",
-                `const ${preparedExport.componentName} = ({ className, ...props }: ComponentPropsWithoutRef<"svg">) => (`,
-                      /**/ svgElement,
-                ");",
-                "",
-                `export default ${preparedExport.componentName};`,
-            ].join("\n"),
+            code,
             componentName: preparedExport.componentName,
             error: "",
             fileName: `${preparedExport.fileBaseName}.tsx`,
