@@ -27,7 +27,7 @@ export function prepareReactExport({ exportDocument, pathName }: GenerateReactCo
     const clonedDocument = cloneDocument(exportDocument);
     const hoistedRoot = hoistSharedPathAttributes(clonedDocument.root);
     const classedRoot = convertSvgAttributesToTailwindClasses(hoistedRoot);
-    
+
     const normalizedDocument: SvgInputDocument = {
         ...clonedDocument,
         root: classedRoot,
@@ -158,6 +158,10 @@ function convertNodeAttributesToTailwindClasses(attributes: SvgInputNode["attrib
     const nextAttributes: SvgInputNode["attributes"] = [];
 
     for (const attribute of attributes) {
+        if (attribute.name === "xmlns") {
+            continue;
+        }
+
         if (attribute.name === "class") {
             for (const className of attribute.value.split(/\s+/)) {
                 if (className) {
