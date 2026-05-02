@@ -89,7 +89,7 @@ const exportSvgCodeCopiedTimerAtom = atom<number | null>(null);
 
 export const displayedExportSvgCodeAtom = atom(
     (get) => (
-        appSettings.export.svgo.enabled
+        appSettings.export.svgo.svgoEnabled
             ? get(optimizedExportSvgCodeAtom)
             : get(rawExportSvgCodeAtom)
     )
@@ -152,7 +152,7 @@ export const doCopyDisplayedExportSvgCodeAtom = atom(
 export const doSetOptimizeSvgEnabledAtom = atom(
     null,
     (_get, _set, enabled: boolean) => {
-        appSettings.export.svgo.enabled = enabled;
+        appSettings.export.svgo.svgoEnabled = enabled;
     },
 );
 

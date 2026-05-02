@@ -14,13 +14,13 @@ import { SVGO_PRESET_DEFAULT, SVGO_PRESET_DEFAULT_PLUGINS, type SvgoPresetDefaul
 import { doSetOptimizeSvgEnabledAtom, doSetSvgoFloatPrecisionAtom, doSetSvgoMultipassAtom, doSetSvgoPresetDefaultPluginAtom } from "./8-0-dialog-export-atoms";
 
 export function SvgoControls() {
-    const svgo = useSnapshot(appSettings.export.svgo);
+    const { svgoEnabled } = useSnapshot(appSettings.export.svgo);
     const setOptimizeSvgEnabled = useSetAtom(doSetOptimizeSvgEnabledAtom);
 
     return (
         <div className="px-2 py-1.5 border rounded flex items-center justify-between gap-2 select-none">
             <label className="flex items-center cursor-pointer">
-                <Switch className="scale-60 cursor-pointer" checked={svgo.enabled} onCheckedChange={(checked) => setOptimizeSvgEnabled(checked === true)} />
+                <Switch className="scale-60 cursor-pointer" checked={svgoEnabled} onCheckedChange={(checked) => setOptimizeSvgEnabled(checked === true)} />
                 <span>
                     Optimize SVG
                 </span>

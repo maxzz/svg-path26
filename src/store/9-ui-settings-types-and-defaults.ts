@@ -59,7 +59,7 @@ export interface FooterSettings {
 export type ViewBoxStr = string;          // ViewBox as a string: "x,y,width,height" separated by commas
 
 export interface ExportSvgoSettings {
-    enabled: boolean;                      // Optimize exported SVG with SVGO
+    svgoEnabled: boolean;                  // Optimize exported SVG with SVGO
     multipass: boolean;                    // Run SVGO multiple passes
     floatPrecision: number;                // SVGO float precision
     presetDefault: SvgoPresetDefaultPluginOptions; // Enabled preset-default plugins
@@ -152,7 +152,7 @@ export const DEFAULT_SVGO_PRESET_DEFAULT_PLUGIN_OPTIONS = Object.fromEntries(
 ) as SvgoPresetDefaultPluginOptions;
 
 export const DEFAULT_EXPORT_SVGO_SETTINGS: ExportSvgoSettings = {
-    enabled: false,
+    svgoEnabled: false,
     multipass: false,
     floatPrecision: 3,
     presetDefault: DEFAULT_SVGO_PRESET_DEFAULT_PLUGIN_OPTIONS,

@@ -10,7 +10,7 @@ import { doCopyDisplayedExportSvgCodeAtom, exportSvgCodeAccordionValueAtom, expo
 export function RawSvgPreviewAccordion() {
     const [accordionValue, setAccordionValue] = useAtom(exportSvgCodeAccordionValueAtom);
 
-    const { enabled } = useSnapshot(appSettings.export.svgo);
+    const { svgoEnabled } = useSnapshot(appSettings.export.svgo);
     const rawSvgCode = useAtomValue(rawExportSvgCodeAtom);
     const optimizedSvgCode = useAtomValue(optimizedExportSvgCodeAtom);
     const optimizedError = useAtomValue(optimizedExportSvgErrorAtom);
@@ -18,7 +18,7 @@ export function RawSvgPreviewAccordion() {
 
     const copySvgCode = useSetAtom(doCopyDisplayedExportSvgCodeAtom);
 
-    const displayedSvgCode = enabled ? optimizedSvgCode : rawSvgCode;
+    const displayedSvgCode = svgoEnabled ? optimizedSvgCode : rawSvgCode;
     const canCopy = displayedSvgCode.trim().length > 0;
 
     return (
@@ -36,7 +36,7 @@ export function RawSvgPreviewAccordion() {
                 <AccordionContent className="pb-2 text-xs">
                     <div className="mb-1.5 flex items-center justify-between gap-2">
                         <span className="text-muted-foreground">
-                            {enabled ? "Optimized SVG code" : "Raw SVG code"}
+                            {svgoEnabled ? "Optimized SVG code" : "Raw SVG code"}
                         </span>
                         <Button
                             variant="outline"
@@ -51,7 +51,7 @@ export function RawSvgPreviewAccordion() {
                         </Button>
                     </div>
 
-                    {enabled && optimizedError && (
+                    {svgoEnabled && optimizedError && (
                         <p className="mb-1.5 text-[11px] text-destructive">
                             SVGO failed: {optimizedError}
                         </p>

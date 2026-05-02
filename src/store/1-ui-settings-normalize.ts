@@ -237,7 +237,7 @@ function createExportSvgoSettingsSchema(defaultSettings: ExportSvgoSettings) {
     return z.preprocess(
         toRecord,
         z.object({
-            enabled: z.boolean().catch(defaultSettings.enabled),
+            svgoEnabled: z.boolean().catch(defaultSettings.svgoEnabled),
             multipass: z.boolean().catch(defaultSettings.multipass),
             floatPrecision: z.number().catch(defaultSettings.floatPrecision),
             presetDefault: z.record(z.string(), z.boolean()).catch(defaultSettings.presetDefault),
