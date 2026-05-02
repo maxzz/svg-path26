@@ -9,6 +9,7 @@ export function generateReactComponentFromTemplate(options: GenerateReactCompone
     const svgElement = emitSvgRoot(rootNode, 2);
     const code = [
         'import { type ComponentPropsWithoutRef } from "react";',
+        'import { cn } from "@/utils";',
         "",
         `export function ${preparedExport.componentName}({ className, ...rest }: ComponentPropsWithoutRef<"svg">) {`,
         "    return (",

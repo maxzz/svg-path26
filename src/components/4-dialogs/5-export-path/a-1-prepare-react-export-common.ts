@@ -234,6 +234,11 @@ function convertPresentationalAttributeToTailwindClass(name: string, value: stri
         if (trimmedValue === "currentColor" || trimmedValue === "current") {
             return "stroke-current";
         }
+        return `stroke-[${encodeTailwindArbitraryValue(trimmedValue)}]`;
+    }
+
+    if (name === "stroke-width") {
+        return `stroke-[${encodeTailwindArbitraryValue(trimmedValue)}]`;
     }
 
     return `[${name}:${encodeTailwindArbitraryValue(trimmedValue)}]`;

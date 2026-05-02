@@ -64,7 +64,7 @@ describe("react export helpers", () => {
         expect(preparedExport.componentName).toBe("CameraIcon");
         expect(preparedExport.exportDocument.root.attributes.find((attribute) => attribute.name === "class")?.value).toContain("[fill:#123456]");
         expect(preparedExport.exportDocument.root.attributes.find((attribute) => attribute.name === "class")?.value).toContain("stroke-none");
-        expect(preparedExport.exportDocument.root.attributes.find((attribute) => attribute.name === "class")?.value).toContain("[stroke-width:2]");
+        expect(preparedExport.exportDocument.root.attributes.find((attribute) => attribute.name === "class")?.value).toContain("stroke-[2]");
         expect(preparedExport.exportDocument.root.children.every((child) => child.attributes.every((attribute) => !["fill", "stroke", "stroke-width"].includes(attribute.name)))).toBe(true);
     });
 

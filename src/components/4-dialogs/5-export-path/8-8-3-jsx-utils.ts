@@ -52,12 +52,14 @@ type JsxAttributeLike = {
 export function buildRootAttributeParts(attributes: JsxAttributeLike[], restPropsName: string): string[] {
     const classAttribute = attributes.find((attribute) => attribute.name === "class")?.value ?? "";
     const otherAttributes = attributes.filter((attribute) => attribute.name !== "class");
+    const baseClassName = classAttribute.trim();
+    const classNameExpression = baseClassName
+        ? `className={cn("${escapeJavaScriptString(baseClassName)}", className)}`
+        : "className={cn(className)}";
 
     return [
         ...otherAttributes.map((attribute) => formatJsxAttribute(attribute.name, attribute.value)),
-        classAttribute
-            ? `className={className ? "${escapeJavaScriptString(classAttribute)} " + className : "${escapeJavaScriptString(classAttribute)}"}`
-            : "className={className}",
+        classNameExpression,
         `{...${restPropsName}}`,
     ];
 }

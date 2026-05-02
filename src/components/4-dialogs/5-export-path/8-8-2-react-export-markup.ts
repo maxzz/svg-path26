@@ -15,6 +15,7 @@ export function generateReactComponentWithMarkupParser(options: GenerateReactCom
         const svgElement = emitSvgElement(parsedDocument.documentElement, 1);
         const code = [
             'import { type ComponentPropsWithoutRef } from "react";',
+            'import { cn } from "@/utils";',
             "",
             `export function ${preparedExport.componentName}({ className, ...rest }: ComponentPropsWithoutRef<"svg">) {`,
             "    return (",
