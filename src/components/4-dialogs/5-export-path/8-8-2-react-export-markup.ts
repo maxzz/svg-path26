@@ -1,15 +1,8 @@
 import { generateReactComponentFromTemplate } from "./8-8-1-react-export-template";
-import { prepareReactExport, type GenerateReactComponentOptions, type ReactComponentGenerationResult } from "./a-1-prepare-react-export-common";
+import { type GenerateReactComponentOptions, type ReactComponentGenerationResult, prepareReactExport } from "./a-1-prepare-react-export-common";
 
 export function generateReactComponentWithMarkupParser(options: GenerateReactComponentOptions): ReactComponentGenerationResult {
     const preparedExport = prepareReactExport(options);
-
-    if (typeof DOMParser === "undefined") {
-        return {
-            ...generateReactComponentFromTemplate(options),
-            notice: "DOMParser is not available in this runtime. Used the template generator instead.",
-        };
-    }
 
     try {
         const parsedDocument = new DOMParser().parseFromString(preparedExport.svgMarkup, "image/svg+xml");

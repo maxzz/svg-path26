@@ -8,7 +8,7 @@ import { normalizeExportFileBaseName, saveTextFile } from "./a-3-export-utils";
 import { generateReactComponentFromTemplate } from "./8-8-1-react-export-template";
 import { generateReactComponentWithMarkupParser } from "./8-8-2-react-export-markup";
 import { displayedExportSvgCodeAtom, exportDialogBusyAtom, exportReactComponentErrorAtom, exportReactComponentNoticeAtom, viewBoxDraftAtom } from "./8-0-dialog-export-atoms";
-import { type ReactComponentGenerationResult } from "./a-1-prepare-react-export-common";
+import { type GenerateReactComponentOptions, type ReactComponentGenerationResult } from "./a-1-prepare-react-export-common";
 
 export const doExportFileAtom = atom(
     null,
@@ -33,10 +33,7 @@ export const doExportFileAtom = atom(
                     pathName: appSettings.pathEditor.pathName,
                 };
 
-                const result: ReactComponentGenerationResult =
-                    appSettings.export.reactComponentGenerator === "markup"
-                        ? generateReactComponentWithMarkupParser(generatorOptions)
-                        : generateReactComponentFromTemplate(generatorOptions);
+                const result = generateReactComponent(generatorOptions);
 
                 if (result.notice) {
                     set(exportReactComponentNoticeAtom, result.notice);
@@ -67,3 +64,17 @@ export const doExportFileAtom = atom(
     },
 );
 
+function generateReactComponent(options: GenerateReactComponentOptions): ReactComponentGenerationResult {
+    if (appSettings.export.reactComponentGenerator === "markup") {
+        if (typeof DOMParser === "undefined") {
+            return {
+                ...generateReactComponentFromTemplate(options),
+                notice: "DOMParser is not available in this runtime. Used the template generator instead.",
+            };
+        }
+
+        return generateReactComponentWithMarkupParser(options);
+    }
+
+    return generateReactComponentFromTemplate(options);
+}
