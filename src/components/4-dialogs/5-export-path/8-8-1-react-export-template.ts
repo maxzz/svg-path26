@@ -6,13 +6,15 @@ export function generateReactComponentFromTemplate(options: GenerateReactCompone
     const preparedExport = prepareReactExport(options);
     const rootNode = preparedExport.exportDocument.root;
 
+    const svgElement = emitSvgRoot(rootNode, 2);
+
     return {
         code: [
             'import { type ComponentPropsWithoutRef } from "react";',
             "",
             `export function ${preparedExport.componentName}({ className, ...props }: ComponentPropsWithoutRef<"svg">) {`,
             "    return (",
-            emitSvgRoot(rootNode, 2),
+                     /**/ svgElement,
             "    );",
             "}",
             "",

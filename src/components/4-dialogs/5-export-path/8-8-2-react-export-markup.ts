@@ -12,12 +12,14 @@ export function generateReactComponentWithMarkupParser(options: GenerateReactCom
             throw new Error(parserError.textContent ?? "Failed to parse SVG markup.");
         }
 
+        const svgElement = emitSvgElement(parsedDocument.documentElement, 1);
+
         return {
             code: [
-                'import type { ComponentPropsWithoutRef } from "react";',
+                'import { type ComponentPropsWithoutRef } from "react";',
                 "",
                 `const ${preparedExport.componentName} = ({ className, ...props }: ComponentPropsWithoutRef<"svg">) => (`,
-                emitSvgElement(parsedDocument.documentElement, 1),
+                      /**/ svgElement,
                 ");",
                 "",
                 `export default ${preparedExport.componentName};`,
