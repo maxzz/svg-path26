@@ -1,6 +1,16 @@
 import { serializeSvgInputDocument, type SvgInputDocument, type SvgInputNode } from "@/svg-core/3-svg-input";
 import { normalizeExportFileBaseName } from "./a-3-export-utils";
 
+export type ReactComponentGenerationResult = {
+    code: string;
+    componentName: string;
+    error: string;
+    fileName: string;
+    notice?: string;
+};
+
+// prepareReactExport types
+
 export type GenerateReactComponentOptions = {
     exportDocument: SvgInputDocument;
     pathName: string;
@@ -13,32 +23,11 @@ export type PreparedReactExport = {
     svgMarkup: string;
 };
 
-export type ReactComponentGenerationResult = {
-    code: string;
-    componentName: string;
-    error: string;
-    fileName: string;
-    notice?: string;
-};
-
-const PRESENTATIONAL_ATTR_NAMES = new Set([
-    "clip-rule",
-    "fill",
-    "fill-opacity",
-    "fill-rule",
-    "opacity",
-    "stroke",
-    "stroke-linecap",
-    "stroke-linejoin",
-    "stroke-opacity",
-    "stroke-width",
-    "vector-effect",
-]);
-
 export function prepareReactExport({ exportDocument, pathName }: GenerateReactComponentOptions): PreparedReactExport {
     const clonedDocument = cloneDocument(exportDocument);
     const hoistedRoot = hoistSharedPathAttributes(clonedDocument.root);
     const classedRoot = convertSvgAttributesToTailwindClasses(hoistedRoot);
+    
     const normalizedDocument: SvgInputDocument = {
         ...clonedDocument,
         root: classedRoot,
@@ -52,6 +41,8 @@ export function prepareReactExport({ exportDocument, pathName }: GenerateReactCo
         svgMarkup: serializeSvgInputDocument(normalizedDocument),
     };
 }
+
+// Utility functions
 
 function cloneDocument(document: SvgInputDocument): SvgInputDocument {
     return {
@@ -282,3 +273,17 @@ function toPascalCaseComponentName(fileBaseName: string): string {
     const baseName = words.join("") || "SvgPath";
     return /^[A-Z_]/.test(baseName) ? baseName : `Svg${baseName}`;
 }
+
+const PRESENTATIONAL_ATTR_NAMES = new Set([
+    "clip-rule",
+    "fill",
+    "fill-opacity",
+    "fill-rule",
+    "opacity",
+    "stroke",
+    "stroke-linecap",
+    "stroke-linejoin",
+    "stroke-opacity",
+    "stroke-width",
+    "vector-effect",
+]);

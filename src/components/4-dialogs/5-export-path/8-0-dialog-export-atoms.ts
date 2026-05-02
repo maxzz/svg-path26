@@ -46,7 +46,7 @@ export const doResetExportViewBoxDraftAtom = atom(
         const fallback = get(pathViewBoxAtom);
         const pathValue = get(svgPathInputAtom);
         const exportViewBox = computeExportViewBox(pathValue, exportStroke ? exportStrokeWidth : 0, fallback);
-        
+
         set(viewBoxDraftAtom, exportViewBox);
         refreshExportSvgCode(get, set, exportViewBox);
     },
@@ -87,11 +87,13 @@ export const exportDialogBusyAtom = atom(false);
 
 const exportSvgCodeCopiedTimerAtom = atom<number | null>(null);
 
-export const displayedExportSvgCodeAtom = atom((get) => (
-    appSettings.export.svgo.enabled
-        ? get(optimizedExportSvgCodeAtom)
-        : get(rawExportSvgCodeAtom)
-));
+export const displayedExportSvgCodeAtom = atom(
+    (get) => (
+        appSettings.export.svgo.enabled
+            ? get(optimizedExportSvgCodeAtom)
+            : get(rawExportSvgCodeAtom)
+    )
+);
 
 export const doRefreshExportSvgCodeAtom = atom(
     null,
@@ -178,6 +180,8 @@ export const doSetSvgoPresetDefaultPluginAtom = atom(
     },
 );
 
+// Utility functions
+
 function resolveCustomPresetValue(preset: ViewBoxStr, boundsViewBox: ViewBox, currentViewBox: ViewBox): string {
     if (preset === "current") {
         return viewBoxToString(currentViewBox);
@@ -214,12 +218,7 @@ function refreshExportSvgCode(get: Getter, set: Setter, exportViewBoxDraft = get
     const svgInputDocument = get(svgInputDocumentAtom);
     const pathValue = get(svgPathInputAtom);
     const pathViewBox = get(pathViewBoxAtom);
-    const rawSvgData = buildExportSvgData({
-        svgInputDocument,
-        pathValue,
-        pathViewBox,
-        exportViewBoxDraft,
-    });
+    const rawSvgData = buildExportSvgData({ svgInputDocument, pathValue, pathViewBox, exportViewBoxDraft });
     const optimizedResult = optimizeExportSvgData(rawSvgData, appSettings.export.svgo);
 
     set(rawExportSvgCodeAtom, rawSvgData);

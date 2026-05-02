@@ -19,7 +19,6 @@ export function RawSvgPreviewAccordion() {
     const copySvgCode = useSetAtom(doCopyDisplayedExportSvgCodeAtom);
 
     const displayedSvgCode = enabled ? optimizedSvgCode : rawSvgCode;
-    const codeLabel = enabled ? "Optimized SVG code" : "Raw SVG code";
     const canCopy = displayedSvgCode.trim().length > 0;
 
     return (
@@ -36,7 +35,9 @@ export function RawSvgPreviewAccordion() {
 
                 <AccordionContent className="pb-2 text-xs">
                     <div className="mb-1.5 flex items-center justify-between gap-2">
-                        <span className="text-muted-foreground">{codeLabel}</span>
+                        <span className="text-muted-foreground">
+                            {enabled ? "Optimized SVG code" : "Raw SVG code"}
+                        </span>
                         <Button
                             variant="outline"
                             size="xs"
