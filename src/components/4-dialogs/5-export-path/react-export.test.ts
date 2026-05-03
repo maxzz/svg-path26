@@ -96,6 +96,8 @@ describe("react export helpers", () => {
         expect(result.fileName).toBe("camel-case-icon.tsx");
         expect(result.componentName).toBe("CamelCaseIcon");
         expect(result.code).toContain("export function CamelCaseIcon");
+        expect(result.code).toContain("{ className, title, ...rest }");
+        expect(result.code).toContain("{title && <title>{title}</title>}");
         expect(result.code).not.toContain("dangerouslySetInnerHTML");
     });
 

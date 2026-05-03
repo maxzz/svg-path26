@@ -14,10 +14,10 @@ export function generateReactComponentWithMarkupParser(options: GenerateReactCom
 
         const svgElement = emitSvgElement(parsedDocument.documentElement, 1);
         const code = [
-            'import { type ComponentPropsWithoutRef } from "react";',
+            'import { type ComponentPropsWithRef } from "react";',
             'import { cn } from "@/utils";',
             "",
-            `export function ${preparedExport.componentName}({ className, ...rest }: ComponentPropsWithoutRef<"svg">) {`,
+            `export function ${preparedExport.componentName}({ className, title, ...rest }: ComponentPropsWithRef<"svg"> & { title?: string }) {`,
             "    return (",
                   /**/ svgElement,
             "    );",
@@ -41,11 +41,31 @@ export function generateReactComponentWithMarkupParser(options: GenerateReactCom
     }
 }
 
+type RootChildElement = Element | { kind: "title-line" };
+
 function emitSvgElement(element: Element, depth: number): string {
     const attributes = [...element.attributes];
     const attributeParts = buildRootAttributeParts(attributes, "rest");
+    const children: RootChildElement[] = [{ kind: "title-line" }, ...element.children];
 
-    return emitElementMarkup(element.tagName.toLowerCase(), attributeParts, [...element.children], depth, emitChildElement);
+    return emitElementMarkup(element.tagName.toLowerCase(), attributeParts, children, depth, emitRootChildElement);
+}
+
+function emitRootChildElement(node: RootChildElement, depth: number): string {
+    if (isTitleLineElement(node)) {
+        return renderTitleLine(depth);
+    }
+
+    return emitChildElement(node, depth);
+}
+
+function renderTitleLine(depth: number): string {
+    const indent = "    ".repeat(depth);
+    return `${indent}{title && <title>{title}</title>}`;
+}
+
+function isTitleLineElement(node: RootChildElement): node is { kind: "title-line" } {
+    return "kind" in node && node.kind === "title-line";
 }
 
 function emitChildElement(element: Element, depth: number): string {

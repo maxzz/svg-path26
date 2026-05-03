@@ -8,10 +8,10 @@ export function generateReactComponentFromTemplate(options: GenerateReactCompone
 
     const svgElement = emitSvgRoot(rootNode, 2);
     const code = [
-        'import { type ComponentPropsWithoutRef } from "react";',
+        'import { type ComponentPropsWithRef } from "react";',
         'import { cn } from "@/utils";',
         "",
-        `export function ${preparedExport.componentName}({ className, ...rest }: ComponentPropsWithoutRef<"svg">) {`,
+        `export function ${preparedExport.componentName}({ className, title, ...rest }: ComponentPropsWithRef<"svg"> & { title?: string }) {`,
         "    return (",
                  /**/ svgElement,
         "    );",
@@ -27,10 +27,30 @@ export function generateReactComponentFromTemplate(options: GenerateReactCompone
     };
 }
 
+type RootChildNode = SvgInputNode | { kind: "title-line" };
+
 function emitSvgRoot(node: SvgInputNode, depth: number): string {
     const attributeParts = buildRootAttributeParts(node.attributes, "rest");
+    const children: RootChildNode[] = [{ kind: "title-line" }, ...node.children];
 
-    return emitElementMarkup(node.tagName, attributeParts, node.children, depth, emitChildNode);
+    return emitElementMarkup(node.tagName, attributeParts, children, depth, emitRootChildNode);
+}
+
+function emitRootChildNode(node: RootChildNode, depth: number): string {
+    if (isTitleLineNode(node)) {
+        return renderTitleLine(depth);
+    }
+
+    return emitChildNode(node, depth);
+}
+
+function renderTitleLine(depth: number): string {
+    const indent = "    ".repeat(depth);
+    return `${indent}{title && <title>{title}</title>}`;
+}
+
+function isTitleLineNode(node: RootChildNode): node is { kind: "title-line" } {
+    return "kind" in node && node.kind === "title-line";
 }
 
 function emitChildNode(node: SvgInputNode, depth: number): string {
