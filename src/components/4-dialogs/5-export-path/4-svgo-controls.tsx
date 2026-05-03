@@ -32,7 +32,8 @@ export function SvgoControls() {
 }
 
 function SvgoOptionsPopover() {
-    const svgo = useSnapshot(appSettings.export.svgo);
+    const { multipass, floatPrecision, presetDefault } = useSnapshot(appSettings.export.svgo);
+
     const setSvgoMultipass = useSetAtom(doSetSvgoMultipassAtom);
     const setSvgoFloatPrecision = useSetAtom(doSetSvgoFloatPrecisionAtom);
     const setSvgoPresetDefaultPlugin = useSetAtom(doSetSvgoPresetDefaultPluginAtom);
@@ -66,9 +67,9 @@ function SvgoOptionsPopover() {
                         SVGO options
                     </h4>
 
-                    <div className="p-3 pb-2 grid gap-2">
+                    <div className="p-3 pb-2 flex items-center justify-between gap-2">
                         <label className="flex items-center gap-2 cursor-pointer">
-                            <Checkbox className="size-3.5" checked={svgo.multipass} onCheckedChange={(checked) => setSvgoMultipass(checked === true)} />
+                            <Checkbox className="size-3.5" checked={multipass} onCheckedChange={(checked) => setSvgoMultipass(checked === true)} />
                             <span>Multipass</span>
                         </label>
 
@@ -77,12 +78,12 @@ function SvgoOptionsPopover() {
                                 Float precision
                             </span>
                             <Input
-                                className="h-6 w-16 px-1 text-right"
+                                className="h-6 w-12 px-1 text-right"
                                 type="number"
                                 min={0}
                                 max={8}
                                 step={1}
-                                value={svgo.floatPrecision}
+                                value={floatPrecision}
                                 onChange={(event) => updateFloatPrecision(Number(event.target.value))}
                             />
                         </label>
@@ -109,7 +110,7 @@ function SvgoOptionsPopover() {
                                     <SvgoPluginCheckbox
                                         key={plugin.id}
                                         plugin={plugin}
-                                        checked={svgo.presetDefault[plugin.id]}
+                                        checked={presetDefault[plugin.id]}
                                         onCheckedChange={(enabled) => setSvgoPresetDefaultPlugin({ pluginName: plugin.id, enabled })}
                                     />
                                 )
