@@ -1,6 +1,6 @@
 import { generateReactComponentFromTemplate } from "./8-8-1-react-export-template";
 import { type GenerateReactComponentOptions, type ReactComponentGenerationResult, prepareReactExport } from "./a-1-prepare-react-export-common";
-import { buildAttributeParts, buildRootAttributeParts, emitElementMarkup } from "./8-8-3-jsx-utils";
+import { buildAttributeParts, buildRootAttributeParts, emitElementMarkup, isTitleLineNode, renderTitleLine, type TitleLineNode, withTitleLine } from "./8-8-3-jsx-utils";
 
 export function generateReactComponentWithMarkupParser(options: GenerateReactComponentOptions): ReactComponentGenerationResult {
     const preparedExport = prepareReactExport(options);
@@ -12,7 +12,7 @@ export function generateReactComponentWithMarkupParser(options: GenerateReactCom
             throw new Error(parserError.textContent ?? "Failed to parse SVG markup.");
         }
 
-        const svgElement = emitSvgElement(parsedDocument.documentElement, 1);
+        const svgElement = emitSvgElement(parsedDocument.documentElement, 2);
         const code = [
             'import { type ComponentPropsWithRef } from "react";',
             'import { cn } from "@/utils";',
@@ -41,31 +41,22 @@ export function generateReactComponentWithMarkupParser(options: GenerateReactCom
     }
 }
 
-type RootChildElement = Element | { kind: "title-line" };
+type RootChildElement = Element | TitleLineNode;
 
 function emitSvgElement(element: Element, depth: number): string {
     const attributes = [...element.attributes];
     const attributeParts = buildRootAttributeParts(attributes, "rest");
-    const children: RootChildElement[] = [{ kind: "title-line" }, ...element.children];
+    const children: RootChildElement[] = withTitleLine([...element.children]);
 
     return emitElementMarkup(element.tagName.toLowerCase(), attributeParts, children, depth, emitRootChildElement);
 }
 
 function emitRootChildElement(node: RootChildElement, depth: number): string {
-    if (isTitleLineElement(node)) {
+    if (isTitleLineNode(node)) {
         return renderTitleLine(depth);
     }
 
     return emitChildElement(node, depth);
-}
-
-function renderTitleLine(depth: number): string {
-    const indent = "    ".repeat(depth);
-    return `${indent}{title && <title>{title}</title>}`;
-}
-
-function isTitleLineElement(node: RootChildElement): node is { kind: "title-line" } {
-    return "kind" in node && node.kind === "title-line";
 }
 
 function emitChildElement(element: Element, depth: number): string {

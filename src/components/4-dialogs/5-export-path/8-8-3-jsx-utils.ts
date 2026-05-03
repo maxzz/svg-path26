@@ -16,6 +16,21 @@ export function emitElementMarkup<T>(
     return `${indent}<${tagName}${joinedAttributes}>\n${renderedChildren}\n${indent}</${tagName}>`;
 }
 
+export type TitleLineNode = { kind: "title-line" };
+
+export function withTitleLine<T>(children: T[]): (T | TitleLineNode)[] {
+    return [{ kind: "title-line" }, ...children];
+}
+
+export function isTitleLineNode<T>(node: T | TitleLineNode): node is TitleLineNode {
+    return typeof node === "object" && node !== null && "kind" in node && node.kind === "title-line";
+}
+
+export function renderTitleLine(depth: number): string {
+    const indent = "    ".repeat(depth);
+    return `${indent}{title && <title>{title}</title>}`;
+}
+
 export function formatJsxAttribute(name: string, value: string): string {
     return `${normalizeJsxAttributeName(name)}="${escapeJsxAttributeValue(value)}"`;
 }
