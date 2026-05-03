@@ -98,16 +98,16 @@ function SvgoOptionsPopover() {
                                 {SVGO_PRESET_DEFAULT.id}
                             </span>
                         </div>
-                        <p className="mt-1 leading-4">
+                        {/* <p className="mt-1 leading-4">
                             {SVGO_PRESET_DEFAULT.description}
-                        </p>
+                        </p> */}
                     </div>
 
-                    <ScrollArea className="h-56 px-3 pb-3" viewportClassName="pb-3" fixedWidth parentContentWidth>
-                        <div className="grid gap-1.5">
+                    <ScrollArea className="h-72 px-3 pb-4" viewportClassName="pb-3" fixedWidth parentContentWidth>
+                        <div className="grid gap-1">
                             {SVGO_PRESET_DEFAULT_PLUGINS.map(
                                 (plugin) => (
-                                    <SvgoPluginCheckbox
+                                    <CheckboxSvgo
                                         key={plugin.id}
                                         plugin={plugin}
                                         checked={presetDefault[plugin.id]}
@@ -123,7 +123,7 @@ function SvgoOptionsPopover() {
     );
 }
 
-function SvgoPluginCheckbox({ plugin, checked, onCheckedChange }: { plugin: SvgoPresetDefaultPlugin; checked: boolean; onCheckedChange: (enabled: boolean) => void; }) {
+function CheckboxSvgo({ plugin, checked, onCheckedChange }: { plugin: SvgoPresetDefaultPlugin; checked: boolean; onCheckedChange: (enabled: boolean) => void; }) {
     return (
         <div className="grid grid-cols-[1fr_auto] items-start gap-2 rounded-sm px-1 py-1 hover:bg-accent/40">
             <label className="flex min-w-0 items-start gap-2 cursor-pointer">
