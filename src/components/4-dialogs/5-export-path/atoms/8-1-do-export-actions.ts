@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 import { appSettings } from "@/store/0-ui-settings";
-import { svgPathInputAtom } from "../../../store/0-atoms/1-1-svg-path-input";
-import { pathViewBoxAtom } from "../../../store/0-atoms/2-2-path-viewbox";
+import { svgPathInputAtom } from "../../../../store/0-atoms/1-1-svg-path-input";
+import { pathViewBoxAtom } from "../../../../store/0-atoms/2-2-path-viewbox";
 import { svgInputDocumentAtom } from "@/store/0-atoms/1-3-svg-input";
 import { buildExportSvgDocument } from "./a-2-build-svg";
 import { normalizeExportFileBaseName, saveTextFile } from "./a-3-export-utils";

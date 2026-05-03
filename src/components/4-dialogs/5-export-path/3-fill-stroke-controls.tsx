@@ -3,7 +3,7 @@ import { useSnapshot } from "valtio";
 import { Input } from "@/components/ui/shadcn/input";
 import { Switch } from "@/components/ui/shadcn/switch";
 import { appSettings } from "@/store/0-ui-settings";
-import { doRefreshExportSvgCodeAtom } from "./8-0-dialog-export-atoms";
+import { doRefreshExportSvgCodeAtom } from "./atoms/8-0-dialog-export-atoms";
 
 export function FillStrokeControls() {
     const { exportFill, exportFillColor, exportStroke, exportStrokeColor, exportStrokeWidth } = useSnapshot(appSettings.export);
