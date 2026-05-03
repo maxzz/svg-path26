@@ -5,7 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/shadcn/button";
 import { Textarea } from "@/components/ui/shadcn/textarea";
 import { appSettings } from "@/store/0-ui-settings";
-import { doCopyDisplayedExportSvgCodeAtom, exportSvgCodeAccordionValueAtom, exportSvgCodeCopiedAtom, optimizedExportSvgCodeAtom, optimizedExportSvgErrorAtom, rawExportSvgCodeAtom } from "./atoms/8-0-dialog-export-atoms";
+import { doCopyDisplayedExportSvgCodeAtom, exportSvgCodeAccordionValueAtom, exportSvgCodeCopiedAtom, optimizedExportSvgCodeAtom, optimizedExportSvgErrorAtom, rawExportSvgCodeAtom } from "./atoms/8-0-all";
 
 export function RawSvgPreviewAccordion() {
     const [accordionValue, setAccordionValue] = useAtom(exportSvgCodeAccordionValueAtom);

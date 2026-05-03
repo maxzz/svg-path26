@@ -7,7 +7,7 @@ import { buildExportSvgDocument } from "./a-2-build-svg";
 import { normalizeExportFileBaseName, saveTextFile } from "./a-3-export-utils";
 import { generateReactComponentFromTemplate } from "./8-8-1-react-export-template";
 import { generateReactComponentWithMarkupParser } from "./8-8-2-react-export-markup";
-import { displayedExportSvgCodeAtom, exportDialogBusyAtom, exportReactComponentErrorAtom, exportReactComponentNoticeAtom, viewBoxDraftAtom } from "./8-0-dialog-export-atoms";
+import { displayedExportSvgCodeAtom, exportDialogBusyAtom, exportReactComponentErrorAtom, exportReactComponentNoticeAtom, viewBoxDraftAtom } from "./8-0-all";
 import { type GenerateReactComponentOptions, type ReactComponentGenerationResult } from "./a-1-prepare-react-export-common";
 
 export const doExportFileAtom = atom(

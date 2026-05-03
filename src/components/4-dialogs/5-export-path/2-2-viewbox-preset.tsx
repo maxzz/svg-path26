@@ -4,7 +4,7 @@ import { useSnapshot } from "valtio";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/shadcn/select";
 import { svgPathInputAtom } from "@/store/0-atoms/1-1-svg-path-input";
 import { type ViewBoxStr } from "@/store/9-ui-settings-types-and-defaults";
-import { doSetExportViewBoxDraftAtom, viewBoxCustomValueStrDraftAtom, viewBoxDraftAtom, viewBoxStrDraftAtom } from "@/components/4-dialogs/5-export-path/atoms/8-0-dialog-export-atoms";
+import { doSetExportViewBoxDraftAtom, viewBoxCustomValueStrDraftAtom, viewBoxDraftAtom, viewBoxStrDraftAtom } from "@/components/4-dialogs/5-export-path/atoms/8-0-all";
 import { pathViewBoxAtom } from "@/store/0-atoms/2-2-path-viewbox";
 import { computeExportViewBox } from "@/components/2-editor/2-props/4-section-path-commands/8-svg-utils";
 import { appSettings } from "@/store/0-ui-settings";

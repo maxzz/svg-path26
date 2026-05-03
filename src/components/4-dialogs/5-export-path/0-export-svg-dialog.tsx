@@ -2,7 +2,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { appSettings } from "@/store/0-ui-settings";
 import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
-import { exportDialogBusyAtom, exportSvgDialogOpenAtom, viewBoxDraftAtom, viewBoxStrDraftAtom } from "@/components/4-dialogs/5-export-path/atoms/8-0-dialog-export-atoms";
+import { exportDialogBusyAtom, exportSvgDialogOpenAtom, viewBoxDraftAtom, viewBoxStrDraftAtom } from "@/components/4-dialogs/5-export-path/atoms/8-0-all";
 import { doExportFileAtom } from "@/components/4-dialogs/5-export-path/atoms/8-1-do-export-actions";
 import { viewBoxToString } from "@/store/8-utils/1-viewbox-utils";
 import { SvgPreview } from "./1-svg-preview";

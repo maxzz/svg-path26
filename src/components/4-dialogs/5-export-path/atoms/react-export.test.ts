@@ -7,7 +7,7 @@ import { buildExportSvgDocument } from "./a-2-build-svg";
 import { prepareReactExport } from "./a-1-prepare-react-export-common";
 import { generateReactComponentFromTemplate } from "./8-8-1-react-export-template";
 import { generateReactComponentWithMarkupParser } from "./8-8-2-react-export-markup";
-import { doSetExportAsReactComponentAtom, doSetReactComponentGeneratorAtom } from "./8-0-dialog-export-atoms";
+import { doSetExportAsReactComponentAtom, doSetReactComponentGeneratorAtom } from "./8-0-all";
 
 describe("react export helpers", () => {
     beforeEach(() => {

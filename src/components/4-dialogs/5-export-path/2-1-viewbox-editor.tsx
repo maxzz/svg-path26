@@ -1,7 +1,7 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { cn } from "@/utils";
 import { Input } from "@/components/ui/shadcn/input";
-import { doSetExportViewBoxDraftAtom, viewBoxCustomValueStrDraftAtom, viewBoxDraftAtom, viewBoxStrDraftAtom } from "./atoms/8-0-dialog-export-atoms";
+import { doSetExportViewBoxDraftAtom, viewBoxCustomValueStrDraftAtom, viewBoxDraftAtom, viewBoxStrDraftAtom } from "./atoms/8-0-all";
 import { ViewBoxPresetSelect, toCustomPresetId } from "./2-2-viewbox-preset";
 
 export function ViewBoxEditor() {
