@@ -13,8 +13,10 @@ import { classNames } from "@/utils";
 export function OpenPathDialog() {
     const { storedPaths } = useSnapshot(appSettings.pathEditor);
     const [open, setOpen] = useAtom(openPathDialogOpenAtom);
+
     const doOpenNamedPath = useSetAtom(doOpenNamedPathAtom);
     const doDeleteNamedPath = useSetAtom(doDeleteNamedPathAtom);
+
     const [selectedName, setSelectedName] = useState<string | null>(null);
 
     const sortedStored = useMemo(
@@ -23,15 +25,13 @@ export function OpenPathDialog() {
 
     const selectedEntry = useMemo(
         () => sortedStored.find((entry) => entry.name === selectedName) ?? null,
-        [selectedName, sortedStored],
-    );
+        [selectedName, sortedStored]);
 
     useEffect(
         () => {
             if (open) setSelectedName(null);
         },
-        [open],
-    );
+        [open]);
 
     useEffect(
         () => {
@@ -40,12 +40,17 @@ export function OpenPathDialog() {
                 setSelectedName(null);
             }
         },
-        [selectedName, storedPaths],
-    );
+        [selectedName, storedPaths]);
 
     function handleOpenClick() {
         if (!selectedEntry) return;
         doOpenNamedPath(selectedEntry.name);
+        setOpen(false);
+    }
+
+    function handleOpenEntry(name: string) {
+        setSelectedName(name);
+        doOpenNamedPath(name);
         setOpen(false);
     }
 
@@ -74,6 +79,7 @@ export function OpenPathDialog() {
                                     entry={entry}
                                     selected={entry.name === selectedName}
                                     onSelect={() => setSelectedName(entry.name)}
+                                    onOpen={() => handleOpenEntry(entry.name)}
                                     onDelete={() => doDeleteNamedPath(entry.name)}
                                 />
                             )
@@ -99,7 +105,19 @@ type StoredPathEntry = {
     updatedAt: number;
 };
 
-function Row({ entry, selected, onSelect, onDelete }: { entry: StoredPathEntry; selected: boolean; onSelect: () => void; onDelete: () => void; }) {
+function Row({
+    entry,
+    selected,
+    onSelect,
+    onOpen,
+    onDelete,
+}: {
+    entry: StoredPathEntry;
+    selected: boolean;
+    onSelect: () => void;
+    onOpen: () => void;
+    onDelete: () => void;
+}) {
     return (
         <div
             className={classNames(
@@ -111,6 +129,7 @@ function Row({ entry, selected, onSelect, onDelete }: { entry: StoredPathEntry; 
             role="button"
             tabIndex={0}
             onClick={onSelect}
+            onDoubleClick={onOpen}
             onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
@@ -136,6 +155,9 @@ function Row({ entry, selected, onSelect, onDelete }: { entry: StoredPathEntry; 
                     onClick={(event) => {
                         event.stopPropagation();
                         onDelete();
+                    }}
+                    onDoubleClick={(event) => {
+                        event.stopPropagation();
                     }}
                     aria-label="Delete"
                     title="Delete"
