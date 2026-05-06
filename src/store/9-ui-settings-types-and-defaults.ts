@@ -2,7 +2,7 @@ import { type ViewBox } from "@/svg-core/9-types-svg-model";
 import { type ThemeMode } from "@/utils";
 import { SVGO_PRESET_DEFAULT_PLUGIN_NAMES, type SvgoPresetDefaultPluginOptions } from "./2-svgo-presets";
 
-export interface StoredPathSetting {
+export interface StoredPathEntry {
     name: string;
     path: string;
     viewBox: ViewBox;
@@ -23,7 +23,7 @@ export interface PathEditorSettings {
     viewBox: ViewBox;                     // Stored canvas viewBox
     pathName: string;                     // Path name
     rawPath: string;                      // Raw path
-    storedPaths: StoredPathSetting[];     // Stored paths
+    storedPaths: StoredPathEntry[];       // Stored paths
 }
 
 export interface CanvasSettings {

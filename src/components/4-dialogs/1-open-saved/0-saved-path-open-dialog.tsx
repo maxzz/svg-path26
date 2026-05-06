@@ -9,6 +9,7 @@ import { openPathDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
 import { PathPreview } from "@/components/ui/local-ui/8-path-preview";
 import { IconTrash } from "@/components/ui/icons/normal";
 import { classNames } from "@/utils";
+import type { StoredPathEntry } from "@/store/9-ui-settings-types-and-defaults";
 
 export function OpenPathDialog() {
     const { storedPaths } = useSnapshot(appSettings.pathEditor);
@@ -19,7 +20,7 @@ export function OpenPathDialog() {
 
     const [selectedName, setSelectedName] = useState<string | null>(null);
 
-    const sortedStored = useMemo(
+    const sortedStored = useMemo<StoredPathEntry[]>(
         () => [...storedPaths].sort((a, b) => b.updatedAt - a.updatedAt),
         [storedPaths]);
 
@@ -98,12 +99,6 @@ export function OpenPathDialog() {
         </Dialog>
     );
 }
-
-type StoredPathEntry = {
-    name: string;
-    path: string;
-    updatedAt: number;
-};
 
 function Row({
     entry,
