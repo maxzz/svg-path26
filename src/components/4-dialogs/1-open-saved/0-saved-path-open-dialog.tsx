@@ -11,19 +11,8 @@ import { IconTrash } from "@/components/ui/icons/normal";
 import { classNames } from "@/utils";
 import type { StoredPathEntry } from "@/store/9-ui-settings-types-and-defaults";
 
-const openPathSelectedNameAtom = atom<string | null>(null);
-
 export function OpenPathDialog() {
     const [open, setOpen] = useAtom(openPathDialogOpenAtom);
-    const doOpenNamedPath = useSetAtom(doOpenNamedPathAtom);
-    const selectedName = useAtomValue(openPathSelectedNameAtom);
-
-    function handleOpenClick() {
-        if (!selectedName) return;
-        doOpenNamedPath(selectedName);
-        setOpen(false);
-    }
-
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="w-auto! min-w-80! max-w-xl!">
@@ -42,21 +31,40 @@ export function OpenPathDialog() {
                     <Button variant="outline" onClick={() => setOpen(false)}>
                         Cancel
                     </Button>
-                    <Button disabled={!selectedName} onClick={handleOpenClick}>
-                        Open
-                    </Button>
+                    <ButtonOk />
                 </DialogFooter>
             </DialogContent>
         </Dialog>
     );
 }
 
+const openPathSelectedNameAtom = atom<string | null>(null);
+
+function ButtonOk() {
+    const selectedName = useAtomValue(openPathSelectedNameAtom);
+    const setOpen = useSetAtom(openPathDialogOpenAtom);
+    const doOpenNamedPath = useSetAtom(doOpenNamedPathAtom);
+    return (
+        <Button
+            disabled={!selectedName}
+            onClick={() => {
+                if (!selectedName) return;
+                doOpenNamedPath(selectedName);
+                setOpen(false);
+            }}
+        >
+            Open
+        </Button>
+    );
+}
+
 function ListView() {
-    const { storedPaths } = useSnapshot(appSettings.pathEditor);
     const [open, setOpen] = useAtom(openPathDialogOpenAtom);
+    const [selectedName, setSelectedName] = useAtom(openPathSelectedNameAtom);
+
+    const { storedPaths } = useSnapshot(appSettings.pathEditor);
     const doOpenNamedPath = useSetAtom(doOpenNamedPathAtom);
     const doDeleteNamedPath = useSetAtom(doDeleteNamedPathAtom);
-    const [selectedName, setSelectedName] = useAtom(openPathSelectedNameAtom);
 
     const sortedStored = useMemo<StoredPathEntry[]>(
         () => [...storedPaths].sort((a, b) => b.updatedAt - a.updatedAt),
