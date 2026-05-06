@@ -100,26 +100,14 @@ export function OpenPathDialog() {
     );
 }
 
-function Row({
-    entry,
-    selected,
-    onSelect,
-    onOpen,
-    onDelete,
-}: {
-    entry: StoredPathEntry;
-    selected: boolean;
-    onSelect: () => void;
-    onOpen: () => void;
-    onDelete: () => void;
-}) {
+function Row({ entry, selected, onSelect, onOpen, onDelete }: { entry: StoredPathEntry; selected: boolean; onSelect: () => void; onOpen: () => void; onDelete: () => void; }) {
     return (
         <div
             className={classNames(
-                "px-2 py-1.5 w-full rounded border flex items-center gap-3 transition-colors duration-100 cursor-pointer",
+                "px-2 w-full rounded border bg-list-item-background transition-colors duration-100 cursor-pointer select-none flex items-center gap-3",
                 selected
-                    ? "text-slate-950 bg-blue-300 border-transparent"
-                    : "bg-background hover:bg-accent/60",
+                    ? "text-list-item-selected-foreground bg-list-item-selected border-transparent"
+                    : "hover:bg-list-item-hover",
             )}
             role="button"
             tabIndex={0}
@@ -133,7 +121,7 @@ function Row({
             }}
             aria-pressed={selected}
         >
-            <PathPreview path={entry.path} className={classNames("h-10 w-16 rounded bg-muted/20", selected && "bg-white/50")} />
+            <PathPreview path={entry.path} className={classNames("h-10 w-16 rounded bg-list-item-background", selected && "bg-list-item-selected")} />
 
             <div className="min-w-0 flex-1">
                 <p className="truncate text-xs font-medium">{entry.name}</p>
