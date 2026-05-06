@@ -1,4 +1,4 @@
-import { useEffect, useMemo, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, type KeyboardEvent, type Ref } from "react";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { Button } from "@/components/ui/shadcn/button";
@@ -82,6 +82,15 @@ function ListView() {
         },
         [open]);
 
+    const rowRefs = useRef(new Map<string, HTMLDivElement | null>());
+
+    const getRowRef = useCallback(
+        (name: string) => (node: HTMLDivElement | null) => {
+            rowRefs.current.set(name, node);
+        },
+        [],
+    );
+
     useEffect(
         () => {
             if (!selectedName) return;
@@ -90,6 +99,14 @@ function ListView() {
             }
         },
         [selectedName, storedPaths]);
+
+    useEffect(
+        () => {
+            if (!selectedName) return;
+            rowRefs.current.get(selectedName)?.scrollIntoView({ block: "nearest" });
+        },
+        [selectedName],
+    );
 
     function handleOpenEntry(name: string) {
         setSelectedName(name);
@@ -148,6 +165,7 @@ function ListView() {
                                 onSelect={() => setSelectedName(entry.name)}
                                 onOpen={() => handleOpenEntry(entry.name)}
                                 onDelete={() => doDeleteNamedPath(entry.name)}
+                                rowRef={getRowRef(entry.name)}
                             />
                         )
                     )}
@@ -156,7 +174,21 @@ function ListView() {
     );
 }
 
-function Row({ entry, selected, onSelect, onOpen, onDelete }: { entry: StoredPathEntry; selected: boolean; onSelect: () => void; onOpen: () => void; onDelete: () => void; }) {
+function Row({
+    entry,
+    selected,
+    onSelect,
+    onOpen,
+    onDelete,
+    rowRef,
+}: {
+    entry: StoredPathEntry;
+    selected: boolean;
+    onSelect: () => void;
+    onOpen: () => void;
+    onDelete: () => void;
+    rowRef?: Ref<HTMLDivElement>;
+}) {
     return (
         <div
             className={classNames(
@@ -167,6 +199,7 @@ function Row({ entry, selected, onSelect, onOpen, onDelete }: { entry: StoredPat
             )}
             role="button"
             tabIndex={0}
+            ref={rowRef}
             onClick={onSelect}
             onDoubleClick={onOpen}
             onKeyDown={(event) => {
