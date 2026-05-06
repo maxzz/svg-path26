@@ -3,6 +3,7 @@ import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
+import { ScrollArea } from "@/components/ui/shadcn/scroll-area";
 import { appSettings } from "@/store/0-ui-settings";
 import { doDeleteNamedPathAtom, doOpenNamedPathAtom } from "@/store/0-atoms/2-6-stored-paths-actions";
 import { openPathDialogOpenAtom } from "@/store/0-atoms/4-0-dialogs-atoms";
@@ -92,25 +93,27 @@ function ListView() {
     }
 
     return (
-        <div className="max-h-96 space-y-px overflow-auto">
-            {!sortedStored.length
-                ? (
-                    <p className="text-xs text-muted-foreground">
-                        No saved paths yet.
-                    </p>
-                ) : sortedStored.map(
-                    (entry) => (
-                        <Row
-                            key={entry.name}
-                            entry={entry}
-                            selected={entry.name === selectedName}
-                            onSelect={() => setSelectedName(entry.name)}
-                            onOpen={() => handleOpenEntry(entry.name)}
-                            onDelete={() => doDeleteNamedPath(entry.name)}
-                        />
-                    )
-                )}
-        </div>
+        <ScrollArea className="max-h-96 rounded-md border" fixedWidth parentContentWidth>
+            <div className="p-1 space-y-px">
+                {!sortedStored.length
+                    ? (
+                        <p className="px-1 py-2 text-xs text-muted-foreground">
+                            No saved paths yet.
+                        </p>
+                    ) : sortedStored.map(
+                        (entry) => (
+                            <Row
+                                key={entry.name}
+                                entry={entry}
+                                selected={entry.name === selectedName}
+                                onSelect={() => setSelectedName(entry.name)}
+                                onOpen={() => handleOpenEntry(entry.name)}
+                                onDelete={() => doDeleteNamedPath(entry.name)}
+                            />
+                        )
+                    )}
+            </div>
+        </ScrollArea>
     );
 }
 
