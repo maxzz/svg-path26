@@ -67,6 +67,8 @@ function ListView() {
     const doOpenNamedPath = useSetAtom(doOpenNamedPathAtom);
     const doDeleteNamedPath = useSetAtom(doDeleteNamedPathAtom);
 
+    // Initial state
+
     const sortedStored = useMemo<StoredPathEntry[]>(
         () => [...storedPaths].sort((a, b) => b.updatedAt - a.updatedAt),
         [storedPaths]);
@@ -82,14 +84,17 @@ function ListView() {
         },
         [open]);
 
+    // Refs
+
     const rowRefs = useRef(new Map<string, HTMLDivElement | null>());
 
     const getRowRef = useCallback(
         (name: string) => (node: HTMLDivElement | null) => {
             rowRefs.current.set(name, node);
         },
-        [],
-    );
+        []);
+
+    // Select and scroll to selected item
 
     useEffect(
         () => {
@@ -108,11 +113,7 @@ function ListView() {
         [selectedName],
     );
 
-    function handleOpenEntry(name: string) {
-        setSelectedName(name);
-        doOpenNamedPath(name);
-        setOpen(false);
-    }
+    // Set selected index, keyboard handling, and close dialog
 
     function selectIndex(index: number) {
         const clampedIndex = Math.max(0, Math.min(sortedStored.length - 1, index));
@@ -148,6 +149,12 @@ function ListView() {
         }
     }
 
+    function handleOpenEntry(name: string) {
+        setSelectedName(name);
+        doOpenNamedPath(name);
+        setOpen(false);
+    }
+
     return (
         <ScrollArea className="max-h-96 rounded-md border" fixedWidth parentContentWidth>
             <div className="p-1 space-y-px" tabIndex={0} onKeyDown={handleListKeyDown}>
@@ -156,7 +163,8 @@ function ListView() {
                         <p className="px-1 py-2 text-xs text-muted-foreground">
                             No saved paths yet.
                         </p>
-                    ) : sortedStored.map(
+                    )
+                    : sortedStored.map(
                         (entry) => (
                             <Row
                                 key={entry.name}
@@ -174,32 +182,16 @@ function ListView() {
     );
 }
 
-function Row({
-    entry,
-    selected,
-    onSelect,
-    onOpen,
-    onDelete,
-    rowRef,
-}: {
-    entry: StoredPathEntry;
-    selected: boolean;
-    onSelect: () => void;
-    onOpen: () => void;
-    onDelete: () => void;
-    rowRef?: Ref<HTMLDivElement>;
-}) {
+function Row({ entry, selected, onSelect, onOpen, onDelete, rowRef }: { entry: StoredPathEntry; selected: boolean; onSelect: () => void; onOpen: () => void; onDelete: () => void; rowRef?: Ref<HTMLDivElement>; }) {
     return (
         <div
+            ref={rowRef}
             className={classNames(
                 "px-2 w-full rounded border bg-list-item-background transition-colors duration-100 cursor-pointer select-none flex items-center gap-3",
                 selected
                     ? "text-list-item-selected-foreground bg-list-item-selected border-transparent"
                     : "hover:bg-list-item-hover",
             )}
-            role="button"
-            tabIndex={0}
-            ref={rowRef}
             onClick={onSelect}
             onDoubleClick={onOpen}
             onKeyDown={(event) => {
@@ -208,6 +200,8 @@ function Row({
                     onSelect();
                 }
             }}
+            role="button"
+            tabIndex={0}
             aria-pressed={selected}
         >
             <PathPreview path={entry.path} className={classNames("size-10 rounded bg-list-item-background", selected && "bg-list-item-selected")} />
