@@ -108,7 +108,9 @@ function ListView() {
     useEffect(
         () => {
             if (!selectedName) return;
-            rowRefs.current.get(selectedName)?.scrollIntoView({ block: "nearest" });
+            const row = rowRefs.current.get(selectedName);
+            row?.scrollIntoView({ block: "nearest" });
+            row?.focus({ preventScroll: true });
         },
         [selectedName],
     );
@@ -195,7 +197,11 @@ function Row({ entry, selected, onSelect, onOpen, onDelete, rowRef }: { entry: S
             onClick={onSelect}
             onDoubleClick={onOpen}
             onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    onOpen();
+                }
+                if (event.key === " ") {
                     event.preventDefault();
                     onSelect();
                 }
