@@ -156,8 +156,8 @@ function ListView() {
     }
 
     return (
-        <ScrollArea className="max-h-96 rounded-md border" fixedWidth parentContentWidth>
-            <div className="p-1 space-y-px" tabIndex={0} onKeyDown={handleListKeyDown}>
+        <ScrollArea className="max-h-96 rounded border" fixedWidth parentContentWidth>
+            <div className="bg-list-item-background" tabIndex={0} onKeyDown={handleListKeyDown}>
                 {!sortedStored.length
                     ? (
                         <p className="px-1 py-2 text-xs text-muted-foreground">
@@ -187,7 +187,7 @@ function Row({ entry, selected, onSelect, onOpen, onDelete, rowRef }: { entry: S
         <div
             ref={rowRef}
             className={classNames(
-                "px-2 w-full rounded border bg-list-item-background transition-colors duration-100 cursor-pointer select-none flex items-center gap-3",
+                "px-2 w-full bg-list-item-background cursor-pointer select-none flex items-center gap-3",
                 selected
                     ? "text-list-item-selected-foreground bg-list-item-selected border-transparent"
                     : "hover:bg-list-item-hover",
