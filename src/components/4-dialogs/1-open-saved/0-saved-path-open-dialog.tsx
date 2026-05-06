@@ -187,7 +187,7 @@ function Row({ entry, selected, onSelect, onOpen, onDelete, rowRef }: { entry: S
         <div
             ref={rowRef}
             className={classNames(
-                "px-2 w-full bg-list-item-background cursor-pointer select-none flex items-center gap-3",
+                "group px-2 w-full bg-list-item-background cursor-pointer select-none flex items-center gap-3",
                 selected
                     ? "text-list-item-selected-foreground bg-list-item-selected border-transparent"
                     : "hover:bg-list-item-hover",
@@ -204,7 +204,7 @@ function Row({ entry, selected, onSelect, onOpen, onDelete, rowRef }: { entry: S
             tabIndex={0}
             aria-pressed={selected}
         >
-            <PathPreview path={entry.path} className={classNames("size-10 rounded bg-list-item-background", selected && "bg-list-item-selected")} />
+            <PathPreview path={entry.path} className={classNames("size-10 rounded bg-list-item-background group-hover:bg-list-item-hover group-focus:bg-list-item-selected", selected && "bg-list-item-selected")} />
 
             <div className="min-w-0 flex-1">
                 <p className="truncate text-xs font-medium">{entry.name}</p>
