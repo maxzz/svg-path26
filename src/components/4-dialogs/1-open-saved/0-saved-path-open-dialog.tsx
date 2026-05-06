@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { useAtom, useSetAtom } from "jotai";
+import { useEffect, useMemo } from "react";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { Button } from "@/components/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/shadcn/dialog";
@@ -11,22 +11,56 @@ import { IconTrash } from "@/components/ui/icons/normal";
 import { classNames } from "@/utils";
 import type { StoredPathEntry } from "@/store/9-ui-settings-types-and-defaults";
 
+const openPathSelectedNameAtom = atom<string | null>(null);
+
 export function OpenPathDialog() {
+    const [open, setOpen] = useAtom(openPathDialogOpenAtom);
+    const doOpenNamedPath = useSetAtom(doOpenNamedPathAtom);
+    const selectedName = useAtomValue(openPathSelectedNameAtom);
+
+    function handleOpenClick() {
+        if (!selectedName) return;
+        doOpenNamedPath(selectedName);
+        setOpen(false);
+    }
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogContent className="w-auto! min-w-80! max-w-xl!">
+                <DialogHeader>
+                    <DialogTitle>
+                        Open saved path
+                    </DialogTitle>
+                    <DialogDescription>
+                        Choose a path from browser storage.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <ListView />
+
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => setOpen(false)}>
+                        Cancel
+                    </Button>
+                    <Button disabled={!selectedName} onClick={handleOpenClick}>
+                        Open
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+function ListView() {
     const { storedPaths } = useSnapshot(appSettings.pathEditor);
     const [open, setOpen] = useAtom(openPathDialogOpenAtom);
-
     const doOpenNamedPath = useSetAtom(doOpenNamedPathAtom);
     const doDeleteNamedPath = useSetAtom(doDeleteNamedPathAtom);
-
-    const [selectedName, setSelectedName] = useState<string | null>(null);
+    const [selectedName, setSelectedName] = useAtom(openPathSelectedNameAtom);
 
     const sortedStored = useMemo<StoredPathEntry[]>(
         () => [...storedPaths].sort((a, b) => b.updatedAt - a.updatedAt),
         [storedPaths]);
-
-    const selectedEntry = useMemo(
-        () => sortedStored.find((entry) => entry.name === selectedName) ?? null,
-        [selectedName, sortedStored]);
 
     useEffect(
         () => {
@@ -43,12 +77,6 @@ export function OpenPathDialog() {
         },
         [selectedName, storedPaths]);
 
-    function handleOpenClick() {
-        if (!selectedEntry) return;
-        doOpenNamedPath(selectedEntry.name);
-        setOpen(false);
-    }
-
     function handleOpenEntry(name: string) {
         setSelectedName(name);
         doOpenNamedPath(name);
@@ -56,47 +84,25 @@ export function OpenPathDialog() {
     }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="w-auto! min-w-80! max-w-xl!">
-                <DialogHeader>
-                    <DialogTitle>
-                        Open saved path
-                    </DialogTitle>
-                    <DialogDescription>
-                        Choose a path from browser storage.
-                    </DialogDescription>
-                </DialogHeader>
-
-                <div className="max-h-96 space-y-px overflow-auto">
-                    {!sortedStored.length
-                        ? (
-                            <p className="text-xs text-muted-foreground">
-                                No saved paths yet.
-                            </p>
-                        ) : sortedStored.map(
-                            (entry) => (
-                                <Row
-                                    key={entry.name}
-                                    entry={entry}
-                                    selected={entry.name === selectedName}
-                                    onSelect={() => setSelectedName(entry.name)}
-                                    onOpen={() => handleOpenEntry(entry.name)}
-                                    onDelete={() => doDeleteNamedPath(entry.name)}
-                                />
-                            )
-                        )}
-                </div>
-
-                <DialogFooter>
-                    <Button variant="outline" onClick={() => setOpen(false)}>
-                        Cancel
-                    </Button>
-                    <Button disabled={!selectedEntry} onClick={handleOpenClick}>
-                        Open
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+        <div className="max-h-96 space-y-px overflow-auto">
+            {!sortedStored.length
+                ? (
+                    <p className="text-xs text-muted-foreground">
+                        No saved paths yet.
+                    </p>
+                ) : sortedStored.map(
+                    (entry) => (
+                        <Row
+                            key={entry.name}
+                            entry={entry}
+                            selected={entry.name === selectedName}
+                            onSelect={() => setSelectedName(entry.name)}
+                            onOpen={() => handleOpenEntry(entry.name)}
+                            onDelete={() => doDeleteNamedPath(entry.name)}
+                        />
+                    )
+                )}
+        </div>
     );
 }
 
