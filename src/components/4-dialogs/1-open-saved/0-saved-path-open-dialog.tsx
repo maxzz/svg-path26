@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, type KeyboardEvent } from "react";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { Button } from "@/components/ui/shadcn/button";
@@ -71,6 +71,11 @@ function ListView() {
         () => [...storedPaths].sort((a, b) => b.updatedAt - a.updatedAt),
         [storedPaths]);
 
+    const selectedIndex = useMemo(
+        () => sortedStored.findIndex((entry) => entry.name === selectedName),
+        [sortedStored, selectedName],
+    );
+
     useEffect(
         () => {
             if (open) setSelectedName(null);
@@ -92,9 +97,43 @@ function ListView() {
         setOpen(false);
     }
 
+    function selectIndex(index: number) {
+        const clampedIndex = Math.max(0, Math.min(sortedStored.length - 1, index));
+        const entry = sortedStored[clampedIndex];
+        if (entry) setSelectedName(entry.name);
+    }
+
+    function handleListKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+        if (!sortedStored.length) return;
+        switch (event.key) {
+            case "ArrowDown": {
+                event.preventDefault();
+                selectIndex(selectedIndex === -1 ? 0 : selectedIndex + 1);
+                break;
+            }
+            case "ArrowUp": {
+                event.preventDefault();
+                selectIndex(selectedIndex === -1 ? sortedStored.length - 1 : selectedIndex - 1);
+                break;
+            }
+            case "Home": {
+                event.preventDefault();
+                selectIndex(0);
+                break;
+            }
+            case "End": {
+                event.preventDefault();
+                selectIndex(sortedStored.length - 1);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
     return (
         <ScrollArea className="max-h-96 rounded-md border" fixedWidth parentContentWidth>
-            <div className="p-1 space-y-px">
+            <div className="p-1 space-y-px" tabIndex={0} onKeyDown={handleListKeyDown}>
                 {!sortedStored.length
                     ? (
                         <p className="px-1 py-2 text-xs text-muted-foreground">
