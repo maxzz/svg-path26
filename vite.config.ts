@@ -24,6 +24,7 @@ export default defineConfig({
                 },
             },
         },
+        // minify: false,
     },
     server: {
         port: 3000,

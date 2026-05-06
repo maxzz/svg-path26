@@ -62,3 +62,5 @@ export function ExportSvgDialog() {
         </Dialog>
     );
 }
+
+//TODO: test on https://icones.js.org/collection/all?s=paste&icon=hugeicons:file-paste "Export SVG": it's showing wrong preview
