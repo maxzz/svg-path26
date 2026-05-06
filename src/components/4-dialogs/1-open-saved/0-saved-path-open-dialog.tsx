@@ -57,7 +57,7 @@ export function OpenPathDialog() {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="w-auto! max-w-xl!">
+            <DialogContent className="w-auto! min-w-80! max-w-xl!">
                 <DialogHeader>
                     <DialogTitle>
                         Open saved path
@@ -67,7 +67,7 @@ export function OpenPathDialog() {
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="max-h-96 space-y-2 overflow-auto">
+                <div className="max-h-96 space-y-px overflow-auto">
                     {!sortedStored.length
                         ? (
                             <p className="text-xs text-muted-foreground">
@@ -121,7 +121,7 @@ function Row({ entry, selected, onSelect, onOpen, onDelete }: { entry: StoredPat
             }}
             aria-pressed={selected}
         >
-            <PathPreview path={entry.path} className={classNames("h-10 w-16 rounded bg-list-item-background", selected && "bg-list-item-selected")} />
+            <PathPreview path={entry.path} className={classNames("size-10 rounded bg-list-item-background", selected && "bg-list-item-selected")} />
 
             <div className="min-w-0 flex-1">
                 <p className="truncate text-xs font-medium">{entry.name}</p>
@@ -144,6 +144,7 @@ function Row({ entry, selected, onSelect, onOpen, onDelete }: { entry: StoredPat
                     }}
                     aria-label="Delete"
                     title="Delete"
+                    tabIndex={-1}
                 >
                     <IconTrash className="size-3.5" aria-hidden="true" />
                 </Button>
