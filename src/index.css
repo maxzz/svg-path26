@@ -67,6 +67,15 @@
     --color-section-panel-background: var(--section-panel-background);
     --color-section-panel-foreground: var(--section-panel-foreground);
     --color-section-panel-active: var(--section-panel-active);
+
+    /* List items */
+    --color-list-item-background: var(--list-item-background);
+    --color-list-item-foreground: var(--list-item-foreground);
+    --color-list-item-active: var(--list-item-active);
+    --color-list-item-hover: var(--list-item-hover);
+    --color-list-item-selected: var(--list-item-selected);
+    --color-list-item-selected-foreground: var(--list-item-selected-foreground);
+    --color-list-item-selected-hover: var(--list-item-selected-hover);
 }
 
 :root {
@@ -107,6 +116,15 @@
     --section-panel-background: oklch(0.95 0.01 260.73);
     --section-panel-foreground: oklch(0.984 0.003 247.858);
     --section-panel-active: oklch(0.984 0.003 247.858);
+
+    /* List items */
+    --list-item-background: oklch(0.984 0.003 247.858);
+    --list-item-foreground: oklch(0.208 0.042 265.755);
+    --list-item-active: oklch(0.984 0.003 247.858);
+    --list-item-hover: oklch(0.984 0.003 247.858);
+    --list-item-selected: oklch(0.984 0.003 247.858);
+    --list-item-selected-foreground: oklch(0.208 0.042 265.755);
+    --list-item-selected-hover: oklch(0.984 0.003 247.858);
 }
 
 .dark {
@@ -146,6 +164,15 @@
     --section-panel-background: oklch(0.3 0.06 266.75);
     --section-panel-foreground: oklch(0.984 0.003 247.858);
     --section-panel-active: oklch(0.13 0 196.87);
+
+    /* List items */
+    --list-item-background: oklch(0.3 0.06 266.75);
+    --list-item-foreground: oklch(0.984 0.003 247.858);
+    --list-item-active: oklch(0.13 0 196.87);
+    --list-item-hover: oklch(0.3 0.06 266.75);
+    --list-item-selected: oklch(0.13 0 196.87);
+    --list-item-selected-foreground: oklch(0.984 0.003 247.858);
+    --list-item-selected-hover: oklch(0.13 0 196.87);
 }
 
 @layer base {
