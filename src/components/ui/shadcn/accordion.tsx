@@ -5,15 +5,13 @@ import * as AccordionPrimitive from "@radix-ui/react-accordion";
 
 const Accordion = AccordionPrimitive.Root;
 
-function AccordionItem({ className, ...rest }: React.ComponentProps<typeof AccordionPrimitive.Item>) {
+export function AccordionItem({ className, ...rest }: React.ComponentProps<typeof AccordionPrimitive.Item>) {
     return (
-        <AccordionPrimitive.Item
-            className={cn("border-b", className)}
-            {...rest} />
+        <AccordionPrimitive.Item className={cn("border-b", className)} {...rest} />
     );
 }
 
-function AccordionTrigger({ className, children, showIcon = true, ...rest }: React.ComponentProps<typeof AccordionPrimitive.Trigger> & { showIcon?: boolean; }) {
+export function AccordionTrigger({ className, children, showIcon = true, ...rest }: React.ComponentProps<typeof AccordionPrimitive.Trigger> & { showIcon?: boolean; }) {
     return (
         <AccordionPrimitive.Header className="flex">
             <AccordionPrimitive.Trigger
@@ -29,7 +27,7 @@ function AccordionTrigger({ className, children, showIcon = true, ...rest }: Rea
     );
 }
 
-function AccordionContent({ className, children, ...rest }: React.ComponentProps<typeof AccordionPrimitive.Content>) {
+export function AccordionContent({ className, children, ...rest }: React.ComponentProps<typeof AccordionPrimitive.Content>) {
     return (
         <AccordionPrimitive.Content
             className="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
@@ -39,5 +37,3 @@ function AccordionContent({ className, children, ...rest }: React.ComponentProps
         </AccordionPrimitive.Content>
     );
 }
-
-export { Accordion, AccordionItem, AccordionTrigger, AccordionContent };
