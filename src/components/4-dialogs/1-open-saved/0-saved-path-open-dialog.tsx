@@ -80,9 +80,15 @@ function ListView() {
 
     useEffect(
         () => {
-            if (open) setSelectedName(null);
+            if (!open) {
+                setSelectedName(null);
+                return;
+            }
+            if (selectedName) return;
+            setSelectedName(sortedStored[0]?.name ?? null);
         },
-        [open]);
+        [open, selectedName, sortedStored, setSelectedName],
+    );
 
     // Refs
 
